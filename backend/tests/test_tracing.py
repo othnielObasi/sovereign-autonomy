@@ -100,3 +100,53 @@ def test_run_loop_is_traced_end_to_end(traced, monkeypatch):
     assert "gate" in names and names.count("permit") >= 3
     assert mission.patched and mission.outputs["status"] in ("stopped", "completed")
     assert all(c.outputs.get("permit") == "used" for c in mission.children if c.name == "permit")
+
+
+# --- OpenTelemetry -------------------------------------------------------------------------------
+
+@pytest.fixture
+def otel(monkeypatch):
+    from opentelemetry.sdk.trace.export.in_memory_span_exporter import InMemorySpanExporter
+    monkeypatch.setattr(settings, "langsmith_api_key", None)    # OpenTelemetry on its own
+    exporter = InMemorySpanExporter()
+    tracing.configure_otel(exporter)
+    yield exporter
+    tracing.disable_otel()
+
+
+def test_otel_mission_spans_nest_under_the_mission(otel):
+    tracing.mission_start("run-o", "mis-o", "Deliver to B-03", {"x": 12.5, "y": 13.5})
+    with tracing.within_mission("run-o"):
+        tracing.llm_call(model="muse-spark-1.3", provider="meta", tier="reasoning", prompt="secret plan text",
+                         output="{}", with_image=True)
+    tracing.mission_event("run-o", "gate", inputs={"proposal": {"intent": "MOVE_TO"}}, outputs={"decision": "APPROVED"})
+    tracing.mission_event("run-o", "permit", outputs={"permit": "refused", "reason": "kill_switch_active"},
+                          error="kill_switch_active")
+    tracing.mission_end("run-o", "stopped")
+    spans = {s.name: s for s in otel.get_finished_spans()}
+    mission = spans["mission"]
+    assert mission.attributes["mission.status"] == "stopped" and mission.attributes["run.id"] == "run-o"
+    for name in ("model muse-spark-1.3", "gate", "permit"):
+        assert spans[name].parent.span_id == mission.context.span_id
+        assert spans[name].context.trace_id == mission.context.trace_id
+    model = spans["model muse-spark-1.3"]
+    assert model.attributes["gen_ai.request.model"] == "muse-spark-1.3" and model.attributes["model.camera_image_attached"]
+    assert "secret plan text" not in str(dict(model.attributes))      # prompts stay out of OpenTelemetry
+    assert spans["gate"].attributes["out.decision"] == "APPROVED"
+    assert not spans["permit"].status.is_ok
+
+
+def test_otel_standalone_events(otel):
+    tracing.event("kill_switch", {"scope": "global"}, {"stop_verified": True, "authority_revoked_ms": 3.2})
+    span = otel.get_finished_spans()[0]
+    assert span.name == "kill_switch" and span.parent is None and span.attributes["out.stop_verified"] is True
+
+
+def test_otel_run_loop_end_to_end(otel, monkeypatch):
+    from test_execution_authority import test_run_loop_sends_only_permitted_moves
+    test_run_loop_sends_only_permitted_moves(monkeypatch)
+    spans = otel.get_finished_spans()
+    mission = next(s for s in spans if s.name == "mission")
+    children = [s for s in spans if s.parent is not None and s.parent.span_id == mission.context.span_id]
+    names = [s.name for s in children]
+    assert "gate" in names and names.count("permit") >= 3

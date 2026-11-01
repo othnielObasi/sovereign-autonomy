@@ -22,6 +22,8 @@ dependencies = [
   "alembic>=1.13.0",
   "networkx>=3.0",
   "langsmith>=0.3,<1",
+  "opentelemetry-sdk>=1.25,<2",
+  "opentelemetry-exporter-otlp-proto-http>=1.25,<2",
 ]
 
 [project.optional-dependencies]
