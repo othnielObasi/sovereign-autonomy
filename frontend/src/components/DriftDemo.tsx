@@ -72,7 +72,7 @@ export function DriftDemo() {
 
   return (
     <Panel title="Test a plan for task drift"
-      subtitle="Mission: take the robot to dock B-03. Pick a plan, as if Nemotron had proposed it, and see what the task guard does. Nothing moves; nothing is recorded.">
+      subtitle="Mission: take the robot to dock B-03. Pick a plan, as if the planner had proposed it, and see what the task guard does. Nothing moves; nothing is recorded.">
       <div className="grid lg:grid-cols-5 gap-4">
         <div className="lg:col-span-2 space-y-3">
           <div className="grid grid-cols-2 gap-2">

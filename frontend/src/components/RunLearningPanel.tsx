@@ -82,7 +82,7 @@ export function RunLearningPanel({ runId, events, ended }: { runId: string; even
             {offered.map(([id, text]) => (
               <li key={id} className="text-xs leading-relaxed">
                 <Mono>L{id}</Mono>{" "}
-                {applied.has(id) && <Pill tone="nv" className="mr-1">used by Nemotron</Pill>}
+                {applied.has(id) && <Pill tone="nv" className="mr-1">used by the planner</Pill>}
                 <span className="text-mc-mute">{text}</span>
               </li>
             ))}

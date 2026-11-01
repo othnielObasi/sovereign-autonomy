@@ -168,6 +168,8 @@ async def _plan_and_start_loop(svc: RunService, run_id: str, mission_id: str, mi
                     db.commit()
                     logger.warning("Run %s: canary %s tripped by %s; plan discarded", run_id, hit["marker"],
                                    plan.get("model_used"))
+                    from app.observability import metrics
+                    metrics.inc("canary_tripped_total", model=str(plan.get("model_used")))
                     plan = {"waypoints": []}
 
                 if plan and plan.get("waypoints"):

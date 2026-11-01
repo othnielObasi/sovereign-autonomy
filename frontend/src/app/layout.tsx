@@ -9,7 +9,7 @@ const mono = JetBrains_Mono({ subsets: ["latin"], variable: "--font-mono", displ
 
 export const metadata = {
   title: "Sovereign Autonomy",
-  description: "Sovereign Autonomy — every robot move, proven safe before it happens. NVIDIA Nemotron proposes; a governance gate decides.",
+  description: "Sovereign Autonomy: Meta's models plan and perceive; nothing moves without a single-use permit for that exact move.",
 };
 
 function Logo() {
@@ -57,7 +57,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           <div className="max-w-[1600px] mx-auto px-4 sm:px-6 py-5 flex flex-col sm:flex-row gap-2 justify-between text-xs text-mc-dim">
             <span>Sovereign Autonomy · NOVTIA · MIT licensed</span>
             <span>
-              Planning by <span className="text-mc-nv">NVIDIA Nemotron</span> on Nebius Token Factory · hosted on Nebius AI Cloud
+              Planning by <span className="text-mc-accent">Muse Spark</span> · perception by <span className="text-mc-accent">SAM 3.1</span> · Meta Global AI Developer Hackathon
             </span>
           </div>
         </footer>

@@ -5,152 +5,225 @@
     "panels": [
       {
         "id": 1,
-        "title": "Governance Decisions",
+        "title": "Permits enforced",
         "type": "stat",
-        "gridPos": { "x": 0, "y": 0, "w": 6, "h": 4 },
+        "gridPos": {
+          "x": 0,
+          "y": 0,
+          "w": 4,
+          "h": 4
+        },
         "targets": [
           {
-            "expr": "sum(governance_decisions_total)"
+            "expr": "permits_enforced",
+            "refId": "A"
           }
         ]
       },
       {
         "id": 2,
-        "title": "Approval Rate",
-        "type": "gauge",
-        "gridPos": { "x": 6, "y": 0, "w": 6, "h": 4 },
+        "title": "Kill switches active",
+        "type": "stat",
+        "gridPos": {
+          "x": 4,
+          "y": 0,
+          "w": 4,
+          "h": 4
+        },
         "targets": [
           {
-            "expr": "sum(governance_decisions_total{approved=\"true\"}) / sum(governance_decisions_total) * 100"
+            "expr": "kill_switches_active",
+            "refId": "A"
           }
-        ],
-        "fieldConfig": {
-          "defaults": {
-            "unit": "percent",
-            "min": 0,
-            "max": 100,
-            "thresholds": {
-              "steps": [
-                { "value": 0, "color": "red" },
-                { "value": 70, "color": "yellow" },
-                { "value": 90, "color": "green" }
-              ]
-            }
-          }
-        }
+        ]
       },
       {
         "id": 3,
-        "title": "Average Risk Score",
-        "type": "gauge",
-        "gridPos": { "x": 12, "y": 0, "w": 6, "h": 4 },
+        "title": "Permits issued",
+        "type": "stat",
+        "gridPos": {
+          "x": 8,
+          "y": 0,
+          "w": 4,
+          "h": 4
+        },
         "targets": [
           {
-            "expr": "avg(governance_risk_score)"
+            "expr": "sum(permits_issued_total)",
+            "refId": "A"
           }
-        ],
-        "fieldConfig": {
-          "defaults": {
-            "min": 0,
-            "max": 1,
-            "thresholds": {
-              "steps": [
-                { "value": 0, "color": "green" },
-                { "value": 0.4, "color": "yellow" },
-                { "value": 0.7, "color": "red" }
-              ]
-            }
-          }
-        }
+        ]
       },
       {
         "id": 4,
-        "title": "Policy Violations",
+        "title": "Moves refused before a permit",
         "type": "stat",
-        "gridPos": { "x": 18, "y": 0, "w": 6, "h": 4 },
+        "gridPos": {
+          "x": 12,
+          "y": 0,
+          "w": 4,
+          "h": 4
+        },
         "targets": [
           {
-            "expr": "sum(policy_violations_total)"
+            "expr": "sum(permits_refused_total)",
+            "refId": "A"
           }
-        ],
-        "fieldConfig": {
-          "defaults": {
-            "color": { "mode": "thresholds" },
-            "thresholds": {
-              "steps": [
-                { "value": 0, "color": "green" },
-                { "value": 10, "color": "yellow" },
-                { "value": 50, "color": "red" }
-              ]
-            }
-          }
-        }
+        ]
       },
       {
         "id": 5,
-        "title": "Decisions Over Time",
-        "type": "timeseries",
-        "gridPos": { "x": 0, "y": 4, "w": 12, "h": 8 },
+        "title": "Last kill: revoke / verified stop (ms)",
+        "type": "stat",
+        "gridPos": {
+          "x": 16,
+          "y": 0,
+          "w": 8,
+          "h": 4
+        },
         "targets": [
           {
-            "expr": "rate(governance_decisions_total[5m])",
-            "legendFormat": "{{approved}}"
+            "expr": "max(kill_revoke_ms_last)",
+            "refId": "A"
+          },
+          {
+            "expr": "max(kill_stop_verified_ms_last)",
+            "refId": "B"
           }
         ]
       },
       {
         "id": 6,
-        "title": "Risk Score Distribution",
-        "type": "histogram",
-        "gridPos": { "x": 12, "y": 4, "w": 12, "h": 8 },
+        "title": "Gate decisions by verdict",
+        "type": "timeseries",
+        "gridPos": {
+          "x": 0,
+          "y": 4,
+          "w": 12,
+          "h": 8
+        },
         "targets": [
           {
-            "expr": "governance_risk_score"
+            "expr": "sum by (decision) (rate(governance_decisions_total[1m]))",
+            "refId": "A",
+            "legendFormat": "{{decision}}"
           }
         ]
       },
       {
         "id": 7,
-        "title": "Violations by Policy",
-        "type": "piechart",
-        "gridPos": { "x": 0, "y": 12, "w": 8, "h": 8 },
+        "title": "Permit refusals by reason",
+        "type": "timeseries",
+        "gridPos": {
+          "x": 12,
+          "y": 4,
+          "w": 12,
+          "h": 8
+        },
         "targets": [
           {
-            "expr": "sum by (policy_id) (policy_violations_total)"
+            "expr": "sum by (reason) (rate(permits_refused_total[1m]))",
+            "refId": "A",
+            "legendFormat": "{{reason}}"
           }
         ]
       },
       {
         "id": 8,
-        "title": "Active Robots",
-        "type": "stat",
-        "gridPos": { "x": 8, "y": 12, "w": 4, "h": 4 },
+        "title": "Dispatch outcomes",
+        "type": "timeseries",
+        "gridPos": {
+          "x": 0,
+          "y": 12,
+          "w": 12,
+          "h": 8
+        },
         "targets": [
           {
-            "expr": "count(up{job=\"robot\"})"
+            "expr": "sum by (outcome) (rate(dispatch_total[1m]))",
+            "refId": "A",
+            "legendFormat": "{{outcome}}"
           }
         ]
       },
       {
         "id": 9,
-        "title": "Policy Evaluation Latency",
+        "title": "Model calls and p50 latency",
         "type": "timeseries",
-        "gridPos": { "x": 12, "y": 12, "w": 12, "h": 8 },
+        "gridPos": {
+          "x": 12,
+          "y": 12,
+          "w": 12,
+          "h": 8
+        },
         "targets": [
           {
-            "expr": "histogram_quantile(0.99, governance_evaluation_duration_seconds_bucket)",
-            "legendFormat": "p99"
+            "expr": "sum by (model) (model_calls_total)",
+            "refId": "A",
+            "legendFormat": "{{model}}"
           },
           {
-            "expr": "histogram_quantile(0.50, governance_evaluation_duration_seconds_bucket)",
-            "legendFormat": "p50"
+            "expr": "max by (model) (model_latency_p50_ms)",
+            "refId": "B",
+            "legendFormat": "{{model}}"
           }
-        ],
-        "fieldConfig": {
-          "defaults": {
-            "unit": "s"
+        ]
+      },
+      {
+        "id": 10,
+        "title": "Learning memory",
+        "type": "stat",
+        "gridPos": {
+          "x": 0,
+          "y": 20,
+          "w": 8,
+          "h": 4
+        },
+        "targets": [
+          {
+            "expr": "learning_cells",
+            "refId": "A"
+          },
+          {
+            "expr": "learning_quarantined_records",
+            "refId": "B"
           }
-        }
+        ]
+      },
+      {
+        "id": 11,
+        "title": "Canary trips",
+        "type": "stat",
+        "gridPos": {
+          "x": 8,
+          "y": 20,
+          "w": 8,
+          "h": 4
+        },
+        "targets": [
+          {
+            "expr": "sum(canary_tripped_total)",
+            "refId": "A"
+          }
+        ]
+      },
+      {
+        "id": 12,
+        "title": "Kill switches by scope",
+        "type": "stat",
+        "gridPos": {
+          "x": 16,
+          "y": 20,
+          "w": 8,
+          "h": 4
+        },
+        "targets": [
+          {
+            "expr": "sum by (scope) (kill_switch_total)",
+            "refId": "A",
+            "legendFormat": "{{scope}}"
+          }
+        ]
       }
     ]
   }

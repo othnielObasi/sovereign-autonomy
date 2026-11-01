@@ -159,6 +159,8 @@ class GovernanceEngine:
         except Exception as e:  # signing must never block the safety decision itself
             logger.error("Receipt signing failed for run %s: %s", run_id, e)
         db.add(record)
+        from app.observability import metrics
+        metrics.inc("governance_decisions_total", decision=decision.decision, state=decision.policy_state)
 
         return decision
 

@@ -7,13 +7,14 @@ import { cx } from "@/components/ui";
 
 const API_BASE = process.env.NEXT_PUBLIC_API_BASE || "/api";
 
-// Five destinations. /demo (guided demo) is reached from the Overview page;
+// Six destinations. /demo (guided demo) is reached from the Overview page;
 // /compliance and /audit live under Evidence.
 const links = [
   { href: "/", label: "Overview", match: (p: string) => p === "/" || p.startsWith("/demo") },
   { href: "/missions", label: "Missions", match: (p: string) => p.startsWith("/missions") },
   { href: "/runs", label: "Runs", match: (p: string) => p.startsWith("/runs") },
   { href: "/policies", label: "Governance", match: (p: string) => p.startsWith("/policies") },
+  { href: "/authority", label: "Authority", match: (p: string) => p.startsWith("/authority") },
   { href: "/evidence", label: "Evidence", match: (p: string) => ["/evidence", "/compliance", "/audit"].some((x) => p.startsWith(x)) },
 ];
 
@@ -36,7 +37,7 @@ export function StatusPill() {
   }, []);
   const ok = !down && h?.status === "ok";
   const sim = h?.checks?.simulator === "ok";
-  const planner = h?.planner_provider === "nemotron" ? "Nemotron" : h?.planner_provider || "…";
+  const planner = h?.planner_provider === "muse" ? "Muse Spark" : h?.planner_provider === "nemotron" ? "Nemotron" : h?.planner_provider || "…";
   return (
     <div className={cx("hidden lg:flex items-center gap-2 rounded-full border px-3 py-1 text-xs",
       ok ? "border-mc-ok/30 bg-mc-ok/10 text-mc-ok" : "border-mc-stop/30 bg-mc-stop/10 text-mc-stop")}

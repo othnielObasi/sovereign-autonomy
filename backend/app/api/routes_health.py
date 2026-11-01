@@ -61,3 +61,11 @@ async def health():
     # Return 200 as long as the backend is alive — dependency failures
     # are reported in the payload but should NOT cause container restarts.
     return JSONResponse(status_code=200, content=payload)
+
+
+@router.get("/metrics", include_in_schema=False)
+def prometheus_metrics():
+    """Prometheus text format: gate decisions, permits, dispatch, kill switches, models."""
+    from fastapi.responses import PlainTextResponse
+    from app.observability import metrics
+    return PlainTextResponse(metrics.render(), media_type="text/plain; version=0.0.4")

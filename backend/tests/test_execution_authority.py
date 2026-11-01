@@ -454,3 +454,27 @@ def test_security_drills_all_pass_against_the_real_simulator(authority, sim, mon
     assert [r["drill"] for r in result["results"]] == names
     assert authority.kill_locks() == []          # the kill drill reset its own lock
     assert rl._memory.status()["quarantined"] == 0   # the planted record was removed
+
+
+# --- metrics ----------------------------------------------------------------------------------------
+
+def test_metrics_endpoint_counts_the_safety_path(authority, sim, monkeypatch):
+    import app.services.execution_authority as ea
+    from app.main import app
+    monkeypatch.setattr(ea, "_authority", authority)
+
+    async def go():
+        action, token = await _issue(authority, sim, {"x": 6.0, "y": 3.5, "max_speed": 0.3})
+        await authority.dispatch("run-1", action, token, sim)
+        await authority.kill("robot", "robot-1", reason="metrics", actor="op", sim=sim)
+        await _observe(authority, sim)
+        with pytest.raises(Rejected):
+            authority.authorize_or_count(run_id="r", mission_id="m", intent="MOVE_TO", params={"x": 6, "y": 3.5},
+                                         decision="APPROVED", policy_version="v")
+        await authority.reset("robot", "robot-1", actor="op", sim=sim)
+
+    run(go())
+    text = TestClient(app).get("/metrics").text
+    for needle in ("permits_issued_total", 'dispatch_total{outcome="accepted"}', 'kill_switch_total{scope="robot"}',
+                   'permits_refused_total{reason="kill_switch_active"}', "kill_revoke_ms_count", "permits_enforced 1"):
+        assert needle in text, needle

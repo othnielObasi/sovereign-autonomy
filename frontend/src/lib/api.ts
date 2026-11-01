@@ -491,7 +491,7 @@ export async function postBulletin(text: string, source = "noticeboard") {
   return r.json();
 }
 
-/* ── Vision: NVIDIA VLM reads the robot camera, cross-checked with sensors ── */
+/* ── Vision: SAM 3.1 reads the robot camera, cross-checked with sensors ──── */
 
 export async function getPerceptionStatus() {
   const r = await fetchWithRetry(`${API_BASE}/perception/status`, { cache: "no-store" });
@@ -528,5 +528,44 @@ export const getLearningSummary = () => getJson("/evidence/learning", "learning 
 export async function checkPlanForDrift(body: { start: { x: number; y: number }; goal: { x: number; y: number }; waypoints: Array<{ x: number; y: number }> }) {
   const r = await fetch(`${API_BASE}/plans/check`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) });
   if (!r.ok) throw new Error(await parseErrorResponse(r, "Plan check failed"));
+  return r.json();
+}
+
+/* ── Execution authority: permits, kill switches, voice stop, drills ──────── */
+
+export const getAuthorityStatus = () => getJson("/authority/status", "authority status");
+export const getAuthorityEvidence = (limit = 100) => getJson(`/authority/evidence?limit=${limit}`, "authority events");
+export const getRouteLearning = () => getJson("/authority/learning", "learned routing");
+
+async function postJson(path: string, body: any, what: string, headers: Record<string, string> = {}) {
+  const r = await fetch(`${API_BASE}${path}`, {
+    method: "POST", headers: { "Content-Type": "application/json", ...headers }, body: JSON.stringify(body ?? {}),
+  });
+  if (!r.ok) throw new Error(await parseErrorResponse(r, `${what} failed`));
+  return r.json();
+}
+
+export type KillScope = "global" | "robot" | "mission" | "agent";
+
+/** Anyone may stop the robot; no login needed. */
+export const killSwitch = (scope: KillScope, id = "*", reason = "operator stop") =>
+  postJson("/authority/kill", { scope, id, reason }, "Kill switch");
+
+/** Lifting a kill switch needs an operator login (a dev token outside production). */
+export async function resetKillSwitch(scope: KillScope, id = "*") {
+  const tok = await fetch(`${API_BASE}/auth/dev-token`, { method: "POST" });
+  if (!tok.ok) throw new Error("Operator login required to reset a kill switch");
+  const { access_token } = await tok.json();
+  return postJson("/authority/reset", { scope, id }, "Reset", { Authorization: `Bearer ${access_token}` });
+}
+
+export const runDrills = (drills?: string[]) => postJson("/authority/drills", drills ? { drills } : {}, "Drills");
+
+/** Send recorded speech; a stop phrase fires a kill switch (voice can never start the robot). */
+export async function voiceStop(wav: Blob) {
+  const form = new FormData();
+  form.append("audio", wav, "speech.wav");
+  const r = await fetch(`${API_BASE}/authority/voice`, { method: "POST", body: form });
+  if (!r.ok) throw new Error(await parseErrorResponse(r, "Voice stop failed"));
   return r.json();
 }

@@ -203,7 +203,7 @@ function Learning() {
         <Panel title="How learning works">
           <ol className="space-y-2.5 text-xs text-mc-mute">
             <li><span className="text-mc-ink font-semibold">Distil.</span> After each run, denials are grouped by 2 m floor cell and policy, with the fastest speed the gate approved there.</li>
-            <li><span className="text-mc-ink font-semibold">Retrieve.</span> Before planning, up to 5 lessons within 4 m of the route go to Nemotron as advice.</li>
+            <li><span className="text-mc-ink font-semibold">Retrieve.</span> Before planning, up to 5 lessons within 4 m of the route go to the planner as advice.</li>
             <li><span className="text-mc-ink font-semibold">Audit.</span> Each plan records the lessons that shaped it in the hash chain.</li>
           </ol>
         </Panel>

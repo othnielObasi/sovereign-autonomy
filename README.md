@@ -20,17 +20,16 @@ Everything in this section was built from 26 October 2026 onward. The git histor
 
 | Capability | Status |
 |---|---|
-| Execution authority (`backend/app/autonomy/`, `services/execution_authority.py`): every approved move gets a signed, single-use permit for exactly that move, sent through one dispatch path | Working: wired into the run loop |
-| Permit-checking simulator: a move without a valid, unused permit is refused; controller e-stop; dead-man stop if moves stop arriving | Working |
-| Kill switches (global, robot, mission, agent): instant revocation, verified stop, survive restarts, reset needs an operator login (`/authority/*`) | Working |
-| Crash reconciliation: a move whose answer was lost is settled from the controller's actual state, never retried | Working |
-| Graph routing, signed experience records, canaries, corridor reservations | Built and tested; not yet wired in |
-| Muse Spark mission planning | Planned |
-| SAM 3.1 perception (camera frames to floor positions) | Planned |
-| Muse Voice Transcribe operator stop (voice can stop, never start) | Planned |
-| Muse Spark Open (open weights) cross-check planner | Planned |
-| Learned routing (NetworkX) with signed, quarantinable experience records | Planned |
-| Canaries and scripted poisoning/injection attacks | Planned |
+| **Muse Spark** plans each mission from the map and the robot camera; **Muse Spark Open** (Baseten) proposes steps | Ready: runs when `MODEL_API_KEY` / `BASETEN_API_KEY` are set |
+| **SAM 3.1** perception: detections projected onto the floor, cross-checked with sensors | Ready: runs with `MODEL_API_KEY` |
+| **Muse Voice Transcribe** stop: say "stop" and the robot stops; voice can never start it | Ready: runs with `MODEL_API_KEY` |
+| Execution authority: every approved move gets a signed, single-use permit after a full-path check; the simulator checks it again | Working |
+| Kill switches (global, robot, mission, agent), controller e-stop, verified stop, dead-man stop | Working |
+| Restart recovery: interrupted runs pause; resume settles uncertain moves and continues from the last confirmed waypoint | Working |
+| Learned routing on NetworkX from signed experience; forged records quarantined | Working |
+| Canary tripwire: a plan that obeys an instruction hidden in untrusted data is discarded | Working |
+| Security drills: eight real attacks against the live simulator, pass/fail (`/authority`) | Working |
+| Prometheus `/metrics` and Grafana dashboard for the safety path | Working |
 
 This table is updated as each item lands. [`docs/TRACEABILITY.md`](docs/TRACEABILITY.md) maps every capability in the plan to its status and tests.
 
@@ -87,6 +86,8 @@ cd frontend && npm install && npm run dev
 ```
 
 Without model keys the planner uses a clearly labelled deterministic fallback, and every safety control still applies.
+
+To use Meta's models, add `MODEL_API_KEY` (and optionally `BASETEN_API_KEY`) to `.env` and `backend/.env`, then check them with `cd backend && python ../scripts/check_meta.py`.
 
 ## Testing
 

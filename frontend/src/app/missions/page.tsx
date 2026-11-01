@@ -82,7 +82,7 @@ export default function MissionsPage() {
   return (
     <Page wide>
       <PageHeader eyebrow="Missions" title="Missions"
-        subtitle="A mission is a destination for the robot. Nemotron plans the route; the gate approves every move before it runs."
+        subtitle="A mission is a destination for the robot. Muse Spark plans the route; the gate approves every move, and each approved move needs its own permit."
         actions={<Button href="/twin">Pick a bay on the warehouse →</Button>} />
 
       <div className="grid lg:grid-cols-3 gap-4">

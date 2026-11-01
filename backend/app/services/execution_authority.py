@@ -24,6 +24,7 @@ from app.autonomy import permit as wire
 from app.autonomy.core import Action, CheckpointStore, KillSwitch, PermitStore, Rejected, WorldState, check_move
 from app.autonomy.operations import Budget, EvidenceLog, SafeDispatcher, Watchdog
 from app.config import settings
+from app.observability import metrics
 
 logger = logging.getLogger("app.execution_authority")
 
@@ -160,7 +161,16 @@ class ExecutionAuthority:
                         intent, dict(params or {}), version, policy_version or "")
         token = self.permits.issue(action, approved=(decision == "APPROVED"),
                                    ttl_s=settings.permit_ttl_s, agent_id=agent_id)
+        metrics.inc("permits_issued_total")
         return action, token
+
+    def authorize_or_count(self, **kw) -> tuple[Action, str]:
+        """authorize(), counting refusals by reason for /metrics."""
+        try:
+            return self.authorize(**kw)
+        except Rejected as exc:
+            metrics.inc("permits_refused_total", reason=str(exc))
+            raise
 
     @staticmethod
     def _check_path(state: Dict[str, Any], params: Dict[str, Any]) -> None:
@@ -184,7 +194,13 @@ class ExecutionAuthority:
         budget = self._budgets.setdefault(run_id, Budget(settings.max_actions_per_run))
         watchdog = self._watchdogs.setdefault(run_id, Watchdog(settings.dispatch_watchdog_s))
         dispatcher = SafeDispatcher(self.permits, self.checkpoints, SimController(sim), budget, watchdog, self.evidence)
-        result = await dispatcher.dispatch_async(token, action)
+        try:
+            result = await dispatcher.dispatch_async(token, action)
+        except Rejected as exc:
+            metrics.inc("dispatch_total", outcome="unknown" if "unknown" in str(exc) else "refused")
+            raise
+        metrics.inc("dispatch_total", outcome="controller_refused" if isinstance(result, dict) and result.get("rejected")
+                    else "accepted")
         if isinstance(result, dict) and result.get("rejected"):
             # The controller refused it: verified not executed
             self.checkpoints.reconcile(action.action_id, controller_verified=True, executed=False)
@@ -238,6 +254,10 @@ class ExecutionAuthority:
             controller = {"ok": False, "error": type(exc).__name__}
         stop = await self._verify_stopped(sim)
         self.evidence.emit("kill_switch", "*", None, scope=scope, id=ident, reason=reason, actor=actor)
+        metrics.inc("kill_switch_total", scope=scope)
+        metrics.observe("kill_revoke_ms", revoked_ms, scope=scope)
+        if stop.get("stop_verified_ms") is not None:
+            metrics.observe("kill_stop_verified_ms", stop["stop_verified_ms"], scope=scope)
         return {"scope": scope, "id": ident, "authority_revoked_ms": round(revoked_ms, 2),
                 "controller": controller, **stop}
 

@@ -457,7 +457,7 @@ class RunService:
         from app.config import settings as _cfg
         from app.policies.params import active_params, params_hash
         try:
-            action, token = authority.authorize(
+            action, token = authority.authorize_or_count(
                 run_id=run_id, mission_id=mission_id, intent=intent, params=params,
                 decision="APPROVED", policy_version=params_hash(active_params()),
                 agent_id=f"planner:{_cfg.planner_provider}",

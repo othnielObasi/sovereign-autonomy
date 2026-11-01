@@ -2,54 +2,64 @@
 
 import React, { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
-import { getBenchmarks, getLearningSummary, getLlmModels, getPerceptionStatus, listRuns } from "@/lib/api";
+import { getAuthorityStatus, getLearningSummary, getLlmModels, getPerceptionStatus, getRouteLearning, listRuns } from "@/lib/api";
 import { Button, Mono, Page, Panel, Pill, Stat, Verdict, cx } from "@/components/ui";
 
-type Suite = { id: string; title: string; execution: string; totals: Record<string, any>; model_usage?: any };
 type Run = { id: string; mission_id: string; status: string; started_at: string; ended_at?: string | null };
 
-const fmt = (n: number | null | undefined) => (n == null ? "—" : n.toLocaleString());
+const API_BASE = process.env.NEXT_PUBLIC_API_BASE || "/api";
 
+// "new" = built during the Meta hackathon; "earlier" = carried over from our earlier codebase
 const STEPS = [
-  { n: "01", title: "Propose", who: "NVIDIA Nemotron 3 Ultra", text: "Plans the mission and replans after a denial. Fast Nemotron models handle per-step calls. Every output is only a proposal." },
-  { n: "02", title: "Decide", who: "Deterministic gate · 11 policies", text: "Geofence, zone speed, people and vehicles, racking, hazard zones, perception confidence, operator escalation. No model in the loop." },
-  { n: "03", title: "Execute or stop", who: "Robot / simulator", text: "Only approved moves run. Every denial sends STOP, so the robot never continues toward an old target." },
-  { n: "04", title: "Prove", who: "Hash chain + Ed25519", text: "Every decision is chained and signed with the rules version it was judged under. Anyone can verify it later." },
+  { n: "01", title: "See and plan", who: "Muse Spark", tag: "new",
+    text: "Plans each mission from the map and the robot's own camera frame, and replans after a denial. Muse Spark Open proposes each step." },
+  { n: "02", title: "Perceive", who: "SAM 3.1", tag: "new",
+    text: "Segments the camera frame; each detection is projected onto the floor in metres and cross-checked with the sensors. It can only add caution." },
+  { n: "03", title: "Decide", who: "Deterministic gate · 11 policies", tag: "earlier",
+    text: "Geofence, zone speed, people and vehicles, racking, hazard zones, perception confidence. No model in the loop." },
+  { n: "04", title: "Permit", who: "Execution authority", tag: "new",
+    text: "An approved move gets a signed, single-use permit for exactly that move after a full-path check. The robot controller checks it again; anything else is refused." },
+  { n: "05", title: "Stop", who: "Kill switches · Muse Voice Transcribe", tag: "new",
+    text: "Robot, mission, planner or everything: authority revoked in milliseconds, stop verified at the controller. Say “stop” and it stops; voice can never start it." },
 ];
 
 const UNTRUSTED = [
-  { title: "Model plans", text: "Only proposals; every move is judged." },
+  { title: "Model plans", text: "Only proposals; no model can issue a permit." },
   { title: "Vision", text: "Cross-checked; can only slow the robot." },
-  { title: "The web", text: "Screened; can only tighten hazard zones." },
-  { title: "Lessons", text: "From the gate only; never change the rules." },
+  { title: "Learning memory", text: "Signed; forged records are quarantined." },
+  { title: "Hidden instructions", text: "A canary tripwire discards plans that obey them." },
 ];
 
 export default function OverviewPage() {
-  const [suites, setSuites] = useState<Suite[]>([]);
   const [runs, setRuns] = useState<Run[]>([]);
   const [models, setModels] = useState<any>(null);
   const [vision, setVision] = useState<any>(null);
   const [learning, setLearning] = useState<any>(null);
+  const [authority, setAuthority] = useState<any>(null);
+  const [routing, setRouting] = useState<any>(null);
+  const [health, setHealth] = useState<any>(null);
 
   useEffect(() => {
-    getBenchmarks().then((d) => setSuites(d.suites || [])).catch(() => {});
     getLlmModels().then(setModels).catch(() => {});
     getPerceptionStatus().then(setVision).catch(() => {});
     getLearningSummary().then(setLearning).catch(() => {});
-    const loadRuns = () => listRuns().then((d: any) => setRuns(Array.isArray(d) ? d : d.runs || [])).catch(() => {});
-    loadRuns();
-    const id = setInterval(loadRuns, 10000);
+    getRouteLearning().then(setRouting).catch(() => {});
+    fetch(`${API_BASE}/health`, { cache: "no-store" }).then((r) => r.json()).then(setHealth).catch(() => {});
+    const load = () => {
+      listRuns().then((d: any) => setRuns(Array.isArray(d) ? d : d.runs || [])).catch(() => {});
+      getAuthorityStatus().then(setAuthority).catch(() => {});
+    };
+    load();
+    const id = setInterval(load, 8000);
     return () => clearInterval(id);
   }, []);
 
-  const nemo = suites.find((s) => s.id === "nemotron");
-  const lastRound: any = (nemo as any)?.rounds_detail?.[(nemo as any)?.rounds_detail?.length - 1];
+  const active = runs.find((r) => ["running", "planning", "paused"].includes(r.status));
   const latestEnded = runs.filter((r) => ["stopped", "completed"].includes(r.status))
     .sort((a, b) => (b.started_at || "").localeCompare(a.started_at || ""))[0];
-  const rule = suites.find((s) => s.id === "rule_based");
-  const ultra = nemo?.model_usage?.by_model?.find((m: any) => String(m.model).includes("Ultra"));
-  const active = runs.find((r) => ["running", "planning", "paused"].includes(r.status));
   const recent = useMemo(() => [...runs].sort((a, b) => (b.started_at || "").localeCompare(a.started_at || "")).slice(0, 6), [runs]);
+  const locks = authority?.kill_locks?.length || 0;
+  const muse = models?.provider === "muse";
 
   return (
     <div className="mc-grid-bg">
@@ -58,22 +68,23 @@ export default function OverviewPage() {
         <section className="grid lg:grid-cols-5 gap-8 items-center pt-4 pb-10">
           <div className="lg:col-span-3">
             <div className="flex flex-wrap gap-2 mb-4">
-              <Pill tone="nv">NVIDIA Nemotron</Pill>
-              <Pill tone="accent">Nebius Token Factory · AI Cloud</Pill>
-              <Pill>Physical AI</Pill>
+              <Pill tone="accent">Muse Spark</Pill>
+              <Pill tone="accent">SAM 3.1</Pill>
+              <Pill tone="accent">Muse Voice Transcribe</Pill>
+              <Pill>Push the Frontier</Pill>
             </div>
             <h1 className="text-4xl sm:text-5xl font-semibold tracking-tight leading-[1.05]">
-              Every robot move,<br /><span className="text-mc-accent">proven safe</span> before it happens.
+              AI plans the robot&apos;s moves.<br /><span className="text-mc-accent">Nothing moves</span> without proof it was allowed.
             </h1>
             <p className="mt-5 text-base sm:text-lg text-mc-mute max-w-2xl leading-relaxed">
-              An NVIDIA Nemotron planner proposes. A deterministic governance gate decides. Every decision leaves a signed,
-              hash-chained receipt. The AI can be brilliant or wrong; the robot only ever does what the rules allow.
+              Meta&apos;s models see the warehouse and plan the route. A deterministic gate judges every move, and only a signed,
+              single-use permit for that exact move lets the robot act. Kill switches and a spoken “stop” revoke authority at once.
             </p>
             <div className="mt-7 flex flex-wrap gap-3">
               <Button variant="primary" href={active ? `/runs/${active.id}` : "/twin"} className="px-5 py-2.5">
                 {active ? "Watch the mission in progress" : "Open the live warehouse"}
               </Button>
-              <Button href="/demo" className="px-5 py-2.5">Guided demo</Button>
+              <Button href="/authority" className="px-5 py-2.5">Run the security drills</Button>
               <Button variant="ghost" href="/evidence">See the evidence →</Button>
             </div>
             {active && (
@@ -84,77 +95,75 @@ export default function OverviewPage() {
             )}
           </div>
 
-          {/* Proof */}
+          {/* Live proof */}
           <div className="lg:col-span-2 grid grid-cols-2 gap-3">
-            <Stat className="col-span-2" label="Unsafe moves executed · Nemotron planner"
-              value={<span>{fmt(nemo?.totals?.ungoverned?.unsafe_executed)} <span className="text-mc-dim text-lg">→</span> <span className="text-mc-ok">{fmt(nemo?.totals?.governed?.unsafe_executed)}</span></span>}
-              hint={nemo ? "Without the gate → with it. 20 seeded missions per arm, run on Nebius Serverless Jobs." : "Loading benchmark…"} />
-            <Stat label="Rule-based planner" tone="ok"
-              value={<span><span className="text-mc-ink">{fmt(rule?.totals?.ungoverned?.unsafe_executed)}</span> <span className="text-mc-dim text-base">→</span> {fmt(rule?.totals?.governed?.unsafe_executed)}</span>}
-              hint="150 missions per arm" />
-            <Stat label="Ultra calls on Token Factory" tone="nv"
-              value={ultra ? `${ultra.ok}/${ultra.calls}` : "—"} hint={ultra ? `p50 ${(ultra.p50_latency_ms / 1000).toFixed(1)} s · benchmark run` : "benchmark run"} />
+            <Stat className="col-span-2" label="Execution authority"
+              tone={!authority ? "neutral" : !authority.enabled || locks ? "stop" : "ok"}
+              value={!authority ? "…" : !authority.enabled ? "Not configured" : locks ? `Stopped · ${locks} kill switch${locks > 1 ? "es" : ""}` : "Permits enforced"}
+              hint="Every move needs a single-use permit; the robot controller checks it again." />
+            <Stat label="Planner" tone={muse ? "accent" : "neutral"} value={muse ? "Muse Spark" : models?.provider || "…"}
+              hint={muse ? "camera + map" : "add MODEL_API_KEY"} />
+            <Stat label="Quarantined memory" tone={routing?.quarantined ? "warn" : "ok"} value={routing ? routing.quarantined : "—"}
+              hint={routing ? `${routing.learned_cells} learned cells` : ""} />
           </div>
         </section>
 
         {/* ── How it works ─────────────────────────────────────────────── */}
         <section className="mb-10">
           <h2 className="text-[13px] font-semibold uppercase tracking-[0.12em] text-mc-dim mb-3">How it works</h2>
-          <div className="grid md:grid-cols-2 xl:grid-cols-4 gap-3">
+          <div className="grid md:grid-cols-2 xl:grid-cols-5 gap-3">
             {STEPS.map((s, i) => (
               <div key={s.n} className="relative rounded-xl border border-mc-line bg-mc-panel p-4">
                 <div className="flex items-center justify-between">
                   <span className="font-mono text-xs text-mc-accent">{s.n}</span>
-                  {i < 3 && <span className="hidden xl:block absolute -right-2.5 top-1/2 -translate-y-1/2 text-mc-line2 z-10">▸</span>}
+                  <Pill tone={s.tag === "new" ? "accent" : "neutral"}>{s.tag === "new" ? "New" : "Earlier work"}</Pill>
+                  {i < STEPS.length - 1 && <span className="hidden xl:block absolute -right-2.5 top-1/2 -translate-y-1/2 text-mc-line2 z-10">▸</span>}
                 </div>
                 <div className="mt-2 text-lg font-semibold">{s.title}</div>
-                <div className={cx("text-xs font-medium mt-0.5", i === 0 ? "text-mc-nv" : "text-mc-accent")}>{s.who}</div>
+                <div className="text-xs font-medium mt-0.5 text-mc-accent">{s.who}</div>
                 <p className="mt-2 text-sm text-mc-mute leading-relaxed">{s.text}</p>
               </div>
             ))}
           </div>
         </section>
 
-        {/* ── Learns from the gate, stays on task ───────────────────────── */}
+        {/* ── Learns, and stays on task ─────────────────────────────────── */}
         <section className="mb-10">
-          <h2 className="text-[13px] font-semibold uppercase tracking-[0.12em] text-mc-dim mb-3">It learns, and it stays on task</h2>
+          <h2 className="text-[13px] font-semibold uppercase tracking-[0.12em] text-mc-dim mb-3">It learns, and learning can&apos;t be poisoned</h2>
           <div className="grid lg:grid-cols-2 gap-4">
-            <Panel title="Adaptive learning" subtitle="The planner learns from the gate. The gate never drifts.">
+            <Panel title="Learned routing" subtitle="New · NetworkX over the warehouse floor">
               <ul className="space-y-1.5 text-sm text-mc-mute mb-4">
-                <li><span className="text-mc-ink">Denials become lessons</span>, by place and policy.</li>
-                <li><span className="text-mc-ink">Lessons near the route</span> go to <span className="text-mc-nv">Nemotron Ultra</span> before it plans.</li>
-                <li><span className="text-mc-ink">Only the gate teaches</span>; lessons never change the rules.</li>
+                <li><span className="text-mc-ink">Where the gate slowed or stopped the robot</span>, the route learns to expect a delay.</li>
+                <li><span className="text-mc-ink">Racking and hazard zones are hard limits</span> that learning can never open.</li>
+                <li><span className="text-mc-ink">Every record is signed</span>; a planted or edited one is quarantined.</li>
               </ul>
               <div className="grid grid-cols-3 gap-2">
-                <MiniStat label="Lessons learned" value={learning?.lessons} />
-                <MiniStat label="Plans shaped by lessons" value={learning?.plans_with_lessons} />
-                <MiniStat label="Unsafe proposals / 100 moves" tone="ok"
-                  value={lastRound ? <>{lastRound.arms?.governed?.unsafe_proposed_per_100_moves} → {lastRound.arms?.learning?.unsafe_proposed_per_100_moves}</> : undefined}
-                  hint="benchmark, round 2, with vs without lessons" />
+                <MiniStat label="Router" value={routing?.last_route?.router || "—"} />
+                <MiniStat label="Learned cells" value={routing?.learned_cells} />
+                <MiniStat label="Quarantined" value={routing?.quarantined} tone={routing?.quarantined ? "warn" : "ok"} />
               </div>
             </Panel>
-            <Panel title="Task-drift control" subtitle="Every plan and replan is checked before the robot uses it.">
+            <Panel title="Lessons and task-drift control" subtitle="Earlier work · now feeding Muse Spark">
               <ul className="space-y-1.5 text-sm text-mc-mute mb-4">
-                <li><span className="text-mc-ink">Must end at the mission&apos;s destination</span>, never one the model picks.</li>
-                <li><span className="text-mc-ink">No wandering</span>: at most twice the aisle route.</li>
+                <li><span className="text-mc-ink">Denials become lessons</span>, given to the planner before it plans.</li>
+                <li><span className="text-mc-ink">Every plan must end at the mission&apos;s destination</span> and stay near the aisle route.</li>
                 <li><span className="text-mc-ink">A failing plan isn&apos;t used</span>; the aisle route is taken instead.</li>
               </ul>
               <div className="grid grid-cols-3 gap-2">
+                <MiniStat label="Lessons learned" value={learning?.lessons} />
                 <MiniStat label="Plans checked" value={learning?.task_checks} />
                 <MiniStat label="Drift caught" value={learning?.drift_caught} tone={learning?.drift_caught ? "warn" : "ok"} />
-                <MiniStat label="Replans after a denial" value={learning?.replans} />
               </div>
             </Panel>
           </div>
           <div className="mt-3 text-xs text-mc-dim">
-            Watch it happen: open any run and the <span className="text-mc-ink">Learning &amp; task</span> tab shows the lessons Nemotron was given, every replan and every task check
-            {latestEnded && <> (<Link href={`/runs/${latestEnded.id}`} className="text-mc-accent hover:underline">latest run</Link>)</>}. All lessons: <Link href="/policies" className="text-mc-accent hover:underline">Governance</Link>.
+            Open any run to see each permit used, every replan and every task check
+            {latestEnded && <> (<Link href={`/runs/${latestEnded.id}`} className="text-mc-accent hover:underline">latest run</Link>)</>}.
           </div>
         </section>
 
         <section className="grid lg:grid-cols-3 gap-4 mb-10 lg:items-start">
-          {/* ── Untrusted by default ─────────────────────────────────── */}
-          <Panel title="Untrusted by default" subtitle="Every outside input can add caution. None can remove it." className="lg:col-span-2">
+          <Panel title="Untrusted by default" subtitle="Every input can add caution. None can authorize a move." className="lg:col-span-2">
             <div className="grid sm:grid-cols-2 gap-x-6 gap-y-3">
               {UNTRUSTED.map((u) => (
                 <div key={u.title} className="flex gap-2.5">
@@ -165,15 +174,14 @@ export default function OverviewPage() {
             </div>
           </Panel>
 
-          {/* ── Live system ─────────────────────────────────────────── */}
           <Panel title="Live system" subtitle="What is running behind this page">
             <div className="space-y-2.5 text-sm">
-              <Row k="Mission planning" v={<span className="text-mc-nv">{short(models?.tiers?.reasoning)}</span>} />
-              <Row k="Per-step proposals" v={<span className="text-mc-nv">{(models?.tiers?.fast || []).map(short).join(", ") || "—"}</span>} />
-              <Row k="Vision cross-check" v={<span className="text-mc-nv">{vision?.enabled ? short(vision.model) : "off"}</span>} />
+              <Row k="Mission planning" v={<span className="text-mc-accent">{short(models?.tiers?.reasoning || models?.primary)}</span>} />
+              <Row k="Per-step proposals" v={<span className="text-mc-accent">{(models?.tiers?.fast || []).map(short).join(", ") || "—"}</span>} />
+              <Row k="Perception" v={<span className="text-mc-accent">{vision?.enabled ? short(vision.model) : "off"}</span>} />
+              <Row k="Voice stop" v={health?.voice_enabled ? "Muse Voice Transcribe" : "off (needs MODEL_API_KEY)"} />
+              <Row k="Execution authority" v={authority?.enabled ? "permits enforced" : "not configured"} />
               <Row k="Safety gate" v="11 deterministic policies" />
-              <Row k="Hosting" v="Nebius AI Cloud VM" />
-              <Row k="Benchmark compute" v="Nebius Serverless Jobs" />
             </div>
           </Panel>
         </section>
@@ -204,7 +212,7 @@ export default function OverviewPage() {
 }
 
 function short(m?: string) {
-  return String(m || "—").replace(/^nvidia\//, "").replace(/_/g, ".");
+  return String(m || "—").replace(/^nvidia\//, "").replace(/^meta-models\//, "").replace(/_/g, ".");
 }
 
 function MiniStat({ label, value, hint, tone }: { label: string; value: React.ReactNode; hint?: string; tone?: "ok" | "warn" }) {

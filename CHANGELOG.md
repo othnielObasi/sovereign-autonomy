@@ -26,3 +26,11 @@ The first commit in this repository is the pre-existing codebase; everything lis
 - Operator approvals now expire (120 s).
 - `PERMIT_SECRET` is required by Docker Compose and in production.
 - `docs/TRACEABILITY.md`: every planned capability with its status and evidence.
+- **Meta models**: Muse Spark plans missions with the robot camera frame attached; Muse Spark Open on Baseten proposes steps; SAM 3.1 reads the camera, with detections projected onto the floor and cross-checked; Muse Voice Transcribe turns a spoken stop into a kill switch (voice can never start the robot). `scripts/check_meta.py` checks real keys.
+- **Learned routing**: the live router runs on NetworkX; racks and hazard zones are hard limits; delays learned from where runs were slowed or stopped steer the route. Experience is signed; forged or edited records are quarantined.
+- **Canary tripwire** on every mission plan; a plan that obeys it is discarded.
+- **Full-path check** before every permit (people, obstacles, hazard zones, bounds).
+- **Restart recovery**: interrupted runs are paused, not failed; resume refuses under a kill switch, settles uncertain moves with the controller and continues from the last confirmed waypoint.
+- **Security drills** (`/authority/drills`): bypass, tampered, replayed and forged permits, poisoned memory, injected site text, canary, kill switch, each against the live simulator.
+- **Dashboard**: new Authority page (kill switches, voice stop, reset, drills, live permit events), authority controls on every run, Overview rewritten around the hackathon work with "New" and "Earlier work" labels.
+- **Observability**: Prometheus `/metrics` for the safety path; Grafana dashboard rebuilt on those metrics.

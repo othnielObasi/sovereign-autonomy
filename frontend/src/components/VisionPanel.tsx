@@ -37,7 +37,7 @@ function Plot({ check }: { check: Check }) {
 const list = (items: Obj[]) => items.map((o) => `${o.type} ${o.ahead_m.toFixed(1)} m ahead`).join(", ");
 
 /**
- * Vision check: an NVIDIA vision-language model on Nebius Token Factory reads the
+ * Vision check: SAM 3.1 (or the earlier vision-language model, without a Meta key) reads the
  * robot camera; Sovereign Autonomy compares what it saw with the sensors. The gate never
  * relies on it — a sighting the sensors can't confirm can only slow the robot.
  */
@@ -83,11 +83,11 @@ export function VisionPanel({ runId }: { runId?: string }) {
       <div className="flex items-center justify-between mb-2 gap-2">
         <h3 className="text-sm font-bold text-mc-ink tracking-wide uppercase">Vision check</h3>
         <span className={`text-[10px] font-semibold px-2 py-0.5 rounded-full border ${status.enabled ? "text-emerald-300 border-emerald-500/40 bg-emerald-500/10" : "text-mc-ink/85 border-mc-line2/40"}`}>
-          {status.enabled ? shortModel : "Off (needs Nebius key)"}
+          {status.enabled ? shortModel : "Off (needs MODEL_API_KEY)"}
         </span>
       </div>
       <p className="text-[11px] text-mc-mute mb-3 leading-relaxed">
-        An NVIDIA vision model reads the robot camera every {status.interval_s ?? 5}s during a run. Its answer is checked against the sensors and never trusted on its own: anything it sees that the sensors don&apos;t can only slow the robot.
+        SAM 3.1 reads the robot camera every {status.interval_s ?? 5}s during a run. Its answer is checked against the sensors and never trusted on its own: anything it sees that the sensors don&apos;t can only slow the robot.
       </p>
 
       {!last ? (

@@ -6,6 +6,7 @@ import { WarehouseView } from "@/components/WarehouseView";
 import { ScoreCard } from "@/components/ScoreCard";
 import { SiteIntelPanel } from "@/components/SiteIntelPanel";
 import { VisionPanel } from "@/components/VisionPanel";
+import { AuthorityPanel } from "@/components/AuthorityPanel";
 import { IntrospectionPanel } from "@/components/IntrospectionPanel";
 import { wsUrlForRun } from "@/lib/ws";
 import type { WsMessage } from "@/lib/types";
@@ -834,7 +835,7 @@ export default function RunPage({ params }: { params: { runId: string } }) {
                   </div>
                   <div className="text-[11px] text-mc-mute mt-0.5">
                     {currentStatus === "planning"
-                      ? "The Nemotron planner is computing an optimal multi-waypoint plan. The robot will not move until planning and governance review complete."
+                      ? "Muse Spark is planning the route from the map and the robot camera. The robot will not move until planning and governance review complete."
                       : "The robot is following the approved plan. Watch the map and chain-of-trust below for live progress."}
                   </div>
                 </div>
@@ -1330,6 +1331,7 @@ export default function RunPage({ params }: { params: { runId: string } }) {
               { id: "analysis", label: "Analysis" },
             ]} />
             <div className="pt-3 space-y-3">
+            <AuthorityPanel compact />
             {sideTab === "learning" && (
               <RunLearningPanel runId={runId} events={events}
                 ended={["stopped", "completed", "failed", "failed_safety"].includes(String(currentStatus).toLowerCase())} />
@@ -1338,7 +1340,7 @@ export default function RunPage({ params }: { params: { runId: string } }) {
             {/* Tavily site intelligence (untrusted input) */}
             <SiteIntelPanel />
 
-            {/* NVIDIA vision model on the robot camera, cross-checked with sensors */}
+            {/* Robot camera perception (SAM 3.1, or the earlier vision model), cross-checked with sensors */}
             <VisionPanel runId={runId} />
 
             </>)}
