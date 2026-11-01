@@ -46,7 +46,7 @@ Last checked: 1 Nov 2026. 303 backend tests passing; frontend type-checks; a liv
 | 1 | World-state synchronization | **Working** (single robot) | Versioned, forward-only, freshness-checked; telemetry re-read before the gate if planning was slow |
 | 2 | Trajectory safety | **Working**, point model | Full-path check at permit time plus the pre-existing racking check. No footprint, braking distance or moving-obstacle prediction |
 | 3 | Execution reconciliation | **Working** | Lost answers settled from controller state, never retried |
-| 4 | Identity and authorization | **Partial** | Kill-switch reset requires a logged-in operator. No roles; development tokens are disabled only in production |
+| 4 | Identity and authorization | **Working** | Roles viewer < operator < admin with password-hashed accounts; stopping open to all, mission control and reset need an operator, rule activation and rollback need an admin; enforced in production (`test_roles.py`). No SSO or per-tenant separation |
 | 5 | Watchdogs and degraded mode | **Working** | Dispatch watchdog; simulator dead-man stop; no permit secret means nothing moves; model outage falls back |
 | 6 | Human-in-the-loop supervision | **Pre-existing, working** | Approve/deny/override; approvals expire after 120 s; operator kill and reset in the dashboard |
 | 7 | Multi-robot coordination | **Partial** | Exclusive corridor reservations built and tested; the simulator has one robot, so not wired |
@@ -54,9 +54,9 @@ Last checked: 1 Nov 2026. 303 backend tests passing; frontend type-checks; a liv
 | 9 | Model and learning lifecycle | **Pre-existing, partial** | Governed rule changes with replay, approval and rollback. No model shadow rollout |
 | 10 | Incident replay | **Pre-existing, partial** | Hash-chained events, replay service, benchmark replay by seed |
 | 11 | Resource budgets | **Working** | Per-run action budget on the dispatch path; STOP never goes through it |
-| 12 | Fleet disaster recovery | **Not started** | Out of scope |
+| 12 | Fleet disaster recovery | **Working** (single site) | Signed, verified backups and restore; full-loss drill keeps kill switches and used permits (`test_backup_restore.py`); recovery objectives and steps in `docs/RUNBOOK.md`. No multi-site replication |
 | 13 | Checkpointing and task continuity | **Working** | A restart pauses runs; resume refuses under a kill switch, settles uncertain moves and continues from the last confirmed waypoint (`test_resume.py`) |
-| — | Safety assurance case | **Not started** | |
+| — | Safety assurance case | **Working** | `docs/SAFETY_CASE.md`: claim, assumptions, 15 hazards each linked to controls and tests, residual risks. Not a certification |
 
 ## Checkpoint continuity scenarios (plan §16)
 
