@@ -42,3 +42,7 @@ userdata.sh
 
 # Original merge kit (now ported into backend/app/autonomy) and its planning document
 sovereign_autonomy_mergekit/
+
+# Local backups (contain mission data)
+backups/
+backend/backups/
