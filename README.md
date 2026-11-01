@@ -20,16 +20,19 @@ Everything in this section was built from 26 October 2026 onward. The git histor
 
 | Capability | Status |
 |---|---|
-| Execution-authority package (`backend/app/autonomy/`): signed single-use permits, scoped kill switches, world-state versions, checkpoints with crash reconciliation, full-path checks, graph routing | Built and tested (26 tests); not yet wired into the run loop |
+| Execution authority (`backend/app/autonomy/`, `services/execution_authority.py`): every approved move gets a signed, single-use permit for exactly that move, sent through one dispatch path | Working: wired into the run loop |
+| Permit-checking simulator: a move without a valid, unused permit is refused; controller e-stop; dead-man stop if moves stop arriving | Working |
+| Kill switches (global, robot, mission, agent): instant revocation, verified stop, survive restarts, reset needs an operator login (`/authority/*`) | Working |
+| Crash reconciliation: a move whose answer was lost is settled from the controller's actual state, never retried | Working |
+| Graph routing, signed experience records, canaries, corridor reservations | Built and tested; not yet wired in |
 | Muse Spark mission planning | Planned |
 | SAM 3.1 perception (camera frames to floor positions) | Planned |
 | Muse Voice Transcribe operator stop (voice can stop, never start) | Planned |
 | Muse Spark Open (open weights) cross-check planner | Planned |
-| Permit-checking simulator `/command` (no command without a permit) | Planned |
 | Learned routing (NetworkX) with signed, quarantinable experience records | Planned |
 | Canaries and scripted poisoning/injection attacks | Planned |
 
-This table is updated as each item lands, with its tests.
+This table is updated as each item lands. [`docs/TRACEABILITY.md`](docs/TRACEABILITY.md) maps every capability in the plan to its status and tests.
 
 ## Pre-existing foundation (before 26 October 2026)
 
@@ -51,6 +54,7 @@ Carried over from our earlier robotics governance codebase and **not** presented
 ```bash
 git clone https://github.com/othnielObasi/sovereign-autonomy.git
 cd sovereign-autonomy
+echo "PERMIT_SECRET=$(python -c 'import secrets; print(secrets.token_hex(32))')" >> .env
 docker compose up -d
 ```
 
@@ -69,6 +73,9 @@ Run each from the repository root, in its own terminal.
 # 1. Warehouse simulator (shares its engine with the benchmark in backend/bench)
 pip install -r sim/warehouse_sim/requirements.txt
 PYTHONPATH=backend uvicorn server:app --app-dir sim/warehouse_sim --host 0.0.0.0 --port 8090
+
+# 0. Both processes need the same permit secret (nothing moves without it)
+export PERMIT_SECRET=$(python -c "import secrets; print(secrets.token_hex(32))")
 
 # 2. Backend
 cd backend && pip install -e ".[dev]"

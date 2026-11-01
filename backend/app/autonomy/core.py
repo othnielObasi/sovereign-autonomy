@@ -8,7 +8,6 @@ a certified emergency stop.
 from __future__ import annotations
 
 import hashlib
-import hmac
 import json
 import math
 import sqlite3
@@ -17,12 +16,10 @@ import time
 import uuid
 from contextlib import contextmanager
 from dataclasses import asdict, dataclass
-from typing import Any, Iterator
+from typing import Iterator
 
-
-def canonical(obj: Any) -> str:
-    """Stable JSON used for every digest and signature."""
-    return json.dumps(obj, sort_keys=True, separators=(",", ":"), allow_nan=False)
+from . import permit as wire
+from .permit import canonical  # noqa: F401  (re-exported)
 
 
 class Rejected(RuntimeError):
@@ -65,8 +62,11 @@ class Action:
     world_version: int
     policy_version: str
 
+    def as_dict(self) -> dict:
+        return asdict(self)
+
     def digest(self) -> str:
-        return hashlib.sha256(canonical(asdict(self)).encode()).hexdigest()
+        return wire.action_digest(asdict(self))
 
 
 class WorldState:
@@ -169,9 +169,6 @@ class PermitStore:
                 "id TEXT PRIMARY KEY, payload TEXT NOT NULL, used INTEGER NOT NULL DEFAULT 0)"
             )
 
-    def _sign(self, raw: str) -> str:
-        return hmac.new(self.secret, raw.encode(), hashlib.sha256).hexdigest()
-
     def issue(self, action: Action, *, approved: bool, ttl_s: float = 5.0, agent_id: str = "") -> str:
         if not approved:
             raise Rejected("governance_denied")
@@ -189,23 +186,18 @@ class PermitStore:
             "epoch": self.kills.epoch,
             "expires": time.time() + ttl_s,
         }
-        raw = canonical(payload)
         with _sqlite(self.path, write=True) as c:
-            c.execute("INSERT INTO permits(id,payload) VALUES (?,?)", (payload["id"], raw))
-        return canonical({"payload": payload, "signature": self._sign(raw)})
+            c.execute("INSERT INTO permits(id,payload) VALUES (?,?)", (payload["id"], canonical(payload)))
+        return wire.sign(self.secret, payload)
 
     def consume(self, token: str, action: Action) -> None:
         """Verify and atomically use up a permit. Raises Rejected on any failure."""
         try:
-            envelope = json.loads(token)
-            payload, signature = envelope["payload"], envelope["signature"]
-            raw = canonical(payload)
-        except (ValueError, KeyError, TypeError) as exc:
-            raise Rejected("malformed_permit") from exc
-        if not isinstance(signature, str) or not hmac.compare_digest(signature, self._sign(raw)):
-            raise Rejected("invalid_signature")
-        if (payload["digest"] != action.digest() or payload["robot"] != action.robot_id
-                or payload["mission"] != action.mission_id):
+            payload, raw = wire.open_envelope(self.secret, token)
+        except wire.PermitError as exc:
+            raise Rejected(str(exc)) from exc
+        if (payload.get("digest") != action.digest() or payload.get("robot") != action.robot_id
+                or payload.get("mission") != action.mission_id):
             raise Rejected("action_mismatch")
         with self._lock:
             self.kills.require_active(action, payload["agent"])
@@ -233,7 +225,7 @@ class CheckpointStore:
         with _sqlite(self.path, write=True) as c:
             c.execute("CREATE TABLE IF NOT EXISTS missions (id TEXT PRIMARY KEY, version INTEGER NOT NULL, state TEXT NOT NULL)")
             c.execute("CREATE TABLE IF NOT EXISTS events (seq INTEGER PRIMARY KEY AUTOINCREMENT, mission TEXT, event TEXT, previous_hash TEXT, event_hash TEXT)")
-            c.execute("CREATE TABLE IF NOT EXISTS actions (id TEXT PRIMARY KEY, mission TEXT, status TEXT)")
+            c.execute("CREATE TABLE IF NOT EXISTS actions (id TEXT PRIMARY KEY, mission TEXT, status TEXT, detail TEXT)")
 
     def checkpoint(self, mission: str, state: dict, expected_version: int | None = None) -> int:
         with _sqlite(self.path, write=True) as c:
@@ -258,7 +250,8 @@ class CheckpointStore:
     def begin_action(self, action: Action) -> None:
         with _sqlite(self.path, write=True) as c:
             try:
-                c.execute("INSERT INTO actions VALUES (?,?,?)", (action.action_id, action.mission_id, "IN_DOUBT"))
+                c.execute("INSERT INTO actions(id,mission,status,detail) VALUES (?,?,?,?)",
+                          (action.action_id, action.mission_id, "IN_DOUBT", canonical(action.as_dict())))
             except sqlite3.IntegrityError as exc:
                 raise Rejected("duplicate_action_requires_reconciliation") from exc
             self._event(c, action.mission_id, {"kind": "action_dispatched", "action": action.action_id})
@@ -278,6 +271,17 @@ class CheckpointStore:
         with _sqlite(self.path) as c:
             rows = c.execute("SELECT id FROM actions WHERE mission=? AND status='IN_DOUBT'", (mission,)).fetchall()
         return [r[0] for r in rows]
+
+    def action(self, action_id: str) -> Action | None:
+        """The stored action, so an uncertain one can be checked against the controller."""
+        with _sqlite(self.path) as c:
+            row = c.execute("SELECT detail FROM actions WHERE id=?", (action_id,)).fetchone()
+        return Action(**json.loads(row[0])) if row and row[0] else None
+
+    def status(self, action_id: str) -> str | None:
+        with _sqlite(self.path) as c:
+            row = c.execute("SELECT status FROM actions WHERE id=?", (action_id,)).fetchone()
+        return row[0] if row else None
 
     def require_reconciled(self, mission: str) -> None:
         if self.in_doubt(mission):

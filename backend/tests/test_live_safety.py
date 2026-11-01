@@ -81,7 +81,8 @@ def test_live_sim_api(sim_client):
     for key in ("x", "y", "zone", "nearest_obstacle_m", "nearest_obstacle_xy", "human_distance_m", "walking_humans"):
         assert key in tel
     assert tel["nearest_obstacle_m"] >= 0
-    assert sim_client.post("/command", json={"intent": "MOVE_TO", "params": {"x": 99, "y": 1}}).json()["ok"] is False
+    unpermitted = sim_client.post("/command", json={"intent": "MOVE_TO", "params": {"x": 99, "y": 1}})
+    assert unpermitted.status_code == 403 and unpermitted.json()["detail"] == "permit_required"
     assert sim_client.post("/scenario", json={"scenario": "spill"}).json()["ok"] is True
     assert any(o["type"] == "spill" for o in sim_client.get("/world").json()["obstacles"])
     seed = sim_client.post("/seed", json={"seed": 2043}).json()

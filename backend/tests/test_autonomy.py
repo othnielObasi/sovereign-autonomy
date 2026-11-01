@@ -10,10 +10,11 @@ import time
 
 import pytest
 
-from app.autonomy import (Action, Budget, CanaryRegistry, CheckpointStore, CorridorReservations,
-                          EvidenceLog, Experience, KillSwitch, MissionIntegrity, PermitStore,
-                          Rejected, RouteGraph, SafeDispatcher, TrajectoryValidator,
-                          TrustedExperience, Watchdog, WorldState)
+from app.autonomy.core import (Action, CheckpointStore, KillSwitch, PermitStore, Rejected,
+                               TrajectoryValidator, WorldState)
+from app.autonomy.intelligence import (CanaryRegistry, Experience, MissionIntegrity, RouteGraph,
+                                       TrustedExperience)
+from app.autonomy.operations import Budget, CorridorReservations, EvidenceLog, SafeDispatcher, Watchdog
 
 SECRET = b"0123456789abcdef0123456789abcdef"
 
@@ -313,7 +314,7 @@ def test_dispatch_success_path(env):
     _, _, permits, checkpoints, action = env
 
     class Controller:
-        def send(self, a):
+        def send(self, a, permit):
             return {"accepted": True, "action_id": a.action_id}
 
     log = EvidenceLog()
@@ -327,7 +328,7 @@ def test_lost_acknowledgement_is_never_retried(env):
     _, _, permits, checkpoints, action = env
 
     class FailingController:
-        def send(self, a):
+        def send(self, a, permit):
             raise TimeoutError()
 
     dispatcher = SafeDispatcher(permits, checkpoints, FailingController(), Budget(2), Watchdog(10), EvidenceLog())
@@ -346,7 +347,7 @@ def test_dispatch_blocked_when_watchdog_expired(env):
     dog.last_heartbeat -= 5
 
     class Controller:
-        def send(self, a):
+        def send(self, a, permit):
             raise AssertionError("must not be called")
 
     dispatcher = SafeDispatcher(permits, checkpoints, Controller(), Budget(5), dog, EvidenceLog())

@@ -25,11 +25,12 @@ import random
 import threading
 import time
 from contextlib import asynccontextmanager
-from typing import Any, Dict, List
+from typing import Any, Dict, List, Optional
 
 from fastapi import FastAPI, HTTPException, Request, Response
 from pydantic import BaseModel, Field
 
+from app.autonomy import permit as permits
 from bench.scenarios import HOTSPOTS, generate
 from bench.world import Circle, Layout, RobotState, Walker, World
 from traffic import ActorNavigation, FORKLIFT_RADIUS, TrafficWorld
@@ -38,11 +39,21 @@ SIM_TICK_HZ = float(os.getenv("SIM_TICK_HZ", "10"))
 SIM_SPEED = float(os.getenv("SIM_SPEED", "1.0"))        # 2.0 = twice real time
 SIM_SEED = int(os.getenv("SIM_SEED", "42"))
 SIM_TOKEN = os.getenv("SIM_TOKEN", "").strip()
+# Every MOVE_TO must carry a permit signed with this secret (shared with the backend).
+# Unset = no move is accepted (fails closed). STOP and WAIT never need a permit.
+PERMIT_SECRET = os.getenv("PERMIT_SECRET", "").strip().encode()
+SIM_ROBOT_ID = os.getenv("SIM_ROBOT_ID", "robot-1")
+# Dead-man stop: if no permitted move arrives for this long, the robot brakes on its
+# own, so a crashed or cut-off backend cannot leave it driving. 0 disables it.
+SIM_DEADMAN_S = float(os.getenv("SIM_DEADMAN_S", "5"))
 PARKING = (3.0, 3.5)
 
 layout = Layout()
 _lock = threading.RLock()
 _state: Dict[str, Any] = {"world": None, "mode": "live", "seed": SIM_SEED, "events": []}
+_used_permits: Dict[str, float] = {}     # permit id -> expiry; a permit works once
+_estop: Dict[str, Any] = {"engaged": False, "reason": "", "since": None}
+_deadman: Dict[str, Any] = {"last_move": None, "tripped": 0}
 
 
 def _require_token(request: Request) -> None:
@@ -119,7 +130,14 @@ async def _clock() -> None:
     while True:
         t0 = time.perf_counter()
         with _lock:
-            _world().step(dt * SIM_SPEED)
+            w = _world()
+            last = _deadman["last_move"]
+            if (SIM_DEADMAN_S > 0 and w.robot.target is not None and last is not None
+                    and time.monotonic() - last > SIM_DEADMAN_S):
+                w.command("STOP")
+                _deadman["tripped"] += 1
+                _deadman["last_move"] = None
+            w.step(dt * SIM_SPEED)
         await asyncio.sleep(max(0.0, dt - (time.perf_counter() - t0)))
 
 
@@ -182,6 +200,8 @@ def _telemetry(w: World) -> Dict[str, Any]:
         "obstacles": _obstacles(w),
         "bounds": w.layout.geofence,
         "target": w.robot.target,
+        "estop": dict(_estop),
+        "deadman_trips": _deadman["tripped"],
         "sim_time": round(w.t, 2),
         "mode": _state["mode"],
         "seed": _state["seed"],
@@ -197,6 +217,36 @@ def _telemetry(w: World) -> Dict[str, Any]:
 class Command(BaseModel):
     intent: str = Field(..., description="MOVE_TO|STOP|WAIT")
     params: Dict[str, Any] = Field(default_factory=dict)
+    # Required for MOVE_TO: the action's identity fields and its signed permit
+    action: Optional[Dict[str, Any]] = None
+    permit: Optional[str] = None
+
+
+class EstopRequest(BaseModel):
+    engaged: bool
+    reason: str = ""
+    release_token: str = ""
+
+
+def _check_permit(cmd: Command) -> None:
+    """Refuse a move unless its permit is valid for exactly this command and unused."""
+    if len(PERMIT_SECRET) < 32:
+        raise HTTPException(status_code=403, detail="permit_verification_not_configured")
+    if not cmd.permit or not isinstance(cmd.action, dict):
+        raise HTTPException(status_code=403, detail="permit_required")
+    action = dict(cmd.action, kind=cmd.intent, params=cmd.params)
+    if action.get("robot_id") != SIM_ROBOT_ID:
+        raise HTTPException(status_code=403, detail="wrong_robot")
+    try:
+        payload = permits.verify_for_action(PERMIT_SECRET, cmd.permit, action)
+    except permits.PermitError as exc:
+        raise HTTPException(status_code=403, detail=str(exc))
+    now = time.time()
+    for pid in [p for p, exp in _used_permits.items() if exp < now]:
+        del _used_permits[pid]
+    if payload["id"] in _used_permits:
+        raise HTTPException(status_code=403, detail="permit_replayed")
+    _used_permits[payload["id"]] = float(payload["expires"])
 
 
 class ScenarioRequest(BaseModel):
@@ -254,6 +304,10 @@ def command(request: Request, cmd: Command):
         w = _world()
         g = w.layout.geofence
         if cmd.intent == "MOVE_TO":
+            if _estop["engaged"]:
+                raise HTTPException(status_code=423, detail="estop_engaged")
+            _check_permit(cmd)
+            _deadman["last_move"] = time.monotonic()
             x = float(cmd.params.get("x", w.robot.x))
             y = float(cmd.params.get("y", w.robot.y))
             if not (g["min_x"] <= x <= g["max_x"] and g["min_y"] <= y <= g["max_y"]):
@@ -267,6 +321,27 @@ def command(request: Request, cmd: Command):
             w.command("STOP")
             return {"ok": True, "wait": cmd.params.get("seconds", 1)}
         return {"ok": False, "error": f"Unknown intent: {cmd.intent}"}
+
+
+@app.post("/estop")
+def estop(request: Request, body: EstopRequest):
+    """Controller-level stop. Engaging is always allowed; releasing needs a release
+    token signed by the backend, so only an authorized reset can lift it."""
+    _require_token(request)
+    with _lock:
+        if body.engaged:
+            _world().command("STOP")
+            if not _estop["engaged"]:
+                _estop.update(engaged=True, reason=body.reason, since=time.time())
+            return {"ok": True, "engaged": True}
+        if len(PERMIT_SECRET) < 32:
+            raise HTTPException(status_code=403, detail="permit_verification_not_configured")
+        try:
+            permits.verify_release(PERMIT_SECRET, body.release_token, SIM_ROBOT_ID)
+        except permits.PermitError as exc:
+            raise HTTPException(status_code=403, detail=str(exc))
+        _estop.update(engaged=False, reason="", since=None)
+        return {"ok": True, "engaged": False}
 
 
 SCENARIOS = {

@@ -2,6 +2,7 @@
 an evidence log, and the single dispatch path that every command must take."""
 from __future__ import annotations
 
+import inspect
 import json
 import threading
 import time
@@ -78,7 +79,8 @@ class EvidenceLog:
 
 
 class Controller(Protocol):
-    def send(self, action: Action) -> Any: ...
+    """Sends one action, with its permit, to the robot controller (which checks the permit again)."""
+    def send(self, action: Action, permit: str) -> Any: ...
 
 
 class SafeDispatcher:
@@ -95,16 +97,34 @@ class SafeDispatcher:
         self.permits, self.checkpoints, self.controller = permits, checkpoints, controller
         self.budget, self.watchdog, self.evidence = budget, watchdog, evidence
 
-    def dispatch(self, token: str, action: Action) -> Any:
+    def _prepare(self, token: str, action: Action) -> None:
         self.watchdog.require_healthy()
         self.permits.consume(token, action)
         self.budget.consume()
         self.checkpoints.begin_action(action)
         self.evidence.emit("command_dispatched", action.mission_id, action.action_id)
+
+    def _unknown(self, action: Action, exc: Exception) -> Rejected:
+        self.evidence.emit("command_outcome_unknown", action.mission_id, action.action_id, error=type(exc).__name__)
+        return Rejected("controller_outcome_unknown_reconcile_before_retry")
+
+    def dispatch(self, token: str, action: Action) -> Any:
+        self._prepare(token, action)
         try:
-            result = self.controller.send(action)
+            result = self.controller.send(action, token)
         except Exception as exc:
-            self.evidence.emit("command_outcome_unknown", action.mission_id, action.action_id, error=type(exc).__name__)
-            raise Rejected("controller_outcome_unknown_reconcile_before_retry") from exc
+            raise self._unknown(action, exc) from exc
+        self.evidence.emit("controller_acknowledged", action.mission_id, action.action_id)
+        return result
+
+    async def dispatch_async(self, token: str, action: Action) -> Any:
+        """Same as dispatch, for a controller whose send() is a coroutine."""
+        self._prepare(token, action)
+        try:
+            result = self.controller.send(action, token)
+            if inspect.isawaitable(result):
+                result = await result
+        except Exception as exc:
+            raise self._unknown(action, exc) from exc
         self.evidence.emit("controller_acknowledged", action.mission_id, action.action_id)
         return result

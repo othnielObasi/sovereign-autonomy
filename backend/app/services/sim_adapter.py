@@ -43,7 +43,23 @@ class SimAdapter:
         return r.json()
 
     async def send_command(self, command: Dict[str, Any]) -> Dict[str, Any]:
+        """Send a command. A move the simulator refuses (missing, invalid or reused
+        permit; e-stop engaged) comes back as {"ok": False, "rejected": True, ...}:
+        a definite "not executed", not an unknown outcome."""
         r = await self._client.post(f"{self.base_url}/command", json=command)
+        if r.status_code in (403, 423):
+            try:
+                detail = r.json().get("detail")
+            except ValueError:
+                detail = r.text
+            return {"ok": False, "rejected": True, "reason": detail, "status": r.status_code}
+        r.raise_for_status()
+        return r.json()
+
+    async def estop(self, *, engaged: bool, reason: str = "", release_token: str = "") -> Dict[str, Any]:
+        """Engage (anyone may stop the robot) or release (needs a signed release token)."""
+        r = await self._client.post(f"{self.base_url}/estop",
+                                    json={"engaged": engaged, "reason": reason, "release_token": release_token})
         r.raise_for_status()
         return r.json()
 

@@ -25,6 +25,7 @@ import asyncio
 import math
 import json
 import logging
+import time
 from typing import Any, Dict, List, Optional
 
 from sqlalchemy.orm import Session
@@ -37,6 +38,13 @@ from app.services.governance_engine import GovernanceEngine
 from app.services.telemetry_service import TelemetryService
 from app.services.telemetry_validator import TelemetryValidator
 from app.services.integrity_monitor import RuntimeIntegrityChecker
+from app.services.execution_authority import get_authority
+from app.autonomy.core import Rejected
+
+
+def settings_world_age() -> float:
+    from app.config import settings as _cfg
+    return float(_cfg.world_max_age_s)
 from app.world_model import ZONE_SPEED_LIMITS
 from app.utils.ids import new_id
 from app.utils.time import utc_now
@@ -382,6 +390,45 @@ class RunService:
     MAX_CONSECUTIVE_TICK_ERRORS = 5
     AGENT_PROPOSAL_TIMEOUT = 15  # seconds
 
+    async def _execute_permitted(self, db: Session, run_id: str, mission_id: str,
+                                 intent: str, params: Dict[str, Any]) -> Dict[str, Any]:
+        """Send an APPROVED command. A MOVE_TO only goes out with a single-use permit
+        for exactly these parameters, through the one dispatch path; the simulator
+        checks the permit again. STOP and WAIT need no permit (stopping is always allowed).
+
+        Returns the simulator's answer, or {"ok": False, "rejected": True, ...} when
+        authority refused the move (the robot is then told to stop)."""
+        if intent != "MOVE_TO":
+            return await self.sim.send_command({"intent": intent, "params": params})
+        authority = get_authority()
+        from app.config import settings as _cfg
+        from app.policies.params import active_params, params_hash
+        try:
+            action, token = authority.authorize(
+                run_id=run_id, mission_id=mission_id, intent=intent, params=params,
+                decision="APPROVED", policy_version=params_hash(active_params()),
+                agent_id=f"planner:{_cfg.planner_provider}",
+            )
+            result = await authority.dispatch(run_id, action, token, self.sim)
+        except Rejected as exc:
+            reason = str(exc)
+            unknown = reason.startswith("controller_outcome_unknown")
+            self._append_event(db, run_id, "ALERT" if unknown else "AUTHORITY", {
+                "event": "command_outcome_unknown" if unknown else "permit_refused",
+                "reason": reason, "intent": intent, "params": params,
+            })
+            try:   # contain it: an uncertain or refused move ends with the robot stopped
+                await self.sim.send_command({"intent": "STOP", "params": {}})
+            except Exception:
+                pass
+            return {"ok": False, "rejected": not unknown, "reason": reason}
+        self._append_event(db, run_id, "AUTHORITY", {
+            "event": "permit_used" if not result.get("rejected") else "controller_refused",
+            "action_id": action.action_id, "world_version": action.world_version,
+            "policy_version": action.policy_version, "reason": result.get("reason"),
+        })
+        return result
+
     async def _run_loop(self, run_id: str) -> None:
         """Core tick-based control loop for a single run.
 
@@ -452,6 +499,12 @@ class RunService:
                     goal = json.loads(mission.goal_json) if mission else {"x": 0, "y": 0}
 
                     telemetry = await self.sim.get_telemetry()
+                    tel_fetched_at = time.monotonic()
+                    authority = get_authority()
+                    authority.heartbeat(run_id)
+                    if mission is not None:
+                        for settled in authority.reconcile_in_doubt(mission.id, telemetry):
+                            self._append_event(db, run_id, "AUTHORITY", {"event": "reconciled", **settled})
 
                     # Site intelligence: hazard zones (Tavily-informed, firewall-screened)
                     # join the telemetry the gate sees; their audit events join this run's chain.
@@ -692,6 +745,15 @@ class RunService:
 
                     proposal_payload = proposal.model_dump()
 
+                    # The gate must judge fresh positions: if planning took a while, re-read
+                    # the robot and people, then record this as the world version a permit binds to.
+                    if time.monotonic() - tel_fetched_at > settings_world_age() / 2:
+                        try:
+                            telemetry.update(await self.sim.get_telemetry())
+                        except Exception as fresh_err:
+                            logger.warning("Run %s: telemetry refresh failed: %s", run_id, fresh_err)
+                    authority.observe(telemetry)
+
                     # Governance evaluates and persists decision
                     gov_decision = self.gov.evaluate_and_record(
                         db, run_id, telemetry, proposal,
@@ -737,7 +799,8 @@ class RunService:
                         self._wp_denial_counts[run_id] = 0
 
                         cmd = {"intent": proposal.intent, "params": proposal.params}
-                        execution = await self.sim.send_command(cmd)
+                        execution = await self._execute_permitted(
+                            db, run_id, mission.id if mission else run.mission_id, proposal.intent, proposal.params or {})
 
                         # --- Execution verification: confirm sim actually responded ---
                         exec_verified = False
@@ -847,7 +910,9 @@ class RunService:
                                     logger.info("Run %s: NEEDS_REVIEW — slower move approved (count %d)", run_id, denial_count)
                                     self._wp_denial_counts[run_id] = 0   # the robot is moving under an approved decision
                                     cmd = {"intent": cautious.intent, "params": cautious_params}
-                                    execution = await self.sim.send_command(cmd)
+                                    authority.observe(telemetry)
+                                    execution = await self._execute_permitted(
+                                        db, run_id, mission.id if mission else run.mission_id, cautious.intent, cautious_params)
                                     exec_verified = execution.get("ok", False) or execution.get("ack", False)
                                     self._append_event(db, run_id, "EXECUTION", {
                                         "command": cmd,

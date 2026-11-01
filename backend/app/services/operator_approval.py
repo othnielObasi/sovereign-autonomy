@@ -12,13 +12,17 @@ outside the run loop’s session scope.
 """
 
 from typing import Dict, Any
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
 
 from app.db.session import SessionLocal
 from app.db.models import OperatorApproval
 
 
-def approve(run_id: str, proposal_hash: str, approved_by: str | None = None, notes: str | None = None) -> None:
+APPROVAL_TTL_S = 120   # an approval covers a decision made now, not one made later
+
+
+def approve(run_id: str, proposal_hash: str, approved_by: str | None = None, notes: str | None = None,
+            ttl_s: float = APPROVAL_TTL_S) -> None:
     """Record operator approval for a specific governance proposal.
 
     Args:
@@ -35,6 +39,7 @@ def approve(run_id: str, proposal_hash: str, approved_by: str | None = None, not
             proposal_hash=proposal_hash,
             approved_by=approved_by,
             approved_at=now,
+            expires_at=now + timedelta(seconds=ttl_s),
             notes=notes,
         )
         db.add(oa)
@@ -57,14 +62,23 @@ def revoke(run_id: str, proposal_hash: str) -> None:
 
 
 def is_approved(run_id: str, proposal_hash: str) -> bool:
-    """Check whether a proposal has been approved by an operator."""
+    """Check whether a proposal has an operator approval that has not expired."""
     db = SessionLocal()
     try:
-        cnt = db.query(OperatorApproval).filter(
+        rows = db.query(OperatorApproval).filter(
             OperatorApproval.run_id == run_id,
             OperatorApproval.proposal_hash == proposal_hash,
-        ).count()
-        return cnt > 0
+        ).all()
+        now = datetime.now(timezone.utc)
+        for row in rows:
+            exp = row.expires_at
+            if exp is None:
+                continue   # older rows without an expiry no longer count
+            if exp.tzinfo is None:
+                exp = exp.replace(tzinfo=timezone.utc)
+            if exp > now:
+                return True
+        return False
     finally:
         db.close()
 

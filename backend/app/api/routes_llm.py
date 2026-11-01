@@ -291,13 +291,28 @@ async def execute_plan(body: ExecuteRequest):
             "governance": gov.model_dump(),
         })
 
-        if gov.decision != "DENIED":
-            # APPROVED or NEEDS_REVIEW — execute (NEEDS_REVIEW is a warning, not a block)
-            cmd = {"intent": "MOVE_TO", "params": proposal.params}
+        if gov.decision == "APPROVED":
+            # Only an approved move executes, and only with a single-use permit for exactly
+            # these parameters (the simulator checks it again). NEEDS_REVIEW does not execute.
+            from app.autonomy.core import Rejected
+            from app.config import settings as _cfg
+            from app.policies.params import active_params, params_hash
+            from app.services.execution_authority import get_authority
+            authority = get_authority()
             try:
-                result = await _sim.send_command(cmd)
-                step.executed = True
+                authority.observe(telemetry)
+                action, token = authority.authorize(
+                    run_id="llm-execute", mission_id="llm-execute", intent="MOVE_TO", params=proposal.params,
+                    decision=gov.decision, policy_version=params_hash(active_params()),
+                    agent_id=f"planner:{_cfg.planner_provider}")
+                result = await authority.dispatch("llm-execute", action, token, _sim)
+                step.executed = bool(result.get("ok")) and not result.get("rejected")
                 step.sim_result = result
+                if not step.executed:
+                    overall_status = "partial"
+            except Rejected as e:
+                step.sim_result = {"ok": False, "rejected": True, "reason": str(e)}
+                overall_status = "partial"
             except Exception as e:
                 step.sim_result = {"error": str(e)}
                 overall_status = "partial"
@@ -320,11 +335,8 @@ async def execute_plan(body: ExecuteRequest):
             except Exception:
                 step.movement_m = None
 
-            # If NEEDS_REVIEW, note it but continue
-            if gov.decision == "NEEDS_REVIEW" and overall_status == "completed":
-                overall_status = "completed_with_warnings"
         else:
-            # DENIED — governance hard-blocks this waypoint
+            # DENIED or NEEDS_REVIEW: nothing executes without an approval
             overall_status = "blocked" if idx == 0 else "partial"
             steps.append(step)
             break  # Stop at first denied waypoint

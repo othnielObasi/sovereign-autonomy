@@ -50,6 +50,19 @@ class Settings(BaseSettings):
     # In production, SHOULD be set via env var SIM_TOKEN
     sim_token: str = Field(default_factory=generate_secret)
 
+    # ------------------------------------------------------------
+    # Execution authority (app/autonomy)
+    # ------------------------------------------------------------
+    # Shared with the simulator, which checks every move's permit with it.
+    # Unset = no permits can be issued, so the robot cannot move (fails closed).
+    permit_secret: str = ""
+    permit_ttl_s: float = 5.0
+    robot_id: str = "robot-1"
+    authority_db_path: str = "data/authority.db"
+    world_max_age_s: float = 2.0       # telemetry older than this cannot back a permit
+    max_actions_per_run: int = 5000
+    dispatch_watchdog_s: float = 30.0  # no loop heartbeat for this long blocks dispatch
+
     # Gazebo
     gazebo_master_uri: str = "http://localhost:11311"
 
@@ -227,6 +240,8 @@ class Settings(BaseSettings):
                 missing.append("JWT_SECRET")
             if not os.environ.get("SIM_TOKEN"):
                 missing.append("SIM_TOKEN")
+            if len(self.permit_secret) < 32:
+                missing.append("PERMIT_SECRET (32+ characters)")
             if missing:
                 raise RuntimeError(
                     f"Missing required environment variables in production: {', '.join(missing)}"

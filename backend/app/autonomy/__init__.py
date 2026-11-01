@@ -3,14 +3,13 @@
 A model may propose an action; only a signed, single-use permit for that exact
 action, issued against fresh world state and not revoked by a kill switch, lets
 it reach the controller. Built during the Meta Global AI Developer Hackathon.
-"""
-from .core import (Action, CheckpointStore, KillSwitch, PermitStore, Rejected,
-                   TrajectoryValidator, WorldState, canonical)
-from .intelligence import CanaryRegistry, Experience, MissionIntegrity, RouteGraph, TrustedExperience
-from .operations import Budget, CorridorReservations, EvidenceLog, SafeDispatcher, Watchdog
 
-__all__ = [
-    "Action", "Budget", "CanaryRegistry", "CheckpointStore", "CorridorReservations", "EvidenceLog",
-    "Experience", "KillSwitch", "MissionIntegrity", "PermitStore", "Rejected", "RouteGraph",
-    "SafeDispatcher", "TrajectoryValidator", "TrustedExperience", "Watchdog", "WorldState", "canonical",
-]
+Modules:
+  permit        permit wire format (standard library only; also used by the simulator)
+  core          world state, kill switches, permit store, checkpoints, path checks
+  intelligence  graph routing, signed experience, canaries, mission scope
+  operations    budgets, watchdog, corridor reservations, evidence log, dispatch
+
+Import from the submodules; this package deliberately imports nothing, so the
+simulator can load `permit` without the backend's other dependencies.
+"""

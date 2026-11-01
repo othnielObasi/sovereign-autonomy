@@ -2,6 +2,14 @@
 
 from __future__ import annotations
 
+import os
+import tempfile
+
+# Execution authority: a test-only permit secret (the simulator under test reads the
+# same variable) and a throwaway database, set before the app is imported.
+os.environ.setdefault("PERMIT_SECRET", "test-permit-secret-0123456789abcdef0123")
+os.environ.setdefault("AUTHORITY_DB_PATH", os.path.join(tempfile.mkdtemp(prefix="authority-"), "authority.db"))
+
 import pytest
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker

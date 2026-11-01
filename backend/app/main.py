@@ -25,6 +25,7 @@ from app.api.routes_operator import router as operator_router
 from app.api.routes_policy_proposals import router as policy_proposals_router
 from app.api.routes_site_intel import router as site_intel_router
 from app.api.routes_evidence import router as evidence_router
+from app.api.routes_authority import router as authority_router  # noqa: E402
 from app.services.run_service import RunService
 
 configure_logging()
@@ -207,6 +208,7 @@ app.include_router(operator_router)
 app.include_router(policy_proposals_router)
 app.include_router(site_intel_router)
 app.include_router(evidence_router)
+app.include_router(authority_router)
 
 # Initialize RunService and bind broadcaster
 run_service = RunService()
