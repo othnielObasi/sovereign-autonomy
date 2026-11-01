@@ -20,7 +20,7 @@ Everything in this section was built from 26 October 2026 onward. The git histor
 
 | Capability | Status |
 |---|---|
-| Execution-authority package (`backend/app/autonomy/`): signed single-use permits, scoped kill switches, world-state versions, checkpoints with crash reconciliation, full-path checks, graph routing | In progress |
+| Execution-authority package (`backend/app/autonomy/`): signed single-use permits, scoped kill switches, world-state versions, checkpoints with crash reconciliation, full-path checks, graph routing | Built and tested (26 tests); not yet wired into the run loop |
 | Muse Spark mission planning | Planned |
 | SAM 3.1 perception (camera frames to floor positions) | Planned |
 | Muse Voice Transcribe operator stop (voice can stop, never start) | Planned |

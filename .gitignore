@@ -39,3 +39,6 @@ userdata.sh
 
 # TypeScript build cache
 *.tsbuildinfo
+
+# Original merge kit (now ported into backend/app/autonomy) and its planning document
+sovereign_autonomy_mergekit/
