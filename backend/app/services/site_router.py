@@ -62,6 +62,31 @@ def capped_speed(x: float, y: float, speed: float, zones: Optional[List[Dict[str
     return speed
 
 
+last_route_info: Dict[str, Any] = {}
+
+
+def _route(layout, start, goal, extra):
+    """NetworkX route with delays learned from signed experience; the A* grid router
+    is the fallback. Either way racks and hazard zones stay impassable."""
+    from app.config import settings
+    if settings.learned_routing:
+        try:
+            from app.services.route_learning import get_memory, learned_route
+            delays, quarantined = get_memory().load()
+            result = learned_route(layout, start, goal, extra, delays)
+            if result:
+                last_route_info.clear()
+                last_route_info.update(router="networkx", learned_cells=len(delays),
+                                       learned_delay_s=round(result["learned_delay"], 2),
+                                       quarantined=len(quarantined))
+                return result["points"]
+        except Exception as exc:
+            logger.warning("Learned routing failed, using grid A*: %s", exc)
+    last_route_info.clear()
+    last_route_info.update(router="astar")
+    return layout.route(start, goal, extra=extra)
+
+
 def route_plan(world: Dict[str, Any], start: Dict[str, Any], goal: Dict[str, Any],
                speed_limits: Dict[str, float], avoid: Optional[Dict[str, Any]] = None,
                max_speed: float = 0.5, hazards: Optional[List[Dict[str, Any]]] = None) -> Optional[List[Waypoint]]:
@@ -74,7 +99,7 @@ def route_plan(world: Dict[str, Any], start: Dict[str, Any], goal: Dict[str, Any
         return None
     extra = [Circle(float(avoid["x"]), float(avoid["y"]), 0.8, "blocked")] if avoid else []
     extra += hazard_circles(hazards)
-    route = layout.route((float(start["x"]), float(start["y"])), (float(goal["x"]), float(goal["y"])), extra=extra)
+    route = _route(layout, (float(start["x"]), float(start["y"])), (float(goal["x"]), float(goal["y"])), extra)
     if not route:
         return None
     wps = []

@@ -344,3 +344,26 @@ class TrajectoryValidator:
                 if any(math.hypot(x - ox, y - oy) < r + self.clearance for ox, oy, r in obstacles):
                     raise Rejected("trajectory_obstacle_clearance")
         return True
+
+
+def check_move(start: tuple[float, float], end: tuple[float, float],
+               bounds: tuple[float, float, float, float] | None,
+               keep_out: list[tuple[float, float, float, str]], *, resolution: float = 0.1) -> None:
+    """Full-path check for one straight move, sampled every `resolution` metres.
+
+    `keep_out` holds (x, y, radius, kind) circles the robot centre must stay out of.
+    A move is refused only if it goes deeper into a keep-out circle than the robot
+    already is, so a robot that starts too close can always back away. Raises Rejected.
+    """
+    (x0, y0), (x1, y1) = start, end
+    steps = max(1, math.ceil(math.hypot(x1 - x0, y1 - y0) / resolution))
+    start_gap = {i: math.hypot(x0 - cx, y0 - cy) - r for i, (cx, cy, r, _) in enumerate(keep_out)}
+    for k in range(1, steps + 1):
+        t = k / steps
+        x, y = x0 + (x1 - x0) * t, y0 + (y1 - y0) * t
+        if bounds and not (bounds[0] <= x <= bounds[2] and bounds[1] <= y <= bounds[3]):
+            raise Rejected("trajectory_out_of_bounds")
+        for i, (cx, cy, r, kind) in enumerate(keep_out):
+            gap = math.hypot(x - cx, y - cy) - r
+            if gap < 0 and gap < start_gap[i] - 1e-6:
+                raise Rejected(f"trajectory_{kind}_clearance")

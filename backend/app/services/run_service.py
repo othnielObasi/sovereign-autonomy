@@ -421,6 +421,9 @@ class RunService:
                 await self.sim.send_command({"intent": "STOP", "params": {}})
             except Exception:
                 pass
+            if reason.startswith("trajectory_"):
+                # The path check refused it: count it like a gate denial so the loop replans
+                self._wp_denial_counts[run_id] = self._wp_denial_counts.get(run_id, 0) + 1
             return {"ok": False, "rejected": not unknown, "reason": reason}
         self._append_event(db, run_id, "AUTHORITY", {
             "event": "permit_used" if not result.get("rejected") else "controller_refused",
@@ -1241,6 +1244,9 @@ class RunService:
             ldb = SessionLocal()
             try:
                 distill_run(ldb, run_id)
+                # Signed experience for the learned router: where this run was slowed or stopped
+                from app.services.route_learning import get_memory
+                get_memory().record_run(ldb, run_id)
             finally:
                 ldb.close()
         except Exception as dl_err:

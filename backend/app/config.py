@@ -61,6 +61,7 @@ class Settings(BaseSettings):
     authority_db_path: str = "data/authority.db"
     world_max_age_s: float = 2.0       # telemetry older than this cannot back a permit
     max_actions_per_run: int = 5000
+    learned_routing: bool = True       # NetworkX routing with delays from signed experience
     dispatch_watchdog_s: float = 30.0  # no loop heartbeat for this long blocks dispatch
 
     # Gazebo

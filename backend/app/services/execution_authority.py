@@ -21,13 +21,37 @@ import time
 from typing import Any, Dict, List, Optional
 
 from app.autonomy import permit as wire
-from app.autonomy.core import Action, CheckpointStore, KillSwitch, PermitStore, Rejected, WorldState
+from app.autonomy.core import Action, CheckpointStore, KillSwitch, PermitStore, Rejected, WorldState, check_move
 from app.autonomy.operations import Budget, EvidenceLog, SafeDispatcher, Watchdog
 from app.config import settings
 
 logger = logging.getLogger("app.execution_authority")
 
 TARGET_MATCH_M = 0.05   # how close the controller's target must be to call a move "accepted"
+ROBOT_RADIUS_M = 0.4
+PERSON_STOP_M = 1.0     # same stop radius the gate's human-proximity rule uses
+
+
+def keep_out_circles(state: Dict[str, Any]) -> List[tuple]:
+    """Keep-out circles for the robot centre, from the telemetry the permit binds to."""
+    circles: List[tuple] = []
+    for o in state.get("obstacles") or []:
+        try:
+            circles.append((float(o["x"]), float(o["y"]), float(o.get("r", 0.4)) + ROBOT_RADIUS_M, "obstacle"))
+        except (KeyError, TypeError, ValueError):
+            continue
+    for p in state.get("walking_humans") or []:
+        try:
+            circles.append((float(p["x"]), float(p["y"]), PERSON_STOP_M, "person"))
+        except (KeyError, TypeError, ValueError):
+            continue
+    for z in state.get("site_constraints") or []:
+        try:
+            if float(z.get("radius", 0)) > 0:   # exclusion zones only; slow zones are the gate's job
+                circles.append((float(z["x"]), float(z["y"]), float(z["radius"]), "hazard"))
+        except (KeyError, TypeError, ValueError):
+            continue
+    return circles
 
 
 class SimController:
@@ -121,9 +145,14 @@ class ExecutionAuthority:
         """Turn an approved decision into a permit for this exact action. Raises Rejected."""
         if not self.enabled:
             raise Rejected("permit_secret_not_configured")
+        if decision != "APPROVED":
+            raise Rejected("governance_denied")   # the gate decides first; nothing else can approve
         version = self.world.current_version(self.robot_id)
         if version is None:
             raise Rejected("no_world_state")
+        if intent == "MOVE_TO":
+            state = self.world.require(self.robot_id, version)
+            self._check_path(state, params or {})
         with self._lock:
             self._seq += 1
             seq = self._seq
@@ -132,6 +161,20 @@ class ExecutionAuthority:
         token = self.permits.issue(action, approved=(decision == "APPROVED"),
                                    ttl_s=settings.permit_ttl_s, agent_id=agent_id)
         return action, token
+
+    @staticmethod
+    def _check_path(state: Dict[str, Any], params: Dict[str, Any]) -> None:
+        """Second, independent layer behind the gate: sample the whole straight move."""
+        try:
+            start = (float(state["x"]), float(state["y"]))
+            end = (float(params["x"]), float(params["y"]))
+        except (KeyError, TypeError, ValueError):
+            raise Rejected("trajectory_unknown_positions")
+        b = state.get("bounds") or {}
+        bounds = None
+        if all(k in b for k in ("min_x", "min_y", "max_x", "max_y")):
+            bounds = (float(b["min_x"]), float(b["min_y"]), float(b["max_x"]), float(b["max_y"]))
+        check_move(start, end, bounds, keep_out_circles(state))
 
     async def dispatch(self, run_id: str, action: Action, token: str, sim) -> Dict[str, Any]:
         """Send through the single dispatch path, then record what the controller said.

@@ -57,8 +57,16 @@ def run(coro):
     return asyncio.run(coro)
 
 
+async def _observe(authority, sim):
+    """Real simulator telemetry, minus the walking workers: these tests are about permits,
+    and the path check (tested on its own below) would otherwise depend on where people wander."""
+    tel = await sim.get_telemetry()
+    tel["walking_humans"], tel["obstacles"] = [], []
+    authority.observe(tel)
+
+
 async def _issue(authority, sim, params, run_id="run-1"):
-    authority.observe(await sim.get_telemetry())
+    await _observe(authority, sim)
     return authority.authorize(run_id=run_id, mission_id="mis-1", intent="MOVE_TO", params=params,
                                decision="APPROVED", policy_version="v1", agent_id="planner:test")
 
@@ -142,7 +150,7 @@ def test_kill_switch_stops_robot_voids_permits_and_survives_restart(authority, s
         with pytest.raises(Rejected, match="kill"):
             await authority.dispatch("run-1", action, token, sim)
         restarted = ExecutionAuthority(secret=SECRET, db_path=authority.db_path)
-        restarted.observe(await sim.get_telemetry())
+        await _observe(restarted, sim)
         with pytest.raises(Rejected, match="kill"):
             restarted.authorize(run_id="r", mission_id="m", intent="MOVE_TO", params={"x": 6, "y": 3.5},
                                 decision="APPROVED", policy_version="v1")
@@ -169,7 +177,7 @@ def test_reset_requires_an_actor(authority, sim):
 def test_mission_kill_blocks_only_that_mission(authority, sim):
     async def go():
         await authority.kill("mission", "mis-1", reason="test", actor="op", sim=sim)
-        authority.observe(await sim.get_telemetry())
+        await _observe(authority, sim)
         with pytest.raises(Rejected, match="kill"):
             authority.authorize(run_id="r", mission_id="mis-1", intent="MOVE_TO", params={"x": 6, "y": 3.5},
                                 decision="APPROVED", policy_version="v1")
@@ -401,3 +409,34 @@ def test_operator_approval_expires(monkeypatch):
         db.commit()
     finally:
         db.close()
+
+
+# --- full-path check before a permit ---------------------------------------------------------------
+
+def test_permit_refused_when_the_path_runs_through_a_person_or_obstacle(authority):
+    base = {"x": 3.0, "y": 3.5, "bounds": {"min_x": 0, "min_y": 0, "max_x": 40, "max_y": 25}}
+    cases = [
+        ({"walking_humans": [{"x": 6.0, "y": 3.6}]}, "person"),        # walking straight through someone
+        ({"obstacles": [{"x": 6.0, "y": 3.5, "r": 0.4, "type": "dropped_pallet"}]}, "obstacle"),
+        ({"site_constraints": [{"x": 6.0, "y": 3.5, "radius": 1.0, "slow_radius": 2.0, "max_speed": 0.2}]}, "hazard"),
+    ]
+    for extra, kind in cases:
+        authority.observe({**base, **extra})
+        with pytest.raises(Rejected, match=f"trajectory_{kind}_clearance"):
+            authority.authorize(run_id="r", mission_id="m", intent="MOVE_TO", params={"x": 9.0, "y": 3.5},
+                                decision="APPROVED", policy_version="v")
+    authority.observe(base)
+    with pytest.raises(Rejected, match="out_of_bounds"):
+        authority.authorize(run_id="r", mission_id="m", intent="MOVE_TO", params={"x": 45.0, "y": 3.5},
+                            decision="APPROVED", policy_version="v")
+
+
+def test_robot_already_close_can_still_back_away(authority):
+    # A person 0.8 m away (inside the 1 m stop radius): moving away is allowed, moving closer is not
+    authority.observe({"x": 3.0, "y": 3.5, "walking_humans": [{"x": 3.8, "y": 3.5}]})
+    authority.authorize(run_id="r", mission_id="m", intent="MOVE_TO", params={"x": 1.5, "y": 3.5},
+                        decision="APPROVED", policy_version="v")
+    authority.observe({"x": 3.0, "y": 3.5, "walking_humans": [{"x": 3.8, "y": 3.5}]})
+    with pytest.raises(Rejected, match="person"):
+        authority.authorize(run_id="r", mission_id="m", intent="MOVE_TO", params={"x": 3.5, "y": 3.5},
+                            decision="APPROVED", policy_version="v")

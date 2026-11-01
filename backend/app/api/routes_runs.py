@@ -149,11 +149,26 @@ async def _plan_and_start_loop(svc: RunService, run_id: str, mission_id: str, mi
                 async with asyncio.timeout(LLM_PLAN_TIMEOUT):
                     planner = get_planner()
                     from app.services.site_intel.service import site_intel
+                    from app.services import canaries
+                    canary_token, canary_line = canaries.plant(run_id)
+                    context = canaries.with_canary(site_intel.planner_context(), canary_line)
                     try:
                         plan = await planner.generate_plan(telemetry, mission_title, goal, lessons=lessons,
-                                                           untrusted_context=site_intel.planner_context())
+                                                           untrusted_context=context)
                     except TypeError:  # planners without the parameter
                         plan = await planner.generate_plan(telemetry, mission_title, goal, lessons=lessons)
+
+                # Canary: a plan that obeyed an instruction hidden in untrusted data is not used
+                hit = canaries.tripped(canary_token, plan) if plan else None
+                if hit:
+                    svc._append_event(db, run_id, "CANARY", {
+                        "event": "planner_followed_untrusted_instruction", "marker": hit["marker"],
+                        "model_used": plan.get("model_used"), "action": "plan discarded; aisle route used",
+                    })
+                    db.commit()
+                    logger.warning("Run %s: canary %s tripped by %s; plan discarded", run_id, hit["marker"],
+                                   plan.get("model_used"))
+                    plan = {"waypoints": []}
 
                 if plan and plan.get("waypoints"):
                     # Keep the model's waypoints but re-route any leg that would cut through racking
