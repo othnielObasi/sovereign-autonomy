@@ -4,7 +4,7 @@ import React, { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import {
-  createMission, deleteMission, getWorld, listMissions, pauseMission, replayMission, resumeMission, startRun, updateMission,
+  createMission, deleteMission, getFleet, getWorld, listMissions, pauseMission, replayMission, resumeMission, startRun, updateMission,
 } from "@/lib/api";
 import type { Mission, MissionStatus } from "@/lib/types";
 import { Button, Empty, Mono, Notice, Page, PageHeader, Panel, Pill, Tabs, Verdict, cx } from "@/components/ui";
@@ -38,6 +38,8 @@ export default function MissionsPage() {
   // create
   const [title, setTitle] = useState(PRESETS[0].title);
   const [bayId, setBayId] = useState(PRESETS[0].bay);
+  const [robots, setRobots] = useState<string[]>(["robot-1"]);
+  const [robotId, setRobotId] = useState("robot-1");
   const [creating, setCreating] = useState(false);
   // edit
   const [editingId, setEditingId] = useState<string | null>(null);
@@ -47,7 +49,11 @@ export default function MissionsPage() {
   async function reload() {
     try { setMissions(await listMissions()); } catch { setError("Failed to load missions"); } finally { setLoading(false); }
   }
-  useEffect(() => { reload(); getWorld().then((w: any) => setBays(w?.bays || [])).catch(() => {}); }, []);
+  useEffect(() => {
+    reload();
+    getWorld().then((w: any) => setBays(w?.bays || [])).catch(() => {});
+    getFleet().then((f: any) => { const ids = (f?.robots || []).map((r: any) => r.robot_id); if (ids.length) setRobots(ids); }).catch(() => {});
+  }, []);
 
   const act = (fn: () => Promise<any>) => async () => {
     setError(null);
@@ -57,7 +63,7 @@ export default function MissionsPage() {
   async function create(start: boolean) {
     setCreating(true); setError(null);
     try {
-      const m = await createMission({ title, bay_id: bayId || undefined } as any);
+      const m = await createMission({ title, bay_id: bayId || undefined, robot_id: robotId } as any);
       if (start) {
         const r = await startRun(m.id);
         router.push(`/runs/${r.run_id}`);
@@ -109,11 +115,18 @@ export default function MissionsPage() {
             ))}
             {bays.length === 0 && <option value={bayId}>{bayId}</option>}
           </select>
+          {robots.length > 1 && (<>
+            <label className="block text-xs text-mc-dim mt-3 mb-1" htmlFor="m-robot">Robot</label>
+            <select id="m-robot" value={robotId} onChange={(e) => setRobotId(e.target.value)}
+              className="w-full rounded-lg bg-mc-raise border border-mc-line2 px-3 py-2 text-sm">
+              {robots.map((r) => <option key={r} value={r}>{r}</option>)}
+            </select>
+          </>)}
           <div className="grid grid-cols-2 gap-2 mt-4">
             <Button onClick={() => create(false)} disabled={creating || !title.trim()}>Save draft</Button>
             <Button variant="primary" onClick={() => create(true)} disabled={creating || !title.trim()}>{creating ? "Starting…" : "Start governed run"}</Button>
           </div>
-          <p className="mt-3 text-[11px] text-mc-dim leading-relaxed">On the public demo the robot is shared: if a mission is already running you&apos;ll be pointed to it.</p>
+          <p className="mt-3 text-[11px] text-mc-dim leading-relaxed">Each robot runs one mission at a time. Two robots never get overlapping paths: each move reserves its stretch of floor before it gets a permit.</p>
         </Panel>
 
         {/* List */}
@@ -152,7 +165,7 @@ export default function MissionsPage() {
                             </div>
                             <div className="mt-1 text-xs text-mc-dim flex flex-wrap gap-x-3">
                               <Mono className="text-mc-dim">{m.id}</Mono>
-                              {m.goal && <span>goal ({m.goal.x}, {m.goal.y}){m.goal.zone ? ` · ${m.goal.zone}` : ""}</span>}
+                              {m.goal && <span>goal ({m.goal.x}, {m.goal.y}){m.goal.zone ? ` · ${m.goal.zone}` : ""}{m.goal.robot_id ? ` · ${m.goal.robot_id}` : ""}</span>}
                               <span>{new Date(m.created_at).toLocaleString()}</span>
                             </div>
                           </div>

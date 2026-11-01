@@ -22,7 +22,7 @@ hackathon. Status of every capability: [`TRACEABILITY.md`](TRACEABILITY.md).
 | A1 | The simulator's telemetry (positions, people, obstacles) is correct | Real robots need sensor fusion and calibration; perception is cross-checked but sensors are trusted |
 | A2 | `PERMIT_SECRET` is known only to the backend and the controller | Rotate it (RUNBOOK); a leaked secret lets an attacker forge permits |
 | A3 | The controller checks permits before moving (it is the last line) | A controller that ignores permits removes the execution boundary |
-| A4 | One robot, one backend process | Multi-replica backends need a shared permit store and fencing |
+| A4 | One backend process (any number of robots) | Multi-replica backends need a shared permit and reservation store, and fencing |
 | A5 | People and vehicles are treated as static between ticks (~0.5–1 s) | See residual risk R1 |
 
 ## Hazards, controls and evidence
@@ -44,6 +44,7 @@ hackathon. Status of every capability: [`TRACEABILITY.md`](TRACEABILITY.md).
 | H13 | Safety rules changed without authorization | Rule changes need replay, a second person, versioning and rollback (earlier work); activation and rollback need an admin | `test_governed_rules_and_signing.py`; `test_rule_activation_needs_admin` |
 | H14 | Evidence of what happened is lost or altered | Hash-chained events and signed receipts (earlier work); hash-chained action journal; signed, verified backups | `test_checkpoint_tamper_detected`; `test_tampered_or_foreign_backups_are_refused` |
 | H15 | A model outage leaves the robot without a plan | Labelled deterministic fallback; gate and permits unchanged | `test_model_outage_falls_back_to_labelled_deterministic_plan` |
+| H16 | Two robots collide | Each robot sees the others as obstacles (gate and path check); each move reserves its floor cells first, so overlapping paths are refused; one run per robot | `test_two_robots_cannot_hold_overlapping_paths`; `test_reservation_contention_has_one_winner`; `test_a_robot_never_sees_itself_as_an_obstacle`; live: two missions at once, 0 robot contacts |
 
 ## Residual risks
 
@@ -53,7 +54,7 @@ hackathon. Status of every capability: [`TRACEABILITY.md`](TRACEABILITY.md).
 | R2 | Point-robot path model | The path check samples the robot's centre with fixed margins; no body shape or braking distance | Swept footprint and speed-dependent stopping distance in the path check |
 | R3 | Software stop only | The e-stop is software in the controller | A safety-rated hardware stop that does not depend on any software here |
 | R4 | Shared-secret permits | HMAC means the controller could in principle forge permits too | Asymmetric signatures (backend signs, controller only verifies) |
-| R5 | Single robot, single process | Permit store and kill switches are per process with SQLite | Shared transactional store, fencing tokens, multi-robot coordination |
+| R5 | Single backend process | Permit store, reservations and kill switches are per process (SQLite and memory); two robots are coordinated, but only by one backend | Shared transactional store, fencing tokens, a fleet scheduler |
 | R6 | Perception tested only in simulation | SAM 3.1 and the vision cross-check see rendered frames | Real cameras, calibration, and measured miss rates |
 | R7 | Model behaviour can change | Models may follow injected instructions (seen live) | Already contained by the gate and permits; keep the canary and drills running |
 

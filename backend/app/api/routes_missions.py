@@ -54,7 +54,11 @@ def create_mission(
     db: Session = Depends(get_db),
     user: str | None = Depends(OPERATOR),
 ):
-    m = svc.create(db, payload)
+    from app.services.mission_service import UnknownBay
+    try:
+        m = svc.create(db, payload)
+    except UnknownBay as exc:
+        raise HTTPException(status_code=422, detail=f"Unknown bay: {exc}")
     return _to_out(m)
 
 
@@ -83,7 +87,11 @@ def update_mission(
     db: Session = Depends(get_db),
     user: str | None = Depends(OPERATOR),
 ):
-    m = svc.update(db, mission_id, payload)
+    from app.services.mission_service import UnknownBay
+    try:
+        m = svc.update(db, mission_id, payload)
+    except UnknownBay as exc:
+        raise HTTPException(status_code=422, detail=f"Unknown bay: {exc}")
     if not m:
         raise HTTPException(status_code=404, detail="Mission not found or not editable (must be draft/paused)")
     return _to_out(m)

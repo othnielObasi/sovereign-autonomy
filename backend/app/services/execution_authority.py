@@ -22,13 +22,15 @@ from typing import Any, Dict, List, Optional
 
 from app.autonomy import permit as wire
 from app.autonomy.core import Action, CheckpointStore, KillSwitch, PermitStore, Rejected, WorldState, check_move
-from app.autonomy.operations import Budget, EvidenceLog, SafeDispatcher, Watchdog
+from app.autonomy.operations import Budget, CorridorReservations, EvidenceLog, SafeDispatcher, Watchdog
 from app.config import settings
 from app.observability import metrics
 
 logger = logging.getLogger("app.execution_authority")
 
 TARGET_MATCH_M = 0.05   # how close the controller's target must be to call a move "accepted"
+RESERVE_TTL_S = 10.0    # a robot's path hold lasts this long unless renewed by its next permit
+RESERVE_PAD_CELLS = 1   # cells either side of the path (0.5 m grid -> ~0.5 m margin each side)
 ROBOT_RADIUS_M = 0.4
 PERSON_STOP_M = 1.0     # same stop radius the gate's human-proximity rule uses
 
@@ -89,6 +91,8 @@ class ExecutionAuthority:
         self._lock = threading.Lock()
         self._budgets: Dict[str, Budget] = {}
         self._watchdogs: Dict[str, Watchdog] = {}
+        self.reservations = CorridorReservations()
+        self._mission_robot: Dict[str, str] = {}
         self._init_kill_table()
         if not self.enabled:
             logger.warning("PERMIT_SECRET is not set (32+ characters): no move can be authorized")
@@ -122,13 +126,17 @@ class ExecutionAuthority:
 
     # --- world state ---------------------------------------------------------------------
 
-    def observe(self, telemetry: Dict[str, Any]) -> int:
-        """Record fresh telemetry; returns the new world version."""
+    def observe(self, telemetry: Dict[str, Any], robot_id: Optional[str] = None) -> int:
+        """Record fresh telemetry for one robot; returns the new world version."""
+        rid = robot_id or telemetry.get("robot_id") or self.robot_id
         with self._lock:
             self._version += 1
             version = self._version
-        self.world.update(self.robot_id, version, dict(telemetry))
+        self.world.update(rid, version, dict(telemetry))
         return version
+
+    def robots(self) -> List[str]:
+        return sorted(set([self.robot_id] + self.world.robots() + list(self._mission_robot.values())))
 
     # --- per-run controls ------------------------------------------------------------------
 
@@ -142,22 +150,26 @@ class ExecutionAuthority:
     # --- authorize and dispatch -------------------------------------------------------------
 
     def authorize(self, *, run_id: str, mission_id: str, intent: str, params: Dict[str, Any],
-                  decision: str, policy_version: str, agent_id: str = "") -> tuple[Action, str]:
+                  decision: str, policy_version: str, agent_id: str = "",
+                  robot_id: Optional[str] = None) -> tuple[Action, str]:
         """Turn an approved decision into a permit for this exact action. Raises Rejected."""
         if not self.enabled:
             raise Rejected("permit_secret_not_configured")
         if decision != "APPROVED":
             raise Rejected("governance_denied")   # the gate decides first; nothing else can approve
-        version = self.world.current_version(self.robot_id)
+        rid = robot_id or self.robot_id
+        version = self.world.current_version(rid)
         if version is None:
             raise Rejected("no_world_state")
+        self._mission_robot[mission_id] = rid
         if intent == "MOVE_TO":
-            state = self.world.require(self.robot_id, version)
+            state = self.world.require(rid, version)
             self._check_path(state, params or {})
+            self._reserve_path(rid, state, params or {})
         with self._lock:
             self._seq += 1
             seq = self._seq
-        action = Action(self.robot_id, mission_id, f"{run_id}:{seq}:{int(time.time() * 1000)}",
+        action = Action(rid, mission_id, f"{run_id}:{seq}:{int(time.time() * 1000)}",
                         intent, dict(params or {}), version, policy_version or "")
         token = self.permits.issue(action, approved=(decision == "APPROVED"),
                                    ttl_s=settings.permit_ttl_s, agent_id=agent_id)
@@ -185,6 +197,20 @@ class ExecutionAuthority:
         if all(k in b for k in ("min_x", "min_y", "max_x", "max_y")):
             bounds = (float(b["min_x"]), float(b["min_y"]), float(b["max_x"]), float(b["max_y"]))
         check_move(start, end, bounds, keep_out_circles(state))
+
+    def _reserve_path(self, robot_id: str, state: Dict[str, Any], params: Dict[str, Any]) -> None:
+        """Hold the floor cells along this move (plus a margin) for this robot only, so two
+        robots can never be authorized onto overlapping paths. All or nothing."""
+        from bench.world import GRID_M
+        (x0, y0), (x1, y1) = (float(state["x"]), float(state["y"])), (float(params["x"]), float(params["y"]))
+        steps = max(1, math.ceil(math.hypot(x1 - x0, y1 - y0) / (GRID_M / 2)))
+        keys = set()
+        for k in range(steps + 1):
+            ci, cj = int((x0 + (x1 - x0) * k / steps) / GRID_M), int((y0 + (y1 - y0) * k / steps) / GRID_M)
+            for di in range(-RESERVE_PAD_CELLS, RESERVE_PAD_CELLS + 1):
+                for dj in range(-RESERVE_PAD_CELLS, RESERVE_PAD_CELLS + 1):
+                    keys.add(f"{ci + di},{cj + dj}")
+        self.reservations.reserve_path(robot_id, keys, ttl_s=RESERVE_TTL_S)
 
     async def dispatch(self, run_id: str, action: Action, token: str, sim) -> Dict[str, Any]:
         """Send through the single dispatch path, then record what the controller said.
@@ -245,14 +271,25 @@ class ExecutionAuthority:
         revoked_ms = (time.monotonic() - t0) * 1000
 
         controller: Dict[str, Any] = {}
+        if scope == "global":
+            robots = self.robots()
+        elif scope == "robot":
+            robots = [ident]
+        elif scope == "mission":
+            robots = [self._mission_robot.get(ident, self.robot_id)]
+        else:   # agent: stop every robot it may have been driving
+            robots = self.robots()
         try:
-            if scope == "global" or (scope == "robot" and ident == self.robot_id):
+            if scope == "global":
                 controller = await sim.estop(engaged=True, reason=reason)
+            elif scope == "robot":
+                controller = await sim.estop(engaged=True, reason=reason, robot_id=ident)
             else:
-                controller = await sim.send_command({"intent": "STOP", "params": {}})
+                for rid in robots:
+                    controller = await sim.send_command({"intent": "STOP", "params": {}, "robot_id": rid})
         except Exception as exc:   # authority is already revoked; report the controller failure
             controller = {"ok": False, "error": type(exc).__name__}
-        stop = await self._verify_stopped(sim)
+        stop = await self._verify_stopped(sim, robots)
         self.evidence.emit("kill_switch", "*", None, scope=scope, id=ident, reason=reason, actor=actor)
         metrics.inc("kill_switch_total", scope=scope)
         from app.observability import tracing
@@ -261,20 +298,27 @@ class ExecutionAuthority:
         metrics.observe("kill_revoke_ms", revoked_ms, scope=scope)
         if stop.get("stop_verified_ms") is not None:
             metrics.observe("kill_stop_verified_ms", stop["stop_verified_ms"], scope=scope)
-        return {"scope": scope, "id": ident, "authority_revoked_ms": round(revoked_ms, 2),
+        return {"scope": scope, "id": ident, "robots": robots, "authority_revoked_ms": round(revoked_ms, 2),
                 "controller": controller, **stop}
 
-    async def _verify_stopped(self, sim, timeout_s: float = 5.0) -> Dict[str, Any]:
+    async def _verify_stopped(self, sim, robots: Optional[List[str]] = None, timeout_s: float = 5.0) -> Dict[str, Any]:
+        """Poll each robot's telemetry until it reports no speed and no target."""
         t0 = time.monotonic()
+        pending = list(robots or [self.robot_id])
         while time.monotonic() - t0 < timeout_s:
-            try:
-                tel = await sim.get_telemetry()
-                if abs(float(tel.get("speed", 0.0))) < 0.02 and not tel.get("target"):
-                    return {"stop_verified": True, "stop_verified_ms": round((time.monotonic() - t0) * 1000, 1)}
-            except Exception:
-                pass
+            still = []
+            for rid in pending:
+                try:
+                    tel = await (sim.get_telemetry(robot_id=rid) if rid != self.robot_id else sim.get_telemetry())
+                    if not (abs(float(tel.get("speed", 0.0))) < 0.02 and not tel.get("target")):
+                        still.append(rid)
+                except Exception:
+                    still.append(rid)
+            pending = still
+            if not pending:
+                return {"stop_verified": True, "stop_verified_ms": round((time.monotonic() - t0) * 1000, 1)}
             await asyncio.sleep(0.1)
-        return {"stop_verified": False, "stop_verified_ms": None}
+        return {"stop_verified": False, "stop_verified_ms": None, "not_stopped": pending}
 
     async def reset(self, scope: str, ident: str, *, actor: str, sim) -> Dict[str, Any]:
         """Lift one lock (caller must be an authenticated operator). Old permits stay void."""
@@ -287,10 +331,20 @@ class ExecutionAuthority:
         finally:
             conn.close()
         controller: Dict[str, Any] = {}
-        still_stopped = any(s == "global" or (s == "robot" and i == self.robot_id) for s, i in self.kills.active())
-        if not still_stopped and self.enabled:
+        active = self.kills.active()
+        if scope == "global":
+            still_stopped = False
+            release_for = "*"
+        elif scope == "robot":
+            still_stopped = any(s == "global" for s, _ in active)
+            release_for = ident
+        else:
+            still_stopped = any(s == "global" for s, _ in active)
+            release_for = None      # mission/agent locks never engaged a controller e-stop
+        if release_for and self.enabled:
             try:
-                controller = await sim.estop(engaged=False, release_token=wire.release_token(self.secret, self.robot_id))
+                controller = await sim.estop(engaged=False, robot_id=None if release_for == "*" else release_for,
+                                             release_token=wire.release_token(self.secret, release_for))
             except Exception as exc:
                 controller = {"ok": False, "error": type(exc).__name__}
         self.evidence.emit("kill_switch_reset", "*", None, scope=scope, id=ident, actor=actor)
@@ -301,9 +355,9 @@ class ExecutionAuthority:
                 "still_stopped": still_stopped}
 
     def status(self) -> Dict[str, Any]:
-        return {"enabled": self.enabled, "robot_id": self.robot_id, "epoch": self.kills.epoch,
+        return {"enabled": self.enabled, "robot_id": self.robot_id, "robots": self.robots(), "epoch": self.kills.epoch,
                 "kill_locks": self.kill_locks(), "world_version": self.world.current_version(self.robot_id),
-                "journal_intact": self.checkpoints.verify_chain()}
+                "reservations": self.reservations.held(), "journal_intact": self.checkpoints.verify_chain()}
 
 
 _authority: Optional[ExecutionAuthority] = None

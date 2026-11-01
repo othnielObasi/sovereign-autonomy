@@ -23,11 +23,20 @@ class ScenarioIn(BaseModel):
     )
 
 
+@router.get("/sim/fleet")
+async def get_fleet():
+    """Every robot in the warehouse: pose, target, e-stop."""
+    try:
+        return await sim.get_fleet()
+    except Exception as e:
+        raise HTTPException(status_code=502, detail=f"sim error: {e}")
+
+
 @router.get("/sim/telemetry")
-async def get_telemetry():
+async def get_telemetry(robot_id: str | None = None):
     """Proxy the simulator's current telemetry (robot position, sensors)."""
     try:
-        telemetry = await sim.get_telemetry()
+        telemetry = await (sim.get_telemetry(robot_id=robot_id) if robot_id else sim.get_telemetry())
     except Exception as e:
         raise HTTPException(status_code=502, detail=f"sim error: {e}")
     # Include active hazard zones so every view shows what the gate enforces

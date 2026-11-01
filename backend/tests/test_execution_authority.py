@@ -44,8 +44,10 @@ def sim(sim_module):
     adapter = SimAdapter(base_url="http://sim")
     adapter._client = httpx.AsyncClient(transport=httpx.ASGITransport(app=sim_module.app), base_url="http://sim")
     sim_module._estop.update(engaged=False, reason="", since=None)
+    sim_module._robot_estops.clear()
     yield adapter
     sim_module._estop.update(engaged=False, reason="", since=None)
+    sim_module._robot_estops.clear()
 
 
 @pytest.fixture
@@ -129,12 +131,18 @@ def test_estop_blocks_even_valid_permits_until_signed_release(authority, sim):
         blocked = await sim.send_command(_raw_command(action, token))
         with pytest.raises(httpx.HTTPStatusError):
             await sim.estop(engaged=False, release_token="not-a-token")
-        released = await sim.estop(engaged=False, release_token=wire.release_token(SECRET.encode(), "robot-1"))
+        wrong = None
+        try:
+            await sim.estop(engaged=False, release_token=wire.release_token(SECRET.encode(), "robot-1"))
+        except httpx.HTTPStatusError as exc:
+            wrong = exc.response.status_code      # a one-robot token cannot lift the global stop
+        released = await sim.estop(engaged=False, release_token=wire.release_token(SECRET.encode(), "*"))
         action2, token2 = await _issue(authority, sim, {"x": 6.0, "y": 3.5, "max_speed": 0.3})
         after = await authority.dispatch("run-1", action2, token2, sim)
-        return engaged, blocked, released, after
+        return engaged, blocked, released, after, wrong
 
-    engaged, blocked, released, after = run(go())
+    engaged, blocked, released, after, wrong = run(go())
+    assert wrong == 403
     assert engaged["engaged"] is True
     assert blocked["rejected"] and blocked["reason"] == "estop_engaged" and blocked["status"] == 423
     assert released["engaged"] is False
@@ -160,7 +168,7 @@ def test_kill_switch_stops_robot_voids_permits_and_survives_restart(authority, s
 
     report, tel, reset, restarted = run(go())
     assert report["stop_verified"] is True and report["controller"]["engaged"] is True
-    assert tel["estop"]["engaged"] is True
+    assert tel["estop"]["robot"] is not None and tel["estop"]["engaged"] is False   # this robot only
     assert reset["controller_released"] is True and restarted.kill_locks() == []
 
 

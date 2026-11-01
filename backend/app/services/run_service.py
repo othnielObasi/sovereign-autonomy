@@ -42,6 +42,32 @@ from app.services.execution_authority import get_authority
 from app.autonomy.core import Rejected
 
 
+class RobotView:
+    """The simulator as seen by one robot: telemetry, commands, camera and reset for
+    that robot only. The default robot uses the adapter unchanged."""
+
+    def __init__(self, sim, robot_id: str):
+        self._sim, self.robot_id = sim, robot_id
+
+    async def get_telemetry(self):
+        return await self._sim.get_telemetry(robot_id=self.robot_id)
+
+    async def send_command(self, command):
+        return await self._sim.send_command(dict(command, robot_id=self.robot_id))
+
+    async def get_frame(self, size: int = 512):
+        return await self._sim.get_frame(size=size, robot_id=self.robot_id)
+
+    async def reset_robot(self):
+        return await self._sim.reset_robot(robot_id=self.robot_id)
+
+    async def estop(self, **kw):
+        return await self._sim.estop(**kw)
+
+    def __getattr__(self, name):          # world, scenarios, seeds: shared by all robots
+        return getattr(self._sim, name)
+
+
 def settings_world_age() -> float:
     from app.config import settings as _cfg
     return float(_cfg.world_max_age_s)
@@ -97,6 +123,7 @@ class RunService:
                                              # commanded and actual position after exec
 
         self.sim = SimAdapter()
+        self._run_robot: Dict[str, str] = {}   # run id -> robot it drives
         self.agent = AgentRouter()
         self.gov = GovernanceEngine()
         self.tel = TelemetryService()
@@ -179,6 +206,12 @@ class RunService:
         db.refresh(run)
         try:
             from app.db.models import Mission as _M
+            _m = db.query(_M).filter(_M.id == mission_id).first()
+            self._run_robot[run.id] = self.robot_of_goal(json.loads(_m.goal_json) if _m else None)
+        except Exception:
+            pass
+        try:
+            from app.db.models import Mission as _M
             from app.observability import tracing
             m = db.query(_M).filter(_M.id == mission_id).first()
             tracing.mission_start(run.id, mission_id, m.title if m else "", json.loads(m.goal_json) if m else {})
@@ -188,6 +221,36 @@ class RunService:
         # Do NOT launch loop yet — caller must attach a plan first, then
         # call begin_running() to transition from "planning" → "running".
         return run
+
+    @staticmethod
+    def robot_of_goal(goal: Optional[Dict[str, Any]]) -> str:
+        from app.config import settings as _cfg
+        return str((goal or {}).get("robot_id") or _cfg.robot_id)
+
+    def sim_for_robot(self, robot_id: str):
+        from app.config import settings as _cfg
+        return self.sim if robot_id == _cfg.robot_id else RobotView(self.sim, robot_id)
+
+    def robot_for(self, run_id: str) -> str:
+        if run_id not in self._run_robot:
+            from app.db.session import SessionLocal as _SL
+            from app.db.models import Mission as _M
+            db = _SL()
+            try:
+                run = db.query(Run).filter(Run.id == run_id).first()
+                m = db.query(_M).filter(_M.id == run.mission_id).first() if run else None
+                if m is None:          # unknown run: answer the default, but don't remember it
+                    return self.robot_of_goal(None)
+                self._run_robot[run_id] = self.robot_of_goal(json.loads(m.goal_json))
+            except Exception:
+                return self.robot_of_goal(None)
+            finally:
+                db.close()
+        return self._run_robot[run_id]
+
+    def sim_for(self, run_id: str):
+        """The simulator view for the robot this run drives."""
+        return self.sim_for_robot(self.robot_for(run_id))
 
     def begin_running(self, db: Session, run_id: str) -> None:
         """Transition a run from 'planning' to 'running' and launch the loop.
@@ -247,7 +310,7 @@ class RunService:
 
         # Halt the robot first: an operator stop must not wait on the database.
         try:
-            await self.sim.send_command({"intent": "STOP", "params": {}})
+            await self.sim_for(run_id).send_command({"intent": "STOP", "params": {}})
         except Exception as e:
             logger.warning("Run %s: STOP command to robot failed: %s", run_id, e)
 
@@ -283,7 +346,7 @@ class RunService:
 
         # Return robot to parking station on manual stop
         try:
-            await self.sim.reset_robot()
+            await self.sim_for(run_id).reset_robot()
             logger.info("Run %s: robot returned to parking after manual stop", run_id)
         except Exception:
             pass
@@ -308,7 +371,7 @@ class RunService:
 
         # Send STOP to simulator
         try:
-            await self.sim.send_command({"intent": "STOP", "params": {}})
+            await self.sim_for(run_id).send_command({"intent": "STOP", "params": {}})
         except Exception:
             pass
 
@@ -367,7 +430,7 @@ class RunService:
             raise Rejected("kill_switch_active")
         settled: List[Dict[str, Any]] = []
         try:
-            tel = await self.sim.get_telemetry()
+            tel = await self.sim_for(run_id).get_telemetry()
             settled = authority.reconcile_in_doubt(run.mission_id, tel)
         except Rejected:
             raise
@@ -458,8 +521,10 @@ class RunService:
 
         Returns the simulator's answer, or {"ok": False, "rejected": True, ...} when
         authority refused the move (the robot is then told to stop)."""
+        sim = self.sim_for(run_id)
+        robot_id = self.robot_for(run_id)
         if intent != "MOVE_TO":
-            return await self.sim.send_command({"intent": intent, "params": params})
+            return await sim.send_command({"intent": intent, "params": params})
         authority = get_authority()
         from app.config import settings as _cfg
         from app.policies.params import active_params, params_hash
@@ -467,9 +532,9 @@ class RunService:
             action, token = authority.authorize_or_count(
                 run_id=run_id, mission_id=mission_id, intent=intent, params=params,
                 decision="APPROVED", policy_version=params_hash(active_params()),
-                agent_id=f"planner:{_cfg.planner_provider}",
+                agent_id=f"planner:{_cfg.planner_provider}", robot_id=robot_id,
             )
-            result = await authority.dispatch(run_id, action, token, self.sim)
+            result = await authority.dispatch(run_id, action, token, sim)
         except Rejected as exc:
             reason = str(exc)
             unknown = reason.startswith("controller_outcome_unknown")
@@ -478,7 +543,7 @@ class RunService:
                 "reason": reason, "intent": intent, "params": params,
             })
             try:   # contain it: an uncertain or refused move ends with the robot stopped
-                await self.sim.send_command({"intent": "STOP", "params": {}})
+                await self.sim_for(run_id).send_command({"intent": "STOP", "params": {}})
             except Exception:
                 pass
             if reason.startswith("trajectory_"):
@@ -550,7 +615,7 @@ class RunService:
                         started = run.started_at.replace(tzinfo=None)
                         if (utc_now().replace(tzinfo=None) - started).total_seconds() > _cfg.demo_max_run_s:
                             try:
-                                await self.sim.send_command({"intent": "STOP", "params": {}})
+                                await self.sim_for(run_id).send_command({"intent": "STOP", "params": {}})
                             except Exception:
                                 pass
                             run.status = "stopped"
@@ -570,7 +635,7 @@ class RunService:
                     mission = db.query(Mission).filter(Mission.id == run.mission_id).first()
                     goal = json.loads(mission.goal_json) if mission else {"x": 0, "y": 0}
 
-                    telemetry = await self.sim.get_telemetry()
+                    telemetry = await self.sim_for(run_id).get_telemetry()
                     tel_fetched_at = time.monotonic()
                     authority = get_authority()
                     authority.heartbeat(run_id)
@@ -598,7 +663,7 @@ class RunService:
                             if self._ws_broadcast:
                                 await self._ws_broadcast(run_id, {"kind": "perception", "data": res})
                         if perception.due(run_id):
-                            asyncio.create_task(perception.run_check(self.sim, dict(telemetry), run_id))
+                            asyncio.create_task(perception.run_check(self.sim_for(run_id), dict(telemetry), run_id))
                         telemetry = perception.apply(telemetry)
                     except Exception as vis_err:
                         logger.warning("Run %s: vision step failed: %s", run_id, vis_err)
@@ -622,7 +687,7 @@ class RunService:
                         })
                         # Send STOP to sim and abort tick
                         try:
-                            await self.sim.send_command({"intent": "STOP", "params": {}})
+                            await self.sim_for(run_id).send_command({"intent": "STOP", "params": {}})
                         except Exception:
                             pass
                         db.commit()
@@ -711,7 +776,7 @@ class RunService:
                         # Plan used up before the goal: route the rest along the aisles rather than straight at it
                         try:
                             from app.services.site_router import route_plan
-                            routed = route_plan(await self.sim.get_world(), telemetry, goal, ZONE_SPEED_LIMITS,
+                            routed = route_plan(await self.sim_for(run_id).get_world(), telemetry, goal, ZONE_SPEED_LIMITS,
                                                 hazards=telemetry.get("site_constraints"))
                         except Exception as route_err:
                             routed = None
@@ -729,7 +794,7 @@ class RunService:
                         rx_, ry_ = float(telemetry.get("x", 0)), float(telemetry.get("y", 0))
                         inside_z = next((z for z in zones if math.hypot(rx_ - float(z["x"]), ry_ - float(z["y"])) < float(z["radius"])), None)
                         if inside_z:
-                            site_w = await self.sim.get_world()
+                            site_w = await self.sim_for(run_id).get_world()
                             exit_pt = hazard_exit_point(site_w, rx_, ry_, inside_z)
                             if exit_pt:
                                 hazard_proposal = ActionProposal(
@@ -741,7 +806,7 @@ class RunService:
                                 hold_reason = f"Inside the {inside_z.get('label', 'hazard')} zone with no clear way out — holding for the operator"
                         elif wp and crosses_hazard(telemetry, [wp], zones):
                             from app.services.site_router import route_plan as _rp
-                            around = _rp(await self.sim.get_world(), telemetry, goal, ZONE_SPEED_LIMITS, hazards=zones)
+                            around = _rp(await self.sim_for(run_id).get_world(), telemetry, goal, ZONE_SPEED_LIMITS, hazards=zones)
                             if around:
                                 async with self._plans_lock:
                                     self._plans[run_id] = around
@@ -787,7 +852,7 @@ class RunService:
                         db.commit()
                         world_state = None
                         try:
-                            world_state = await self.sim.get_world()
+                            world_state = await self.sim_for(run_id).get_world()
                         except Exception:
                             pass
                         try:
@@ -821,10 +886,10 @@ class RunService:
                     # the robot and people, then record this as the world version a permit binds to.
                     if time.monotonic() - tel_fetched_at > settings_world_age() / 2:
                         try:
-                            telemetry.update(await self.sim.get_telemetry())
+                            telemetry.update(await self.sim_for(run_id).get_telemetry())
                         except Exception as fresh_err:
                             logger.warning("Run %s: telemetry refresh failed: %s", run_id, fresh_err)
-                    authority.observe(telemetry)
+                    authority.observe(telemetry, robot_id=self.robot_for(run_id))
 
                     # Governance evaluates and persists decision
                     gov_decision = self.gov.evaluate_and_record(
@@ -925,7 +990,7 @@ class RunService:
                         # Denied or NEEDS_REVIEW: stop the robot. Without this the simulator kept
                         # driving to the last approved target, so a denial only withheld a new one.
                         try:
-                            stop_ack = await self.sim.send_command({"intent": "STOP", "params": {}})
+                            stop_ack = await self.sim_for(run_id).send_command({"intent": "STOP", "params": {}})
                         except Exception as stop_err:
                             stop_ack = {"ok": False, "error": str(stop_err)}
                         self._append_event(db, run_id, "EXECUTION", {
@@ -987,7 +1052,7 @@ class RunService:
                                     logger.info("Run %s: NEEDS_REVIEW — slower move approved (count %d)", run_id, denial_count)
                                     self._wp_denial_counts[run_id] = 0   # the robot is moving under an approved decision
                                     cmd = {"intent": cautious.intent, "params": cautious_params}
-                                    authority.observe(telemetry)
+                                    authority.observe(telemetry, robot_id=self.robot_for(run_id))
                                     execution = await self._execute_permitted(
                                         db, run_id, mission.id if mission else run.mission_id, cautious.intent, cautious_params)
                                     exec_verified = execution.get("ok", False) or execution.get("ack", False)
@@ -1056,7 +1121,7 @@ class RunService:
                                     new_plan = await planner.generate_plan(telemetry, replan_instruction, goal, lessons=lessons)
                                 try:
                                     from app.services.site_router import repair_plan, route_plan
-                                    site = await self.sim.get_world()
+                                    site = await self.sim_for(run_id).get_world()
                                     if new_plan.get("model_used") == "deterministic_fallback":
                                         # No model: route around the blocked spot along the aisles
                                         routed = route_plan(site, telemetry, goal, ZONE_SPEED_LIMITS, avoid=blocked_wp,
@@ -1080,7 +1145,7 @@ class RunService:
                                 task_check = None
                                 try:
                                     from app.services.task_guard import guard
-                                    g = guard(new_plan, telemetry, goal, await self.sim.get_world(), ZONE_SPEED_LIMITS,
+                                    g = guard(new_plan, telemetry, goal, await self.sim_for(run_id).get_world(), ZONE_SPEED_LIMITS,
                                               hazards=telemetry.get("site_constraints"))
                                     new_plan, task_check = g["plan"], g["check"]
                                     self._append_event(db, run_id, "TASK_CHECK", {"stage": "replan", **task_check})
@@ -1204,12 +1269,12 @@ class RunService:
 
                         # Return robot to parking station (reset to start position)
                         try:
-                            await self.sim.reset_robot()
+                            await self.sim_for(run_id).reset_robot()
                             logger.info("Run %s: robot returned to parking station", run_id)
                             # Broadcast fresh telemetry so the frontend map shows the robot back at start
                             if self._ws_broadcast:
                                 try:
-                                    reset_telem = await self.sim.get_telemetry()
+                                    reset_telem = await self.sim_for(run_id).get_telemetry()
                                     await self._ws_broadcast(run_id, {"kind": "telemetry", "data": reset_telem})
                                 except Exception:
                                     pass
@@ -1250,7 +1315,7 @@ class RunService:
                                     mission.status = "failed"
                             if self._ws_broadcast:
                                 try:
-                                    reset_telem = await self.sim.get_telemetry()
+                                    reset_telem = await self.sim_for(run_id).get_telemetry()
                                     await self._ws_broadcast(run_id, {"kind": "telemetry", "data": reset_telem})
                                 except Exception:
                                     pass
@@ -1259,7 +1324,7 @@ class RunService:
                             pass
                         # Return robot to parking station even on failure
                         try:
-                            await self.sim.reset_robot()
+                            await self.sim_for(run_id).reset_robot()
                             logger.info("Run %s: robot returned to parking after failure", run_id)
                         except Exception:
                             pass

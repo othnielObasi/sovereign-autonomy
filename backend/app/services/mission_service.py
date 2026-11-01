@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+import logging
 from typing import Any, Dict, List, Optional
 import math
 
@@ -14,6 +15,12 @@ from app.schemas.mission import MissionCreate, MissionUpdate
 from app.utils.ids import new_id
 from app.utils.time import utc_now
 
+
+
+logger = logging.getLogger("app.mission_service")
+
+class UnknownBay(ValueError):
+    """A mission named a bay that does not exist on the site map."""
 
 class MissionService:
     """Manages mission CRUD, goal normalisation, and audit logging.
@@ -61,6 +68,8 @@ class MissionService:
             goal = self._resolve_bay_coords(payload.bay_id)
         else:
             goal = self._normalize_goal(payload.goal or {})
+        if getattr(payload, "robot_id", None):
+            goal = dict(goal, robot_id=payload.robot_id)
 
         m = Mission(
             id=new_id("mis"),
@@ -295,23 +304,19 @@ class MissionService:
                 except Exception:
                     world = None
             if world is None:
-                from pathlib import Path
-
-                repo_root = Path(__file__).resolve().parents[4]
-                world_path = repo_root / "sim" / "mock_sim" / "world.json"
-                if world_path.exists():
-                    with world_path.open() as fh:
-                        world = json.load(fh)
+                # The same warehouse layout the simulator runs on
+                from bench.world import load_layout
+                world = load_layout()
             bays = (world or {}).get("bays") or []
             for b in bays:
                 if str(b.get("id", "")).upper() == str(bay_id).upper():
                     bx, by = float(b.get("x", 0)), float(b.get("y", 0))
                     zone = self._zone_for(bx, by, world)
                     return {"x": bx, "y": by, "zone": zone}
-        except Exception:
-            pass
-        # Fallback: return origin
-        return {"x": 0.0, "y": 0.0}
+        except Exception as exc:
+            logger.warning("Bay lookup failed for %s: %s", bay_id, exc)
+        # Never send a robot to a made-up position
+        raise UnknownBay(bay_id)
 
     def set_status(
         self, db: Session, mission_id: str, new_status: str,

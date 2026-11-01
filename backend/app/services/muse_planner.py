@@ -36,6 +36,8 @@ SYSTEM_PROMPT = (
 )
 
 _frame: contextvars.ContextVar[Optional[bytes]] = contextvars.ContextVar("muse_frame", default=None)
+# The robot whose camera a mission plan should use (set by the caller; default robot if unset)
+planning_robot: contextvars.ContextVar[Optional[str]] = contextvars.ContextVar("planning_robot", default=None)
 
 
 def _dedupe(models: List[str]) -> List[str]:
@@ -105,7 +107,8 @@ class MusePlanner(GeminiPlanner):
         from app.services.sim_adapter import SimAdapter
         sim = SimAdapter()
         try:
-            return await sim.get_frame(size=512)
+            robot = planning_robot.get()
+            return await (sim.get_frame(size=512, robot_id=robot) if robot else sim.get_frame(size=512))
         except Exception as exc:   # no camera: plan from the map alone
             logger.info("No camera frame for planning: %s", exc)
             return None

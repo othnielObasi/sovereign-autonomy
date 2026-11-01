@@ -380,30 +380,35 @@ class World:
                 self.active_spawns.append(s.obstacle)
                 self.spawns.remove(s)
 
-        r = self.robot
-        if r.target is None:
-            r.speed = max(0.0, r.speed - MAX_DECEL * dt)
-            if r.speed > 0:  # coast to a stop along the heading
-                r.x += math.cos(r.theta) * r.speed * dt
-                r.y += math.sin(r.theta) * r.speed * dt
-            return
-        tx, ty = r.target["x"], r.target["y"]
-        dx, dy = tx - r.x, ty - r.y
-        dist = math.hypot(dx, dy)
-        if dist < 0.05:
-            r.speed, r.target = 0.0, None
-            return
-        desired = min(r.target["max_speed"], math.sqrt(2.0 * MAX_DECEL * dist))
-        if desired > r.speed:
-            r.speed = min(desired, r.speed + MAX_ACCEL * dt)
-        else:
-            r.speed = max(desired, r.speed - MAX_DECEL * dt)
-        want = math.atan2(dy, dx)
-        dth = math.atan2(math.sin(want - r.theta), math.cos(want - r.theta))
-        r.theta += max(-MAX_HEADING_RATE * dt, min(MAX_HEADING_RATE * dt, dth))
-        if abs(dth) > math.pi / 4:
-            # Differential drive: brake and turn on the spot rather than arcing into things
-            r.speed = max(0.0, r.speed - MAX_DECEL * dt)
-        step = min(r.speed * dt, dist)
-        r.x += math.cos(r.theta) * step
-        r.y += math.sin(r.theta) * step
+        drive_robot(self.robot, dt)
+
+
+def drive_robot(r: RobotState, dt: float) -> None:
+    """One physics step for a robot: accelerate toward its target, or brake to a stop.
+    Shared by the benchmark world and the live simulator's other robots."""
+    if r.target is None:
+        r.speed = max(0.0, r.speed - MAX_DECEL * dt)
+        if r.speed > 0:  # coast to a stop along the heading
+            r.x += math.cos(r.theta) * r.speed * dt
+            r.y += math.sin(r.theta) * r.speed * dt
+        return
+    tx, ty = r.target["x"], r.target["y"]
+    dx, dy = tx - r.x, ty - r.y
+    dist = math.hypot(dx, dy)
+    if dist < 0.05:
+        r.speed, r.target = 0.0, None
+        return
+    desired = min(r.target["max_speed"], math.sqrt(2.0 * MAX_DECEL * dist))
+    if desired > r.speed:
+        r.speed = min(desired, r.speed + MAX_ACCEL * dt)
+    else:
+        r.speed = max(desired, r.speed - MAX_DECEL * dt)
+    want = math.atan2(dy, dx)
+    dth = math.atan2(math.sin(want - r.theta), math.cos(want - r.theta))
+    r.theta += max(-MAX_HEADING_RATE * dt, min(MAX_HEADING_RATE * dt, dth))
+    if abs(dth) > math.pi / 4:
+        # Differential drive: brake and turn on the spot rather than arcing into things
+        r.speed = max(0.0, r.speed - MAX_DECEL * dt)
+    step = min(r.speed * dt, dist)
+    r.x += math.cos(r.theta) * step
+    r.y += math.sin(r.theta) * step

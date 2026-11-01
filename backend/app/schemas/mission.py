@@ -10,6 +10,7 @@ class MissionCreate(BaseModel):
     # Either a bay identifier (preferred) or explicit goal coordinates
     bay_id: Optional[str] = Field(None, description="Optional bay identifier (e.g. B-03)")
     goal: Optional[Dict[str, Any]] = Field(None, description="Goal object, e.g. {'x': 15, 'y': 7}")
+    robot_id: Optional[str] = Field(None, max_length=50, description="Robot to use (default: the main robot)")
 
 
 class MissionUpdate(BaseModel):

@@ -37,8 +37,8 @@ class SimAdapter:
         r.raise_for_status()
         return r.json()
 
-    async def get_telemetry(self) -> Dict[str, Any]:
-        r = await self._client.get(f"{self.base_url}/telemetry")
+    async def get_telemetry(self, robot_id: Optional[str] = None) -> Dict[str, Any]:
+        r = await self._client.get(f"{self.base_url}/telemetry", params={"robot_id": robot_id} if robot_id else None)
         r.raise_for_status()
         return r.json()
 
@@ -56,16 +56,19 @@ class SimAdapter:
         r.raise_for_status()
         return r.json()
 
-    async def estop(self, *, engaged: bool, reason: str = "", release_token: str = "") -> Dict[str, Any]:
-        """Engage (anyone may stop the robot) or release (needs a signed release token)."""
+    async def estop(self, *, engaged: bool, reason: str = "", release_token: str = "",
+                    robot_id: Optional[str] = None) -> Dict[str, Any]:
+        """Engage (anyone may stop a robot) or release (needs a signed release token).
+        robot_id=None means every robot."""
         r = await self._client.post(f"{self.base_url}/estop",
-                                    json={"engaged": engaged, "reason": reason, "release_token": release_token})
+                                    json={"engaged": engaged, "reason": reason, "release_token": release_token,
+                                          "robot_id": robot_id})
         r.raise_for_status()
         return r.json()
 
-    async def reset_robot(self) -> Dict[str, Any]:
-        """Reset robot to starting position in the simulator."""
-        r = await self._client.post(f"{self.base_url}/reset")
+    async def reset_robot(self, robot_id: Optional[str] = None) -> Dict[str, Any]:
+        """Reset a robot to its parking spot in the simulator."""
+        r = await self._client.post(f"{self.base_url}/reset", params={"robot_id": robot_id} if robot_id else None)
         r.raise_for_status()
         return r.json()
 
@@ -77,15 +80,23 @@ class SimAdapter:
         r.raise_for_status()
         return r.json()
 
-    async def get_frame(self, size: int = 512) -> bytes:
+    async def get_frame(self, size: int = 512, robot_id: Optional[str] = None) -> bytes:
         """Robot camera frame (PNG). Only the warehouse simulator provides it."""
-        r = await self._client.get(f"{self.base_url}/frame", params={"size": size})
+        params: Dict[str, Any] = {"size": size}
+        if robot_id:
+            params["robot_id"] = robot_id
+        r = await self._client.get(f"{self.base_url}/frame", params=params)
         r.raise_for_status()
         return r.content
 
     async def load_seed(self, seed: int, mode: str = "benchmark") -> Dict[str, Any]:
         """Load a benchmark scenario (or another live site) by seed. Warehouse simulator only."""
         r = await self._client.post(f"{self.base_url}/seed", json={"seed": seed, "mode": mode})
+        r.raise_for_status()
+        return r.json()
+
+    async def get_fleet(self) -> Dict[str, Any]:
+        r = await self._client.get(f"{self.base_url}/fleet")
         r.raise_for_status()
         return r.json()
 

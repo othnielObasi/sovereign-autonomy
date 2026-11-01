@@ -585,6 +585,7 @@ export async function checkPlanForDrift(body: { start: { x: number; y: number };
 export const getAuthorityStatus = () => getJson("/authority/status", "authority status");
 export const getAuthorityEvidence = (limit = 100) => getJson(`/authority/evidence?limit=${limit}`, "authority events");
 export const getRouteLearning = () => getJson("/authority/learning", "learned routing");
+export const getFleet = () => getJson("/sim/fleet", "robots");
 
 async function postJson(path: string, body: any, what: string, headers: Record<string, string> = {}) {
   const r = await fetchWithRetry(`${API_BASE}${path}`, {

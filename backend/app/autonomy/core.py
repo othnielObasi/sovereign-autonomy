@@ -88,6 +88,10 @@ class WorldState:
                 "observed_at": time.time() if observed_at is None else observed_at,
             }
 
+    def robots(self) -> list[str]:
+        with self._lock:
+            return list(self._states)
+
     def current_version(self, robot_id: str) -> int | None:
         with self._lock:
             item = self._states.get(robot_id)

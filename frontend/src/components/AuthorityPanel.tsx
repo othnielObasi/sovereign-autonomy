@@ -6,7 +6,7 @@
  * resetting does, and old permits stay void after a reset.
  */
 import React, { useCallback, useEffect, useRef, useState } from "react";
-import { getAuthorityStatus, killSwitch, resetKillSwitch, voiceStop } from "@/lib/api";
+import { getAuthorityStatus, getFleet, killSwitch, resetKillSwitch, voiceStop } from "@/lib/api";
 import { startRecording, type Recorder } from "@/lib/wav";
 import { Button, KV, Notice, Panel, Pill, cx } from "@/components/ui";
 
@@ -18,10 +18,12 @@ export function AuthorityPanel({ compact = false }: { compact?: boolean }) {
   const [busy, setBusy] = useState<string | null>(null);
   const [msg, setMsg] = useState<{ tone: "ok" | "warn" | "stop" | "info"; text: string } | null>(null);
   const [recording, setRecording] = useState(false);
+  const [fleet, setFleet] = useState<Array<{ robot_id: string; speed: number; estopped: boolean }>>([]);
   const rec = useRef<Recorder | null>(null);
 
   const load = useCallback(async () => {
     try { setS(await getAuthorityStatus()); } catch { /* backend offline: keep last state */ }
+    try { setFleet((await getFleet()).robots || []); } catch { /* no fleet endpoint: single robot */ }
   }, []);
   useEffect(() => {
     load();
@@ -29,11 +31,12 @@ export function AuthorityPanel({ compact = false }: { compact?: boolean }) {
     return () => clearInterval(id);
   }, [load]);
 
-  const stop = async (scope: "robot" | "global") => {
-    setBusy(scope);
+  const stop = async (scope: "robot" | "global", robot?: string) => {
+    setBusy(robot ? `robot-${robot}` : scope);
     try {
-      const r = await killSwitch(scope, scope === "robot" ? s?.robot_id || "robot-1" : "*",
-        scope === "robot" ? "operator stop (robot)" : "operator stop (everything)");
+      const target = robot || s?.robot_id || "robot-1";
+      const r = await killSwitch(scope, scope === "robot" ? target : "*",
+        scope === "robot" ? `operator stop (${target})` : "operator stop (everything)");
       setMsg({ tone: r.stop_verified ? "ok" : "warn",
         text: `Authority revoked in ${r.authority_revoked_ms} ms. ${r.stop_verified ? `Stop confirmed in ${r.stop_verified_ms} ms.` : "Stop NOT confirmed — check the robot."}` });
     } catch (e: any) { setMsg({ tone: "stop", text: e.message }); }
@@ -86,6 +89,19 @@ export function AuthorityPanel({ compact = false }: { compact?: boolean }) {
           {recording ? "● Listening — press to send" : busy === "voice" ? "Transcribing…" : "🎙 Voice stop"}
         </Button>
       </div>
+
+      {fleet.length > 1 && (
+        <div className="mt-3 grid grid-cols-2 gap-2">
+          {fleet.map((r) => (
+            <button key={r.robot_id} disabled={!!busy} onClick={() => stop("robot", r.robot_id)}
+              className={cx("rounded-lg border px-3 py-2 text-left text-xs disabled:opacity-50",
+                r.estopped ? "border-mc-stop/40 bg-mc-stop/10 text-mc-stop" : "border-mc-line2 bg-mc-raise text-mc-ink hover:border-mc-stop/50")}>
+              <div className="font-semibold">Stop {r.robot_id}</div>
+              <div className="text-mc-dim">{r.estopped ? "stopped" : `${(r.speed ?? 0).toFixed(2)} m/s`}</div>
+            </button>
+          ))}
+        </div>
+      )}
 
       {msg && <div className="mt-3"><Notice tone={msg.tone}>{msg.text}</Notice></div>}
 

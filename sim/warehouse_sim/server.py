@@ -32,7 +32,7 @@ from pydantic import BaseModel, Field
 
 from app.autonomy import permit as permits
 from bench.scenarios import HOTSPOTS, generate
-from bench.world import Circle, Layout, RobotState, Walker, World
+from bench.world import ROBOT_R, Circle, Layout, RobotState, Walker, World, drive_robot
 from traffic import ActorNavigation, FORKLIFT_RADIUS, TrafficWorld
 
 SIM_TICK_HZ = float(os.getenv("SIM_TICK_HZ", "10"))
@@ -47,13 +47,60 @@ SIM_ROBOT_ID = os.getenv("SIM_ROBOT_ID", "robot-1")
 # own, so a crashed or cut-off backend cannot leave it driving. 0 disables it.
 SIM_DEADMAN_S = float(os.getenv("SIM_DEADMAN_S", "5"))
 PARKING = (3.0, 3.5)
+# Other robots in the live warehouse: "id@x,y;id@x,y" (parking spots). Empty = one robot.
+SIM_FLEET = os.getenv("SIM_FLEET", "robot-2@3.0,21.5")
+
+
+def _parse_fleet(spec: str) -> Dict[str, tuple]:
+    out = {}
+    for part in (spec or "").split(";"):
+        if "@" in part:
+            rid, xy = part.split("@", 1)
+            x, y = xy.split(",")
+            if rid.strip() and rid.strip() != SIM_ROBOT_ID:
+                out[rid.strip()] = (float(x), float(y))
+    return out
+
+
+FLEET_PARKING = _parse_fleet(SIM_FLEET)
 
 layout = Layout()
 _lock = threading.RLock()
 _state: Dict[str, Any] = {"world": None, "mode": "live", "seed": SIM_SEED, "events": []}
 _used_permits: Dict[str, float] = {}     # permit id -> expiry; a permit works once
-_estop: Dict[str, Any] = {"engaged": False, "reason": "", "since": None}
-_deadman: Dict[str, Any] = {"last_move": None, "tripped": 0}
+_estop: Dict[str, Any] = {"engaged": False, "reason": "", "since": None}       # global
+_robot_estops: Dict[str, Dict[str, Any]] = {}                                   # robot id -> reason/since
+_deadman: Dict[str, Any] = {"last_move": None, "tripped": 0}                     # robot-1 (kept for compatibility)
+_others: Dict[str, RobotState] = {rid: RobotState(*xy) for rid, xy in FLEET_PARKING.items()}
+_other_deadman: Dict[str, Dict[str, Any]] = {rid: {"last_move": None, "tripped": 0} for rid in FLEET_PARKING}
+_contacts: Dict[str, int] = {"robot_contact": 0}
+
+
+def fleet_ids() -> List[str]:
+    return [SIM_ROBOT_ID] + list(_others)
+
+
+def _robot(w: World, robot_id: Optional[str]) -> RobotState:
+    rid = robot_id or SIM_ROBOT_ID
+    if rid == SIM_ROBOT_ID:
+        return w.robot
+    if rid in _others:
+        return _others[rid]
+    raise HTTPException(status_code=404, detail=f"unknown robot {rid}")
+
+
+def _estopped(robot_id: str) -> bool:
+    return bool(_estop["engaged"]) or robot_id in _robot_estops
+
+
+def _robot_bodies(w: World, exclude: str) -> List[Circle]:
+    """Every other robot as a solid body."""
+    bodies = []
+    for rid in fleet_ids():
+        if rid != exclude:
+            r = _robot(w, rid)
+            bodies.append(Circle(r.x, r.y, ROBOT_R, "robot"))
+    return bodies
 
 
 def _require_token(request: Request) -> None:
@@ -137,7 +184,21 @@ async def _clock() -> None:
                 w.command("STOP")
                 _deadman["tripped"] += 1
                 _deadman["last_move"] = None
+            for rid, r in _others.items():
+                dm = _other_deadman[rid]
+                if (SIM_DEADMAN_S > 0 and r.target is not None and dm["last_move"] is not None
+                        and time.monotonic() - dm["last_move"] > SIM_DEADMAN_S):
+                    r.target = None
+                    dm["tripped"] += 1
+                    dm["last_move"] = None
+                drive_robot(r, dt * SIM_SPEED)
             w.step(dt * SIM_SPEED)
+            ids = fleet_ids()
+            for i, a in enumerate(ids):
+                for b in ids[i + 1:]:
+                    ra, rb = _robot(w, a), _robot(w, b)
+                    if math.hypot(ra.x - rb.x, ra.y - rb.y) < 2 * ROBOT_R:
+                        _contacts["robot_contact"] += 1
         await asyncio.sleep(max(0.0, dt - (time.perf_counter() - t0)))
 
 
@@ -184,8 +245,30 @@ def _people(w: World) -> List[Dict[str, Any]]:
                                 key=lambda stop: math.dist(stop[0], p.route[-1]))[1]} for p in w.people()]
 
 
-def _telemetry(w: World) -> Dict[str, Any]:
+def _telemetry(w: World, robot_id: Optional[str] = None) -> Dict[str, Any]:
+    """Telemetry for one robot; the other robots appear as obstacles."""
+    rid = robot_id or SIM_ROBOT_ID
+    bodies = _robot_bodies(w, rid)       # from real positions, before any swap
+    if rid != SIM_ROBOT_ID:
+        r = _robot(w, rid)
+        saved = w.robot
+        w.robot = r                      # reuse the world's sensing for this robot's pose
+        try:
+            tel = _telemetry_one(w, rid, bodies)
+        finally:
+            w.robot = saved
+        return tel
+    return _telemetry_one(w, rid, bodies)
+
+
+def _telemetry_one(w: World, robot_id: str, bodies: List[Circle]) -> Dict[str, Any]:
     tel = w.telemetry()
+    for body in bodies:                  # other robots count as obstacles for clearance
+        gap = body.distance(w.robot.x, w.robot.y) - ROBOT_R
+        if gap < tel["nearest_obstacle_m"]:
+            tel["nearest_obstacle_m"] = round(gap, 3)
+            p = body.nearest_point(w.robot.x, w.robot.y)
+            tel["nearest_obstacle_xy"] = [round(p[0], 3), round(p[1], 3)]
     events = list(_state["events"])
     if tel["nearest_obstacle_m"] < 0:   # bodies overlap: report contact, not an impossible distance
         tel["nearest_obstacle_m"] = 0.0
@@ -197,11 +280,14 @@ def _telemetry(w: World) -> Dict[str, Any]:
         "human": dict(nearest, type="human", id="nearest", role="primary") if nearest else None,
         "walking_humans": people,
         "idle_robots": [],
-        "obstacles": _obstacles(w),
+        "obstacles": _obstacles(w) + [{"x": round(b.x, 2), "y": round(b.y, 2), "r": b.r, "type": "robot"}
+                                      for b in bodies],
         "bounds": w.layout.geofence,
         "target": w.robot.target,
-        "estop": dict(_estop),
-        "deadman_trips": _deadman["tripped"],
+        "robot_id": robot_id,
+        "estop": dict(_estop, robot=_robot_estops.get(robot_id)),
+        "deadman_trips": (_deadman if robot_id == SIM_ROBOT_ID else _other_deadman[robot_id])["tripped"],
+        "robot_contacts": _contacts["robot_contact"],
         "sim_time": round(w.t, 2),
         "mode": _state["mode"],
         "seed": _state["seed"],
@@ -220,12 +306,14 @@ class Command(BaseModel):
     # Required for MOVE_TO: the action's identity fields and its signed permit
     action: Optional[Dict[str, Any]] = None
     permit: Optional[str] = None
+    robot_id: Optional[str] = None      # STOP / WAIT target (MOVE_TO uses the permit's robot)
 
 
 class EstopRequest(BaseModel):
     engaged: bool
     reason: str = ""
     release_token: str = ""
+    robot_id: Optional[str] = None      # None = every robot
 
 
 def _check_permit(cmd: Command) -> None:
@@ -235,7 +323,7 @@ def _check_permit(cmd: Command) -> None:
     if not cmd.permit or not isinstance(cmd.action, dict):
         raise HTTPException(status_code=403, detail="permit_required")
     action = dict(cmd.action, kind=cmd.intent, params=cmd.params)
-    if action.get("robot_id") != SIM_ROBOT_ID:
+    if action.get("robot_id") not in fleet_ids():
         raise HTTPException(status_code=403, detail="wrong_robot")
     try:
         payload = permits.verify_for_action(PERMIT_SECRET, cmd.permit, action)
@@ -265,10 +353,24 @@ def health():
 
 
 @app.get("/telemetry")
-def telemetry(request: Request):
+def telemetry(request: Request, robot_id: Optional[str] = None):
     _require_token(request)
     with _lock:
-        return _telemetry(_world())
+        return _telemetry(_world(), robot_id)
+
+
+@app.get("/fleet")
+def fleet(request: Request):
+    """Every robot: pose, target, e-stop and dead-man state."""
+    _require_token(request)
+    with _lock:
+        w = _world()
+        out = []
+        for rid in fleet_ids():
+            r = _robot(w, rid)
+            out.append({"robot_id": rid, "x": round(r.x, 3), "y": round(r.y, 3), "theta": round(r.theta, 3),
+                        "speed": round(r.speed, 3), "target": r.target, "estopped": _estopped(rid)})
+        return {"robots": out, "robot_contacts": _contacts["robot_contact"]}
 
 
 @app.get("/world")
@@ -287,10 +389,16 @@ def world(request: Request):
 
 
 @app.post("/reset")
-def reset_robot(request: Request):
+def reset_robot(request: Request, robot_id: Optional[str] = None):
     _require_token(request)
     with _lock:
         w = _world()
+        rid = robot_id or SIM_ROBOT_ID
+        if rid != SIM_ROBOT_ID:
+            _robot(w, rid)
+            _others[rid] = RobotState(*FLEET_PARKING[rid])
+            x, y = FLEET_PARKING[rid]
+            return {"ok": True, "position": {"x": x, "y": y}, "msg": f"{rid} reset to its parking spot"}
         start = PARKING if _state["mode"] == "live" else _state.get("start", PARKING)
         w.robot = RobotState(*start)
         _state["events"] = []
@@ -304,22 +412,24 @@ def command(request: Request, cmd: Command):
         w = _world()
         g = w.layout.geofence
         if cmd.intent == "MOVE_TO":
-            if _estop["engaged"]:
+            rid = (cmd.action or {}).get("robot_id") or SIM_ROBOT_ID
+            if _estopped(rid):
                 raise HTTPException(status_code=423, detail="estop_engaged")
             _check_permit(cmd)
-            _deadman["last_move"] = time.monotonic()
-            x = float(cmd.params.get("x", w.robot.x))
-            y = float(cmd.params.get("y", w.robot.y))
+            r = _robot(w, rid)
+            (_deadman if rid == SIM_ROBOT_ID else _other_deadman[rid])["last_move"] = time.monotonic()
+            x = float(cmd.params.get("x", r.x))
+            y = float(cmd.params.get("y", r.y))
             if not (g["min_x"] <= x <= g["max_x"] and g["min_y"] <= y <= g["max_y"]):
                 return {"ok": False, "error": f"Target ({x},{y}) outside geofence"}
-            w.command("MOVE_TO", {"x": x, "y": y, "max_speed": float(cmd.params.get("max_speed", 0.5))})
-            return {"ok": True, "set_target": w.robot.target}
-        if cmd.intent == "STOP":
-            w.command("STOP")
-            return {"ok": True, "stopped": True}
-        if cmd.intent == "WAIT":
-            w.command("STOP")
-            return {"ok": True, "wait": cmd.params.get("seconds", 1)}
+            r.target = {"x": x, "y": y, "max_speed": float(cmd.params.get("max_speed", 0.5))}
+            return {"ok": True, "set_target": r.target, "robot_id": rid}
+        if cmd.intent in ("STOP", "WAIT"):
+            r = _robot(w, cmd.robot_id)
+            r.target = None
+            if cmd.intent == "STOP":
+                return {"ok": True, "stopped": True, "robot_id": cmd.robot_id or SIM_ROBOT_ID}
+            return {"ok": True, "wait": cmd.params.get("seconds", 1), "robot_id": cmd.robot_id or SIM_ROBOT_ID}
         return {"ok": False, "error": f"Unknown intent: {cmd.intent}"}
 
 
@@ -329,19 +439,28 @@ def estop(request: Request, body: EstopRequest):
     token signed by the backend, so only an authorized reset can lift it."""
     _require_token(request)
     with _lock:
+        w = _world()
         if body.engaged:
-            _world().command("STOP")
-            if not _estop["engaged"]:
-                _estop.update(engaged=True, reason=body.reason, since=time.time())
-            return {"ok": True, "engaged": True}
+            if body.robot_id:                       # one robot
+                _robot(w, body.robot_id).target = None
+                _robot_estops.setdefault(body.robot_id, {"reason": body.reason, "since": time.time()})
+            else:                                   # every robot
+                for rid in fleet_ids():
+                    _robot(w, rid).target = None
+                if not _estop["engaged"]:
+                    _estop.update(engaged=True, reason=body.reason, since=time.time())
+            return {"ok": True, "engaged": True, "robot_id": body.robot_id}
         if len(PERMIT_SECRET) < 32:
             raise HTTPException(status_code=403, detail="permit_verification_not_configured")
         try:
-            permits.verify_release(PERMIT_SECRET, body.release_token, SIM_ROBOT_ID)
+            permits.verify_release(PERMIT_SECRET, body.release_token, body.robot_id or "*")
         except permits.PermitError as exc:
             raise HTTPException(status_code=403, detail=str(exc))
-        _estop.update(engaged=False, reason="", since=None)
-        return {"ok": True, "engaged": False}
+        if body.robot_id:
+            _robot_estops.pop(body.robot_id, None)
+        else:
+            _estop.update(engaged=False, reason="", since=None)
+        return {"ok": True, "engaged": False, "robot_id": body.robot_id}
 
 
 SCENARIOS = {
@@ -435,12 +554,18 @@ def load_seed(request: Request, body: SeedRequest):
 
 
 @app.get("/frame")
-def frame(request: Request, size: int = 512, view_m: float = 12.0):
+def frame(request: Request, size: int = 512, view_m: float = 12.0, robot_id: Optional[str] = None):
     """Robot camera: a heading-up top-down view around the robot, as PNG."""
     _require_token(request)
     from camera import render
     with _lock:
-        png = render(_world(), size=max(128, min(size, 1024)), view_m=max(4.0, min(view_m, 30.0)))
+        w = _world()
+        saved = w.robot
+        w.robot = _robot(w, robot_id)
+        try:
+            png = render(w, size=max(128, min(size, 1024)), view_m=max(4.0, min(view_m, 30.0)))
+        finally:
+            w.robot = saved
     return Response(content=png, media_type="image/png", headers={"Cache-Control": "no-store"})
 
 

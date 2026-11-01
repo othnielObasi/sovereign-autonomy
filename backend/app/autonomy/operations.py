@@ -59,6 +59,36 @@ class CorridorReservations:
             if self.reservations.get(corridor, ("", 0))[0] == robot:
                 self.reservations.pop(corridor, None)
 
+    def reserve_path(self, robot: str, keys, ttl_s: float = 10) -> None:
+        """Hold every key for `robot`, all or nothing, replacing its earlier holds.
+        Raises Rejected('corridor_conflict') if another robot holds any of them."""
+        keys = set(keys)
+        now = time.time()
+        with self._lock:
+            for k in keys:
+                old = self.reservations.get(k)
+                if old and old[0] != robot and old[1] > now:
+                    raise Rejected("corridor_conflict")
+            for k in [k for k, (r, _) in self.reservations.items() if r == robot and k not in keys]:
+                del self.reservations[k]
+            for k in keys:
+                self.reservations[k] = (robot, now + ttl_s)
+
+    def release_robot(self, robot: str) -> None:
+        with self._lock:
+            for k in [k for k, (r, _) in self.reservations.items() if r == robot]:
+                del self.reservations[k]
+
+    def held(self) -> dict:
+        """robot -> number of unexpired holds."""
+        now = time.time()
+        out: dict = {}
+        with self._lock:
+            for r, exp in self.reservations.values():
+                if exp > now:
+                    out[r] = out.get(r, 0) + 1
+        return out
+
 
 class EvidenceLog:
     """Structured events keyed by mission and action, exportable as JSON lines."""

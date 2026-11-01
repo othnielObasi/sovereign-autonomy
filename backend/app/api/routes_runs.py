@@ -135,7 +135,7 @@ async def _plan_and_start_loop(svc: RunService, run_id: str, mission_id: str, mi
             try:
                 telemetry = {}
                 try:
-                    telemetry = await svc.sim.get_telemetry()
+                    telemetry = await svc.sim_for(run_id).get_telemetry()
                 except Exception:
                     pass
 
@@ -154,12 +154,15 @@ async def _plan_and_start_loop(svc: RunService, run_id: str, mission_id: str, mi
                     canary_token, canary_line = canaries.plant(run_id)
                     context = canaries.with_canary(site_intel.planner_context(), canary_line)
                     from app.observability import tracing
+                    from app.services.muse_planner import planning_robot
+                    _robot_token = planning_robot.set(svc.robot_for(run_id))
                     with tracing.within_mission(run_id):
                         try:
                             plan = await planner.generate_plan(telemetry, mission_title, goal, lessons=lessons,
                                                                untrusted_context=context)
                         except TypeError:  # planners without the parameter
                             plan = await planner.generate_plan(telemetry, mission_title, goal, lessons=lessons)
+                    planning_robot.reset(_robot_token)
 
                 # Canary: a plan that obeyed an instruction hidden in untrusted data is not used
                 hit = canaries.tripped(canary_token, plan) if plan else None
@@ -190,7 +193,7 @@ async def _plan_and_start_loop(svc: RunService, run_id: str, mission_id: str, mi
                     site_world = None
                     try:
                         from app.services.site_router import repair_plan
-                        site_world = await svc.sim.get_world()
+                        site_world = await svc.sim_for(run_id).get_world()
                         fixed, n_fixed = repair_plan(site_world, telemetry, plan["waypoints"], _ZL)
                         if n_fixed:
                             plan["waypoints"], plan["repaired_legs"] = fixed, n_fixed
@@ -349,6 +352,18 @@ async def start_run(
                    f"Stop or complete it before starting a new one.",
         )
 
+    # Guard: one active run per robot (two runs must never drive the same robot)
+    robot_id = svc.robot_of_goal(json.loads(mission.goal_json))
+    for other in db.query(Run).filter(Run.status.in_(("planning", "running", "paused"))).all():
+        other_mission = db.query(Mission).filter(Mission.id == other.mission_id).first()
+        other_robot = svc.robot_of_goal(json.loads(other_mission.goal_json) if other_mission else None)
+        if other_robot == robot_id:
+            raise HTTPException(
+                status_code=409,
+                detail=f"{robot_id} is already on run {other.id} ({other.status}). Stop it first, "
+                       f"or give this mission another robot.",
+            )
+
     # Guard: limit concurrent active runs to prevent sim/event-loop saturation
     MAX_CONCURRENT_RUNS = 5
     active_count = db.query(Run).filter(Run.status.in_(("planning", "running"))).count()
@@ -361,8 +376,8 @@ async def start_run(
 
     # Reset simulator robot to starting position for a clean run
     try:
-        await svc.sim.reset_robot()
-        logger.info("Sim robot reset to start position for mission %s", mission_id)
+        await svc.sim_for_robot(robot_id).reset_robot()
+        logger.info("Sim robot %s reset to start position for mission %s", robot_id, mission_id)
     except Exception as reset_err:
         logger.warning("Failed to reset sim robot: %s — continuing with current position", reset_err)
 
@@ -372,7 +387,7 @@ async def start_run(
     # Persist a seed fallback plan synchronously so the PLAN event is
     # immediately visible in the chain-of-trust, even before LLM planning.
     try:
-        telemetry = await svc.sim.get_telemetry()
+        telemetry = await svc.sim_for(run.id).get_telemetry()
     except Exception:
         telemetry = {}
 
@@ -382,7 +397,7 @@ async def start_run(
         from app.services.site_router import route_plan
         from app.world_model import ZONE_SPEED_LIMITS as _ZL
         if telemetry:
-            seed_wps = route_plan(await svc.sim.get_world(), telemetry, json.loads(mission.goal_json), _ZL)
+            seed_wps = route_plan(await svc.sim_for(run.id).get_world(), telemetry, json.loads(mission.goal_json), _ZL)
     except Exception as route_err:
         logger.warning("Aisle routing unavailable for run %s: %s", run.id, route_err)
     if not seed_wps:
