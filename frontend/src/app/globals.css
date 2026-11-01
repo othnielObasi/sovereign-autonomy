@@ -1,0 +1,108 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Custom styles */
+body {
+  @apply bg-mc-bg text-mc-ink antialiased;
+}
+
+/* Mission-control surfaces */
+.mc-grid-bg {
+  background-image:
+    linear-gradient(rgba(34, 211, 238, 0.04) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(34, 211, 238, 0.04) 1px, transparent 1px);
+  background-size: 32px 32px;
+}
+.mc-scroll::-webkit-scrollbar { width: 6px; height: 6px; }
+.mc-scroll::-webkit-scrollbar-thumb { background: #253246; border-radius: 3px; }
+.tabular { font-variant-numeric: tabular-nums; }
+
+/* Smooth animations — scoped to interactive elements only */
+a, button, input, select, textarea {
+  transition-property: background-color, border-color, color, opacity, box-shadow, transform;
+  transition-duration: 150ms;
+}
+
+/* === Demo Dashboard Animations === */
+
+@keyframes pulse-glow {
+  0%, 100% { box-shadow: 0 0 8px 2px var(--glow-color, rgba(0,212,255,0.3)); }
+  50% { box-shadow: 0 0 20px 6px var(--glow-color, rgba(0,212,255,0.5)); }
+}
+
+@keyframes pulse-ring {
+  0% { transform: scale(1); opacity: 1; }
+  100% { transform: scale(1.4); opacity: 0; }
+}
+
+@keyframes slide-in-right {
+  from { transform: translateX(20px); opacity: 0; }
+  to { transform: translateX(0); opacity: 1; }
+}
+
+@keyframes slide-in-up {
+  from { transform: translateY(10px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
+@keyframes live-dot {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.3; }
+}
+
+@keyframes banner-pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.85; }
+}
+
+.animate-glow-green { --glow-color: rgba(34,197,94,0.4); animation: pulse-glow 2s ease-in-out infinite; }
+.animate-glow-yellow { --glow-color: rgba(234,179,8,0.4); animation: pulse-glow 1.5s ease-in-out infinite; }
+.animate-glow-red { --glow-color: rgba(239,68,68,0.5); animation: pulse-glow 0.8s ease-in-out infinite; }
+.animate-glow-blue { --glow-color: rgba(59,130,246,0.4); animation: pulse-glow 1.5s ease-in-out infinite; }
+
+.animate-slide-in { animation: slide-in-right 0.3s ease-out; }
+.animate-slide-up { animation: slide-in-up 0.25s ease-out; }
+.animate-live-dot { animation: live-dot 1.5s ease-in-out infinite; }
+.animate-banner-pulse { animation: banner-pulse 2s ease-in-out infinite; }
+
+/* Scenario button active ring */
+.scenario-active-ring {
+  position: relative;
+}
+.scenario-active-ring::after {
+  content: '';
+  position: absolute;
+  inset: -3px;
+  border-radius: 12px;
+  animation: pulse-ring 2s ease-out infinite;
+  pointer-events: none;
+}
+.scenario-active-ring.ring-green::after { border: 2px solid rgba(34,197,94,0.5); }
+.scenario-active-ring.ring-yellow::after { border: 2px solid rgba(234,179,8,0.5); }
+.scenario-active-ring.ring-red::after { border: 2px solid rgba(239,68,68,0.5); }
+.scenario-active-ring.ring-blue::after { border: 2px solid rgba(59,130,246,0.5); }
+
+/* Consistent card styling */
+.dash-card {
+  @apply bg-slate-800 rounded-xl shadow-lg shadow-black/20 border border-slate-700/50;
+}
+
+/* Scrollbar styling for panels */
+.dash-scroll::-webkit-scrollbar { width: 4px; }
+.dash-scroll::-webkit-scrollbar-track { background: transparent; }
+.dash-scroll::-webkit-scrollbar-thumb { background: rgba(148,163,184,0.3); border-radius: 2px; }
+
+/* Timeline live line */
+.timeline-live-line {
+  position: relative;
+}
+.timeline-live-line::before {
+  content: '';
+  position: absolute;
+  left: 8px;
+  top: 0;
+  bottom: 0;
+  width: 2px;
+  background: linear-gradient(to bottom, rgba(0,212,255,0.6), transparent);
+}

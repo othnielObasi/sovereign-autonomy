@@ -1,0 +1,16 @@
+.env
+.env.*
+*.key
+*.pem
+__pycache__
+*.pyc
+.git
+.pytest_cache
+.ruff_cache
+sovereign_autonomy_backend.egg-info
+data/
+tests/
+# Benchmark outputs: only the summaries the Evidence page serves
+bench/results/*/*
+!bench/results/*/results.json
+!bench/results/*/manifest.json

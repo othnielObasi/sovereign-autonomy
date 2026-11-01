@@ -1,0 +1,17 @@
+{
+  "name": "sovereign-autonomy",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Runtime governance for AI-planned robot moves: NVIDIA Nemotron proposes, a deterministic gate decides, every decision is signed. This root package only holds the Playwright browser smoke tests.",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/othnielObasi/sovereign-autonomy.git"
+  },
+  "license": "MIT",
+  "scripts": {
+    "test:smoke": "node tests/warehouse-ui.smoke.cjs && node tests/warehouse-parity.smoke.cjs"
+  },
+  "devDependencies": {
+    "playwright": "^1.41.0"
+  }
+}

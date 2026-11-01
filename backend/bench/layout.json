@@ -1,0 +1,342 @@
+{
+ "geofence": {
+  "min_x": 0,
+  "max_x": 40,
+  "min_y": 0,
+  "max_y": 25
+ },
+ "zone_speed_limits": {
+  "aisle": 0.5,
+  "corridor": 0.7,
+  "staging": 0.3,
+  "loading_bay": 0.4
+ },
+ "zones": [
+  {
+   "name": "aisle",
+   "rect": {
+    "min_x": 0,
+    "max_x": 40,
+    "min_y": 0,
+    "max_y": 12
+   }
+  },
+  {
+   "name": "corridor",
+   "rect": {
+    "min_x": 0,
+    "max_x": 40,
+    "min_y": 12,
+    "max_y": 15
+   }
+  },
+  {
+   "name": "staging",
+   "rect": {
+    "min_x": 0,
+    "max_x": 40,
+    "min_y": 15,
+    "max_y": 19
+   }
+  },
+  {
+   "name": "loading_bay",
+   "rect": {
+    "min_x": 0,
+    "max_x": 40,
+    "min_y": 19,
+    "max_y": 25
+   }
+  }
+ ],
+ "racks": [
+  {
+   "id": "RA-1",
+   "x1": 1,
+   "x2": 11,
+   "y": 1,
+   "depth": 1.0,
+   "levels": 4
+  },
+  {
+   "id": "RA-2",
+   "x1": 14,
+   "x2": 24,
+   "y": 1,
+   "depth": 1.0,
+   "levels": 4
+  },
+  {
+   "id": "RA-3",
+   "x1": 27,
+   "x2": 38,
+   "y": 1,
+   "depth": 1.0,
+   "levels": 4
+  },
+  {
+   "id": "RB-1",
+   "x1": 1,
+   "x2": 11,
+   "y": 5,
+   "depth": 1.0,
+   "levels": 4
+  },
+  {
+   "id": "RB-2",
+   "x1": 14,
+   "x2": 24,
+   "y": 5,
+   "depth": 1.0,
+   "levels": 4
+  },
+  {
+   "id": "RB-3",
+   "x1": 27,
+   "x2": 38,
+   "y": 5,
+   "depth": 1.0,
+   "levels": 4
+  },
+  {
+   "id": "RC-1",
+   "x1": 1,
+   "x2": 11,
+   "y": 9,
+   "depth": 1.0,
+   "levels": 4
+  },
+  {
+   "id": "RC-2",
+   "x1": 14,
+   "x2": 24,
+   "y": 9,
+   "depth": 1.0,
+   "levels": 4
+  },
+  {
+   "id": "RC-3",
+   "x1": 27,
+   "x2": 38,
+   "y": 9,
+   "depth": 1.0,
+   "levels": 4
+  }
+ ],
+ "obstacles": [
+  {
+   "x": 33,
+   "y": 3,
+   "type": "tote_stack",
+   "r": 0.3
+  },
+  {
+   "x": 18,
+   "y": 17,
+   "type": "pallet",
+   "r": 0.6
+  },
+  {
+   "x": 35,
+   "y": 11,
+   "type": "handcart",
+   "r": 0.4
+  },
+  {
+   "x": 37.5,
+   "y": 23.6,
+   "type": "pallet",
+   "r": 0.5
+  },
+  {
+   "x": 1.0,
+   "y": 17.5,
+   "type": "handcart",
+   "r": 0.4
+  }
+ ],
+ "human": {
+  "x": 20,
+  "y": 7.5
+ },
+ "features": [
+  {
+   "type": "charging_station",
+   "x": 35,
+   "y": 17,
+   "label": "CHG-01"
+  },
+  {
+   "type": "charging_station",
+   "x": 38,
+   "y": 17,
+   "label": "CHG-02"
+  },
+  {
+   "type": "packing_station",
+   "x": 8,
+   "y": 17,
+   "label": "PACK-01"
+  },
+  {
+   "type": "packing_station",
+   "x": 16,
+   "y": 17,
+   "label": "PACK-02"
+  },
+  {
+   "type": "fire_exit",
+   "x": 0,
+   "y": 13.5,
+   "label": "EXIT-W"
+  },
+  {
+   "type": "fire_exit",
+   "x": 40,
+   "y": 13.5,
+   "label": "EXIT-E"
+  }
+ ],
+ "bays": [
+  {
+   "id": "B-01",
+   "x": 4,
+   "y": 23,
+   "side": "top",
+   "type": "dock"
+  },
+  {
+   "id": "B-02",
+   "x": 10,
+   "y": 23,
+   "side": "top",
+   "type": "dock"
+  },
+  {
+   "id": "B-03",
+   "x": 16,
+   "y": 23,
+   "side": "top",
+   "type": "dock"
+  },
+  {
+   "id": "B-04",
+   "x": 22,
+   "y": 23,
+   "side": "top",
+   "type": "dock"
+  },
+  {
+   "id": "B-05",
+   "x": 28,
+   "y": 23,
+   "side": "top",
+   "type": "dock"
+  },
+  {
+   "id": "B-06",
+   "x": 34,
+   "y": 23,
+   "side": "top",
+   "type": "dock"
+  },
+  {
+   "id": "A-01",
+   "x": 3,
+   "y": 3.5,
+   "side": "aisle",
+   "type": "pick"
+  },
+  {
+   "id": "A-02",
+   "x": 8,
+   "y": 3.5,
+   "side": "aisle",
+   "type": "pick"
+  },
+  {
+   "id": "A-03",
+   "x": 16,
+   "y": 3.5,
+   "side": "aisle",
+   "type": "pick"
+  },
+  {
+   "id": "A-04",
+   "x": 21,
+   "y": 3.5,
+   "side": "aisle",
+   "type": "pick"
+  },
+  {
+   "id": "A-05",
+   "x": 30,
+   "y": 3.5,
+   "side": "aisle",
+   "type": "pick"
+  },
+  {
+   "id": "A-06",
+   "x": 35,
+   "y": 3.5,
+   "side": "aisle",
+   "type": "pick"
+  },
+  {
+   "id": "A-07",
+   "x": 3,
+   "y": 7.5,
+   "side": "aisle",
+   "type": "pick"
+  },
+  {
+   "id": "A-08",
+   "x": 8,
+   "y": 7.5,
+   "side": "aisle",
+   "type": "pick"
+  },
+  {
+   "id": "A-09",
+   "x": 16,
+   "y": 7.5,
+   "side": "aisle",
+   "type": "pick"
+  },
+  {
+   "id": "A-10",
+   "x": 21,
+   "y": 7.5,
+   "side": "aisle",
+   "type": "pick"
+  },
+  {
+   "id": "A-11",
+   "x": 30,
+   "y": 7.5,
+   "side": "aisle",
+   "type": "pick"
+  },
+  {
+   "id": "A-12",
+   "x": 35,
+   "y": 7.5,
+   "side": "aisle",
+   "type": "pick"
+  },
+  {
+   "id": "S-01",
+   "x": 8,
+   "y": 17,
+   "side": "staging",
+   "type": "staging"
+  },
+  {
+   "id": "S-02",
+   "x": 16,
+   "y": 17,
+   "side": "staging",
+   "type": "staging"
+  }
+ ]
+}

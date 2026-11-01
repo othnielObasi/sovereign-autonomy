@@ -1,0 +1,111 @@
+policies:
+  - policy_id: GEOFENCE_01
+    name: Geofence enforcement
+    description: Deny actions if robot or destination is outside the allowed operating area.
+    severity: HIGH
+    parameters:
+      min_x: 0.0
+      max_x: 40.0
+      min_y: 0.0
+      max_y: 25.0
+    trigger: "Robot position or destination outside boundary"
+    action: STOP
+
+  - policy_id: SAFE_SPEED_01
+    name: Zone speed limit
+    description: Enforce maximum speed per zone type. Aisle, corridor, and loading bay each have distinct limits.
+    severity: HIGH
+    parameters:
+      aisle_limit_ms: 0.5
+      corridor_limit_ms: 0.7
+      loading_bay_limit_ms: 0.4
+    trigger: "Proposed speed exceeds zone limit"
+    action: SLOW
+
+  - policy_id: HUMAN_PROXIMITY_02
+    name: Human proximity enforcement
+    description: Enforce SLOW when a human or worker is within the slow radius, STOP within the stop radius.
+    severity: HIGH
+    parameters:
+      slow_radius_m: 3.0
+      stop_radius_m: 1.0
+      max_speed_near_human_ms: 0.4
+    trigger: "Human/worker within proximity radius"
+    action: "STOP if < 1m, SLOW if < 3m"
+
+  - policy_id: HUMAN_CLEARANCE_02
+    name: Human confidence speed check
+    description: Deny unsafe speed when a human is detected with high confidence and speed exceeds safe limit.
+    severity: HIGH
+    parameters:
+      min_confidence: 0.65
+      max_speed_near_human_ms: 0.4
+    trigger: "Human detected (conf >= 0.65) and speed too high"
+    action: SLOW
+
+  - policy_id: OBSTACLE_CLEARANCE_03
+    name: Obstacle clearance
+    description: Deny motion if nearest obstacle is below the minimum clearance distance.
+    severity: HIGH
+    parameters:
+      min_clearance_m: 0.5
+    trigger: "Obstacle distance < 0.5m"
+    action: REPLAN
+
+  - policy_id: UNCERTAINTY_04
+    name: Perception uncertainty gate
+    description: Flag risky actions when human detection confidence is below the threshold.
+    severity: MEDIUM
+    parameters:
+      min_human_confidence: 0.65
+      min_confidence_for_move: 0.55
+    trigger: "Human detected but confidence < 65%"
+    action: SLOW + operator review
+
+  - policy_id: HITL_05
+    name: Human-in-the-loop trigger
+    description: Escalate to operator review when aggregate risk score exceeds the threshold.
+    severity: HIGH
+    parameters:
+      risk_threshold: 0.75
+    trigger: "Risk score >= 0.75"
+    action: NEEDS_REVIEW (operator escalation)
+
+  - policy_id: WORKER_PROXIMITY_06
+    name: Walking worker proximity
+    description: Enforce SLOW/STOP when walking warehouse workers (separate from primary human detection) are within proximity radius.
+    severity: HIGH
+    parameters:
+      slow_radius_m: 3.0
+      stop_radius_m: 1.0
+    trigger: "Walking worker within proximity radius"
+    action: "STOP if < 1m, SLOW if < 3m"
+
+  - policy_id: PATH_CLEARANCE_07
+    name: Path clearance
+    description: Deny a move whose straight path runs through permanent racking, so the robot replans along the aisles before it starts instead of being stopped when already close.
+    severity: HIGH
+    parameters:
+      robot_radius_m: 0.4
+      path_margin_m: 0.6
+    trigger: "Straight path to the target passes within 0.2 m of racking (robot body)"
+    action: REPLAN
+
+  - policy_id: HAZARD_EXCLUSION_08
+    name: Hazard exclusion zone
+    description: Deny a move that would enter or cross a temporary exclusion zone round a hazard such as a spill. Every spill gets a baseline zone at once; corroborated guidance from authoritative sources (via Tavily, screened as untrusted) can only enlarge it. A robot already inside may only back out, slowly.
+    severity: HIGH
+    parameters:
+      baseline_radius_m: 1.2
+      max_radius_m: 6.0
+      corroborating_sources: 2
+    trigger: "Path to the target passes within the zone radius, or the robot is inside and not leaving"
+    action: REPLAN
+  - policy_id: HAZARD_SLOW_09
+    name: Hazard slow zone
+    description: Cap speed near a hazard zone. Limits come from reviewed per-hazard rules (0.2 to 0.3 m/s), never from outside text.
+    severity: MEDIUM
+    parameters:
+      max_speed_range: "0.1 to 0.3"
+    trigger: "Robot or path within the slow radius above the zone's speed cap"
+    action: SLOW

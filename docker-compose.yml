@@ -1,0 +1,72 @@
+services:
+  postgres:
+    image: postgres:16
+    environment:
+      POSTGRES_USER: sovereign
+      POSTGRES_PASSWORD: sovereign
+      POSTGRES_DB: sovereign
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  backend:
+    build: ./backend
+    env_file:
+      - path: .env
+        required: false
+    environment:
+      DATABASE_URL: "postgresql://sovereign:sovereign@postgres:5432/sovereign"
+      SIM_BASE_URL: "http://warehouse-sim:8090"
+      CORS_ORIGINS: "http://localhost:3000"
+    ports:
+      - "8080:8080"
+    depends_on:
+      - postgres
+      - warehouse-sim
+    volumes:
+      - ./backend:/app
+      - backend_data:/app/data
+    command: >
+      sh -c "python -m app.preflight &&
+             uvicorn app.main:app --host 0.0.0.0 --port 8080"
+
+  # Live warehouse on the benchmark's engine (solid racks, workers, forklift, camera)
+  warehouse-sim:
+    build:
+      context: .
+      dockerfile: sim/warehouse_sim/Dockerfile
+    ports:
+      - "8090:8090"
+    environment:
+      SIM_TICK_HZ: "10"
+      SIM_SEED: "42"
+
+  # The original demo simulator, kept for comparison: docker compose --profile legacy up mock-sim
+  mock-sim:
+    build: ./sim/mock_sim
+    profiles: ["legacy"]
+    ports:
+      - "8091:8090"
+    environment:
+      SIM_TICK_HZ: "10"
+    command: >
+      uvicorn server:app --host 0.0.0.0 --port 8090
+
+  frontend:
+    build: ./frontend
+    env_file:
+      - path: .env
+        required: false
+    environment:
+      BACKEND_URL: "http://backend:8080"
+    ports:
+      - "3000:3000"
+    depends_on:
+      - backend
+    command: >
+      sh -c "npm install && npm run dev -- --hostname 0.0.0.0 --port 3000"
+
+volumes:
+  postgres_data:
+  backend_data:
