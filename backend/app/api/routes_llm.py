@@ -155,9 +155,9 @@ async def list_models():
     """List the active planner provider, its model tiers and cascade order."""
     from app.services.gemini_planner import MODEL_CASCADE
     planner = _get_planner()
-    if getattr(planner, "provider", None) == "nemotron":
+    if getattr(planner, "provider", None) in ("muse", "nemotron"):
         return {
-            "provider": "nemotron",
+            "provider": planner.provider,
             "primary": planner.primary_model,
             "tiers": {"fast": planner.fast_models, "reasoning": planner.reasoning_model},
             "cascade": planner.model_cascade,

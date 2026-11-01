@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import secrets
-from typing import List, Optional
+from typing import Dict, List, Optional
 
 from pydantic import Field
 from pydantic_settings import BaseSettings, SettingsConfigDict
@@ -97,6 +97,35 @@ class Settings(BaseSettings):
     gemini_enabled: bool = False
 
     # ------------------------------------------------------------
+    # Meta Model API (preferred planner, perception and voice)
+    # ------------------------------------------------------------
+    # MODEL_API_KEY is the name Meta's own docs use. When set, Muse Spark plans
+    # every mission (seeing the robot camera as well as the map), SAM 3.1 reads
+    # the camera, and Muse Voice Transcribe turns a spoken "stop" into a kill switch.
+    model_api_key: Optional[str] = None
+    meta_base_url: str = "https://api.meta.ai/v1"
+    muse_enabled: bool = True
+    muse_reasoning_model: str = "muse-spark-1.3"       # mission planning and replanning
+    muse_fast_model: str = "muse-spark-1.3"            # per-step proposals when Muse Spark Open is not set up
+    muse_reasoning_effort: str = "high"
+    muse_fast_effort: str = "low"
+    muse_reasoning_timeout_s: float = 40.0
+    muse_fast_timeout_s: float = 12.0
+    muse_plan_with_camera: bool = True                 # attach the robot camera frame to mission planning
+    sam_enabled: bool = True
+    sam_model: str = "sam-3.1"
+    sam_timeout_s: float = 15.0
+    # What SAM is asked to find for each object type the gate cares about
+    sam_concepts: str = "person=orange circle,forklift=yellow rectangle,spill=light blue blotch,pallet=brown square"
+    voice_model: str = "muse-voice-transcribe-1.0"
+
+    # Muse Spark Open (Meta open weights) served by Baseten, OpenAI-compatible.
+    # When set, it proposes each step; Muse Spark keeps mission planning.
+    baseten_api_key: Optional[str] = None
+    baseten_base_url: str = "https://inference.baseten.co/v1"
+    muse_open_model: str = "meta-models/muse-spark-open-1026"
+
+    # ------------------------------------------------------------
     # NVIDIA Nemotron on Nebius Token Factory (OpenAI-compatible)
     # ------------------------------------------------------------
     # When configured, Nemotron replaces Gemini as the planner everywhere.
@@ -128,7 +157,15 @@ class Settings(BaseSettings):
 
     @property
     def vision_configured(self) -> bool:
-        return bool(self.nebius_api_key and self.vision_enabled)
+        return self.vision_enabled and (self.sam_configured or bool(self.nebius_api_key))
+
+    @property
+    def sam_configured(self) -> bool:
+        return bool(self.model_api_key and self.sam_enabled)
+
+    @property
+    def vision_provider(self) -> str:
+        return "sam" if self.sam_configured else "nemotron-vl"
 
     # Public demo guardrails (see app/demo_guard.py). Off by default.
     public_demo: bool = False
@@ -142,7 +179,7 @@ class Settings(BaseSettings):
     # LLM / Agent Configuration
     # ------------------------------------------------------------
     llm_enabled: bool = False
-    llm_provider: str = "nemotron"  # nemotron | gemini | agentic | mock
+    llm_provider: str = "muse"  # muse | nemotron | gemini | agentic | mock (muse/nemotron/gemini all use the best configured model)
     # If true, starting a run will fail unless an LLM multi-waypoint plan is produced
     require_llm_plan_at_start: bool = True
 
@@ -210,16 +247,40 @@ class Settings(BaseSettings):
         return bool(self.gemini_api_key and self.gemini_enabled)
 
     @property
+    def muse_configured(self) -> bool:
+        return bool(self.model_api_key and self.muse_enabled)
+
+    @property
+    def muse_open_configured(self) -> bool:
+        return bool(self.baseten_api_key)
+
+    @property
+    def voice_configured(self) -> bool:
+        return bool(self.model_api_key)
+
+    @property
+    def sam_concept_map(self) -> Dict[str, str]:
+        out = {}
+        for part in self.sam_concepts.split(","):
+            if "=" in part:
+                k, v = part.split("=", 1)
+                if k.strip() and v.strip():
+                    out[k.strip()] = v.strip()
+        return out
+
+    @property
     def nemotron_configured(self) -> bool:
         return bool(self.nebius_api_key and self.nemotron_enabled)
 
     @property
     def planner_configured(self) -> bool:
-        """True when any LLM planner backend (Nemotron preferred) is available."""
-        return self.nemotron_configured or self.gemini_configured
+        """True when any LLM planner backend (Meta Muse preferred) is available."""
+        return self.muse_configured or self.muse_open_configured or self.nemotron_configured or self.gemini_configured
 
     @property
     def planner_provider(self) -> str:
+        if self.muse_configured or self.muse_open_configured:
+            return "muse"
         if self.nemotron_configured:
             return "nemotron"
         if self.gemini_configured:

@@ -63,6 +63,7 @@ class AgentRouter:
     """Select between deterministic, LLM, or agentic planner.
 
     Modes (via settings.llm_provider):
+    - "muse"     → Single-call Meta Muse planner (Muse Spark / Muse Spark Open)
     - "nemotron" → Single-call Nemotron planner on Nebius Token Factory
     - "gemini"   → Single-call GeminiPlanner (fast, stateless)
     - "agentic"  → ReAct agent with tool use, memory, replanning
@@ -142,7 +143,7 @@ class AgentRouter:
                 return self.simple.propose(telemetry, goal, last_governance)
 
         # ── Single-call LLM mode (Nemotron preferred, Gemini fallback) ──
-        if provider in ("nemotron", "gemini"):
+        if provider in ("muse", "nemotron", "gemini"):
             try:
                 return await self._gemini_planner().propose(telemetry, goal, nl_task, last_governance)
             except Exception:

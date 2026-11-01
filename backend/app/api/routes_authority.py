@@ -5,9 +5,10 @@ authenticated operator, and permits issued before the switch stay void.
 """
 from __future__ import annotations
 
+import re
 from typing import Literal, Optional
 
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, File, HTTPException, UploadFile
 from pydantic import BaseModel, Field
 
 from app.auth.jwt import get_current_user, require_authenticated_user
@@ -56,6 +57,44 @@ async def reset(req: ResetRequest, user: str = Depends(require_authenticated_use
     if not any(s == req.scope and i == ident for s, i in authority.kills.active()):
         raise HTTPException(status_code=404, detail="no such kill switch is active")
     return await authority.reset(req.scope, req.id, actor=user, sim=_sim())
+
+
+_STOP_WORDS = re.compile(r"\b(stop|halt|freeze|abort|emergency|e-?stop)\b", re.I)
+_ALL_WORDS = re.compile(r"\b(everything|everyone|all|global|whole site|every robot)\b", re.I)
+
+
+def voice_intent(transcript: str, robot_id: str) -> Optional[dict]:
+    """Map speech to a kill switch. Voice can only ever stop: anything else is ignored."""
+    if not transcript or not _STOP_WORDS.search(transcript):
+        return None
+    if _ALL_WORDS.search(transcript):
+        return {"scope": "global", "id": "*"}
+    return {"scope": "robot", "id": robot_id}
+
+
+@router.post("/voice")
+async def voice_stop(audio: UploadFile = File(..., description="WAV, mono 16-bit PCM, 16 or 24 kHz"),
+                     user: Optional[str] = Depends(get_current_user)):
+    """Spoken stop (Muse Voice Transcribe). A stop phrase fires a kill switch; nothing
+    spoken can start, resume or reset the robot."""
+    from app.config import settings
+    from app.services import meta_models
+    if not settings.voice_configured:
+        raise HTTPException(status_code=503, detail="voice needs MODEL_API_KEY (Muse Voice Transcribe)")
+    wav = await audio.read()
+    if len(wav) > 32 * 1024 * 1024:
+        raise HTTPException(status_code=413, detail="audio too large")
+    transcript, call = await meta_models.transcribe(wav)
+    if transcript is None:
+        raise HTTPException(status_code=502, detail="transcription failed")
+    authority = get_authority()
+    intent = voice_intent(transcript, authority.robot_id)
+    if intent is None:
+        return {"transcript": transcript, "action": "none",
+                "note": "No stop phrase heard. Voice can only stop the robot.", "latency_ms": call.get("latency_ms")}
+    report = await authority.kill(intent["scope"], intent["id"], reason=f'voice: "{transcript[:120]}"',
+                                  actor=user or "voice", sim=_sim())
+    return {"transcript": transcript, "action": "kill", "transcribe_ms": call.get("latency_ms"), **report}
 
 
 @router.get("/evidence")

@@ -1,8 +1,11 @@
-"""Robot-camera perception with an NVIDIA vision-language model, cross-checked.
+"""Robot-camera perception, cross-checked against the sensors.
 
-The model (Nemotron 3.5 Super VL on Nebius Token Factory) reads the robot's camera
-frame and reports people, the forklift, spills and pallets. Its output is never
-trusted on its own:
+With a Meta Model API key, SAM 3.1 segments the robot's camera frame: one short
+prompt per object type (person, forklift, spill, pallet), run in parallel, each
+returning pixel boxes. Each box centre is projected onto the warehouse floor with
+the camera geometry, so a detection becomes a position in metres. Without the
+key, the earlier Nemotron vision-language model is used. Either way the output
+is never trusted on its own:
 
 - Every report is compared with the simulator's ground truth in the same view.
 - A real hazard the model missed is recorded as a perception fault. The gate keeps
@@ -149,7 +152,32 @@ class Perception:
         self._seq = 0
 
     # ----------------------------------------------------------------- model
+    async def _ask_sam(self, png: bytes) -> Tuple[Optional[Any], Dict[str, Any]]:
+        """SAM 3.1: one prompt per object type in parallel; box centres -> 0-1000 grid."""
+        import asyncio
+        from app.services import meta_models
+        concepts = {k: v for k, v in settings.sam_concept_map.items() if k in KINDS}
+        t0 = time.monotonic()
+        results = await asyncio.gather(*(meta_models.sam_segment(png, c) for c in concepts.values()))
+        record: Dict[str, Any] = {"model": settings.sam_model, "tier": "vision",
+                                  "latency_ms": round((time.monotonic() - t0) * 1000),
+                                  "calls": len(results), "ok": any(b is not None for b, _ in results)}
+        if not record["ok"]:
+            return None, record
+        objects = []
+        for kind, (boxes, _) in zip(concepts.keys(), results):
+            for b in boxes or []:
+                cx, cy = (b["x1"] + b["x2"]) / 2, (b["y1"] + b["y2"]) / 2
+                objects.append({"type": kind, "x": cx / b["w"] * 1000, "y": cy / b["h"] * 1000,
+                                "box_px": [b["x1"], b["y1"], b["x2"], b["y2"]], "conf": b.get("c")})
+        return {"objects": objects}, record
+
     async def _ask(self, png: bytes) -> Tuple[Optional[Any], Dict[str, Any]]:
+        if settings.sam_configured:
+            return await self._ask_sam(png)
+        return await self._ask_vlm(png)
+
+    async def _ask_vlm(self, png: bytes) -> Tuple[Optional[Any], Dict[str, Any]]:
         from app.services.gemini_planner import _extract_json
         from app.services.nemotron_planner import _get_client, usage_log
         body = {
@@ -197,7 +225,8 @@ class Perception:
         truth = ground_truth(tel)
         self._seq += 1
         result: Dict[str, Any] = {
-            "id": f"vis-{self._seq}", "ts": time.time(), "run_id": run_id, "model": settings.vision_model,
+            "id": f"vis-{self._seq}", "ts": time.time(), "run_id": run_id,
+            "model": settings.sam_model if settings.sam_configured else settings.vision_model,
             "latency_ms": call.get("latency_ms"), "robot": {k: tel.get(k) for k in ("x", "y", "theta")},
             "truth": truth,
         }
@@ -264,7 +293,9 @@ class Perception:
 
     def status(self) -> Dict[str, Any]:
         return {
-            "enabled": settings.vision_configured, "model": settings.vision_model,
+            "enabled": settings.vision_configured,
+            "model": settings.sam_model if settings.sam_configured else settings.vision_model,
+            "provider": settings.vision_provider,
             "interval_s": settings.vision_interval_s, "match_m": settings.vision_match_m,
             "caution_ttl_s": settings.vision_caution_ttl_s, "caution_zones": self.caution_zones(),
             "recent": list(self.recent)[-10:],
