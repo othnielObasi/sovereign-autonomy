@@ -420,7 +420,7 @@ def get_run(run_id: str, db: Session = Depends(get_db)):
     if not run:
         raise HTTPException(status_code=404, detail="Run not found")
     # Reading a run never restarts it. A robot only moves after an explicit
-    # start or resume; startup marks runs left over from a restart as failed.
+    # start or resume; startup pauses runs left over from a restart.
     return RunOut(
         id=run.id,
         mission_id=run.mission_id,
@@ -471,8 +471,12 @@ async def resume_run(
         raise HTTPException(status_code=404, detail="Run not found")
     if run.status != "paused":
         raise HTTPException(status_code=400, detail=f"Cannot resume run in state '{run.status}'")
-    await svc.resume_run(db, run_id)
-    return {"ok": True, "status": "running"}
+    from app.autonomy.core import Rejected
+    try:
+        result = await svc.resume_run(db, run_id) or {}
+    except Rejected as exc:
+        raise HTTPException(status_code=409, detail=str(exc))
+    return {"ok": True, "status": "running", **result}
 
 
 @router.get("/runs/{run_id}/events", response_model=List[EventOut])

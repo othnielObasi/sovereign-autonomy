@@ -315,11 +315,63 @@ class RunService:
         if self._ws_broadcast:
             await self._ws_broadcast(run_id, {"kind": "status", "data": {"status": "paused"}})
 
-    async def resume_run(self, db: Session, run_id: str) -> None:
-        """Resume a paused run."""
+    def _restore_plan(self, db: Session, run_id: str) -> int:
+        """Rebuild the remaining plan from the hash-chained events: the latest PLAN, minus
+        every waypoint before the last one actually sent and acknowledged. Returns how many remain."""
+        events = db.query(Event).filter(Event.run_id == run_id).order_by(Event.ts.asc()).all()
+        waypoints: List[Dict[str, Any]] = []
+        last_target = None
+        for e in events:
+            try:
+                payload = json.loads(e.payload_json)
+            except (TypeError, ValueError):
+                continue
+            if e.type == "PLAN":
+                waypoints = list((payload.get("plan") or {}).get("waypoints") or [])
+                last_target = None
+            elif e.type == "EXECUTION":
+                cmd = payload.get("command") or {}
+                res = payload.get("result") or {}
+                if cmd.get("intent") == "MOVE_TO" and (res.get("ok") or res.get("ack")) and not res.get("rejected"):
+                    last_target = cmd.get("params") or None
+        if last_target and waypoints:
+            for i, wp in enumerate(waypoints):
+                if math.hypot(float(wp["x"]) - float(last_target.get("x", 1e9)),
+                              float(wp["y"]) - float(last_target.get("y", 1e9))) < 0.05:
+                    waypoints = waypoints[i:]   # resume toward the waypoint it was heading to
+                    break
+        if waypoints:
+            self._plans[run_id] = waypoints
+        return len(waypoints)
+
+    async def resume_run(self, db: Session, run_id: str) -> Optional[Dict[str, Any]]:
+        """Resume a paused run, after the same checks a restart needs.
+
+        Raises Rejected if a kill switch covers this robot or mission. Moves whose
+        outcome was lost are settled with the controller first; nothing is replayed."""
         run = db.query(Run).filter(Run.id == run_id).first()
         if not run or run.status != "paused":
-            return
+            return None
+        authority = get_authority()
+        locks = [(s, i) for s, i in authority.kills.active()
+                 if s == "global" or (s == "robot" and i == authority.robot_id)
+                 or (s == "mission" and i == run.mission_id)]
+        if locks:
+            raise Rejected("kill_switch_active")
+        settled: List[Dict[str, Any]] = []
+        try:
+            tel = await self.sim.get_telemetry()
+            settled = authority.reconcile_in_doubt(run.mission_id, tel)
+        except Rejected:
+            raise
+        except Exception as exc:
+            if authority.checkpoints.in_doubt(run.mission_id):
+                raise Rejected("controller_unreachable_cannot_reconcile") from exc
+        for s in settled:
+            self._append_event(db, run_id, "AUTHORITY", {"event": "reconciled", "on": "resume", **s})
+        remaining = len(self._plans[run_id]) if run_id in self._plans else self._restore_plan(db, run_id)
+        if remaining:
+            self._append_event(db, run_id, "AUTHORITY", {"event": "plan_restored", "waypoints_remaining": remaining})
 
         run.status = "running"
         # Sync parent mission status
@@ -345,6 +397,7 @@ class RunService:
 
         if self._ws_broadcast:
             await self._ws_broadcast(run_id, {"kind": "status", "data": {"status": "running"}})
+        return {"reconciled": settled, "waypoints_remaining": remaining}
 
     async def _post_run_analytics(self, run_id: str) -> None:
         """Run heavy post-completion analytics in a background task.

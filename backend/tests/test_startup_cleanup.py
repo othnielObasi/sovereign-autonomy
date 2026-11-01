@@ -10,7 +10,7 @@ from app.main import app
 from app.utils.time import utc_now
 
 
-def test_startup_marks_stale_runs_and_missions_failed():
+def test_startup_pauses_interrupted_runs_and_missions():
     mission_id = "mis_startup_cleanup"
     run_id = "run_startup_cleanup"
 
@@ -56,11 +56,16 @@ def test_startup_marks_stale_runs_and_missions_failed():
         cleaned_mission = db.query(Mission).filter(Mission.id == mission_id).first()
 
         assert cleaned_run is not None
-        assert cleaned_run.status == "failed"
-        assert cleaned_run.ended_at is not None
+        assert cleaned_run.status == "paused"          # resumable, not failed
+        assert cleaned_run.ended_at is None
 
         assert cleaned_mission is not None
-        assert cleaned_mission.status == "failed"
+        assert cleaned_mission.status == "paused"
+
+        from app.db.models import Event
+        note = db.query(Event).filter(Event.run_id == run_id, Event.type == "INTERVENTION").first()
+        assert note is not None and json.loads(note.payload_json)["type"] == "INTERRUPTED"
+        db.query(Event).filter(Event.run_id == run_id).delete()
 
         db.delete(cleaned_run)
         db.delete(cleaned_mission)

@@ -440,3 +440,17 @@ def test_robot_already_close_can_still_back_away(authority):
     with pytest.raises(Rejected, match="person"):
         authority.authorize(run_id="r", mission_id="m", intent="MOVE_TO", params={"x": 3.5, "y": 3.5},
                             decision="APPROVED", policy_version="v")
+
+
+# --- security drills against the real simulator ----------------------------------------------------
+
+def test_security_drills_all_pass_against_the_real_simulator(authority, sim, monkeypatch, tmp_path):
+    import app.services.route_learning as rl
+    from app.services.drills import run_drills
+    monkeypatch.setattr(rl, "_memory", rl.RouteMemory(db_path=str(tmp_path / "exp.db"), secret=SECRET.encode()))
+    names = ["bypass", "tamper", "replay", "forged", "poison", "injection", "kill"]   # canary needs a live model
+    result = run(run_drills(authority, sim, names))
+    assert result["all_passed"], result["results"]
+    assert [r["drill"] for r in result["results"]] == names
+    assert authority.kill_locks() == []          # the kill drill reset its own lock
+    assert rl._memory.status()["quarantined"] == 0   # the planted record was removed

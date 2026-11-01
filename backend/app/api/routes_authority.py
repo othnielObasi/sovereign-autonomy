@@ -97,6 +97,38 @@ async def voice_stop(audio: UploadFile = File(..., description="WAV, mono 16-bit
     return {"transcript": transcript, "action": "kill", "transcribe_ms": call.get("latency_ms"), **report}
 
 
+class DrillRequest(BaseModel):
+    drills: Optional[list[str]] = Field(None, description="subset to run; default all")
+
+
+@router.post("/drills")
+async def drills(req: Optional[DrillRequest] = None):
+    """Run the security drills against the live simulator (only while no mission runs)."""
+    from app.db.models import Run
+    from app.db.session import SessionLocal
+    from app.services.drills import run_drills
+    db = SessionLocal()
+    try:
+        if db.query(Run).filter(Run.status.in_(("running", "planning"))).count():
+            raise HTTPException(status_code=409, detail="stop the running mission before running drills")
+    finally:
+        db.close()
+    authority = get_authority()
+    if not authority.enabled:
+        raise HTTPException(status_code=503, detail="PERMIT_SECRET is not set")
+    result = await run_drills(authority, _sim(), (req.drills if req else None))
+    authority.evidence.emit("security_drills", "*", None, passed=result["passed"], ran=result["ran"])
+    return result
+
+
+@router.get("/learning")
+def learning_status():
+    """Learned-routing memory: verified cells and quarantined records."""
+    from app.services.route_learning import get_memory
+    from app.services.site_router import last_route_info
+    return {**get_memory().status(), "last_route": dict(last_route_info)}
+
+
 @router.get("/evidence")
 def evidence(limit: int = 200):
     """Recent dispatch and kill-switch events (most recent last)."""

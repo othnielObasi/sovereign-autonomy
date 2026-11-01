@@ -106,9 +106,10 @@ async def lifespan(app: FastAPI):
     except Exception as _perr:
         logger.error(f"Could not load active policy version, enforcing defaults: {_perr}")
 
-    # Mark stale "running" runs as interrupted on startup.
-    # In-memory state (asyncio tasks, plans) is lost across restarts, so
-    # blindly resuming dozens of loops overwhelms the simulator and event loop.
+    # Runs interrupted by a restart are paused, not resumed automatically and not
+    # failed: an operator resumes them, and resume first checks kill switches,
+    # settles any move whose outcome was lost, and restores the plan from the last
+    # confirmed waypoint (RunService.resume_run). Every move then needs a new permit.
     from app.db.session import SessionLocal as _SL
     from app.db.models import Run as _Run, Mission as _Mission
     from app.utils.time import utc_now as _utc_now
@@ -116,20 +117,25 @@ async def lifespan(app: FastAPI):
     try:
         stale = _db.query(_Run).filter(_Run.status.in_(("running", "planning"))).all()
         if stale:
-            logger.info("Startup: marking %d stale runs as interrupted", len(stale))
+            logger.info("Startup: pausing %d runs interrupted by the restart", len(stale))
+            from app.api.routes_runs import get_run_svc as _get_svc
+            _svc = _get_svc()
             mission_ids = set()
             for r in stale:
-                r.status = "failed"
-                r.ended_at = _utc_now()
+                was = r.status
+                r.status = "paused"
                 mission_ids.add(r.mission_id)
-            # Keep mission status aligned with the failed run state.
+                _svc._append_event(_db, r.id, "INTERVENTION", {
+                    "type": "INTERRUPTED", "actor": "system", "was": was,
+                    "reason": "Backend restarted mid-run. Resume checks kill switches, settles uncertain moves "
+                              "with the controller and continues from the last confirmed waypoint.",
+                })
             for mid in mission_ids:
                 m = _db.query(_Mission).filter(_Mission.id == mid).first()
-                if m and m.status == "executing":
-                    m.status = "failed"
+                if m and m.status in ("executing", "planning"):
+                    m.status = "paused"
             _db.commit()
-            logger.info("Startup: cleaned up %d stale runs, %d missions reset",
-                        len(stale), len(mission_ids))
+            logger.info("Startup: paused %d runs, %d missions", len(stale), len(mission_ids))
     except Exception as exc:
         logger.warning("Startup stale-run cleanup failed: %s", exc)
         try:
