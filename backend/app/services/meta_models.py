@@ -98,6 +98,12 @@ async def chat(model: str, system: str, prompt: str, *, image_png: Optional[byte
         return None
     finally:
         _log(**record)
+        from app.observability import tracing
+        tracing.llm_call(model=model, provider=provider, tier=tier, system=system, prompt=prompt,
+                         output=locals().get("text") if record.get("ok") else None, with_image=bool(image_png),
+                         error=None if record.get("ok") else str(record.get("error") or record.get("status")),
+                         latency_ms=record.get("latency_ms"), prompt_tokens=record.get("prompt_tokens"),
+                         completion_tokens=record.get("completion_tokens"))
 
 
 # --- SAM 3.1 ---------------------------------------------------------------------------------
@@ -194,6 +200,11 @@ async def sam_segment(png: bytes, concept: str) -> Tuple[Optional[List[Dict[str,
         return None, record
     finally:
         _log(**record)
+        from app.observability import tracing
+        tracing.llm_call(model=settings.sam_model, provider="meta", tier="vision", prompt=concept,
+                         output=f"{record.get('detections', 0)} detection(s)" if record.get("ok") else None,
+                         with_image=True, error=None if record.get("ok") else str(record.get("error") or record.get("status")),
+                         latency_ms=record.get("latency_ms"))
 
 
 # --- Muse Voice Transcribe ------------------------------------------------------------------------
@@ -227,3 +238,8 @@ async def transcribe(wav: bytes) -> Tuple[Optional[str], Dict[str, Any]]:
         return None, record
     finally:
         _log(**record)
+        from app.observability import tracing
+        tracing.llm_call(model=settings.voice_model, provider="meta", tier="voice", prompt="(operator audio)",
+                         output=locals().get("transcript") if record.get("ok") else None,
+                         error=None if record.get("ok") else str(record.get("error") or record.get("status")),
+                         latency_ms=record.get("latency_ms"))

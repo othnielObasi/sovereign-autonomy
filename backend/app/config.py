@@ -120,6 +120,12 @@ class Settings(BaseSettings):
     sam_concepts: str = "person=orange circle,forklift=yellow rectangle,spill=light blue blotch,pallet=brown square"
     voice_model: str = "muse-voice-transcribe-1.0"
 
+    # LangSmith: one trace per mission (model calls -> gate -> permit). On when the key is set.
+    langsmith_api_key: Optional[str] = None
+    langsmith_project: str = "sovereign-autonomy"
+    langsmith_endpoint: str = "https://api.smith.langchain.com"
+    langsmith_tracing: bool = True
+
     # Muse Spark Open (Meta open weights) served by Baseten, OpenAI-compatible.
     # When set, it proposes each step; Muse Spark keeps mission planning.
     baseten_api_key: Optional[str] = None

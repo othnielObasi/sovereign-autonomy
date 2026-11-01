@@ -255,6 +255,9 @@ class ExecutionAuthority:
         stop = await self._verify_stopped(sim)
         self.evidence.emit("kill_switch", "*", None, scope=scope, id=ident, reason=reason, actor=actor)
         metrics.inc("kill_switch_total", scope=scope)
+        from app.observability import tracing
+        tracing.event("kill_switch", {"scope": scope, "id": ident, "reason": reason, "actor": actor or "anonymous"},
+                      {"authority_revoked_ms": round(revoked_ms, 2), "controller": controller, **stop})
         metrics.observe("kill_revoke_ms", revoked_ms, scope=scope)
         if stop.get("stop_verified_ms") is not None:
             metrics.observe("kill_stop_verified_ms", stop["stop_verified_ms"], scope=scope)
@@ -291,6 +294,9 @@ class ExecutionAuthority:
             except Exception as exc:
                 controller = {"ok": False, "error": type(exc).__name__}
         self.evidence.emit("kill_switch_reset", "*", None, scope=scope, id=ident, actor=actor)
+        from app.observability import tracing
+        tracing.event("kill_switch_reset", {"scope": scope, "id": ident, "actor": actor},
+                      {"controller_released": bool(controller.get("ok")), "still_stopped": still_stopped})
         return {"scope": scope, "id": ident, "reset": True, "controller_released": bool(controller.get("ok")),
                 "still_stopped": still_stopped}
 

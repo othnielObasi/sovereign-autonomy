@@ -118,6 +118,8 @@ async def drills(req: Optional[DrillRequest] = None):
         raise HTTPException(status_code=503, detail="PERMIT_SECRET is not set")
     result = await run_drills(authority, _sim(), (req.drills if req else None))
     authority.evidence.emit("security_drills", "*", None, passed=result["passed"], ran=result["ran"])
+    from app.observability import tracing
+    tracing.event("security_drills", {"drills": req.drills if req and req.drills else "all"}, result)
     return result
 
 

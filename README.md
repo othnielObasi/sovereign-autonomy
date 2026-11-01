@@ -30,6 +30,7 @@ Everything in this section was built from 26 October 2026 onward. The git histor
 | Canary tripwire: a plan that obeys an instruction hidden in untrusted data is discarded | Working |
 | Security drills: eight real attacks against the live simulator, pass/fail (`/authority`) | Working |
 | Prometheus `/metrics` and Grafana dashboard for the safety path | Working |
+| LangSmith: one trace per mission, from the model's plan to each gate decision and permit | Ready: runs with `LANGSMITH_API_KEY` |
 
 This table is updated as each item lands. [`docs/TRACEABILITY.md`](docs/TRACEABILITY.md) maps every capability in the plan to its status and tests.
 

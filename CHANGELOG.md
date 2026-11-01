@@ -34,3 +34,4 @@ The first commit in this repository is the pre-existing codebase; everything lis
 - **Security drills** (`/authority/drills`): bypass, tampered, replayed and forged permits, poisoned memory, injected site text, canary, kill switch, each against the live simulator.
 - **Dashboard**: new Authority page (kill switches, voice stop, reset, drills, live permit events), authority controls on every run, Overview rewritten around the hackathon work with "New" and "Earlier work" labels.
 - **Observability**: Prometheus `/metrics` for the safety path; Grafana dashboard rebuilt on those metrics.
+- **LangSmith tracing**: one trace per mission (planning calls with prompt and answer, plan, each gate decision, each permit used or refused, canary trips), plus kill switches, resets and drills. Off without `LANGSMITH_API_KEY`; never blocks a safety decision; camera images and keys are never sent.

@@ -257,6 +257,12 @@ class NemotronPlanner(GeminiPlanner):
                 record["latency_ms"] = round((_time.monotonic() - t0) * 1000)
                 record["cancelled"] = True
             usage_log.record(**record)
+            if not record.get("cancelled"):
+                from app.observability import tracing
+                tracing.llm_call(model=model, provider="nebius", tier=tier, system=SYSTEM_PROMPT, prompt=prompt,
+                                 output=locals().get("text") if record.get("ok") else None,
+                                 error=None if record.get("ok") else str(record.get("error") or record.get("status")),
+                                 latency_ms=record.get("latency_ms"))
 
     # -- tier assignment ----------------------------------------------------
 

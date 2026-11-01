@@ -152,11 +152,13 @@ async def _plan_and_start_loop(svc: RunService, run_id: str, mission_id: str, mi
                     from app.services import canaries
                     canary_token, canary_line = canaries.plant(run_id)
                     context = canaries.with_canary(site_intel.planner_context(), canary_line)
-                    try:
-                        plan = await planner.generate_plan(telemetry, mission_title, goal, lessons=lessons,
-                                                           untrusted_context=context)
-                    except TypeError:  # planners without the parameter
-                        plan = await planner.generate_plan(telemetry, mission_title, goal, lessons=lessons)
+                    from app.observability import tracing
+                    with tracing.within_mission(run_id):
+                        try:
+                            plan = await planner.generate_plan(telemetry, mission_title, goal, lessons=lessons,
+                                                               untrusted_context=context)
+                        except TypeError:  # planners without the parameter
+                            plan = await planner.generate_plan(telemetry, mission_title, goal, lessons=lessons)
 
                 # Canary: a plan that obeyed an instruction hidden in untrusted data is not used
                 hit = canaries.tripped(canary_token, plan) if plan else None
@@ -170,7 +172,16 @@ async def _plan_and_start_loop(svc: RunService, run_id: str, mission_id: str, mi
                                    plan.get("model_used"))
                     from app.observability import metrics
                     metrics.inc("canary_tripped_total", model=str(plan.get("model_used")))
+                    tracing.mission_event(run_id, "canary", inputs={"marker": hit["marker"]},
+                                          outputs={"tripped_by": plan.get("model_used"),
+                                                   "action": "plan discarded; aisle route used"})
                     plan = {"waypoints": []}
+
+                tracing.mission_event(run_id, "plan", run_type="chain", inputs={"instruction": mission_title, "goal": goal},
+                                      outputs={"model_used": (plan or {}).get("model_used"),
+                                               "camera_used": (plan or {}).get("camera_used"),
+                                               "waypoints": len((plan or {}).get("waypoints") or []),
+                                               "canary_tripped": bool(hit)})
 
                 if plan and plan.get("waypoints"):
                     # Keep the model's waypoints but re-route any leg that would cut through racking

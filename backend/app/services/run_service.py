@@ -177,6 +177,13 @@ class RunService:
         db.add(run)
         db.commit()
         db.refresh(run)
+        try:
+            from app.db.models import Mission as _M
+            from app.observability import tracing
+            m = db.query(_M).filter(_M.id == mission_id).first()
+            tracing.mission_start(run.id, mission_id, m.title if m else "", json.loads(m.goal_json) if m else {})
+        except Exception:
+            pass
 
         # Do NOT launch loop yet — caller must attach a plan first, then
         # call begin_running() to transition from "planning" → "running".
@@ -477,12 +484,21 @@ class RunService:
             if reason.startswith("trajectory_"):
                 # The path check refused it: count it like a gate denial so the loop replans
                 self._wp_denial_counts[run_id] = self._wp_denial_counts.get(run_id, 0) + 1
+            from app.observability import tracing
+            tracing.mission_event(run_id, "permit", inputs={"intent": intent, "params": params},
+                                  outputs={"permit": "outcome unknown" if unknown else "refused", "reason": reason},
+                                  error=reason if unknown else None)
             return {"ok": False, "rejected": not unknown, "reason": reason}
         self._append_event(db, run_id, "AUTHORITY", {
             "event": "permit_used" if not result.get("rejected") else "controller_refused",
             "action_id": action.action_id, "world_version": action.world_version,
             "policy_version": action.policy_version, "reason": result.get("reason"),
         })
+        from app.observability import tracing
+        tracing.mission_event(run_id, "permit", inputs={"intent": intent, "params": params},
+                              outputs={"permit": "used" if not result.get("rejected") else "refused by controller",
+                                       "action_id": action.action_id, "world_version": action.world_version,
+                                       "controller": result})
         return result
 
     async def _run_loop(self, run_id: str) -> None:
@@ -827,6 +843,11 @@ class RunService:
                     }
 
                     decision_evt = self._append_event(db, run_id, "DECISION", decision_event_payload)
+                    from app.observability import tracing as _tracing
+                    _tracing.mission_event(run_id, "gate", inputs={"proposal": proposal_payload,
+                                                                   "position": {k: telemetry.get(k) for k in ("x", "y", "speed", "zone")}},
+                                           outputs={"decision": gov_decision.decision, "state": gov_decision.policy_state,
+                                                    "policy_hits": gov_decision.policy_hits, "reasons": gov_decision.reasons[:5]})
 
                     # --- Runtime integrity check (anti-gaming) ---
                     if run_id not in self._integrity_checkers:
@@ -1304,6 +1325,19 @@ class RunService:
                 ldb.close()
         except Exception as dl_err:
             logger.warning("Lesson distillation failed for %s: %s", run_id, dl_err)
+
+        # Close the mission trace with the run's final status
+        try:
+            from app.db.session import SessionLocal as _SL2
+            from app.observability import tracing
+            _tdb = _SL2()
+            try:
+                _r = _tdb.query(Run).filter(Run.id == run_id).first()
+                tracing.mission_end(run_id, _r.status if _r else "ended")
+            finally:
+                _tdb.close()
+        except Exception:
+            pass
 
         # Cleanup finished task references
         try:
