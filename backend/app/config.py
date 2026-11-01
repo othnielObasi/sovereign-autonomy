@@ -38,6 +38,9 @@ class Settings(BaseSettings):
     jwt_algorithm: str = "HS256"
     auth_required: Optional[bool] = None  # Defaults to True in production, False elsewhere
     allow_dev_tokens: Optional[bool] = None  # Defaults to False in production, True elsewhere
+    # Sign-in accounts: "name:role:pbkdf2_sha256$..." separated by ";" (scripts/add_account.py makes entries).
+    # Roles: viewer, operator, admin.
+    auth_accounts: str = ""
 
     # ------------------------------------------------------------
     # Simulator Connection

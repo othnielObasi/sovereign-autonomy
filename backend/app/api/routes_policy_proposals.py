@@ -13,6 +13,7 @@ from pydantic import BaseModel, Field
 from sqlalchemy.orm import Session
 
 from app.auth.jwt import get_current_user
+from app.auth.roles import ADMIN, OPERATOR
 from app.config import settings
 from app.db.models import PolicyActivation, PolicyProposal
 from app.deps import get_db
@@ -93,12 +94,12 @@ def list_proposals(status: Optional[str] = None, db: Session = Depends(get_db)):
 
 
 @router.post("/proposals")
-def create_proposal(body: CreateBody, db: Session = Depends(get_db), user: Optional[str] = Depends(get_current_user)):
+def create_proposal(body: CreateBody, db: Session = Depends(get_db), user: Optional[str] = Depends(OPERATOR)):
     return svc.to_dict(_call(svc.create, db, body.changes, _actor(body.created_by, user), body.description))
 
 
 @router.post("/proposals/from-tuning")
-def create_from_tuning(body: ActorBody, db: Session = Depends(get_db), user: Optional[str] = Depends(get_current_user)):
+def create_from_tuning(body: ActorBody, db: Session = Depends(get_db), user: Optional[str] = Depends(OPERATOR)):
     return svc.to_dict(_call(svc.create_from_tuning, db, _actor(body.by, user)))
 
 
@@ -124,22 +125,22 @@ def benchmark_proposal(proposal_id: str, body: BenchmarkBody = BenchmarkBody(), 
 
 @router.post("/proposals/{proposal_id}/approve")
 def approve_proposal(proposal_id: str, body: ApproveBody, db: Session = Depends(get_db),
-                     user: Optional[str] = Depends(get_current_user)):
+                     user: Optional[str] = Depends(OPERATOR)):
     return svc.to_dict(_call(svc.approve, db, proposal_id, _actor(body.approver, user), body.note))
 
 
 @router.post("/proposals/{proposal_id}/reject")
 def reject_proposal(proposal_id: str, body: ReasonBody, db: Session = Depends(get_db),
-                    user: Optional[str] = Depends(get_current_user)):
+                    user: Optional[str] = Depends(OPERATOR)):
     return svc.to_dict(_call(svc.reject, db, proposal_id, _actor(body.by, user), body.reason))
 
 
 @router.post("/proposals/{proposal_id}/activate")
 def activate_proposal(proposal_id: str, body: ActorBody, db: Session = Depends(get_db),
-                      user: Optional[str] = Depends(get_current_user)):
+                      user: Optional[str] = Depends(ADMIN)):
     return svc.activation_dict(_call(svc.activate, db, proposal_id, _actor(body.by, user)))
 
 
 @router.post("/rollback")
-def rollback(body: ReasonBody, db: Session = Depends(get_db), user: Optional[str] = Depends(get_current_user)):
+def rollback(body: ReasonBody, db: Session = Depends(get_db), user: Optional[str] = Depends(ADMIN)):
     return svc.activation_dict(_call(svc.rollback, db, _actor(body.by, user), body.reason))

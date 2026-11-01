@@ -11,7 +11,8 @@ from typing import Literal, Optional
 from fastapi import APIRouter, Depends, File, HTTPException, UploadFile
 from pydantic import BaseModel, Field
 
-from app.auth.jwt import get_current_user, require_authenticated_user
+from app.auth.jwt import get_current_user
+from app.auth.roles import OPERATOR, OPERATOR_ALWAYS
 from app.services.execution_authority import get_authority
 
 router = APIRouter(prefix="/authority", tags=["authority"])
@@ -50,8 +51,8 @@ async def kill(req: KillRequest, user: Optional[str] = Depends(get_current_user)
 
 
 @router.post("/reset")
-async def reset(req: ResetRequest, user: str = Depends(require_authenticated_user)):
-    """Lift one kill switch. Requires an authenticated operator."""
+async def reset(req: ResetRequest, user: str = Depends(OPERATOR_ALWAYS)):
+    """Lift one kill switch. Requires a signed-in operator or admin, in every environment."""
     authority = get_authority()
     ident = "*" if req.scope == "global" else req.id
     if not any(s == req.scope and i == ident for s, i in authority.kills.active()):
@@ -102,7 +103,7 @@ class DrillRequest(BaseModel):
 
 
 @router.post("/drills")
-async def drills(req: Optional[DrillRequest] = None):
+async def drills(req: Optional[DrillRequest] = None, user: Optional[str] = Depends(OPERATOR)):
     """Run the security drills against the live simulator (only while no mission runs)."""
     from app.db.models import Run
     from app.db.session import SessionLocal

@@ -3,6 +3,7 @@ import Link from "next/link";
 import { Inter, JetBrains_Mono } from "next/font/google";
 import "./globals.css";
 import { NavLinks, StatusPill } from "@/components/NavLinks";
+import { SignIn } from "@/components/SignIn";
 
 const sans = Inter({ subsets: ["latin"], variable: "--font-sans", display: "swap" });
 const mono = JetBrains_Mono({ subsets: ["latin"], variable: "--font-mono", display: "swap" });
@@ -42,6 +43,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             </div>
             <div className="flex items-center gap-3">
               <StatusPill />
+              <SignIn />
               <Link href="/twin"
                 className="hidden sm:inline-flex items-center gap-2 rounded-lg bg-mc-accent text-mc-bg px-3 py-1.5 text-[13px] font-semibold hover:bg-cyan-300">
                 <span className="w-1.5 h-1.5 rounded-full bg-mc-bg animate-live-dot" />

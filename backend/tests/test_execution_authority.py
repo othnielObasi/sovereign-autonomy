@@ -281,7 +281,9 @@ def test_kill_api_open_but_reset_needs_login(monkeypatch, tmp_path):
     assert client.get("/authority/status").json()["kill_locks"][0]["scope"] == "global"
     assert client.post("/authority/reset", json={"scope": "global"}).status_code == 401
     assert client.post("/authority/kill", json={"scope": "robot"}).status_code == 422
-    headers = {"Authorization": f"Bearer {create_access_token('operator-1')}"}
+    viewer = {"Authorization": f"Bearer {create_access_token('watcher', role='viewer')}"}
+    assert client.post("/authority/reset", json={"scope": "global"}, headers=viewer).status_code == 403
+    headers = {"Authorization": f"Bearer {create_access_token('operator-1', role='operator')}"}
     r = client.post("/authority/reset", json={"scope": "global"}, headers=headers)
     assert r.status_code == 200 and r.json()["controller_released"] is True
     assert client.post("/authority/reset", json={"scope": "global"}, headers=headers).status_code == 404

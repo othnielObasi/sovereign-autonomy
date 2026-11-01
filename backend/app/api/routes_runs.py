@@ -10,6 +10,7 @@ from typing import List, Optional
 
 from app.deps import get_db
 from app.auth.jwt import get_current_user
+from app.auth.roles import ADMIN, OPERATOR
 from app.db.models import Run, Event, Mission, TelemetrySample
 from app.schemas.run import RunOut, RunStartResponse
 from app.schemas.events import EventOut
@@ -96,7 +97,7 @@ class _LegacyRunStart(BaseModel):
 async def start_run_legacy(
     body: _LegacyRunStart,
     db: Session = Depends(get_db),
-    user: str | None = Depends(get_current_user),
+    user: str | None = Depends(OPERATOR),
 ):
     """Backward-compatible: accepts POST /runs {mission_id} and proxies to the
     canonical /missions/{id}/start handler."""
@@ -325,7 +326,7 @@ async def _plan_and_start_loop(svc: RunService, run_id: str, mission_id: str, mi
 async def start_run(
     mission_id: str,
     db: Session = Depends(get_db),
-    user: str | None = Depends(get_current_user),
+    user: str | None = Depends(OPERATOR),
 ):
     mission = db.query(Mission).filter(Mission.id == mission_id).first()
     if not mission:
@@ -458,7 +459,7 @@ async def stop_run(
 async def pause_run(
     run_id: str,
     db: Session = Depends(get_db),
-    user: str | None = Depends(get_current_user),
+    user: str | None = Depends(OPERATOR),
 ):
     """Pause a running run — robot stops executing but run can be resumed."""
     svc = get_run_svc()
@@ -475,7 +476,7 @@ async def pause_run(
 async def resume_run(
     run_id: str,
     db: Session = Depends(get_db),
-    user: str | None = Depends(get_current_user),
+    user: str | None = Depends(OPERATOR),
 ):
     """Resume a paused run."""
     svc = get_run_svc()

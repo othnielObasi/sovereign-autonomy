@@ -16,11 +16,12 @@ logger = logging.getLogger("app.auth")
 _bearer_scheme = HTTPBearer(auto_error=False)
 
 
-def create_access_token(subject: str) -> str:
+def create_access_token(subject: str, role: str = "viewer") -> str:
     now = utc_now()
     exp = now + timedelta(minutes=settings.access_token_expire_minutes)
     payload: Dict[str, Any] = {
         "sub": subject,
+        "role": role,
         "iss": settings.jwt_issuer,
         "aud": settings.jwt_audience,
         "iat": int(now.timestamp()),

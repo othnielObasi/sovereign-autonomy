@@ -16,6 +16,7 @@ from typing import List
 
 from app.deps import get_db
 from app.auth.jwt import get_current_user
+from app.auth.roles import ADMIN, OPERATOR
 from app.services.mission_service import MissionService
 from app.schemas.mission import MissionCreate, MissionUpdate, MissionOut, MissionAuditOut
 
@@ -51,7 +52,7 @@ def _audit_to_out(a) -> MissionAuditOut:
 def create_mission(
     payload: MissionCreate,
     db: Session = Depends(get_db),
-    user: str | None = Depends(get_current_user),
+    user: str | None = Depends(OPERATOR),
 ):
     m = svc.create(db, payload)
     return _to_out(m)
@@ -80,7 +81,7 @@ def update_mission(
     mission_id: str,
     payload: MissionUpdate,
     db: Session = Depends(get_db),
-    user: str | None = Depends(get_current_user),
+    user: str | None = Depends(OPERATOR),
 ):
     m = svc.update(db, mission_id, payload)
     if not m:
@@ -107,7 +108,7 @@ def pause_mission(
 def resume_mission(
     mission_id: str,
     db: Session = Depends(get_db),
-    user: str | None = Depends(get_current_user),
+    user: str | None = Depends(OPERATOR),
 ):
     m = svc.get(db, mission_id)
     if not m:
@@ -122,7 +123,7 @@ def resume_mission(
 def replay_mission(
     mission_id: str,
     db: Session = Depends(get_db),
-    user: str | None = Depends(get_current_user),
+    user: str | None = Depends(OPERATOR),
 ):
     """Reset a completed mission back to draft so it can be re-executed."""
     m = svc.replay(db, mission_id)
@@ -135,7 +136,7 @@ def replay_mission(
 def delete_mission(
     mission_id: str,
     db: Session = Depends(get_db),
-    user: str | None = Depends(get_current_user),
+    user: str | None = Depends(OPERATOR),
 ):
     m = svc.get(db, mission_id)
     if not m:

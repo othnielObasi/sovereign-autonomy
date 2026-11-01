@@ -6,6 +6,7 @@ from typing import Optional
 from app.services import operator_approval as approval_svc
 from app.utils.hashing import sha256_canonical
 from app.auth.jwt import get_current_user
+from app.auth.roles import ADMIN, OPERATOR
 
 router = APIRouter(prefix="/operator", tags=["operator"])
 
@@ -28,7 +29,7 @@ def _require_operator(current_user: str):
 
 
 @router.post("/approve")
-def approve(req: ApproveRequest, current_user: str | None = Depends(get_current_user)):
+def approve(req: ApproveRequest, current_user: str | None = Depends(OPERATOR)):
     actor = current_user or "operator"
     try:
         ph = sha256_canonical({"proposal": req.proposal})
@@ -39,7 +40,7 @@ def approve(req: ApproveRequest, current_user: str | None = Depends(get_current_
 
 
 @router.post("/override")
-async def operator_override(req: OverrideRequest, current_user: str | None = Depends(get_current_user)):
+async def operator_override(req: OverrideRequest, current_user: str | None = Depends(OPERATOR)):
     """Operator override — allows resuming paused runs, force-approving, or triggering replan.
 
     All overrides are logged as INTERVENTION events in the audit trail.

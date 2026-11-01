@@ -11,6 +11,54 @@
 
 const API_BASE = process.env.NEXT_PUBLIC_API_BASE || "/api";
 
+/* ── Sign-in token ─────────────────────────────────────────────────────────
+ * Writes carry the signed-in user's token (roles: viewer < operator < admin).
+ * Without a sign-in, development servers hand out a dev token; production does not.
+ */
+const TOKEN_KEY = "sa_token";
+let devToken: string | null | undefined;
+
+export function storedSession(): { token: string; user: string; role: string } | null {
+  try { const s = localStorage.getItem(TOKEN_KEY); return s ? JSON.parse(s) : null; } catch { return null; }
+}
+
+export async function signIn(username: string, password: string) {
+  const r = await fetch(`${API_BASE}/auth/login`, {
+    method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ username, password }),
+  });
+  if (!r.ok) throw new Error(await parseErrorResponse(r, "Sign-in failed"));
+  const d = await r.json();
+  const session = { token: d.access_token, user: d.user, role: d.role };
+  try { localStorage.setItem(TOKEN_KEY, JSON.stringify(session)); } catch { /* private mode */ }
+  return session;
+}
+
+export function signOut() {
+  try { localStorage.removeItem(TOKEN_KEY); } catch { /* ignore */ }
+}
+
+async function authToken(): Promise<string | null> {
+  const s = storedSession();
+  if (s?.token) return s.token;
+  if (devToken !== undefined) return devToken;
+  try {
+    const r = await fetch(`${API_BASE}/auth/dev-token?role=admin`, { method: "POST" });
+    devToken = r.ok ? (await r.json()).access_token : null;
+  } catch { devToken = null; }
+  return devToken;
+}
+
+async function withAuth(init?: RequestInit): Promise<RequestInit | undefined> {
+  const method = (init?.method || "GET").toUpperCase();
+  if (method === "GET") return init;
+  const headers = new Headers(init?.headers || {});
+  if (!headers.has("Authorization")) {
+    const tok = await authToken();
+    if (tok) headers.set("Authorization", `Bearer ${tok}`);
+  }
+  return { ...init, headers };
+}
+
 /** Retry wrapper – retries on network failures (TypeError: Failed to fetch) */
 async function fetchWithRetry(
   input: RequestInfo,
@@ -18,6 +66,7 @@ async function fetchWithRetry(
   retries = 2,
   delayMs = 500,
 ): Promise<Response> {
+  init = await withAuth(init);
   for (let attempt = 0; ; attempt++) {
     try {
       const r = await fetch(input, init);
@@ -538,9 +587,9 @@ export const getAuthorityEvidence = (limit = 100) => getJson(`/authority/evidenc
 export const getRouteLearning = () => getJson("/authority/learning", "learned routing");
 
 async function postJson(path: string, body: any, what: string, headers: Record<string, string> = {}) {
-  const r = await fetch(`${API_BASE}${path}`, {
+  const r = await fetchWithRetry(`${API_BASE}${path}`, {
     method: "POST", headers: { "Content-Type": "application/json", ...headers }, body: JSON.stringify(body ?? {}),
-  });
+  }, 0);
   if (!r.ok) throw new Error(await parseErrorResponse(r, `${what} failed`));
   return r.json();
 }
@@ -551,13 +600,9 @@ export type KillScope = "global" | "robot" | "mission" | "agent";
 export const killSwitch = (scope: KillScope, id = "*", reason = "operator stop") =>
   postJson("/authority/kill", { scope, id, reason }, "Kill switch");
 
-/** Lifting a kill switch needs an operator login (a dev token outside production). */
-export async function resetKillSwitch(scope: KillScope, id = "*") {
-  const tok = await fetch(`${API_BASE}/auth/dev-token`, { method: "POST" });
-  if (!tok.ok) throw new Error("Operator login required to reset a kill switch");
-  const { access_token } = await tok.json();
-  return postJson("/authority/reset", { scope, id }, "Reset", { Authorization: `Bearer ${access_token}` });
-}
+/** Lifting a kill switch needs a signed-in operator or admin. */
+export const resetKillSwitch = (scope: KillScope, id = "*") =>
+  postJson("/authority/reset", { scope, id }, "Reset (sign in as an operator)");
 
 export const runDrills = (drills?: string[]) => postJson("/authority/drills", drills ? { drills } : {}, "Drills");
 
@@ -565,7 +610,7 @@ export const runDrills = (drills?: string[]) => postJson("/authority/drills", dr
 export async function voiceStop(wav: Blob) {
   const form = new FormData();
   form.append("audio", wav, "speech.wav");
-  const r = await fetch(`${API_BASE}/authority/voice`, { method: "POST", body: form });
+  const r = await fetchWithRetry(`${API_BASE}/authority/voice`, { method: "POST", body: form }, 0);
   if (!r.ok) throw new Error(await parseErrorResponse(r, "Voice stop failed"));
   return r.json();
 }
