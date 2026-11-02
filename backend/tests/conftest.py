@@ -8,6 +8,11 @@ import tempfile
 # Execution authority: a test-only permit secret (the simulator under test reads the
 # same variable) and a throwaway database, set before the app is imported.
 os.environ.setdefault("PERMIT_SECRET", "test-permit-secret-0123456789abcdef0123")
+# Tests never use real credentials from backend/.env: no paid model calls, no traces sent.
+# (Environment variables override the .env file, so blanking them here is enough.)
+for _secret in ("MODEL_API_KEY", "BASETEN_API_KEY", "LANGSMITH_API_KEY", "NEBIUS_API_KEY", "GEMINI_API_KEY",
+                "TAVILY_API_KEY", "OTEL_EXPORTER_OTLP_ENDPOINT"):
+    os.environ[_secret] = ""
 # Most tests check the benchmark warehouse's exact geometry; the factory has its own tests.
 os.environ.setdefault("SITE_LAYOUT", "warehouse")
 os.environ.setdefault("AUTHORITY_DB_PATH", os.path.join(tempfile.mkdtemp(prefix="authority-"), "authority.db"))
