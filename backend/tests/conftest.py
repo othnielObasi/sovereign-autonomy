@@ -24,6 +24,9 @@ _test_state_dir = tempfile.mkdtemp(prefix="sovereign-tests-")
 os.environ["DATABASE_URL"] = "sqlite:///" + os.path.join(_test_state_dir, "app.db").replace("\\", "/")
 os.environ["AUTHORITY_DB_PATH"] = os.path.join(_test_state_dir, "authority.db")
 os.environ["SIM_STATE_DB"] = os.path.join(_test_state_dir, "controller.db")
+os.environ['EXPERIENCE_ANCHOR_PATH'] = os.path.join(_test_state_dir, 'experience-anchor.sqlite')
+os.environ['RECEIPT_SIGNING_KEY'] = ''
+os.environ['RECEIPT_SIGNING_KEY_FILE'] = os.path.join(_test_state_dir, 'receipt-signing.key')
 
 import pytest
 from sqlalchemy import create_engine

@@ -111,6 +111,7 @@ cd frontend && npx tsc --noEmit
 - [docs/api.md](docs/api.md): API reference
 - [docs/DEVELOPER.md](docs/DEVELOPER.md): where things live and conventions
 - [docs/EXPERIENCE_LEARNING_PLAN.md](docs/EXPERIENCE_LEARNING_PLAN.md): implementation and testing plan for context-aware experience reuse, freshness, permit revocation, and learning evaluation
+- [docs/LEARNING_POISONING_DEFENSES.md](docs/LEARNING_POISONING_DEFENSES.md): source corroboration, bounded influence, quarantine, signed lessons, checkpoint recovery, and remaining trust assumptions
 
 ## Safety scope
 

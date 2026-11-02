@@ -1,0 +1,102 @@
+{
+  "scope": "Isolated real simulator/backend/frontend; signed browser fixture, no model calls",
+  "renderingMode": "forced WebGL fallback",
+  "steps": [
+    "Signed fixture is shown with provenance and eligibility",
+    "Two-robot API and fallback scene load with external requests blocked",
+    "Mission UI creates a run, records changed assumptions, and shows replacement routing",
+    "Old fixture becomes excluded and durable lifecycle changes are visible",
+    "Pause, kill, refused resume, authenticated reset and UI resume match API/controller state",
+    "Authority UI runs real security drills and displays all seven poisoning sub-checks",
+    "WebGL failure leaves mission and stop controls usable"
+  ],
+  "errors": [],
+  "externalRequests": [],
+  "environmentEvents": [
+    {
+      "previous": {
+        "context": {
+          "site_id": "factory",
+          "map_version": "b4b17d6d99e309fe9a7ba008d8cf9d69ad50caf3d6cb6072ce6663806125109c",
+          "policy_version": "aa01208d5790c6c5",
+          "capability_profile_version": "sim-amr-radius-0.4m-v1"
+        },
+        "constraints": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+      },
+      "current": {
+        "context": {
+          "site_id": "factory",
+          "map_version": "b179c360aaea7a5657e7ee0be08702a4c9f19e7b69c9adce3232d999bd1fdd2d",
+          "policy_version": "aa01208d5790c6c5",
+          "capability_profile_version": "sim-amr-radius-0.4m-v1"
+        },
+        "constraints": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+      },
+      "action": "holding_no_route",
+      "waypoints": 0,
+      "changes": [],
+      "reason": "Environment assumptions changed; old plan discarded"
+    },
+    {
+      "previous": {
+        "context": {
+          "site_id": "factory",
+          "map_version": "b179c360aaea7a5657e7ee0be08702a4c9f19e7b69c9adce3232d999bd1fdd2d",
+          "policy_version": "aa01208d5790c6c5",
+          "capability_profile_version": "sim-amr-radius-0.4m-v1"
+        },
+        "constraints": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+      },
+      "current": {
+        "context": {
+          "site_id": "factory",
+          "map_version": "5f28127852fe0412d849824621feed872fe697a9daf622abdad2b99b44981b87",
+          "policy_version": "aa01208d5790c6c5",
+          "capability_profile_version": "sim-amr-radius-0.4m-v1"
+        },
+        "constraints": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+      },
+      "action": "replanned",
+      "waypoints": 22,
+      "changes": [],
+      "reason": "Environment assumptions changed; old plan discarded"
+    }
+  ],
+  "poisoning": {
+    "drill": "poisoning",
+    "passed": true,
+    "detail": "Isolated real-store attacks; no live mission memory or robot movement is modified.",
+    "checks": [
+      {
+        "check": "single_source_advisory",
+        "passed": true
+      },
+      {
+        "check": "mild_flood_cannot_dilute_stop",
+        "passed": true
+      },
+      {
+        "check": "forged_record_quarantined",
+        "passed": true
+      },
+      {
+        "check": "repeated_outlier_quarantined",
+        "passed": true
+      },
+      {
+        "check": "source_share_bounded",
+        "passed": true
+      },
+      {
+        "check": "gate_refuses_out_of_bounds_shortcut",
+        "passed": true
+      },
+      {
+        "check": "deletion_disables_reuse",
+        "passed": true
+      }
+    ],
+    "scope": "learning integrity and deterministic gate; no sensor-truth or hardware claim"
+  },
+  "passed": true
+}

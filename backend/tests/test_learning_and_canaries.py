@@ -66,6 +66,8 @@ def test_signed_experience_counts_and_forged_records_are_quarantined(tmp_path):
     mem = RouteMemory(db_path=str(tmp_path / "exp.db"), secret=SECRET, clock=lambda: 1000.0)
     assert mem.record("run-1", [((10, 7), 4.0, "STOP"), ((11, 7), 1.5, "SLOW")],
                       context=CONTEXT, source_robot_id="robot-1") == 2
+    mem.record('run-2', [((10, 7), 4.0, 'STOP'), ((11, 7), 1.5, 'SLOW')],
+               context=CONTEXT, source_robot_id='robot-2')
     delays, quarantined = mem.load(max_age_s=0, context=CONTEXT)
     assert delays == {(10, 7): 4.0, (11, 7): 1.5} and quarantined == []
 
@@ -77,8 +79,8 @@ def test_signed_experience_counts_and_forged_records_are_quarantined(tmp_path):
     conn.close()
     delays, quarantined = mem.load(max_age_s=0, context=CONTEXT)
     assert delays == {(11, 7): 1.5}
-    assert len(quarantined) == 2 and any(q["id"] == "evil" for q in quarantined)
-    assert mem.status()["quarantined"] == 2
+    assert len(quarantined) == 3 and any(q["id"] == "evil" for q in quarantined)
+    assert mem.status()["quarantined"] == 3
 
 
 def test_experience_from_a_run_comes_from_gate_decisions(tmp_path):
@@ -95,8 +97,17 @@ def test_experience_from_a_run_comes_from_gate_decisions(tmp_path):
                                                 "experience_context": CONTEXT, "source_robot_id": "robot-1"}),
                                             was_executed="false", escalated="false", policy_version="v"))
         db.commit()
+        from app.services.governance_engine import GovernanceEngine
+        from app.utils import signing
+        for decision_row in db.query(GovernanceDecisionRecord).filter(GovernanceDecisionRecord.run_id == 'exp-run').all():
+            decision_row.signature, decision_row.signing_key_id = signing.sign(GovernanceEngine.signing_payload(decision_row))
+        db.commit()
         mem = RouteMemory(db_path=str(tmp_path / "exp.db"), secret=SECRET)
         assert mem.record_run(db, "exp-run") == 2   # the SAFE decision teaches nothing
+        # One source is advisory; a second independent source corroborates the stop.
+        assert mem.load(context=CONTEXT)[0] == {}
+        mem.record('peer-run', [((int(8.1 / GRID_M), int(3.5 / GRID_M)), 4.0, 'STOP')],
+                   context=CONTEXT, source_robot_id='robot-2')
         delays, _ = mem.load(max_age_s=0, context=CONTEXT)
         assert delays[(int(8.1 / GRID_M), int(3.5 / GRID_M))] == pytest.approx(4.0, rel=0.001)
     finally:

@@ -22,9 +22,9 @@ Controller milestone validation: **394 backend tests passed**, including 30 new 
 |---|---|
 | Context-scoped reuse | Simulator/benchmark identity captured in governance receipts; route memory and planner lessons filter site, map, policy, and capabilities. Legacy contextless data is audit-only. `test_experience_context.py`; context-isolation tests in `test_planner_lessons.py` |
 | Historical freshness | Configurable age decay and expiry; post-run recording preserves observation time. Fake-clock expiry/decay and original-time tests in `test_experience_context.py` |
-| Durable memory invalidation | Signed internal service; repeated/concurrent delivery and restart tests; lessons and route retrieval consult it. **Partial:** automatic change-event producers and execution revocation are not yet integrated |
+| Durable memory invalidation | Signed service; automatic environment producers and controller fencing integrated. Repeated delivery/restart tests; lessons and route retrieval consult it. See the lifecycle follow-up below. |
 | Controller-enforced revocation | Signed controller redemption at admission; persisted authority epochs and controller admissions; local stop/reset fencing. `test_controller_redemption.py` covers outages, duplicate races, delayed replies, policy/world changes, restart, reconciliation, and a real HTTP callback |
-| Automatic lifecycle events, paired learning-benefit experiment, browser evidence | Remain planned; memory validation and controller redemption alone do not establish these capabilities |
+| Automatic lifecycle events, paired learning-benefit experiment, browser evidence | Implemented with graph-model and WebGL-fallback validation limits. See lifecycle follow-up and saved evidence below. |
 
 ## Execution contract (plan §3–4)
 
@@ -107,3 +107,17 @@ Simulator, backend and dashboard as separate processes, shared random permit sec
 | Retain controls after scene failure | `SceneBoundary.tsx`, twin fleet stop; local lighting fallback | Browser harness forces WebGL failure and blocks external requests |
 
 Graph results concern modeled travel and queue costs. Physical contacts, hardware safety, and model-driven benefit remain outside this evidence.
+
+## Poisoning-defense follow-up (2 November 2026)
+
+| Requirement | Implementation and evidence |
+|---|---|
+| Two distinct sources before shared reuse | `experience_policy.aggregate`; single-source/many-mission and context tests in `test_learning_poisoning.py` |
+| Bounded source vote and resistance to dilution | Per-source decayed peak, clipped equal two-source vote; extreme/flood tests and isolated `poisoning` drill |
+| Repeated source anomalies | Context-scoped signed quarantine against two agreeing peers across three cells; restart, normal four-second false-stop and context-reset tests |
+| Detect deletion and main-database rollback | Chained inventory plus separate signed SQLite checkpoint; deletion/truncation/rollback/atomic-write/concurrency tests. Protect checkpoint independently; not a remote immutable anchor |
+| Verify lesson integrity and input receipts | Row-bound schema-3 lesson HMAC, typed fields, gate Ed25519 receipts; `test_lesson_integrity.py` covers prompt edits, transplants, unsigned rows and altered receipts |
+| Demonstrate defenses visibly | Authority drill sub-checks and advisory/source-quarantine/integrity states; extended `tests/experience.browser.cjs` |
+| Measure benefit under hardened policy | `bench/results/experience-hardened`: two acquisition sources, 20 graph seeds, 28.6% modeled reduction, 30/30 stale records rejected |
+
+See [LEARNING_POISONING_DEFENSES.md](LEARNING_POISONING_DEFENSES.md) for deployment, recovery and remaining assumptions. Source IDs do not establish independent sensor truth. A two-robot fleet alone cannot supply the two peers required to identify an outlier source.

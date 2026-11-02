@@ -8,6 +8,7 @@ What a backup holds:
   app.db         missions, runs, hash-chained events, signed receipts (SQLite), or
   app.sql        a pg_dump when DATABASE_URL is PostgreSQL
   authority.db   permit journal, action reconciliation, kill switches, learning memory
+  experience-anchor.db  coordinated learning checkpoint (when ledger exists)
   manifest.json  size and SHA-256 of every file, signed with a key derived from
                  PERMIT_SECRET, so a tampered or partial backup is refused
 
@@ -71,7 +72,42 @@ def _sign(manifest: Dict[str, Any], secret: str) -> str:
     return hmac.new(_manifest_key(secret), body, hashlib.sha256).hexdigest()
 
 
-def create(out_dir: Path, *, database_url: str, authority_db: Path, secret: str) -> Path:
+def _has_learning_ledger(path):
+    conn = sqlite3.connect(str(path))
+    try:
+        return bool(conn.execute("SELECT 1 FROM sqlite_master WHERE name='memory_ledger'").fetchone())
+    finally:
+        conn.close()
+
+
+def _memory_ledger(path, secret):
+    from app.services.memory_ledger import MemoryLedger
+    key = hmac.new(secret.encode(), b'experience-records-v1', hashlib.sha256).digest()
+    return MemoryLedger(str(path), key)
+
+
+def _copy_memory_pair(authority_db, anchor, target, secret):
+    """Hold a shared snapshot of both attached databases while copying them."""
+    if not anchor.exists():
+        raise SystemExit('Learning checkpoint missing; refusing an incomplete backup')
+    conn = sqlite3.connect(str(authority_db), timeout=10)
+    try:
+        ledger = _memory_ledger(anchor, secret)
+        ledger.attach(conn)
+        conn.execute('BEGIN')
+        ledger.verify(conn)
+        for name, filename in [('main', 'authority.db'), ('memory_anchor', 'experience-anchor.db')]:
+            dst = sqlite3.connect(str(target / filename))
+            try:
+                conn.backup(dst, name=name)
+            finally:
+                dst.close()
+    finally:
+        conn.close()
+
+
+def create(out_dir: Path, *, database_url: str, authority_db: Path, secret: str,
+           experience_anchor: Optional[Path] = None) -> Path:
     if len(secret) < 32:
         raise SystemExit("PERMIT_SECRET (32+ characters) is needed to sign the backup manifest")
     stamp = time.strftime("%Y%m%d-%H%M%S", time.gmtime())
@@ -88,7 +124,10 @@ def create(out_dir: Path, *, database_url: str, authority_db: Path, secret: str)
         with open(dump, "wb") as f:
             subprocess.run(["pg_dump", "--no-owner", "--format=plain", database_url], stdout=f, check=True)
     if authority_db.exists():
-        _sqlite_copy(authority_db, target / "authority.db")
+        if _has_learning_ledger(authority_db):
+            _copy_memory_pair(authority_db, experience_anchor or Path(str(authority_db) + '.anchor.sqlite'), target, secret)
+        else:
+            _sqlite_copy(authority_db, target / "authority.db")
 
     for p in sorted(target.iterdir()):
         files[p.name] = {"bytes": p.stat().st_size, "sha256": _sha256(p)}
@@ -132,11 +171,27 @@ def verify(backup: Path, *, secret: str) -> Dict[str, Any]:
         journal_ok = CheckpointStore(str(backup / "authority.db")).verify_chain()
         if not journal_ok:
             problems.append("authority.db: action journal hash chain is broken")
+        if _has_learning_ledger(backup / 'authority.db'):
+            anchor = backup / 'experience-anchor.db'
+            if not anchor.exists():
+                problems.append('experience-anchor.db: missing learning checkpoint')
+            else:
+                conn = sqlite3.connect(str(backup / 'authority.db'))
+                try:
+                    ledger = _memory_ledger(anchor, secret)
+                    ledger.attach(conn)
+                    conn.execute('BEGIN')
+                    ledger.verify(conn)
+                except ValueError as exc:
+                    problems.append('learning integrity: ' + str(exc))
+                finally:
+                    conn.close()
     return {"ok": not problems, "problems": problems, "files": list(manifest.get("files", {})),
             "journal_intact": journal_ok, "created_utc": manifest.get("created_utc")}
 
 
-def restore(backup: Path, *, database_url: str, authority_db: Path, secret: str, backend_stopped: bool) -> Dict[str, Any]:
+def restore(backup: Path, *, database_url: str, authority_db: Path, secret: str, backend_stopped: bool,
+            experience_anchor: Optional[Path] = None) -> Dict[str, Any]:
     if not backend_stopped:
         raise SystemExit("Stop the backend first, then pass --backend-stopped")
     check = verify(backup, secret=secret)
@@ -161,6 +216,13 @@ def restore(backup: Path, *, database_url: str, authority_db: Path, secret: str,
             shutil.copy2(authority_db, authority_db.with_suffix(".db.before-restore"))
         _sqlite_copy(backup / "authority.db", authority_db)
         restored.append(str(authority_db))
+    if (backup / 'experience-anchor.db').exists():
+        anchor = experience_anchor or Path(str(authority_db) + '.anchor.sqlite')
+        anchor.parent.mkdir(parents=True, exist_ok=True)
+        if anchor.exists():
+            shutil.copy2(anchor, Path(str(anchor) + '.before-restore'))
+        _sqlite_copy(backup / 'experience-anchor.db', anchor)
+        restored.append(str(anchor))
     return {"restored": restored, "seconds": round(time.monotonic() - t0, 3), "verified": check}
 
 
@@ -173,7 +235,8 @@ def main(argv=None) -> int:
     v = sub.add_parser("verify"); v.add_argument("path")
     r = sub.add_parser("restore"); r.add_argument("path"); r.add_argument("--backend-stopped", action="store_true")
     a = ap.parse_args(argv)
-    common = dict(database_url=settings.database_url, authority_db=Path(settings.authority_db_path))
+    common = dict(database_url=settings.database_url, authority_db=Path(settings.authority_db_path),
+                  experience_anchor=Path(settings.experience_anchor_path) if settings.experience_anchor_path else None)
     if a.cmd == "create":
         print(create(Path(a.out), secret=settings.permit_secret, **common))
     elif a.cmd == "verify":

@@ -67,6 +67,7 @@ class Settings(BaseSettings):
     learned_routing: bool = True       # NetworkX routing with delays from signed experience
     experience_decay_s: float = Field(86400.0, gt=0)  # advisory congestion influence e-folding time
     experience_ttl_s: float = Field(604800.0, gt=0)  # reuse horizon; simulation defaults, not safety thresholds
+    experience_anchor_path: Optional[str] = None  # independently protected SQLite checkpoint; default <authority DB>.anchor.sqlite
     dispatch_watchdog_s: float = 30.0  # no loop heartbeat for this long blocks dispatch
 
     # Gazebo

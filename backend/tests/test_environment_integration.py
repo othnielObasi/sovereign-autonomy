@@ -32,6 +32,7 @@ def test_scenario_change_stops_fences_invalidates_and_replans(authority, sim, mo
     assert mem.load(context=old_context)[0] == {}
     assert any(e["reason"] == "scenario:clear" for e in get_lifecycle().status()["events"])
     mem.record("fresh", [((6, 7), 1.0, "SLOW")], context=context, source_robot_id="robot-B")
+    mem.record("fresh-peer", [((6, 7), 1.0, "SLOW")], context=context, source_robot_id="robot-A")
     assert mem.load(context=context)[0]
     events = []
     svc = RunService()

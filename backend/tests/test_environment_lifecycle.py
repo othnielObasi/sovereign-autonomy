@@ -21,6 +21,7 @@ def setup(tmp_path):
 
 def record(mem, run="acquired", context=CONTEXT):
     mem.record(run, [((1, 2), 4.0, "STOP")], context=context, source_robot_id="robot-A")
+    mem.record(run + '-peer', [((1, 2), 4.0, "STOP")], context=context, source_robot_id="robot-B")
 
 
 @pytest.mark.parametrize("key", ["map_version", "policy_version", "capability_profile_version", "site_id"])

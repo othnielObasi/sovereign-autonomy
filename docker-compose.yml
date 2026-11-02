@@ -22,6 +22,7 @@ services:
       # Shared with the simulator; every move's permit is signed with it
       PERMIT_SECRET: "${PERMIT_SECRET:?Set PERMIT_SECRET (32+ characters) in .env}"
       CORS_ORIGINS: "http://localhost:3000"
+      EXPERIENCE_ANCHOR_PATH: "/anchors/experience.sqlite"
     ports:
       - "8080:8080"
     depends_on:
@@ -30,6 +31,7 @@ services:
     volumes:
       - ./backend:/app
       - backend_data:/app/data
+      - memory_anchor_data:/anchors
     command: >
       sh -c "python -m app.preflight &&
              uvicorn app.main:app --host 0.0.0.0 --port 8080"
@@ -81,3 +83,4 @@ volumes:
   postgres_data:
   backend_data:
   controller_data:
+  memory_anchor_data:

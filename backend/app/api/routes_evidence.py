@@ -39,11 +39,14 @@ def learning_summary(db: Session = Depends(get_db)) -> Dict[str, Any]:
             plans_with_lessons += 1
             lessons_used += len(p.get("lessons_applied") or [])
     lessons = all_lessons(db)
+    quarantined_lessons = sum(l.get('status') == 'quarantined' for l in lessons)
+    lessons = [l for l in lessons if l.get('status') != 'quarantined']
     by_policy: Dict[str, int] = {}
     for l in lessons:
         by_policy[l["policy"]] = by_policy.get(l["policy"], 0) + 1
     return {
         "lessons": len(lessons),
+        'quarantined_lessons': quarantined_lessons,
         "lessons_by_policy": dict(sorted(by_policy.items(), key=lambda kv: -kv[1])),
         "plans_with_lessons": plans_with_lessons,
         "lessons_used": lessons_used,

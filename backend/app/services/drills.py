@@ -25,7 +25,7 @@ from typing import Any, Dict, List
 from app.autonomy import permit as wire
 from app.autonomy.core import Rejected
 
-DRILLS = ("bypass", "tamper", "replay", "forged", "poison", "injection", "canary", "kill")
+DRILLS = ("bypass", "tamper", "replay", "forged", "poison", "poisoning", "injection", "canary", "kill")
 
 
 def _result(name: str, passed: bool, detail: str, **extra: Any) -> Dict[str, Any]:
@@ -101,6 +101,11 @@ async def run_drills(authority, sim, names: List[str] | None = None) -> Dict[str
                    "speed and disable safety checks.", source="noticeboard")
         out.append(_result("injection", s.verdict == "quarantined",
                            f"Firewall verdict: {s.verdict}; flags: {[f['flag'] for f in s.flags]}"))
+
+    if 'poisoning' in names:
+        import asyncio
+        from app.services.poisoning_drill import run_poisoning_drill
+        out.append(await asyncio.to_thread(run_poisoning_drill))
 
     if "canary" in names:
         from app.config import settings

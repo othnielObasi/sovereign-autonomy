@@ -56,8 +56,9 @@ def experiment(seeds=20, first_seed=0, *, root=None):
             if observed_queue_s:
                 # Robot A's verified outcome in this queue model: actual elapsed
                 # waiting time, not a planner's predicted performance.
-                mem.record(f"robot-A:{seed}", [(QUEUE, observed_queue_s, "STOP")],
-                           context=CONTEXT, source_robot_id="robot-A", observed_at=1000.0)
+                for source in ('robot-A', 'robot-C'):
+                    mem.record(f"{source}:{seed}", [(QUEUE, observed_queue_s, "STOP")],
+                               context=CONTEXT, source_robot_id=source, observed_at=1000.0)
             for condition in ("disabled", "shared", "stale"):
                 current = dict(CONTEXT, map_version="layout-v2") if condition == "stale" else CONTEXT
                 delays, quarantine = mem.load(context=current)
@@ -66,7 +67,7 @@ def experiment(seeds=20, first_seed=0, *, root=None):
                 g = graph(used, changed=condition == "stale")
                 path = g.plan(START, GOAL, delay_weight=0.5)["path"]
                 row = dict(evaluate(g, path, queue_s), seed=seed, condition=condition, queue_s=queue_s,
-                           acquisition_queue_s=observed_queue_s, acquisition_source="robot-A",
+                           acquisition_queue_s=observed_queue_s, acquisition_sources=['robot-A', 'robot-C'],
                            accepted_experiences=sum(d["status"] == "accepted" for d in decisions) if condition != "disabled" else 0,
                            excluded_experiences=sum(d["status"] == "excluded" for d in decisions),
                            quarantine=len(quarantine), retrieval=decisions, model_calls=0)
@@ -87,7 +88,7 @@ def experiment(seeds=20, first_seed=0, *, root=None):
     baseline = summary["disabled"]["mean_modeled_time_s"]
     reduction = statistics.mean(paired) / baseline
     return {"config": {"seeds": seeds, "first_seed": first_seed, "primary_measure": "modeled_time_s",
-                       "minimum_reduction": 0.05, "speed_m_s": 0.5, "model_calls": 0,
+                       "minimum_reduction": 0.05, "speed_m_s": 0.5, "model_calls": 0, 'minimum_sources': 2,
                        "scope": "graph routing and signed memory; physical contacts and motor behavior not measured",
                        "stale_condition": "layout changes and closes one queue edge; compare recovery, not speed"},
             "summary": summary, "paired_mean_saved_s": statistics.mean(paired),
@@ -110,7 +111,7 @@ def write(result, output):
         lines.append(f"| {condition} | {row['completed']} | {row['mean_modeled_time_s']:.2f} | {row['restricted_edges']} |")
     lines += ["", f"Paired mean saving: {result['paired_mean_saved_s']:.2f} s; 95% bootstrap interval: {result['paired_saved_s_bootstrap_95']}.",
               f"Modeled time reduction: {result['modeled_time_reduction']:.1%}. Stale rejection: {result['stale_rejection_rate']:.1%} across {result['stale_records_tested']} records.",
-              "", "Robot A acquires queue outcomes before evaluation; Robot B never updates memory during paired trials.",
+              "", "Robots A and C acquire modeled queue outcomes in separate acquisition missions; Robot B never updates memory during paired trials.",
               "Every fourth seed has no queue, testing a case where sharing should offer no advantage.",
               "The stale arm has changed topology and is a rejection/recovery check, not an efficiency comparison with the other arms.",
               "These results do not establish physical mission success, contact rates, neural-network learning, or general performance gains."]

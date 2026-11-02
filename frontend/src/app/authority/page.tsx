@@ -6,7 +6,7 @@ import { AuthorityPanel } from "@/components/AuthorityPanel";
 import { LearningEvidence } from "@/components/LearningEvidence";
 import { Button, Empty, KV, Mono, Notice, Page, PageHeader, Panel, Pill, Stat } from "@/components/ui";
 
-type Drill = { drill: string; passed: boolean; detail: string; skipped?: boolean };
+type Drill = { drill: string; passed: boolean; detail: string; skipped?: boolean; checks?: { check: string; passed: boolean }[] };
 
 const DRILL_LABEL: Record<string, string> = {
   bypass: "Command sent straight to the robot, no permit",
@@ -14,6 +14,7 @@ const DRILL_LABEL: Record<string, string> = {
   replay: "Used permit sent again",
   forged: "Permit signed with the wrong key",
   poison: "Forged record planted in learning memory",
+  poisoning: "Corroboration, flooding, rogue-source quarantine and deletion detection (isolated memory)",
   injection: "Instructions hidden in outside site information",
   canary: "Planner given an instruction hidden in untrusted data",
   kill: "Robot kill switch: revoke, verify stop, refuse moves",
@@ -64,7 +65,7 @@ export default function AuthorityPage() {
         </div>
 
         <div className="lg:col-span-2 space-y-4">
-          <LearningEvidence decisions={learning?.decisions} changes={learning?.lifecycle?.events} context={learning?.experience_context} />
+          <LearningEvidence decisions={learning?.decisions} changes={learning?.lifecycle?.events} context={learning?.experience_context} security={learning} />
           <Panel title="Security drills" subtitle="Real attacks against the live simulator, each with a pass/fail result"
             actions={<Button variant="primary" disabled={running} onClick={go}>{running ? "Running…" : "Run all drills"}</Button>}>
             {err && <Notice tone="stop">{err}</Notice>}
@@ -82,6 +83,7 @@ export default function AuthorityPage() {
                       <div className="min-w-0">
                         <div className="text-sm text-mc-ink">{DRILL_LABEL[d.drill] || d.drill}</div>
                         <div className="text-xs text-mc-mute">{d.detail}</div>
+                        {d.checks && <ul className="mt-2 space-y-1 text-xs">{d.checks.map(c => <li key={c.check} className={c.passed ? "text-emerald-300" : "text-red-300"}>{c.passed ? "PASS" : "FAIL"} · {c.check.replaceAll("_", " ")}</li>)}</ul>}
                       </div>
                     </div>
                   ))}

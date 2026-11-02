@@ -21,6 +21,8 @@ __pycache__/
 
 # Database
 *.db
+*.anchor.sqlite
+*.anchor.sqlite-journal
 backend/data/
 data/
 

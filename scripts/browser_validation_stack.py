@@ -33,6 +33,8 @@ def main():
                PUBLIC_DEMO="false", PYTHONIOENCODING="utf-8", RUN_MIGRATIONS_ON_START="false", SITE_LAYOUT="factory",
                DATABASE_URL="sqlite:///" + str(STATE / f"app-{session}.db").replace("\\", "/"),
                AUTHORITY_DB_PATH=str(STATE / f"authority-{session}.db"), SIM_STATE_DB=str(STATE / f"controller-{session}.db"),
+               EXPERIENCE_ANCHOR_PATH=str(STATE / f'anchor-{session}.sqlite'), RECEIPT_SIGNING_KEY='',
+               RECEIPT_SIGNING_KEY_FILE=str(STATE / f'receipt-{session}.key'),
                SIM_BASE_URL="http://127.0.0.1:18090", AUTHORITY_BASE_URL="http://127.0.0.1:18080",
                BACKEND_URL="http://127.0.0.1:18080", NEXT_DIST_DIR=".next-validation",
                PERMIT_SECRET="browser-validation-only-secret-0123456789abcdef", SIM_TOKEN="",
@@ -72,8 +74,10 @@ def main():
         telemetry = httpx.get("http://127.0.0.1:18090/telemetry", trust_env=False).json()
         policy = httpx.get("http://127.0.0.1:18080/agent/lessons", trust_env=False).json()["policy_version"]
         context = context_from_state(telemetry, policy)
-        RouteMemory(env["AUTHORITY_DB_PATH"], env["PERMIT_SECRET"].encode()).record(
-            f"browser-fixture-{time.time_ns()}", [((6, 7), 4.0, "STOP")], context=context, source_robot_id="robot-A (fixture)")
+        fixture = RouteMemory(env["AUTHORITY_DB_PATH"], env["PERMIT_SECRET"].encode(), anchor_path=env['EXPERIENCE_ANCHOR_PATH'])
+        for source in ['robot-A (fixture)', 'robot-C (fixture)']:
+            fixture.record(f"browser-fixture-{source}-{time.time_ns()}", [((6, 7), 4.0, "STOP")],
+                           context=context, source_robot_id=source)
         print("Signed browser fixture ready", flush=True)
         while not stop.exists():
             if any(p.poll() is not None for p in processes):

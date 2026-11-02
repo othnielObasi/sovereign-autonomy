@@ -23,6 +23,9 @@ from __future__ import annotations
 import json
 import logging
 import math
+import hashlib
+import hmac
+import re
 from typing import Any, Dict, Iterable, List, Optional, Tuple
 
 from sqlalchemy.orm import Session
@@ -31,6 +34,7 @@ from app.db.models import AgentMemoryEntry, GovernanceDecisionRecord
 from app.policies.versioning import policy_version_hash
 from app.utils.time import utc_now
 from app.autonomy.experience import context_key, context_from_state
+from app.autonomy.permit import canonical
 
 logger = logging.getLogger("app.planner_lessons")
 
@@ -95,13 +99,67 @@ def _key(policy: str, zone: str, cell: Tuple[float, float], version: str) -> str
 def _load(entries: Iterable[AgentMemoryEntry]) -> Dict[str, Tuple[AgentMemoryEntry, Dict[str, Any]]]:
     out: Dict[str, Tuple[AgentMemoryEntry, Dict[str, Any]]] = {}
     for e in entries:
-        try:
-            c = json.loads(e.content_json)
-        except (TypeError, ValueError):
-            continue
-        if "key" in c:
+        c, _ = verified_lesson(e)
+        if c is not None:
             out[c["key"]] = (e, c)
     return out
+
+
+def _signature(content, ident):
+    from app.services.route_learning import get_memory
+    memory = get_memory()
+    if not memory.enabled:
+        raise ValueError('lesson_signing_not_configured')
+    body = {k: v for k, v in content.items() if k != 'signature'}
+    return hmac.new(memory.key, ('planner-lesson-v1:' + canonical({'id': ident, 'content': body})).encode(), hashlib.sha256).hexdigest()
+
+
+def _valid_fields(c):
+    from app.services.route_learning import RouteMemory
+    from app.world_model import ZONE_SPEED_LIMITS
+    def number(value):
+        return type(value) in (int, float) and math.isfinite(value)
+    def identifiers(values, limit):
+        return (isinstance(values, list) and 0 < len(values) <= limit
+                and len(set(values)) == len(values)
+                and all(isinstance(v, str) and re.fullmatch(r'[A-Za-z0-9_.:/-]{1,256}', v) for v in values))
+    try:
+        return (isinstance(c, dict) and c.get('schema_version') == 3
+                and c['policy'] in POLICY_DESCRIPTIONS and c['zone'] in set(ZONE_SPEED_LIMITS) | {'unknown'}
+                and RouteMemory._valid_context(c['experience_context'])
+                and c['policy_version'] == c['experience_context']['policy_version']
+                and all(number(c[k]) and abs(c[k]) <= 1e6 for k in ('cell_x', 'cell_y'))
+                and type(c['denials']) is int and 1 <= c['denials'] <= 1000000
+                and identifiers(c['runs'], 50) and identifiers(c['source_robots'], 100)
+                and all(number(c[k]) and c[k] >= 0 for k in ('observed_at', 'validated_at'))
+                and (c['max_approved_speed'] is None or number(c['max_approved_speed']) and 0 <= c['max_approved_speed'] <= 20)
+                and c['key'] == context_key(c['experience_context']) + '|' + _key(c['policy'], c['zone'], (c['cell_x'], c['cell_y']), c['policy_version'])
+                and c['text'] == lesson_text(c))
+    except (KeyError, TypeError, ValueError):
+        return False
+
+
+def verified_lesson(entry):
+    try:
+        c = json.loads(entry.content_json)
+        if not _valid_fields(c):
+            return None, 'invalid_or_legacy_lesson_fields'
+        signature = c.get('signature')
+        if not isinstance(signature, str) or not hmac.compare_digest(_signature(c, entry.id), signature):
+            return None, 'invalid_lesson_signature'
+        return c, None
+    except (ValueError, TypeError):
+        return None, 'invalid_lesson_signature_or_data'
+
+
+def _save_lesson(db, entry, c):
+    c['schema_version'] = 3
+    c['text'] = lesson_text(c)
+    if not _valid_fields(c):
+        raise ValueError('invalid_lesson_fields')
+    db.flush()  # bind signature to the actual row, preventing transplant attacks
+    c['signature'] = _signature(c, entry.id)
+    entry.content_json = json.dumps(c)
 
 
 def lesson_text(c: Dict[str, Any]) -> str:
@@ -142,6 +200,9 @@ def distill_run(db: Session, run_id: str) -> List[Dict[str, Any]]:
     approved_speed: Dict[Tuple[str, float, float], float] = {}  # (version, cell) -> max approved speed
 
     for r in records:
+        from app.services.experience_policy import verified_decision
+        if not verified_decision(r):
+            continue
         try:
             tel = json.loads(r.telemetry_summary or "{}")
             prop = json.loads(r.proposal_json or "{}")
@@ -155,7 +216,10 @@ def distill_run(db: Session, run_id: str) -> List[Dict[str, Any]]:
         context = tel.get("experience_context")
         if context_from_state(context or {}, version) != context or not context or not tel.get("source_robot_id"):
             continue  # historical context must be captured at decision time
-        cell = _cell(float(tel["x"]), float(tel["y"]))
+        try:
+            cell = _cell(float(tel["x"]), float(tel["y"]))
+        except (TypeError, ValueError, OverflowError):
+            continue
         zone = str(tel.get("zone") or "unknown")
 
         if r.decision == "APPROVED" and r.was_executed == "true" and r.proposal_intent == "MOVE_TO":
@@ -167,7 +231,7 @@ def distill_run(db: Session, run_id: str) -> List[Dict[str, Any]]:
 
         if r.decision not in _DENIED:
             continue
-        hits = [h for h in hits if h not in TRANSIENT_POLICIES]
+        hits = [h for h in hits if h in POLICY_DESCRIPTIONS and h not in TRANSIENT_POLICIES]
         if not hits:
             continue
         for policy in hits or ["UNSPECIFIED"]:
@@ -178,7 +242,7 @@ def distill_run(db: Session, run_id: str) -> List[Dict[str, Any]]:
                 "key": key, "policy": policy, "zone": zone, "policy_version": version,
                 "cell_x": cell[0], "cell_y": cell[1], "denials": 0, "example_reason": None,
                 "experience_context": context, "source_robots": [],
-                "observed_at": None, "schema_version": 2,
+                "observed_at": None, "schema_version": 3,
             })
             from datetime import timezone
             observed = r.ts.replace(tzinfo=timezone.utc).timestamp() if r.ts.tzinfo is None else r.ts.timestamp()
@@ -212,7 +276,6 @@ def distill_run(db: Session, run_id: str) -> List[Dict[str, Any]]:
                 prev = c.get("max_approved_speed")
                 c["max_approved_speed"] = speed if prev is None else max(prev, speed)
             c["text"] = lesson_text(c)
-            entry.content_json = json.dumps(c)
             entry.ts = now
             entry.importance = _importance(c)
             entry.run_id = run_id
@@ -222,6 +285,7 @@ def distill_run(db: Session, run_id: str) -> List[Dict[str, Any]]:
             entry = AgentMemoryEntry(run_id=run_id, category=CATEGORY_SPATIAL, ts=now,
                                      content_json=json.dumps(c), importance=_importance(c))
             db.add(entry)
+        _save_lesson(db, entry, c)
         touched.append(c)
 
     _enforce_limit(db)
@@ -273,7 +337,14 @@ def lessons_for_route(
         return []
     from app.services.route_learning import get_memory
     memory = get_memory()
-    events = memory.invalidations()
+    try:
+        memory.load(context=context)
+        if memory.integrity_error:
+            return []
+        events = memory.invalidations()
+    except ValueError:
+        return []
+    blocked_sources = {s['source_robot_id'] for s in memory.source_quarantine}
     sx, sy = float(start.get("x", 0)), float(start.get("y", 0))
     pts = [(sx, sy)]
     if avoid and "x" in avoid and "y" in avoid:
@@ -284,9 +355,10 @@ def lessons_for_route(
 
     scored: List[Tuple[float, int, Dict[str, Any]]] = []
     for entry in db.query(AgentMemoryEntry).filter(AgentMemoryEntry.category == CATEGORY_SPATIAL).all():
-        try:
-            c = json.loads(entry.content_json)
-        except (TypeError, ValueError):
+        c, _ = verified_lesson(entry)
+        if c is None:
+            continue
+        if len(set(c['source_robots']) - blocked_sources) < 2:
             continue
         if c.get("policy_version") != version:
             continue
@@ -304,7 +376,7 @@ def lessons_for_route(
             radius = NEAR_START_M
         if d > radius:
             continue
-        weight = (2.0 if c["policy"] in HARD_POLICIES else 1.0) * c["denials"] * len(c.get("runs", [1]))
+        weight = (2.0 if c["policy"] in HARD_POLICIES else 1.0) * min(c["denials"], 10) * min(len(c['runs']), 3)
         weight *= math.exp(-max(0, memory.clock() - observed) / memory.decay_s)
         scored.append((weight / (1.0 + d), entry.id, c))
 
@@ -333,8 +405,13 @@ def all_lessons(db: Session, current_version_only: bool = True) -> List[Dict[str
     out = []
     for e in (db.query(AgentMemoryEntry).filter(AgentMemoryEntry.category == CATEGORY_SPATIAL)
               .order_by(AgentMemoryEntry.importance.desc(), AgentMemoryEntry.ts.desc()).all()):
-        c = json.loads(e.content_json)
+        c, reason = verified_lesson(e)
+        if c is None:
+            out.append({'id': e.id, 'status': 'quarantined', 'reason': reason,
+                        'text': 'Unverified lesson excluded from planning.'})
+            continue
         if current_version_only and c.get("policy_version") != version:
             continue
-        out.append({"id": e.id, "updated": e.ts.isoformat() if e.ts else None, **c, "text": lesson_text(c)})
+        out.append({"id": e.id, "updated": e.ts.isoformat() if e.ts else None, **c, "text": lesson_text(c),
+                    'status': 'verified' if len(c['source_robots']) >= 2 else 'advisory'})
     return out

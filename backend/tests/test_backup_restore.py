@@ -58,6 +58,48 @@ def test_backup_verifies(live):
     assert set(res["files"]) == {"app.db", "authority.db"} and res["journal_intact"] is True
 
 
+def test_learning_checkpoint_is_backed_up_and_restored_as_a_verified_pair(live, tmp_path):
+    from app.services.route_learning import RouteMemory
+    context = dict(site_id='site', map_version='map', policy_version='rules', capability_profile_version='amr')
+    anchor = tmp_path / 'independent' / 'anchor.sqlite'
+    memory = RouteMemory(str(live['auth_db']), SECRET.encode(), anchor_path=str(anchor), clock=lambda: 1000.0)
+    for source in ['A', 'B']:
+        memory.record('run-' + source, [((1, 1), 4.0, 'STOP')], context=context, source_robot_id=source)
+    bk = B.create(live['out'], database_url=live['url'], authority_db=live['auth_db'], secret=SECRET, experience_anchor=anchor)
+    assert B.verify(bk, secret=SECRET)['ok']
+    assert 'experience-anchor.db' in B.verify(bk, secret=SECRET)['files']
+    new_auth, new_anchor = tmp_path / 'restored' / 'authority.db', tmp_path / 'separate' / 'anchor.sqlite'
+    B.restore(bk, database_url=f"sqlite:///{tmp_path / 'restored-app.db'}", authority_db=new_auth,
+              secret=SECRET, backend_stopped=True, experience_anchor=new_anchor)
+    restored = RouteMemory(str(new_auth), SECRET.encode(), anchor_path=str(new_anchor), clock=lambda: 1000.0)
+    assert restored.load(context=context)[0] == {(1, 1): 4}
+    assert restored.integrity_error is None
+
+
+def test_checkpoint_backup_stays_consistent_during_learning_writes(live, tmp_path):
+    from concurrent.futures import ThreadPoolExecutor
+    from app.services.route_learning import RouteMemory
+    anchor = tmp_path / 'checkpoint.sqlite'
+    memory = RouteMemory(str(live['auth_db']), SECRET.encode(), anchor_path=str(anchor))
+    context = dict(site_id='site', map_version='map', policy_version='rules', capability_profile_version='amr')
+    def write():
+        for i in range(10):
+            memory.record(f'run-{i}', [((1, 1), 4.0, 'STOP')], context=context, source_robot_id=f'robot-{i % 2}')
+    with ThreadPoolExecutor(max_workers=1) as pool:
+        task = pool.submit(write)
+        bk = B.create(live['out'], database_url=live['url'], authority_db=live['auth_db'], secret=SECRET, experience_anchor=anchor)
+        task.result(timeout=20)
+    assert B.verify(bk, secret=SECRET)['ok']
+
+
+def test_missing_learning_checkpoint_refuses_incomplete_backup(live, tmp_path):
+    from app.services.route_learning import RouteMemory
+    memory = RouteMemory(str(live['auth_db']), SECRET.encode())
+    os.remove(memory.ledger.path)
+    with pytest.raises(SystemExit, match='checkpoint missing'):
+        _create(live)
+
+
 def test_full_loss_then_restore(live):
     bk = _create(live)
     os.remove(live["app_db"])

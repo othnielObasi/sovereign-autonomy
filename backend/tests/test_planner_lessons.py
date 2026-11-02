@@ -50,8 +50,8 @@ def _record(db, run_id, telemetry, speed, executed=False):
 
 def _run_with_speeding(db, n_denials=3):
     run_id = f"run_{uuid.uuid4().hex[:8]}"
-    for _ in range(n_denials):
-        _record(db, run_id, AISLE, 0.9)                 # SAFE_SPEED_01 -> NEEDS_REVIEW
+    for i in range(n_denials):
+        _record(db, run_id, dict(AISLE, robot_id=f'robot-{1 + i % 2}'), 0.9)
     _record(db, run_id, AISLE, 0.45, executed=True)     # approved in the same cell
     return run_id
 
@@ -153,6 +153,7 @@ def test_lesson_freshness_and_invalidation_use_the_same_rules_as_route_memory(db
     entry = db.query(AgentMemoryEntry).filter(AgentMemoryEntry.category == pl.CATEGORY_SPATIAL).first()
     content = json.loads(entry.content_json)
     content["observed_at"] = 1000.0
+    content['signature'] = pl._signature(content, entry.id)  # valid old-observation fixture
     entry.content_json = json.dumps(content)
     db.commit()
     assert pl.lessons_for_route(db, _start(2, 8), {"x": 30, "y": 8})

@@ -21,7 +21,7 @@ COPY alembic.ini /app/alembic.ini
 COPY alembic /app/alembic
 COPY app /app/app
 COPY bench /app/bench
-RUN mkdir -p /app/data && chown -R sovereign:sovereign /app/data
+RUN mkdir -p /app/data /anchors && chown -R sovereign:sovereign /app/data /anchors
 
 USER sovereign
 

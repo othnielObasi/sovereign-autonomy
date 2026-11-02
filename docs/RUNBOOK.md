@@ -20,6 +20,7 @@ The restore itself is measured by `tests/test_backup_restore.py::test_full_loss_
 |---|---|
 | `app.db` (SQLite) or `app.sql` (PostgreSQL dump) | Missions, runs, hash-chained events, signed decision receipts, rule versions |
 | `authority.db` | Permit journal, action reconciliation, kill switches, learning memory |
+| `experience-anchor.db` (when learning ledger exists) | Separate signed learning checkpoint, coordinated with `authority.db` |
 | `manifest.json` | Size and SHA-256 of each file, signed with a key derived from `PERMIT_SECRET` |
 
 Not in the backup, by design: the receipt signing key and every other secret. Keep them in
@@ -74,7 +75,7 @@ Copy backups off the server. A backup taken while the backend runs is consistent
 
 The context-aware learning upgrade preserves legacy rows but excludes records without original site/map/policy/capability context. A lower eligible-cell count after upgrade is expected; do not assign the active site's identity to old data to restore the count. New runs accumulate scoped observations from decision receipts.
 
-Inspect `/authority/learning` for `experience_context`, `excluded`, `quarantined`, and per-record reasons. Missing current context means no memory is eligible. Corrupt lifecycle records disable memory retrieval; preserve the database for investigation. The current memory invalidation service only controls reuse; use the existing stop workflow for an operational incident. Controller redemption enforces authority revocation, but automatic change-event propagation into both paths remains planned.
+Inspect `/authority/learning` for `experience_context`, `excluded`, `quarantined`, and per-record reasons. Missing current context means no memory is eligible. Corrupt lifecycle records disable memory retrieval; preserve the database for investigation. Memory invalidation controls reuse; use the stop workflow for an operational incident. Automatic environment propagation and controller fencing are implemented as described below.
 
 ### Controller admission and journal incidents
 
@@ -96,3 +97,13 @@ Scenario/seed changes stop simulator targets and advance the operational map gen
 Active runs discard obsolete routes and audit `ENVIRONMENT_CHANGE` plus `EXPERIENCE_RETRIEVAL`. `holding_no_route` means the robot remains stopped while the planner retries; inspect constraints and restore a traversable route. `replanned` means a replacement exists, not that motion or the mission completed. Authority and mission learning panels show compatibility decisions and propagation delay. Constraint changes invalidate observations up to the event cutoff; map changes require a new generation.
 
 Run `python -m bench.experience_eval --seeds 20 --out bench/results/experience` from `backend` to reproduce the deterministic graph benchmark. For browser checks, build the frontend with `NEXT_DIST_DIR=.next-validation` and `BACKEND_URL=http://127.0.0.1:18080`, start `scripts/browser_validation_stack.py` with the project Python from the repository root, then run `node tests/experience.browser.cjs`. Ports 19300/18080/18090 are isolated loopback services; the fixture is synthetic and no model calls are made. Create `backend/data/browser-validation/stop` to terminate these services. Do not point this harness at a deployment.
+
+## Shared-learning integrity incidents
+
+See [LEARNING_POISONING_DEFENSES.md](LEARNING_POISONING_DEFENSES.md). `advisory` / `independent_source_required` is expected until a second robot corroborates the cell. `source_quarantined` suppresses that source's learning for the exact context; investigate sensors and traffic timing before treating it as malicious. It is not a motor stop.
+
+An `integrity_error` disables learned routing and new memory writes. Preserve the authority database, its ledger, and `EXPERIENCE_ANCHOR_PATH` checkpoint. Fresh telemetry, STOP, deterministic routing and controller admission remain independent. Do not fix an error by deleting or recreating the checkpoint or quarantine rows.
+
+`app.ops.backup` captures the authority database and learning checkpoint in a shared attached-database read transaction, verifies their ledger/checkpoint pair, and includes `experience-anchor.db` in the signed manifest. Restore requires a stopped backend and explicitly restores both to the configured locations. Missing or inconsistent checkpoints refuse backup/verification; do not bypass this by deleting the checkpoint. Restoring only an older authority database against the current checkpoint intentionally disables reuse. Compose provides a separate `/anchors` volume writable by the backend user, but independent administrative access controls are the operator's responsibility. Do not enable WAL on either file.
+
+Unsigned older planner lessons remain quarantined for inspection and are not re-signed. Collect fresh signed gate evidence to generate new lessons. Receipt-key rotation can make old receipts unavailable for distillation unless their verification keys are retained by a trusted mechanism.

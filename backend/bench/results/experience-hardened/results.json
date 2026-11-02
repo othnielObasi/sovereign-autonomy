@@ -1,0 +1,3296 @@
+{
+  "config": {
+    "seeds": 20,
+    "first_seed": 0,
+    "primary_measure": "modeled_time_s",
+    "minimum_reduction": 0.05,
+    "speed_m_s": 0.5,
+    "model_calls": 0,
+    "minimum_sources": 2,
+    "scope": "graph routing and signed memory; physical contacts and motor behavior not measured",
+    "stale_condition": "layout changes and closes one queue edge; compare recovery, not speed"
+  },
+  "summary": {
+    "disabled": {
+      "completed": 20,
+      "mean_modeled_time_s": 30.805,
+      "restricted_edges": 0
+    },
+    "shared": {
+      "completed": 20,
+      "mean_modeled_time_s": 22.0,
+      "restricted_edges": 0
+    },
+    "stale": {
+      "completed": 20,
+      "mean_modeled_time_s": 24.0,
+      "restricted_edges": 0
+    }
+  },
+  "paired_mean_saved_s": 8.805,
+  "paired_saved_s_bootstrap_95": [
+    6.1000000000000005,
+    11.61
+  ],
+  "modeled_time_reduction": 0.28583022236649896,
+  "stale_records_tested": 30,
+  "stale_rejection_rate": 1.0,
+  "acceptance": true,
+  "rows": [
+    {
+      "completed": true,
+      "modeled_time_s": 16.0,
+      "distance_m": 8,
+      "restricted_edges": 0,
+      "route": [
+        [
+          0,
+          0
+        ],
+        [
+          1,
+          0
+        ],
+        [
+          2,
+          0
+        ]
+      ],
+      "seed": 0,
+      "condition": "disabled",
+      "queue_s": 0.0,
+      "acquisition_queue_s": 0.0,
+      "acquisition_sources": [
+        "robot-A",
+        "robot-C"
+      ],
+      "accepted_experiences": 0,
+      "excluded_experiences": 0,
+      "quarantine": 0,
+      "retrieval": [],
+      "model_calls": 0
+    },
+    {
+      "completed": true,
+      "modeled_time_s": 16.0,
+      "distance_m": 8,
+      "restricted_edges": 0,
+      "route": [
+        [
+          0,
+          0
+        ],
+        [
+          1,
+          0
+        ],
+        [
+          2,
+          0
+        ]
+      ],
+      "seed": 0,
+      "condition": "shared",
+      "queue_s": 0.0,
+      "acquisition_queue_s": 0.0,
+      "acquisition_sources": [
+        "robot-A",
+        "robot-C"
+      ],
+      "accepted_experiences": 0,
+      "excluded_experiences": 0,
+      "quarantine": 0,
+      "retrieval": [],
+      "model_calls": 0
+    },
+    {
+      "completed": true,
+      "modeled_time_s": 24.0,
+      "distance_m": 12,
+      "restricted_edges": 0,
+      "route": [
+        [
+          0,
+          0
+        ],
+        [
+          1,
+          1
+        ],
+        [
+          2,
+          0
+        ]
+      ],
+      "seed": 0,
+      "condition": "stale",
+      "queue_s": 0.0,
+      "acquisition_queue_s": 0.0,
+      "acquisition_sources": [
+        "robot-A",
+        "robot-C"
+      ],
+      "accepted_experiences": 0,
+      "excluded_experiences": 0,
+      "quarantine": 0,
+      "retrieval": [],
+      "model_calls": 0
+    },
+    {
+      "completed": true,
+      "modeled_time_s": 30.1,
+      "distance_m": 8,
+      "restricted_edges": 0,
+      "route": [
+        [
+          0,
+          0
+        ],
+        [
+          1,
+          0
+        ],
+        [
+          2,
+          0
+        ]
+      ],
+      "seed": 1,
+      "condition": "disabled",
+      "queue_s": 14.1,
+      "acquisition_queue_s": 14.1,
+      "acquisition_sources": [
+        "robot-A",
+        "robot-C"
+      ],
+      "accepted_experiences": 0,
+      "excluded_experiences": 0,
+      "quarantine": 0,
+      "retrieval": [
+        {
+          "id": "robot-A:1:1:0:STOP:a1afdd6fc1fb2e1d53e5987651427c8eadece936615373be5ad5feccf07002ec:robot-A",
+          "status": "accepted",
+          "reason": null,
+          "source_robot_id": "robot-A",
+          "age_s": 0,
+          "context": {
+            "capability_profile_version": "graph-amr-v1",
+            "map_version": "layout-v1",
+            "policy_version": "benchmark-v1",
+            "site_id": "paired-corridors"
+          },
+          "source_share_limit": 0.5
+        },
+        {
+          "id": "robot-C:1:1:0:STOP:a1afdd6fc1fb2e1d53e5987651427c8eadece936615373be5ad5feccf07002ec:robot-C",
+          "status": "accepted",
+          "reason": null,
+          "source_robot_id": "robot-C",
+          "age_s": 0,
+          "context": {
+            "capability_profile_version": "graph-amr-v1",
+            "map_version": "layout-v1",
+            "policy_version": "benchmark-v1",
+            "site_id": "paired-corridors"
+          },
+          "source_share_limit": 0.5
+        }
+      ],
+      "model_calls": 0
+    },
+    {
+      "completed": true,
+      "modeled_time_s": 24.0,
+      "distance_m": 12,
+      "restricted_edges": 0,
+      "route": [
+        [
+          0,
+          0
+        ],
+        [
+          1,
+          1
+        ],
+        [
+          2,
+          0
+        ]
+      ],
+      "seed": 1,
+      "condition": "shared",
+      "queue_s": 14.1,
+      "acquisition_queue_s": 14.1,
+      "acquisition_sources": [
+        "robot-A",
+        "robot-C"
+      ],
+      "accepted_experiences": 2,
+      "excluded_experiences": 0,
+      "quarantine": 0,
+      "retrieval": [
+        {
+          "id": "robot-A:1:1:0:STOP:a1afdd6fc1fb2e1d53e5987651427c8eadece936615373be5ad5feccf07002ec:robot-A",
+          "status": "accepted",
+          "reason": null,
+          "source_robot_id": "robot-A",
+          "age_s": 0,
+          "context": {
+            "capability_profile_version": "graph-amr-v1",
+            "map_version": "layout-v1",
+            "policy_version": "benchmark-v1",
+            "site_id": "paired-corridors"
+          },
+          "source_share_limit": 0.5
+        },
+        {
+          "id": "robot-C:1:1:0:STOP:a1afdd6fc1fb2e1d53e5987651427c8eadece936615373be5ad5feccf07002ec:robot-C",
+          "status": "accepted",
+          "reason": null,
+          "source_robot_id": "robot-C",
+          "age_s": 0,
+          "context": {
+            "capability_profile_version": "graph-amr-v1",
+            "map_version": "layout-v1",
+            "policy_version": "benchmark-v1",
+            "site_id": "paired-corridors"
+          },
+          "source_share_limit": 0.5
+        }
+      ],
+      "model_calls": 0
+    },
+    {
+      "completed": true,
+      "modeled_time_s": 24.0,
+      "distance_m": 12,
+      "restricted_edges": 0,
+      "route": [
+        [
+          0,
+          0
+        ],
+        [
+          1,
+          1
+        ],
+        [
+          2,
+          0
+        ]
+      ],
+      "seed": 1,
+      "condition": "stale",
+      "queue_s": 14.1,
+      "acquisition_queue_s": 14.1,
+      "acquisition_sources": [
+        "robot-A",
+        "robot-C"
+      ],
+      "accepted_experiences": 0,
+      "excluded_experiences": 2,
+      "quarantine": 0,
+      "retrieval": [
+        {
+          "id": "robot-A:1:1:0:STOP:a1afdd6fc1fb2e1d53e5987651427c8eadece936615373be5ad5feccf07002ec:robot-A",
+          "status": "excluded",
+          "reason": "map_version_mismatch",
+          "source_robot_id": "robot-A",
+          "age_s": 0,
+          "context": {
+            "capability_profile_version": "graph-amr-v1",
+            "map_version": "layout-v1",
+            "policy_version": "benchmark-v1",
+            "site_id": "paired-corridors"
+          }
+        },
+        {
+          "id": "robot-C:1:1:0:STOP:a1afdd6fc1fb2e1d53e5987651427c8eadece936615373be5ad5feccf07002ec:robot-C",
+          "status": "excluded",
+          "reason": "map_version_mismatch",
+          "source_robot_id": "robot-C",
+          "age_s": 0,
+          "context": {
+            "capability_profile_version": "graph-amr-v1",
+            "map_version": "layout-v1",
+            "policy_version": "benchmark-v1",
+            "site_id": "paired-corridors"
+          }
+        }
+      ],
+      "model_calls": 0
+    },
+    {
+      "completed": true,
+      "modeled_time_s": 43.3,
+      "distance_m": 8,
+      "restricted_edges": 0,
+      "route": [
+        [
+          0,
+          0
+        ],
+        [
+          1,
+          0
+        ],
+        [
+          2,
+          0
+        ]
+      ],
+      "seed": 2,
+      "condition": "disabled",
+      "queue_s": 27.3,
+      "acquisition_queue_s": 27.3,
+      "acquisition_sources": [
+        "robot-A",
+        "robot-C"
+      ],
+      "accepted_experiences": 0,
+      "excluded_experiences": 0,
+      "quarantine": 0,
+      "retrieval": [
+        {
+          "id": "robot-A:2:1:0:STOP:a1afdd6fc1fb2e1d53e5987651427c8eadece936615373be5ad5feccf07002ec:robot-A",
+          "status": "accepted",
+          "reason": null,
+          "source_robot_id": "robot-A",
+          "age_s": 0,
+          "context": {
+            "capability_profile_version": "graph-amr-v1",
+            "map_version": "layout-v1",
+            "policy_version": "benchmark-v1",
+            "site_id": "paired-corridors"
+          },
+          "source_share_limit": 0.5
+        },
+        {
+          "id": "robot-C:2:1:0:STOP:a1afdd6fc1fb2e1d53e5987651427c8eadece936615373be5ad5feccf07002ec:robot-C",
+          "status": "accepted",
+          "reason": null,
+          "source_robot_id": "robot-C",
+          "age_s": 0,
+          "context": {
+            "capability_profile_version": "graph-amr-v1",
+            "map_version": "layout-v1",
+            "policy_version": "benchmark-v1",
+            "site_id": "paired-corridors"
+          },
+          "source_share_limit": 0.5
+        }
+      ],
+      "model_calls": 0
+    },
+    {
+      "completed": true,
+      "modeled_time_s": 24.0,
+      "distance_m": 12,
+      "restricted_edges": 0,
+      "route": [
+        [
+          0,
+          0
+        ],
+        [
+          1,
+          1
+        ],
+        [
+          2,
+          0
+        ]
+      ],
+      "seed": 2,
+      "condition": "shared",
+      "queue_s": 27.3,
+      "acquisition_queue_s": 27.3,
+      "acquisition_sources": [
+        "robot-A",
+        "robot-C"
+      ],
+      "accepted_experiences": 2,
+      "excluded_experiences": 0,
+      "quarantine": 0,
+      "retrieval": [
+        {
+          "id": "robot-A:2:1:0:STOP:a1afdd6fc1fb2e1d53e5987651427c8eadece936615373be5ad5feccf07002ec:robot-A",
+          "status": "accepted",
+          "reason": null,
+          "source_robot_id": "robot-A",
+          "age_s": 0,
+          "context": {
+            "capability_profile_version": "graph-amr-v1",
+            "map_version": "layout-v1",
+            "policy_version": "benchmark-v1",
+            "site_id": "paired-corridors"
+          },
+          "source_share_limit": 0.5
+        },
+        {
+          "id": "robot-C:2:1:0:STOP:a1afdd6fc1fb2e1d53e5987651427c8eadece936615373be5ad5feccf07002ec:robot-C",
+          "status": "accepted",
+          "reason": null,
+          "source_robot_id": "robot-C",
+          "age_s": 0,
+          "context": {
+            "capability_profile_version": "graph-amr-v1",
+            "map_version": "layout-v1",
+            "policy_version": "benchmark-v1",
+            "site_id": "paired-corridors"
+          },
+          "source_share_limit": 0.5
+        }
+      ],
+      "model_calls": 0
+    },
+    {
+      "completed": true,
+      "modeled_time_s": 24.0,
+      "distance_m": 12,
+      "restricted_edges": 0,
+      "route": [
+        [
+          0,
+          0
+        ],
+        [
+          1,
+          1
+        ],
+        [
+          2,
+          0
+        ]
+      ],
+      "seed": 2,
+      "condition": "stale",
+      "queue_s": 27.3,
+      "acquisition_queue_s": 27.3,
+      "acquisition_sources": [
+        "robot-A",
+        "robot-C"
+      ],
+      "accepted_experiences": 0,
+      "excluded_experiences": 2,
+      "quarantine": 0,
+      "retrieval": [
+        {
+          "id": "robot-A:2:1:0:STOP:a1afdd6fc1fb2e1d53e5987651427c8eadece936615373be5ad5feccf07002ec:robot-A",
+          "status": "excluded",
+          "reason": "map_version_mismatch",
+          "source_robot_id": "robot-A",
+          "age_s": 0,
+          "context": {
+            "capability_profile_version": "graph-amr-v1",
+            "map_version": "layout-v1",
+            "policy_version": "benchmark-v1",
+            "site_id": "paired-corridors"
+          }
+        },
+        {
+          "id": "robot-C:2:1:0:STOP:a1afdd6fc1fb2e1d53e5987651427c8eadece936615373be5ad5feccf07002ec:robot-C",
+          "status": "excluded",
+          "reason": "map_version_mismatch",
+          "source_robot_id": "robot-C",
+          "age_s": 0,
+          "context": {
+            "capability_profile_version": "graph-amr-v1",
+            "map_version": "layout-v1",
+            "policy_version": "benchmark-v1",
+            "site_id": "paired-corridors"
+          }
+        }
+      ],
+      "model_calls": 0
+    },
+    {
+      "completed": true,
+      "modeled_time_s": 31.8,
+      "distance_m": 8,
+      "restricted_edges": 0,
+      "route": [
+        [
+          0,
+          0
+        ],
+        [
+          1,
+          0
+        ],
+        [
+          2,
+          0
+        ]
+      ],
+      "seed": 3,
+      "condition": "disabled",
+      "queue_s": 15.8,
+      "acquisition_queue_s": 15.8,
+      "acquisition_sources": [
+        "robot-A",
+        "robot-C"
+      ],
+      "accepted_experiences": 0,
+      "excluded_experiences": 0,
+      "quarantine": 0,
+      "retrieval": [
+        {
+          "id": "robot-A:3:1:0:STOP:a1afdd6fc1fb2e1d53e5987651427c8eadece936615373be5ad5feccf07002ec:robot-A",
+          "status": "accepted",
+          "reason": null,
+          "source_robot_id": "robot-A",
+          "age_s": 0,
+          "context": {
+            "capability_profile_version": "graph-amr-v1",
+            "map_version": "layout-v1",
+            "policy_version": "benchmark-v1",
+            "site_id": "paired-corridors"
+          },
+          "source_share_limit": 0.5
+        },
+        {
+          "id": "robot-C:3:1:0:STOP:a1afdd6fc1fb2e1d53e5987651427c8eadece936615373be5ad5feccf07002ec:robot-C",
+          "status": "accepted",
+          "reason": null,
+          "source_robot_id": "robot-C",
+          "age_s": 0,
+          "context": {
+            "capability_profile_version": "graph-amr-v1",
+            "map_version": "layout-v1",
+            "policy_version": "benchmark-v1",
+            "site_id": "paired-corridors"
+          },
+          "source_share_limit": 0.5
+        }
+      ],
+      "model_calls": 0
+    },
+    {
+      "completed": true,
+      "modeled_time_s": 24.0,
+      "distance_m": 12,
+      "restricted_edges": 0,
+      "route": [
+        [
+          0,
+          0
+        ],
+        [
+          1,
+          1
+        ],
+        [
+          2,
+          0
+        ]
+      ],
+      "seed": 3,
+      "condition": "shared",
+      "queue_s": 15.8,
+      "acquisition_queue_s": 15.8,
+      "acquisition_sources": [
+        "robot-A",
+        "robot-C"
+      ],
+      "accepted_experiences": 2,
+      "excluded_experiences": 0,
+      "quarantine": 0,
+      "retrieval": [
+        {
+          "id": "robot-A:3:1:0:STOP:a1afdd6fc1fb2e1d53e5987651427c8eadece936615373be5ad5feccf07002ec:robot-A",
+          "status": "accepted",
+          "reason": null,
+          "source_robot_id": "robot-A",
+          "age_s": 0,
+          "context": {
+            "capability_profile_version": "graph-amr-v1",
+            "map_version": "layout-v1",
+            "policy_version": "benchmark-v1",
+            "site_id": "paired-corridors"
+          },
+          "source_share_limit": 0.5
+        },
+        {
+          "id": "robot-C:3:1:0:STOP:a1afdd6fc1fb2e1d53e5987651427c8eadece936615373be5ad5feccf07002ec:robot-C",
+          "status": "accepted",
+          "reason": null,
+          "source_robot_id": "robot-C",
+          "age_s": 0,
+          "context": {
+            "capability_profile_version": "graph-amr-v1",
+            "map_version": "layout-v1",
+            "policy_version": "benchmark-v1",
+            "site_id": "paired-corridors"
+          },
+          "source_share_limit": 0.5
+        }
+      ],
+      "model_calls": 0
+    },
+    {
+      "completed": true,
+      "modeled_time_s": 24.0,
+      "distance_m": 12,
+      "restricted_edges": 0,
+      "route": [
+        [
+          0,
+          0
+        ],
+        [
+          1,
+          1
+        ],
+        [
+          2,
+          0
+        ]
+      ],
+      "seed": 3,
+      "condition": "stale",
+      "queue_s": 15.8,
+      "acquisition_queue_s": 15.8,
+      "acquisition_sources": [
+        "robot-A",
+        "robot-C"
+      ],
+      "accepted_experiences": 0,
+      "excluded_experiences": 2,
+      "quarantine": 0,
+      "retrieval": [
+        {
+          "id": "robot-A:3:1:0:STOP:a1afdd6fc1fb2e1d53e5987651427c8eadece936615373be5ad5feccf07002ec:robot-A",
+          "status": "excluded",
+          "reason": "map_version_mismatch",
+          "source_robot_id": "robot-A",
+          "age_s": 0,
+          "context": {
+            "capability_profile_version": "graph-amr-v1",
+            "map_version": "layout-v1",
+            "policy_version": "benchmark-v1",
+            "site_id": "paired-corridors"
+          }
+        },
+        {
+          "id": "robot-C:3:1:0:STOP:a1afdd6fc1fb2e1d53e5987651427c8eadece936615373be5ad5feccf07002ec:robot-C",
+          "status": "excluded",
+          "reason": "map_version_mismatch",
+          "source_robot_id": "robot-C",
+          "age_s": 0,
+          "context": {
+            "capability_profile_version": "graph-amr-v1",
+            "map_version": "layout-v1",
+            "policy_version": "benchmark-v1",
+            "site_id": "paired-corridors"
+          }
+        }
+      ],
+      "model_calls": 0
+    },
+    {
+      "completed": true,
+      "modeled_time_s": 16.0,
+      "distance_m": 8,
+      "restricted_edges": 0,
+      "route": [
+        [
+          0,
+          0
+        ],
+        [
+          1,
+          0
+        ],
+        [
+          2,
+          0
+        ]
+      ],
+      "seed": 4,
+      "condition": "disabled",
+      "queue_s": 0.0,
+      "acquisition_queue_s": 0.0,
+      "acquisition_sources": [
+        "robot-A",
+        "robot-C"
+      ],
+      "accepted_experiences": 0,
+      "excluded_experiences": 0,
+      "quarantine": 0,
+      "retrieval": [],
+      "model_calls": 0
+    },
+    {
+      "completed": true,
+      "modeled_time_s": 16.0,
+      "distance_m": 8,
+      "restricted_edges": 0,
+      "route": [
+        [
+          0,
+          0
+        ],
+        [
+          1,
+          0
+        ],
+        [
+          2,
+          0
+        ]
+      ],
+      "seed": 4,
+      "condition": "shared",
+      "queue_s": 0.0,
+      "acquisition_queue_s": 0.0,
+      "acquisition_sources": [
+        "robot-A",
+        "robot-C"
+      ],
+      "accepted_experiences": 0,
+      "excluded_experiences": 0,
+      "quarantine": 0,
+      "retrieval": [],
+      "model_calls": 0
+    },
+    {
+      "completed": true,
+      "modeled_time_s": 24.0,
+      "distance_m": 12,
+      "restricted_edges": 0,
+      "route": [
+        [
+          0,
+          0
+        ],
+        [
+          1,
+          1
+        ],
+        [
+          2,
+          0
+        ]
+      ],
+      "seed": 4,
+      "condition": "stale",
+      "queue_s": 0.0,
+      "acquisition_queue_s": 0.0,
+      "acquisition_sources": [
+        "robot-A",
+        "robot-C"
+      ],
+      "accepted_experiences": 0,
+      "excluded_experiences": 0,
+      "quarantine": 0,
+      "retrieval": [],
+      "model_calls": 0
+    },
+    {
+      "completed": true,
+      "modeled_time_s": 38.0,
+      "distance_m": 8,
+      "restricted_edges": 0,
+      "route": [
+        [
+          0,
+          0
+        ],
+        [
+          1,
+          0
+        ],
+        [
+          2,
+          0
+        ]
+      ],
+      "seed": 5,
+      "condition": "disabled",
+      "queue_s": 22.0,
+      "acquisition_queue_s": 22.0,
+      "acquisition_sources": [
+        "robot-A",
+        "robot-C"
+      ],
+      "accepted_experiences": 0,
+      "excluded_experiences": 0,
+      "quarantine": 0,
+      "retrieval": [
+        {
+          "id": "robot-A:5:1:0:STOP:a1afdd6fc1fb2e1d53e5987651427c8eadece936615373be5ad5feccf07002ec:robot-A",
+          "status": "accepted",
+          "reason": null,
+          "source_robot_id": "robot-A",
+          "age_s": 0,
+          "context": {
+            "capability_profile_version": "graph-amr-v1",
+            "map_version": "layout-v1",
+            "policy_version": "benchmark-v1",
+            "site_id": "paired-corridors"
+          },
+          "source_share_limit": 0.5
+        },
+        {
+          "id": "robot-C:5:1:0:STOP:a1afdd6fc1fb2e1d53e5987651427c8eadece936615373be5ad5feccf07002ec:robot-C",
+          "status": "accepted",
+          "reason": null,
+          "source_robot_id": "robot-C",
+          "age_s": 0,
+          "context": {
+            "capability_profile_version": "graph-amr-v1",
+            "map_version": "layout-v1",
+            "policy_version": "benchmark-v1",
+            "site_id": "paired-corridors"
+          },
+          "source_share_limit": 0.5
+        }
+      ],
+      "model_calls": 0
+    },
+    {
+      "completed": true,
+      "modeled_time_s": 24.0,
+      "distance_m": 12,
+      "restricted_edges": 0,
+      "route": [
+        [
+          0,
+          0
+        ],
+        [
+          1,
+          1
+        ],
+        [
+          2,
+          0
+        ]
+      ],
+      "seed": 5,
+      "condition": "shared",
+      "queue_s": 22.0,
+      "acquisition_queue_s": 22.0,
+      "acquisition_sources": [
+        "robot-A",
+        "robot-C"
+      ],
+      "accepted_experiences": 2,
+      "excluded_experiences": 0,
+      "quarantine": 0,
+      "retrieval": [
+        {
+          "id": "robot-A:5:1:0:STOP:a1afdd6fc1fb2e1d53e5987651427c8eadece936615373be5ad5feccf07002ec:robot-A",
+          "status": "accepted",
+          "reason": null,
+          "source_robot_id": "robot-A",
+          "age_s": 0,
+          "context": {
+            "capability_profile_version": "graph-amr-v1",
+            "map_version": "layout-v1",
+            "policy_version": "benchmark-v1",
+            "site_id": "paired-corridors"
+          },
+          "source_share_limit": 0.5
+        },
+        {
+          "id": "robot-C:5:1:0:STOP:a1afdd6fc1fb2e1d53e5987651427c8eadece936615373be5ad5feccf07002ec:robot-C",
+          "status": "accepted",
+          "reason": null,
+          "source_robot_id": "robot-C",
+          "age_s": 0,
+          "context": {
+            "capability_profile_version": "graph-amr-v1",
+            "map_version": "layout-v1",
+            "policy_version": "benchmark-v1",
+            "site_id": "paired-corridors"
+          },
+          "source_share_limit": 0.5
+        }
+      ],
+      "model_calls": 0
+    },
+    {
+      "completed": true,
+      "modeled_time_s": 24.0,
+      "distance_m": 12,
+      "restricted_edges": 0,
+      "route": [
+        [
+          0,
+          0
+        ],
+        [
+          1,
+          1
+        ],
+        [
+          2,
+          0
+        ]
+      ],
+      "seed": 5,
+      "condition": "stale",
+      "queue_s": 22.0,
+      "acquisition_queue_s": 22.0,
+      "acquisition_sources": [
+        "robot-A",
+        "robot-C"
+      ],
+      "accepted_experiences": 0,
+      "excluded_experiences": 2,
+      "quarantine": 0,
+      "retrieval": [
+        {
+          "id": "robot-A:5:1:0:STOP:a1afdd6fc1fb2e1d53e5987651427c8eadece936615373be5ad5feccf07002ec:robot-A",
+          "status": "excluded",
+          "reason": "map_version_mismatch",
+          "source_robot_id": "robot-A",
+          "age_s": 0,
+          "context": {
+            "capability_profile_version": "graph-amr-v1",
+            "map_version": "layout-v1",
+            "policy_version": "benchmark-v1",
+            "site_id": "paired-corridors"
+          }
+        },
+        {
+          "id": "robot-C:5:1:0:STOP:a1afdd6fc1fb2e1d53e5987651427c8eadece936615373be5ad5feccf07002ec:robot-C",
+          "status": "excluded",
+          "reason": "map_version_mismatch",
+          "source_robot_id": "robot-C",
+          "age_s": 0,
+          "context": {
+            "capability_profile_version": "graph-amr-v1",
+            "map_version": "layout-v1",
+            "policy_version": "benchmark-v1",
+            "site_id": "paired-corridors"
+          }
+        }
+      ],
+      "model_calls": 0
+    },
+    {
+      "completed": true,
+      "modeled_time_s": 40.7,
+      "distance_m": 8,
+      "restricted_edges": 0,
+      "route": [
+        [
+          0,
+          0
+        ],
+        [
+          1,
+          0
+        ],
+        [
+          2,
+          0
+        ]
+      ],
+      "seed": 6,
+      "condition": "disabled",
+      "queue_s": 24.7,
+      "acquisition_queue_s": 24.7,
+      "acquisition_sources": [
+        "robot-A",
+        "robot-C"
+      ],
+      "accepted_experiences": 0,
+      "excluded_experiences": 0,
+      "quarantine": 0,
+      "retrieval": [
+        {
+          "id": "robot-A:6:1:0:STOP:a1afdd6fc1fb2e1d53e5987651427c8eadece936615373be5ad5feccf07002ec:robot-A",
+          "status": "accepted",
+          "reason": null,
+          "source_robot_id": "robot-A",
+          "age_s": 0,
+          "context": {
+            "capability_profile_version": "graph-amr-v1",
+            "map_version": "layout-v1",
+            "policy_version": "benchmark-v1",
+            "site_id": "paired-corridors"
+          },
+          "source_share_limit": 0.5
+        },
+        {
+          "id": "robot-C:6:1:0:STOP:a1afdd6fc1fb2e1d53e5987651427c8eadece936615373be5ad5feccf07002ec:robot-C",
+          "status": "accepted",
+          "reason": null,
+          "source_robot_id": "robot-C",
+          "age_s": 0,
+          "context": {
+            "capability_profile_version": "graph-amr-v1",
+            "map_version": "layout-v1",
+            "policy_version": "benchmark-v1",
+            "site_id": "paired-corridors"
+          },
+          "source_share_limit": 0.5
+        }
+      ],
+      "model_calls": 0
+    },
+    {
+      "completed": true,
+      "modeled_time_s": 24.0,
+      "distance_m": 12,
+      "restricted_edges": 0,
+      "route": [
+        [
+          0,
+          0
+        ],
+        [
+          1,
+          1
+        ],
+        [
+          2,
+          0
+        ]
+      ],
+      "seed": 6,
+      "condition": "shared",
+      "queue_s": 24.7,
+      "acquisition_queue_s": 24.7,
+      "acquisition_sources": [
+        "robot-A",
+        "robot-C"
+      ],
+      "accepted_experiences": 2,
+      "excluded_experiences": 0,
+      "quarantine": 0,
+      "retrieval": [
+        {
+          "id": "robot-A:6:1:0:STOP:a1afdd6fc1fb2e1d53e5987651427c8eadece936615373be5ad5feccf07002ec:robot-A",
+          "status": "accepted",
+          "reason": null,
+          "source_robot_id": "robot-A",
+          "age_s": 0,
+          "context": {
+            "capability_profile_version": "graph-amr-v1",
+            "map_version": "layout-v1",
+            "policy_version": "benchmark-v1",
+            "site_id": "paired-corridors"
+          },
+          "source_share_limit": 0.5
+        },
+        {
+          "id": "robot-C:6:1:0:STOP:a1afdd6fc1fb2e1d53e5987651427c8eadece936615373be5ad5feccf07002ec:robot-C",
+          "status": "accepted",
+          "reason": null,
+          "source_robot_id": "robot-C",
+          "age_s": 0,
+          "context": {
+            "capability_profile_version": "graph-amr-v1",
+            "map_version": "layout-v1",
+            "policy_version": "benchmark-v1",
+            "site_id": "paired-corridors"
+          },
+          "source_share_limit": 0.5
+        }
+      ],
+      "model_calls": 0
+    },
+    {
+      "completed": true,
+      "modeled_time_s": 24.0,
+      "distance_m": 12,
+      "restricted_edges": 0,
+      "route": [
+        [
+          0,
+          0
+        ],
+        [
+          1,
+          1
+        ],
+        [
+          2,
+          0
+        ]
+      ],
+      "seed": 6,
+      "condition": "stale",
+      "queue_s": 24.7,
+      "acquisition_queue_s": 24.7,
+      "acquisition_sources": [
+        "robot-A",
+        "robot-C"
+      ],
+      "accepted_experiences": 0,
+      "excluded_experiences": 2,
+      "quarantine": 0,
+      "retrieval": [
+        {
+          "id": "robot-A:6:1:0:STOP:a1afdd6fc1fb2e1d53e5987651427c8eadece936615373be5ad5feccf07002ec:robot-A",
+          "status": "excluded",
+          "reason": "map_version_mismatch",
+          "source_robot_id": "robot-A",
+          "age_s": 0,
+          "context": {
+            "capability_profile_version": "graph-amr-v1",
+            "map_version": "layout-v1",
+            "policy_version": "benchmark-v1",
+            "site_id": "paired-corridors"
+          }
+        },
+        {
+          "id": "robot-C:6:1:0:STOP:a1afdd6fc1fb2e1d53e5987651427c8eadece936615373be5ad5feccf07002ec:robot-C",
+          "status": "excluded",
+          "reason": "map_version_mismatch",
+          "source_robot_id": "robot-C",
+          "age_s": 0,
+          "context": {
+            "capability_profile_version": "graph-amr-v1",
+            "map_version": "layout-v1",
+            "policy_version": "benchmark-v1",
+            "site_id": "paired-corridors"
+          }
+        }
+      ],
+      "model_calls": 0
+    },
+    {
+      "completed": true,
+      "modeled_time_s": 33.2,
+      "distance_m": 8,
+      "restricted_edges": 0,
+      "route": [
+        [
+          0,
+          0
+        ],
+        [
+          1,
+          0
+        ],
+        [
+          2,
+          0
+        ]
+      ],
+      "seed": 7,
+      "condition": "disabled",
+      "queue_s": 17.2,
+      "acquisition_queue_s": 17.2,
+      "acquisition_sources": [
+        "robot-A",
+        "robot-C"
+      ],
+      "accepted_experiences": 0,
+      "excluded_experiences": 0,
+      "quarantine": 0,
+      "retrieval": [
+        {
+          "id": "robot-A:7:1:0:STOP:a1afdd6fc1fb2e1d53e5987651427c8eadece936615373be5ad5feccf07002ec:robot-A",
+          "status": "accepted",
+          "reason": null,
+          "source_robot_id": "robot-A",
+          "age_s": 0,
+          "context": {
+            "capability_profile_version": "graph-amr-v1",
+            "map_version": "layout-v1",
+            "policy_version": "benchmark-v1",
+            "site_id": "paired-corridors"
+          },
+          "source_share_limit": 0.5
+        },
+        {
+          "id": "robot-C:7:1:0:STOP:a1afdd6fc1fb2e1d53e5987651427c8eadece936615373be5ad5feccf07002ec:robot-C",
+          "status": "accepted",
+          "reason": null,
+          "source_robot_id": "robot-C",
+          "age_s": 0,
+          "context": {
+            "capability_profile_version": "graph-amr-v1",
+            "map_version": "layout-v1",
+            "policy_version": "benchmark-v1",
+            "site_id": "paired-corridors"
+          },
+          "source_share_limit": 0.5
+        }
+      ],
+      "model_calls": 0
+    },
+    {
+      "completed": true,
+      "modeled_time_s": 24.0,
+      "distance_m": 12,
+      "restricted_edges": 0,
+      "route": [
+        [
+          0,
+          0
+        ],
+        [
+          1,
+          1
+        ],
+        [
+          2,
+          0
+        ]
+      ],
+      "seed": 7,
+      "condition": "shared",
+      "queue_s": 17.2,
+      "acquisition_queue_s": 17.2,
+      "acquisition_sources": [
+        "robot-A",
+        "robot-C"
+      ],
+      "accepted_experiences": 2,
+      "excluded_experiences": 0,
+      "quarantine": 0,
+      "retrieval": [
+        {
+          "id": "robot-A:7:1:0:STOP:a1afdd6fc1fb2e1d53e5987651427c8eadece936615373be5ad5feccf07002ec:robot-A",
+          "status": "accepted",
+          "reason": null,
+          "source_robot_id": "robot-A",
+          "age_s": 0,
+          "context": {
+            "capability_profile_version": "graph-amr-v1",
+            "map_version": "layout-v1",
+            "policy_version": "benchmark-v1",
+            "site_id": "paired-corridors"
+          },
+          "source_share_limit": 0.5
+        },
+        {
+          "id": "robot-C:7:1:0:STOP:a1afdd6fc1fb2e1d53e5987651427c8eadece936615373be5ad5feccf07002ec:robot-C",
+          "status": "accepted",
+          "reason": null,
+          "source_robot_id": "robot-C",
+          "age_s": 0,
+          "context": {
+            "capability_profile_version": "graph-amr-v1",
+            "map_version": "layout-v1",
+            "policy_version": "benchmark-v1",
+            "site_id": "paired-corridors"
+          },
+          "source_share_limit": 0.5
+        }
+      ],
+      "model_calls": 0
+    },
+    {
+      "completed": true,
+      "modeled_time_s": 24.0,
+      "distance_m": 12,
+      "restricted_edges": 0,
+      "route": [
+        [
+          0,
+          0
+        ],
+        [
+          1,
+          1
+        ],
+        [
+          2,
+          0
+        ]
+      ],
+      "seed": 7,
+      "condition": "stale",
+      "queue_s": 17.2,
+      "acquisition_queue_s": 17.2,
+      "acquisition_sources": [
+        "robot-A",
+        "robot-C"
+      ],
+      "accepted_experiences": 0,
+      "excluded_experiences": 2,
+      "quarantine": 0,
+      "retrieval": [
+        {
+          "id": "robot-A:7:1:0:STOP:a1afdd6fc1fb2e1d53e5987651427c8eadece936615373be5ad5feccf07002ec:robot-A",
+          "status": "excluded",
+          "reason": "map_version_mismatch",
+          "source_robot_id": "robot-A",
+          "age_s": 0,
+          "context": {
+            "capability_profile_version": "graph-amr-v1",
+            "map_version": "layout-v1",
+            "policy_version": "benchmark-v1",
+            "site_id": "paired-corridors"
+          }
+        },
+        {
+          "id": "robot-C:7:1:0:STOP:a1afdd6fc1fb2e1d53e5987651427c8eadece936615373be5ad5feccf07002ec:robot-C",
+          "status": "excluded",
+          "reason": "map_version_mismatch",
+          "source_robot_id": "robot-C",
+          "age_s": 0,
+          "context": {
+            "capability_profile_version": "graph-amr-v1",
+            "map_version": "layout-v1",
+            "policy_version": "benchmark-v1",
+            "site_id": "paired-corridors"
+          }
+        }
+      ],
+      "model_calls": 0
+    },
+    {
+      "completed": true,
+      "modeled_time_s": 16.0,
+      "distance_m": 8,
+      "restricted_edges": 0,
+      "route": [
+        [
+          0,
+          0
+        ],
+        [
+          1,
+          0
+        ],
+        [
+          2,
+          0
+        ]
+      ],
+      "seed": 8,
+      "condition": "disabled",
+      "queue_s": 0.0,
+      "acquisition_queue_s": 0.0,
+      "acquisition_sources": [
+        "robot-A",
+        "robot-C"
+      ],
+      "accepted_experiences": 0,
+      "excluded_experiences": 0,
+      "quarantine": 0,
+      "retrieval": [],
+      "model_calls": 0
+    },
+    {
+      "completed": true,
+      "modeled_time_s": 16.0,
+      "distance_m": 8,
+      "restricted_edges": 0,
+      "route": [
+        [
+          0,
+          0
+        ],
+        [
+          1,
+          0
+        ],
+        [
+          2,
+          0
+        ]
+      ],
+      "seed": 8,
+      "condition": "shared",
+      "queue_s": 0.0,
+      "acquisition_queue_s": 0.0,
+      "acquisition_sources": [
+        "robot-A",
+        "robot-C"
+      ],
+      "accepted_experiences": 0,
+      "excluded_experiences": 0,
+      "quarantine": 0,
+      "retrieval": [],
+      "model_calls": 0
+    },
+    {
+      "completed": true,
+      "modeled_time_s": 24.0,
+      "distance_m": 12,
+      "restricted_edges": 0,
+      "route": [
+        [
+          0,
+          0
+        ],
+        [
+          1,
+          1
+        ],
+        [
+          2,
+          0
+        ]
+      ],
+      "seed": 8,
+      "condition": "stale",
+      "queue_s": 0.0,
+      "acquisition_queue_s": 0.0,
+      "acquisition_sources": [
+        "robot-A",
+        "robot-C"
+      ],
+      "accepted_experiences": 0,
+      "excluded_experiences": 0,
+      "quarantine": 0,
+      "retrieval": [],
+      "model_calls": 0
+    },
+    {
+      "completed": true,
+      "modeled_time_s": 35.4,
+      "distance_m": 8,
+      "restricted_edges": 0,
+      "route": [
+        [
+          0,
+          0
+        ],
+        [
+          1,
+          0
+        ],
+        [
+          2,
+          0
+        ]
+      ],
+      "seed": 9,
+      "condition": "disabled",
+      "queue_s": 19.4,
+      "acquisition_queue_s": 19.4,
+      "acquisition_sources": [
+        "robot-A",
+        "robot-C"
+      ],
+      "accepted_experiences": 0,
+      "excluded_experiences": 0,
+      "quarantine": 0,
+      "retrieval": [
+        {
+          "id": "robot-A:9:1:0:STOP:a1afdd6fc1fb2e1d53e5987651427c8eadece936615373be5ad5feccf07002ec:robot-A",
+          "status": "accepted",
+          "reason": null,
+          "source_robot_id": "robot-A",
+          "age_s": 0,
+          "context": {
+            "capability_profile_version": "graph-amr-v1",
+            "map_version": "layout-v1",
+            "policy_version": "benchmark-v1",
+            "site_id": "paired-corridors"
+          },
+          "source_share_limit": 0.5
+        },
+        {
+          "id": "robot-C:9:1:0:STOP:a1afdd6fc1fb2e1d53e5987651427c8eadece936615373be5ad5feccf07002ec:robot-C",
+          "status": "accepted",
+          "reason": null,
+          "source_robot_id": "robot-C",
+          "age_s": 0,
+          "context": {
+            "capability_profile_version": "graph-amr-v1",
+            "map_version": "layout-v1",
+            "policy_version": "benchmark-v1",
+            "site_id": "paired-corridors"
+          },
+          "source_share_limit": 0.5
+        }
+      ],
+      "model_calls": 0
+    },
+    {
+      "completed": true,
+      "modeled_time_s": 24.0,
+      "distance_m": 12,
+      "restricted_edges": 0,
+      "route": [
+        [
+          0,
+          0
+        ],
+        [
+          1,
+          1
+        ],
+        [
+          2,
+          0
+        ]
+      ],
+      "seed": 9,
+      "condition": "shared",
+      "queue_s": 19.4,
+      "acquisition_queue_s": 19.4,
+      "acquisition_sources": [
+        "robot-A",
+        "robot-C"
+      ],
+      "accepted_experiences": 2,
+      "excluded_experiences": 0,
+      "quarantine": 0,
+      "retrieval": [
+        {
+          "id": "robot-A:9:1:0:STOP:a1afdd6fc1fb2e1d53e5987651427c8eadece936615373be5ad5feccf07002ec:robot-A",
+          "status": "accepted",
+          "reason": null,
+          "source_robot_id": "robot-A",
+          "age_s": 0,
+          "context": {
+            "capability_profile_version": "graph-amr-v1",
+            "map_version": "layout-v1",
+            "policy_version": "benchmark-v1",
+            "site_id": "paired-corridors"
+          },
+          "source_share_limit": 0.5
+        },
+        {
+          "id": "robot-C:9:1:0:STOP:a1afdd6fc1fb2e1d53e5987651427c8eadece936615373be5ad5feccf07002ec:robot-C",
+          "status": "accepted",
+          "reason": null,
+          "source_robot_id": "robot-C",
+          "age_s": 0,
+          "context": {
+            "capability_profile_version": "graph-amr-v1",
+            "map_version": "layout-v1",
+            "policy_version": "benchmark-v1",
+            "site_id": "paired-corridors"
+          },
+          "source_share_limit": 0.5
+        }
+      ],
+      "model_calls": 0
+    },
+    {
+      "completed": true,
+      "modeled_time_s": 24.0,
+      "distance_m": 12,
+      "restricted_edges": 0,
+      "route": [
+        [
+          0,
+          0
+        ],
+        [
+          1,
+          1
+        ],
+        [
+          2,
+          0
+        ]
+      ],
+      "seed": 9,
+      "condition": "stale",
+      "queue_s": 19.4,
+      "acquisition_queue_s": 19.4,
+      "acquisition_sources": [
+        "robot-A",
+        "robot-C"
+      ],
+      "accepted_experiences": 0,
+      "excluded_experiences": 2,
+      "quarantine": 0,
+      "retrieval": [
+        {
+          "id": "robot-A:9:1:0:STOP:a1afdd6fc1fb2e1d53e5987651427c8eadece936615373be5ad5feccf07002ec:robot-A",
+          "status": "excluded",
+          "reason": "map_version_mismatch",
+          "source_robot_id": "robot-A",
+          "age_s": 0,
+          "context": {
+            "capability_profile_version": "graph-amr-v1",
+            "map_version": "layout-v1",
+            "policy_version": "benchmark-v1",
+            "site_id": "paired-corridors"
+          }
+        },
+        {
+          "id": "robot-C:9:1:0:STOP:a1afdd6fc1fb2e1d53e5987651427c8eadece936615373be5ad5feccf07002ec:robot-C",
+          "status": "excluded",
+          "reason": "map_version_mismatch",
+          "source_robot_id": "robot-C",
+          "age_s": 0,
+          "context": {
+            "capability_profile_version": "graph-amr-v1",
+            "map_version": "layout-v1",
+            "policy_version": "benchmark-v1",
+            "site_id": "paired-corridors"
+          }
+        }
+      ],
+      "model_calls": 0
+    },
+    {
+      "completed": true,
+      "modeled_time_s": 37.1,
+      "distance_m": 8,
+      "restricted_edges": 0,
+      "route": [
+        [
+          0,
+          0
+        ],
+        [
+          1,
+          0
+        ],
+        [
+          2,
+          0
+        ]
+      ],
+      "seed": 10,
+      "condition": "disabled",
+      "queue_s": 21.1,
+      "acquisition_queue_s": 21.1,
+      "acquisition_sources": [
+        "robot-A",
+        "robot-C"
+      ],
+      "accepted_experiences": 0,
+      "excluded_experiences": 0,
+      "quarantine": 0,
+      "retrieval": [
+        {
+          "id": "robot-A:10:1:0:STOP:a1afdd6fc1fb2e1d53e5987651427c8eadece936615373be5ad5feccf07002ec:robot-A",
+          "status": "accepted",
+          "reason": null,
+          "source_robot_id": "robot-A",
+          "age_s": 0,
+          "context": {
+            "capability_profile_version": "graph-amr-v1",
+            "map_version": "layout-v1",
+            "policy_version": "benchmark-v1",
+            "site_id": "paired-corridors"
+          },
+          "source_share_limit": 0.5
+        },
+        {
+          "id": "robot-C:10:1:0:STOP:a1afdd6fc1fb2e1d53e5987651427c8eadece936615373be5ad5feccf07002ec:robot-C",
+          "status": "accepted",
+          "reason": null,
+          "source_robot_id": "robot-C",
+          "age_s": 0,
+          "context": {
+            "capability_profile_version": "graph-amr-v1",
+            "map_version": "layout-v1",
+            "policy_version": "benchmark-v1",
+            "site_id": "paired-corridors"
+          },
+          "source_share_limit": 0.5
+        }
+      ],
+      "model_calls": 0
+    },
+    {
+      "completed": true,
+      "modeled_time_s": 24.0,
+      "distance_m": 12,
+      "restricted_edges": 0,
+      "route": [
+        [
+          0,
+          0
+        ],
+        [
+          1,
+          1
+        ],
+        [
+          2,
+          0
+        ]
+      ],
+      "seed": 10,
+      "condition": "shared",
+      "queue_s": 21.1,
+      "acquisition_queue_s": 21.1,
+      "acquisition_sources": [
+        "robot-A",
+        "robot-C"
+      ],
+      "accepted_experiences": 2,
+      "excluded_experiences": 0,
+      "quarantine": 0,
+      "retrieval": [
+        {
+          "id": "robot-A:10:1:0:STOP:a1afdd6fc1fb2e1d53e5987651427c8eadece936615373be5ad5feccf07002ec:robot-A",
+          "status": "accepted",
+          "reason": null,
+          "source_robot_id": "robot-A",
+          "age_s": 0,
+          "context": {
+            "capability_profile_version": "graph-amr-v1",
+            "map_version": "layout-v1",
+            "policy_version": "benchmark-v1",
+            "site_id": "paired-corridors"
+          },
+          "source_share_limit": 0.5
+        },
+        {
+          "id": "robot-C:10:1:0:STOP:a1afdd6fc1fb2e1d53e5987651427c8eadece936615373be5ad5feccf07002ec:robot-C",
+          "status": "accepted",
+          "reason": null,
+          "source_robot_id": "robot-C",
+          "age_s": 0,
+          "context": {
+            "capability_profile_version": "graph-amr-v1",
+            "map_version": "layout-v1",
+            "policy_version": "benchmark-v1",
+            "site_id": "paired-corridors"
+          },
+          "source_share_limit": 0.5
+        }
+      ],
+      "model_calls": 0
+    },
+    {
+      "completed": true,
+      "modeled_time_s": 24.0,
+      "distance_m": 12,
+      "restricted_edges": 0,
+      "route": [
+        [
+          0,
+          0
+        ],
+        [
+          1,
+          1
+        ],
+        [
+          2,
+          0
+        ]
+      ],
+      "seed": 10,
+      "condition": "stale",
+      "queue_s": 21.1,
+      "acquisition_queue_s": 21.1,
+      "acquisition_sources": [
+        "robot-A",
+        "robot-C"
+      ],
+      "accepted_experiences": 0,
+      "excluded_experiences": 2,
+      "quarantine": 0,
+      "retrieval": [
+        {
+          "id": "robot-A:10:1:0:STOP:a1afdd6fc1fb2e1d53e5987651427c8eadece936615373be5ad5feccf07002ec:robot-A",
+          "status": "excluded",
+          "reason": "map_version_mismatch",
+          "source_robot_id": "robot-A",
+          "age_s": 0,
+          "context": {
+            "capability_profile_version": "graph-amr-v1",
+            "map_version": "layout-v1",
+            "policy_version": "benchmark-v1",
+            "site_id": "paired-corridors"
+          }
+        },
+        {
+          "id": "robot-C:10:1:0:STOP:a1afdd6fc1fb2e1d53e5987651427c8eadece936615373be5ad5feccf07002ec:robot-C",
+          "status": "excluded",
+          "reason": "map_version_mismatch",
+          "source_robot_id": "robot-C",
+          "age_s": 0,
+          "context": {
+            "capability_profile_version": "graph-amr-v1",
+            "map_version": "layout-v1",
+            "policy_version": "benchmark-v1",
+            "site_id": "paired-corridors"
+          }
+        }
+      ],
+      "model_calls": 0
+    },
+    {
+      "completed": true,
+      "modeled_time_s": 35.2,
+      "distance_m": 8,
+      "restricted_edges": 0,
+      "route": [
+        [
+          0,
+          0
+        ],
+        [
+          1,
+          0
+        ],
+        [
+          2,
+          0
+        ]
+      ],
+      "seed": 11,
+      "condition": "disabled",
+      "queue_s": 19.2,
+      "acquisition_queue_s": 19.2,
+      "acquisition_sources": [
+        "robot-A",
+        "robot-C"
+      ],
+      "accepted_experiences": 0,
+      "excluded_experiences": 0,
+      "quarantine": 0,
+      "retrieval": [
+        {
+          "id": "robot-A:11:1:0:STOP:a1afdd6fc1fb2e1d53e5987651427c8eadece936615373be5ad5feccf07002ec:robot-A",
+          "status": "accepted",
+          "reason": null,
+          "source_robot_id": "robot-A",
+          "age_s": 0,
+          "context": {
+            "capability_profile_version": "graph-amr-v1",
+            "map_version": "layout-v1",
+            "policy_version": "benchmark-v1",
+            "site_id": "paired-corridors"
+          },
+          "source_share_limit": 0.5
+        },
+        {
+          "id": "robot-C:11:1:0:STOP:a1afdd6fc1fb2e1d53e5987651427c8eadece936615373be5ad5feccf07002ec:robot-C",
+          "status": "accepted",
+          "reason": null,
+          "source_robot_id": "robot-C",
+          "age_s": 0,
+          "context": {
+            "capability_profile_version": "graph-amr-v1",
+            "map_version": "layout-v1",
+            "policy_version": "benchmark-v1",
+            "site_id": "paired-corridors"
+          },
+          "source_share_limit": 0.5
+        }
+      ],
+      "model_calls": 0
+    },
+    {
+      "completed": true,
+      "modeled_time_s": 24.0,
+      "distance_m": 12,
+      "restricted_edges": 0,
+      "route": [
+        [
+          0,
+          0
+        ],
+        [
+          1,
+          1
+        ],
+        [
+          2,
+          0
+        ]
+      ],
+      "seed": 11,
+      "condition": "shared",
+      "queue_s": 19.2,
+      "acquisition_queue_s": 19.2,
+      "acquisition_sources": [
+        "robot-A",
+        "robot-C"
+      ],
+      "accepted_experiences": 2,
+      "excluded_experiences": 0,
+      "quarantine": 0,
+      "retrieval": [
+        {
+          "id": "robot-A:11:1:0:STOP:a1afdd6fc1fb2e1d53e5987651427c8eadece936615373be5ad5feccf07002ec:robot-A",
+          "status": "accepted",
+          "reason": null,
+          "source_robot_id": "robot-A",
+          "age_s": 0,
+          "context": {
+            "capability_profile_version": "graph-amr-v1",
+            "map_version": "layout-v1",
+            "policy_version": "benchmark-v1",
+            "site_id": "paired-corridors"
+          },
+          "source_share_limit": 0.5
+        },
+        {
+          "id": "robot-C:11:1:0:STOP:a1afdd6fc1fb2e1d53e5987651427c8eadece936615373be5ad5feccf07002ec:robot-C",
+          "status": "accepted",
+          "reason": null,
+          "source_robot_id": "robot-C",
+          "age_s": 0,
+          "context": {
+            "capability_profile_version": "graph-amr-v1",
+            "map_version": "layout-v1",
+            "policy_version": "benchmark-v1",
+            "site_id": "paired-corridors"
+          },
+          "source_share_limit": 0.5
+        }
+      ],
+      "model_calls": 0
+    },
+    {
+      "completed": true,
+      "modeled_time_s": 24.0,
+      "distance_m": 12,
+      "restricted_edges": 0,
+      "route": [
+        [
+          0,
+          0
+        ],
+        [
+          1,
+          1
+        ],
+        [
+          2,
+          0
+        ]
+      ],
+      "seed": 11,
+      "condition": "stale",
+      "queue_s": 19.2,
+      "acquisition_queue_s": 19.2,
+      "acquisition_sources": [
+        "robot-A",
+        "robot-C"
+      ],
+      "accepted_experiences": 0,
+      "excluded_experiences": 2,
+      "quarantine": 0,
+      "retrieval": [
+        {
+          "id": "robot-A:11:1:0:STOP:a1afdd6fc1fb2e1d53e5987651427c8eadece936615373be5ad5feccf07002ec:robot-A",
+          "status": "excluded",
+          "reason": "map_version_mismatch",
+          "source_robot_id": "robot-A",
+          "age_s": 0,
+          "context": {
+            "capability_profile_version": "graph-amr-v1",
+            "map_version": "layout-v1",
+            "policy_version": "benchmark-v1",
+            "site_id": "paired-corridors"
+          }
+        },
+        {
+          "id": "robot-C:11:1:0:STOP:a1afdd6fc1fb2e1d53e5987651427c8eadece936615373be5ad5feccf07002ec:robot-C",
+          "status": "excluded",
+          "reason": "map_version_mismatch",
+          "source_robot_id": "robot-C",
+          "age_s": 0,
+          "context": {
+            "capability_profile_version": "graph-amr-v1",
+            "map_version": "layout-v1",
+            "policy_version": "benchmark-v1",
+            "site_id": "paired-corridors"
+          }
+        }
+      ],
+      "model_calls": 0
+    },
+    {
+      "completed": true,
+      "modeled_time_s": 16.0,
+      "distance_m": 8,
+      "restricted_edges": 0,
+      "route": [
+        [
+          0,
+          0
+        ],
+        [
+          1,
+          0
+        ],
+        [
+          2,
+          0
+        ]
+      ],
+      "seed": 12,
+      "condition": "disabled",
+      "queue_s": 0.0,
+      "acquisition_queue_s": 0.0,
+      "acquisition_sources": [
+        "robot-A",
+        "robot-C"
+      ],
+      "accepted_experiences": 0,
+      "excluded_experiences": 0,
+      "quarantine": 0,
+      "retrieval": [],
+      "model_calls": 0
+    },
+    {
+      "completed": true,
+      "modeled_time_s": 16.0,
+      "distance_m": 8,
+      "restricted_edges": 0,
+      "route": [
+        [
+          0,
+          0
+        ],
+        [
+          1,
+          0
+        ],
+        [
+          2,
+          0
+        ]
+      ],
+      "seed": 12,
+      "condition": "shared",
+      "queue_s": 0.0,
+      "acquisition_queue_s": 0.0,
+      "acquisition_sources": [
+        "robot-A",
+        "robot-C"
+      ],
+      "accepted_experiences": 0,
+      "excluded_experiences": 0,
+      "quarantine": 0,
+      "retrieval": [],
+      "model_calls": 0
+    },
+    {
+      "completed": true,
+      "modeled_time_s": 24.0,
+      "distance_m": 12,
+      "restricted_edges": 0,
+      "route": [
+        [
+          0,
+          0
+        ],
+        [
+          1,
+          1
+        ],
+        [
+          2,
+          0
+        ]
+      ],
+      "seed": 12,
+      "condition": "stale",
+      "queue_s": 0.0,
+      "acquisition_queue_s": 0.0,
+      "acquisition_sources": [
+        "robot-A",
+        "robot-C"
+      ],
+      "accepted_experiences": 0,
+      "excluded_experiences": 0,
+      "quarantine": 0,
+      "retrieval": [],
+      "model_calls": 0
+    },
+    {
+      "completed": true,
+      "modeled_time_s": 32.1,
+      "distance_m": 8,
+      "restricted_edges": 0,
+      "route": [
+        [
+          0,
+          0
+        ],
+        [
+          1,
+          0
+        ],
+        [
+          2,
+          0
+        ]
+      ],
+      "seed": 13,
+      "condition": "disabled",
+      "queue_s": 16.1,
+      "acquisition_queue_s": 16.1,
+      "acquisition_sources": [
+        "robot-A",
+        "robot-C"
+      ],
+      "accepted_experiences": 0,
+      "excluded_experiences": 0,
+      "quarantine": 0,
+      "retrieval": [
+        {
+          "id": "robot-A:13:1:0:STOP:a1afdd6fc1fb2e1d53e5987651427c8eadece936615373be5ad5feccf07002ec:robot-A",
+          "status": "accepted",
+          "reason": null,
+          "source_robot_id": "robot-A",
+          "age_s": 0,
+          "context": {
+            "capability_profile_version": "graph-amr-v1",
+            "map_version": "layout-v1",
+            "policy_version": "benchmark-v1",
+            "site_id": "paired-corridors"
+          },
+          "source_share_limit": 0.5
+        },
+        {
+          "id": "robot-C:13:1:0:STOP:a1afdd6fc1fb2e1d53e5987651427c8eadece936615373be5ad5feccf07002ec:robot-C",
+          "status": "accepted",
+          "reason": null,
+          "source_robot_id": "robot-C",
+          "age_s": 0,
+          "context": {
+            "capability_profile_version": "graph-amr-v1",
+            "map_version": "layout-v1",
+            "policy_version": "benchmark-v1",
+            "site_id": "paired-corridors"
+          },
+          "source_share_limit": 0.5
+        }
+      ],
+      "model_calls": 0
+    },
+    {
+      "completed": true,
+      "modeled_time_s": 24.0,
+      "distance_m": 12,
+      "restricted_edges": 0,
+      "route": [
+        [
+          0,
+          0
+        ],
+        [
+          1,
+          1
+        ],
+        [
+          2,
+          0
+        ]
+      ],
+      "seed": 13,
+      "condition": "shared",
+      "queue_s": 16.1,
+      "acquisition_queue_s": 16.1,
+      "acquisition_sources": [
+        "robot-A",
+        "robot-C"
+      ],
+      "accepted_experiences": 2,
+      "excluded_experiences": 0,
+      "quarantine": 0,
+      "retrieval": [
+        {
+          "id": "robot-A:13:1:0:STOP:a1afdd6fc1fb2e1d53e5987651427c8eadece936615373be5ad5feccf07002ec:robot-A",
+          "status": "accepted",
+          "reason": null,
+          "source_robot_id": "robot-A",
+          "age_s": 0,
+          "context": {
+            "capability_profile_version": "graph-amr-v1",
+            "map_version": "layout-v1",
+            "policy_version": "benchmark-v1",
+            "site_id": "paired-corridors"
+          },
+          "source_share_limit": 0.5
+        },
+        {
+          "id": "robot-C:13:1:0:STOP:a1afdd6fc1fb2e1d53e5987651427c8eadece936615373be5ad5feccf07002ec:robot-C",
+          "status": "accepted",
+          "reason": null,
+          "source_robot_id": "robot-C",
+          "age_s": 0,
+          "context": {
+            "capability_profile_version": "graph-amr-v1",
+            "map_version": "layout-v1",
+            "policy_version": "benchmark-v1",
+            "site_id": "paired-corridors"
+          },
+          "source_share_limit": 0.5
+        }
+      ],
+      "model_calls": 0
+    },
+    {
+      "completed": true,
+      "modeled_time_s": 24.0,
+      "distance_m": 12,
+      "restricted_edges": 0,
+      "route": [
+        [
+          0,
+          0
+        ],
+        [
+          1,
+          1
+        ],
+        [
+          2,
+          0
+        ]
+      ],
+      "seed": 13,
+      "condition": "stale",
+      "queue_s": 16.1,
+      "acquisition_queue_s": 16.1,
+      "acquisition_sources": [
+        "robot-A",
+        "robot-C"
+      ],
+      "accepted_experiences": 0,
+      "excluded_experiences": 2,
+      "quarantine": 0,
+      "retrieval": [
+        {
+          "id": "robot-A:13:1:0:STOP:a1afdd6fc1fb2e1d53e5987651427c8eadece936615373be5ad5feccf07002ec:robot-A",
+          "status": "excluded",
+          "reason": "map_version_mismatch",
+          "source_robot_id": "robot-A",
+          "age_s": 0,
+          "context": {
+            "capability_profile_version": "graph-amr-v1",
+            "map_version": "layout-v1",
+            "policy_version": "benchmark-v1",
+            "site_id": "paired-corridors"
+          }
+        },
+        {
+          "id": "robot-C:13:1:0:STOP:a1afdd6fc1fb2e1d53e5987651427c8eadece936615373be5ad5feccf07002ec:robot-C",
+          "status": "excluded",
+          "reason": "map_version_mismatch",
+          "source_robot_id": "robot-C",
+          "age_s": 0,
+          "context": {
+            "capability_profile_version": "graph-amr-v1",
+            "map_version": "layout-v1",
+            "policy_version": "benchmark-v1",
+            "site_id": "paired-corridors"
+          }
+        }
+      ],
+      "model_calls": 0
+    },
+    {
+      "completed": true,
+      "modeled_time_s": 29.7,
+      "distance_m": 8,
+      "restricted_edges": 0,
+      "route": [
+        [
+          0,
+          0
+        ],
+        [
+          1,
+          0
+        ],
+        [
+          2,
+          0
+        ]
+      ],
+      "seed": 14,
+      "condition": "disabled",
+      "queue_s": 13.7,
+      "acquisition_queue_s": 13.7,
+      "acquisition_sources": [
+        "robot-A",
+        "robot-C"
+      ],
+      "accepted_experiences": 0,
+      "excluded_experiences": 0,
+      "quarantine": 0,
+      "retrieval": [
+        {
+          "id": "robot-A:14:1:0:STOP:a1afdd6fc1fb2e1d53e5987651427c8eadece936615373be5ad5feccf07002ec:robot-A",
+          "status": "accepted",
+          "reason": null,
+          "source_robot_id": "robot-A",
+          "age_s": 0,
+          "context": {
+            "capability_profile_version": "graph-amr-v1",
+            "map_version": "layout-v1",
+            "policy_version": "benchmark-v1",
+            "site_id": "paired-corridors"
+          },
+          "source_share_limit": 0.5
+        },
+        {
+          "id": "robot-C:14:1:0:STOP:a1afdd6fc1fb2e1d53e5987651427c8eadece936615373be5ad5feccf07002ec:robot-C",
+          "status": "accepted",
+          "reason": null,
+          "source_robot_id": "robot-C",
+          "age_s": 0,
+          "context": {
+            "capability_profile_version": "graph-amr-v1",
+            "map_version": "layout-v1",
+            "policy_version": "benchmark-v1",
+            "site_id": "paired-corridors"
+          },
+          "source_share_limit": 0.5
+        }
+      ],
+      "model_calls": 0
+    },
+    {
+      "completed": true,
+      "modeled_time_s": 24.0,
+      "distance_m": 12,
+      "restricted_edges": 0,
+      "route": [
+        [
+          0,
+          0
+        ],
+        [
+          1,
+          1
+        ],
+        [
+          2,
+          0
+        ]
+      ],
+      "seed": 14,
+      "condition": "shared",
+      "queue_s": 13.7,
+      "acquisition_queue_s": 13.7,
+      "acquisition_sources": [
+        "robot-A",
+        "robot-C"
+      ],
+      "accepted_experiences": 2,
+      "excluded_experiences": 0,
+      "quarantine": 0,
+      "retrieval": [
+        {
+          "id": "robot-A:14:1:0:STOP:a1afdd6fc1fb2e1d53e5987651427c8eadece936615373be5ad5feccf07002ec:robot-A",
+          "status": "accepted",
+          "reason": null,
+          "source_robot_id": "robot-A",
+          "age_s": 0,
+          "context": {
+            "capability_profile_version": "graph-amr-v1",
+            "map_version": "layout-v1",
+            "policy_version": "benchmark-v1",
+            "site_id": "paired-corridors"
+          },
+          "source_share_limit": 0.5
+        },
+        {
+          "id": "robot-C:14:1:0:STOP:a1afdd6fc1fb2e1d53e5987651427c8eadece936615373be5ad5feccf07002ec:robot-C",
+          "status": "accepted",
+          "reason": null,
+          "source_robot_id": "robot-C",
+          "age_s": 0,
+          "context": {
+            "capability_profile_version": "graph-amr-v1",
+            "map_version": "layout-v1",
+            "policy_version": "benchmark-v1",
+            "site_id": "paired-corridors"
+          },
+          "source_share_limit": 0.5
+        }
+      ],
+      "model_calls": 0
+    },
+    {
+      "completed": true,
+      "modeled_time_s": 24.0,
+      "distance_m": 12,
+      "restricted_edges": 0,
+      "route": [
+        [
+          0,
+          0
+        ],
+        [
+          1,
+          1
+        ],
+        [
+          2,
+          0
+        ]
+      ],
+      "seed": 14,
+      "condition": "stale",
+      "queue_s": 13.7,
+      "acquisition_queue_s": 13.7,
+      "acquisition_sources": [
+        "robot-A",
+        "robot-C"
+      ],
+      "accepted_experiences": 0,
+      "excluded_experiences": 2,
+      "quarantine": 0,
+      "retrieval": [
+        {
+          "id": "robot-A:14:1:0:STOP:a1afdd6fc1fb2e1d53e5987651427c8eadece936615373be5ad5feccf07002ec:robot-A",
+          "status": "excluded",
+          "reason": "map_version_mismatch",
+          "source_robot_id": "robot-A",
+          "age_s": 0,
+          "context": {
+            "capability_profile_version": "graph-amr-v1",
+            "map_version": "layout-v1",
+            "policy_version": "benchmark-v1",
+            "site_id": "paired-corridors"
+          }
+        },
+        {
+          "id": "robot-C:14:1:0:STOP:a1afdd6fc1fb2e1d53e5987651427c8eadece936615373be5ad5feccf07002ec:robot-C",
+          "status": "excluded",
+          "reason": "map_version_mismatch",
+          "source_robot_id": "robot-C",
+          "age_s": 0,
+          "context": {
+            "capability_profile_version": "graph-amr-v1",
+            "map_version": "layout-v1",
+            "policy_version": "benchmark-v1",
+            "site_id": "paired-corridors"
+          }
+        }
+      ],
+      "model_calls": 0
+    },
+    {
+      "completed": true,
+      "modeled_time_s": 43.4,
+      "distance_m": 8,
+      "restricted_edges": 0,
+      "route": [
+        [
+          0,
+          0
+        ],
+        [
+          1,
+          0
+        ],
+        [
+          2,
+          0
+        ]
+      ],
+      "seed": 15,
+      "condition": "disabled",
+      "queue_s": 27.4,
+      "acquisition_queue_s": 27.4,
+      "acquisition_sources": [
+        "robot-A",
+        "robot-C"
+      ],
+      "accepted_experiences": 0,
+      "excluded_experiences": 0,
+      "quarantine": 0,
+      "retrieval": [
+        {
+          "id": "robot-A:15:1:0:STOP:a1afdd6fc1fb2e1d53e5987651427c8eadece936615373be5ad5feccf07002ec:robot-A",
+          "status": "accepted",
+          "reason": null,
+          "source_robot_id": "robot-A",
+          "age_s": 0,
+          "context": {
+            "capability_profile_version": "graph-amr-v1",
+            "map_version": "layout-v1",
+            "policy_version": "benchmark-v1",
+            "site_id": "paired-corridors"
+          },
+          "source_share_limit": 0.5
+        },
+        {
+          "id": "robot-C:15:1:0:STOP:a1afdd6fc1fb2e1d53e5987651427c8eadece936615373be5ad5feccf07002ec:robot-C",
+          "status": "accepted",
+          "reason": null,
+          "source_robot_id": "robot-C",
+          "age_s": 0,
+          "context": {
+            "capability_profile_version": "graph-amr-v1",
+            "map_version": "layout-v1",
+            "policy_version": "benchmark-v1",
+            "site_id": "paired-corridors"
+          },
+          "source_share_limit": 0.5
+        }
+      ],
+      "model_calls": 0
+    },
+    {
+      "completed": true,
+      "modeled_time_s": 24.0,
+      "distance_m": 12,
+      "restricted_edges": 0,
+      "route": [
+        [
+          0,
+          0
+        ],
+        [
+          1,
+          1
+        ],
+        [
+          2,
+          0
+        ]
+      ],
+      "seed": 15,
+      "condition": "shared",
+      "queue_s": 27.4,
+      "acquisition_queue_s": 27.4,
+      "acquisition_sources": [
+        "robot-A",
+        "robot-C"
+      ],
+      "accepted_experiences": 2,
+      "excluded_experiences": 0,
+      "quarantine": 0,
+      "retrieval": [
+        {
+          "id": "robot-A:15:1:0:STOP:a1afdd6fc1fb2e1d53e5987651427c8eadece936615373be5ad5feccf07002ec:robot-A",
+          "status": "accepted",
+          "reason": null,
+          "source_robot_id": "robot-A",
+          "age_s": 0,
+          "context": {
+            "capability_profile_version": "graph-amr-v1",
+            "map_version": "layout-v1",
+            "policy_version": "benchmark-v1",
+            "site_id": "paired-corridors"
+          },
+          "source_share_limit": 0.5
+        },
+        {
+          "id": "robot-C:15:1:0:STOP:a1afdd6fc1fb2e1d53e5987651427c8eadece936615373be5ad5feccf07002ec:robot-C",
+          "status": "accepted",
+          "reason": null,
+          "source_robot_id": "robot-C",
+          "age_s": 0,
+          "context": {
+            "capability_profile_version": "graph-amr-v1",
+            "map_version": "layout-v1",
+            "policy_version": "benchmark-v1",
+            "site_id": "paired-corridors"
+          },
+          "source_share_limit": 0.5
+        }
+      ],
+      "model_calls": 0
+    },
+    {
+      "completed": true,
+      "modeled_time_s": 24.0,
+      "distance_m": 12,
+      "restricted_edges": 0,
+      "route": [
+        [
+          0,
+          0
+        ],
+        [
+          1,
+          1
+        ],
+        [
+          2,
+          0
+        ]
+      ],
+      "seed": 15,
+      "condition": "stale",
+      "queue_s": 27.4,
+      "acquisition_queue_s": 27.4,
+      "acquisition_sources": [
+        "robot-A",
+        "robot-C"
+      ],
+      "accepted_experiences": 0,
+      "excluded_experiences": 2,
+      "quarantine": 0,
+      "retrieval": [
+        {
+          "id": "robot-A:15:1:0:STOP:a1afdd6fc1fb2e1d53e5987651427c8eadece936615373be5ad5feccf07002ec:robot-A",
+          "status": "excluded",
+          "reason": "map_version_mismatch",
+          "source_robot_id": "robot-A",
+          "age_s": 0,
+          "context": {
+            "capability_profile_version": "graph-amr-v1",
+            "map_version": "layout-v1",
+            "policy_version": "benchmark-v1",
+            "site_id": "paired-corridors"
+          }
+        },
+        {
+          "id": "robot-C:15:1:0:STOP:a1afdd6fc1fb2e1d53e5987651427c8eadece936615373be5ad5feccf07002ec:robot-C",
+          "status": "excluded",
+          "reason": "map_version_mismatch",
+          "source_robot_id": "robot-C",
+          "age_s": 0,
+          "context": {
+            "capability_profile_version": "graph-amr-v1",
+            "map_version": "layout-v1",
+            "policy_version": "benchmark-v1",
+            "site_id": "paired-corridors"
+          }
+        }
+      ],
+      "model_calls": 0
+    },
+    {
+      "completed": true,
+      "modeled_time_s": 16.0,
+      "distance_m": 8,
+      "restricted_edges": 0,
+      "route": [
+        [
+          0,
+          0
+        ],
+        [
+          1,
+          0
+        ],
+        [
+          2,
+          0
+        ]
+      ],
+      "seed": 16,
+      "condition": "disabled",
+      "queue_s": 0.0,
+      "acquisition_queue_s": 0.0,
+      "acquisition_sources": [
+        "robot-A",
+        "robot-C"
+      ],
+      "accepted_experiences": 0,
+      "excluded_experiences": 0,
+      "quarantine": 0,
+      "retrieval": [],
+      "model_calls": 0
+    },
+    {
+      "completed": true,
+      "modeled_time_s": 16.0,
+      "distance_m": 8,
+      "restricted_edges": 0,
+      "route": [
+        [
+          0,
+          0
+        ],
+        [
+          1,
+          0
+        ],
+        [
+          2,
+          0
+        ]
+      ],
+      "seed": 16,
+      "condition": "shared",
+      "queue_s": 0.0,
+      "acquisition_queue_s": 0.0,
+      "acquisition_sources": [
+        "robot-A",
+        "robot-C"
+      ],
+      "accepted_experiences": 0,
+      "excluded_experiences": 0,
+      "quarantine": 0,
+      "retrieval": [],
+      "model_calls": 0
+    },
+    {
+      "completed": true,
+      "modeled_time_s": 24.0,
+      "distance_m": 12,
+      "restricted_edges": 0,
+      "route": [
+        [
+          0,
+          0
+        ],
+        [
+          1,
+          1
+        ],
+        [
+          2,
+          0
+        ]
+      ],
+      "seed": 16,
+      "condition": "stale",
+      "queue_s": 0.0,
+      "acquisition_queue_s": 0.0,
+      "acquisition_sources": [
+        "robot-A",
+        "robot-C"
+      ],
+      "accepted_experiences": 0,
+      "excluded_experiences": 0,
+      "quarantine": 0,
+      "retrieval": [],
+      "model_calls": 0
+    },
+    {
+      "completed": true,
+      "modeled_time_s": 36.4,
+      "distance_m": 8,
+      "restricted_edges": 0,
+      "route": [
+        [
+          0,
+          0
+        ],
+        [
+          1,
+          0
+        ],
+        [
+          2,
+          0
+        ]
+      ],
+      "seed": 17,
+      "condition": "disabled",
+      "queue_s": 20.4,
+      "acquisition_queue_s": 20.4,
+      "acquisition_sources": [
+        "robot-A",
+        "robot-C"
+      ],
+      "accepted_experiences": 0,
+      "excluded_experiences": 0,
+      "quarantine": 0,
+      "retrieval": [
+        {
+          "id": "robot-A:17:1:0:STOP:a1afdd6fc1fb2e1d53e5987651427c8eadece936615373be5ad5feccf07002ec:robot-A",
+          "status": "accepted",
+          "reason": null,
+          "source_robot_id": "robot-A",
+          "age_s": 0,
+          "context": {
+            "capability_profile_version": "graph-amr-v1",
+            "map_version": "layout-v1",
+            "policy_version": "benchmark-v1",
+            "site_id": "paired-corridors"
+          },
+          "source_share_limit": 0.5
+        },
+        {
+          "id": "robot-C:17:1:0:STOP:a1afdd6fc1fb2e1d53e5987651427c8eadece936615373be5ad5feccf07002ec:robot-C",
+          "status": "accepted",
+          "reason": null,
+          "source_robot_id": "robot-C",
+          "age_s": 0,
+          "context": {
+            "capability_profile_version": "graph-amr-v1",
+            "map_version": "layout-v1",
+            "policy_version": "benchmark-v1",
+            "site_id": "paired-corridors"
+          },
+          "source_share_limit": 0.5
+        }
+      ],
+      "model_calls": 0
+    },
+    {
+      "completed": true,
+      "modeled_time_s": 24.0,
+      "distance_m": 12,
+      "restricted_edges": 0,
+      "route": [
+        [
+          0,
+          0
+        ],
+        [
+          1,
+          1
+        ],
+        [
+          2,
+          0
+        ]
+      ],
+      "seed": 17,
+      "condition": "shared",
+      "queue_s": 20.4,
+      "acquisition_queue_s": 20.4,
+      "acquisition_sources": [
+        "robot-A",
+        "robot-C"
+      ],
+      "accepted_experiences": 2,
+      "excluded_experiences": 0,
+      "quarantine": 0,
+      "retrieval": [
+        {
+          "id": "robot-A:17:1:0:STOP:a1afdd6fc1fb2e1d53e5987651427c8eadece936615373be5ad5feccf07002ec:robot-A",
+          "status": "accepted",
+          "reason": null,
+          "source_robot_id": "robot-A",
+          "age_s": 0,
+          "context": {
+            "capability_profile_version": "graph-amr-v1",
+            "map_version": "layout-v1",
+            "policy_version": "benchmark-v1",
+            "site_id": "paired-corridors"
+          },
+          "source_share_limit": 0.5
+        },
+        {
+          "id": "robot-C:17:1:0:STOP:a1afdd6fc1fb2e1d53e5987651427c8eadece936615373be5ad5feccf07002ec:robot-C",
+          "status": "accepted",
+          "reason": null,
+          "source_robot_id": "robot-C",
+          "age_s": 0,
+          "context": {
+            "capability_profile_version": "graph-amr-v1",
+            "map_version": "layout-v1",
+            "policy_version": "benchmark-v1",
+            "site_id": "paired-corridors"
+          },
+          "source_share_limit": 0.5
+        }
+      ],
+      "model_calls": 0
+    },
+    {
+      "completed": true,
+      "modeled_time_s": 24.0,
+      "distance_m": 12,
+      "restricted_edges": 0,
+      "route": [
+        [
+          0,
+          0
+        ],
+        [
+          1,
+          1
+        ],
+        [
+          2,
+          0
+        ]
+      ],
+      "seed": 17,
+      "condition": "stale",
+      "queue_s": 20.4,
+      "acquisition_queue_s": 20.4,
+      "acquisition_sources": [
+        "robot-A",
+        "robot-C"
+      ],
+      "accepted_experiences": 0,
+      "excluded_experiences": 2,
+      "quarantine": 0,
+      "retrieval": [
+        {
+          "id": "robot-A:17:1:0:STOP:a1afdd6fc1fb2e1d53e5987651427c8eadece936615373be5ad5feccf07002ec:robot-A",
+          "status": "excluded",
+          "reason": "map_version_mismatch",
+          "source_robot_id": "robot-A",
+          "age_s": 0,
+          "context": {
+            "capability_profile_version": "graph-amr-v1",
+            "map_version": "layout-v1",
+            "policy_version": "benchmark-v1",
+            "site_id": "paired-corridors"
+          }
+        },
+        {
+          "id": "robot-C:17:1:0:STOP:a1afdd6fc1fb2e1d53e5987651427c8eadece936615373be5ad5feccf07002ec:robot-C",
+          "status": "excluded",
+          "reason": "map_version_mismatch",
+          "source_robot_id": "robot-C",
+          "age_s": 0,
+          "context": {
+            "capability_profile_version": "graph-amr-v1",
+            "map_version": "layout-v1",
+            "policy_version": "benchmark-v1",
+            "site_id": "paired-corridors"
+          }
+        }
+      ],
+      "model_calls": 0
+    },
+    {
+      "completed": true,
+      "modeled_time_s": 30.9,
+      "distance_m": 8,
+      "restricted_edges": 0,
+      "route": [
+        [
+          0,
+          0
+        ],
+        [
+          1,
+          0
+        ],
+        [
+          2,
+          0
+        ]
+      ],
+      "seed": 18,
+      "condition": "disabled",
+      "queue_s": 14.9,
+      "acquisition_queue_s": 14.9,
+      "acquisition_sources": [
+        "robot-A",
+        "robot-C"
+      ],
+      "accepted_experiences": 0,
+      "excluded_experiences": 0,
+      "quarantine": 0,
+      "retrieval": [
+        {
+          "id": "robot-A:18:1:0:STOP:a1afdd6fc1fb2e1d53e5987651427c8eadece936615373be5ad5feccf07002ec:robot-A",
+          "status": "accepted",
+          "reason": null,
+          "source_robot_id": "robot-A",
+          "age_s": 0,
+          "context": {
+            "capability_profile_version": "graph-amr-v1",
+            "map_version": "layout-v1",
+            "policy_version": "benchmark-v1",
+            "site_id": "paired-corridors"
+          },
+          "source_share_limit": 0.5
+        },
+        {
+          "id": "robot-C:18:1:0:STOP:a1afdd6fc1fb2e1d53e5987651427c8eadece936615373be5ad5feccf07002ec:robot-C",
+          "status": "accepted",
+          "reason": null,
+          "source_robot_id": "robot-C",
+          "age_s": 0,
+          "context": {
+            "capability_profile_version": "graph-amr-v1",
+            "map_version": "layout-v1",
+            "policy_version": "benchmark-v1",
+            "site_id": "paired-corridors"
+          },
+          "source_share_limit": 0.5
+        }
+      ],
+      "model_calls": 0
+    },
+    {
+      "completed": true,
+      "modeled_time_s": 24.0,
+      "distance_m": 12,
+      "restricted_edges": 0,
+      "route": [
+        [
+          0,
+          0
+        ],
+        [
+          1,
+          1
+        ],
+        [
+          2,
+          0
+        ]
+      ],
+      "seed": 18,
+      "condition": "shared",
+      "queue_s": 14.9,
+      "acquisition_queue_s": 14.9,
+      "acquisition_sources": [
+        "robot-A",
+        "robot-C"
+      ],
+      "accepted_experiences": 2,
+      "excluded_experiences": 0,
+      "quarantine": 0,
+      "retrieval": [
+        {
+          "id": "robot-A:18:1:0:STOP:a1afdd6fc1fb2e1d53e5987651427c8eadece936615373be5ad5feccf07002ec:robot-A",
+          "status": "accepted",
+          "reason": null,
+          "source_robot_id": "robot-A",
+          "age_s": 0,
+          "context": {
+            "capability_profile_version": "graph-amr-v1",
+            "map_version": "layout-v1",
+            "policy_version": "benchmark-v1",
+            "site_id": "paired-corridors"
+          },
+          "source_share_limit": 0.5
+        },
+        {
+          "id": "robot-C:18:1:0:STOP:a1afdd6fc1fb2e1d53e5987651427c8eadece936615373be5ad5feccf07002ec:robot-C",
+          "status": "accepted",
+          "reason": null,
+          "source_robot_id": "robot-C",
+          "age_s": 0,
+          "context": {
+            "capability_profile_version": "graph-amr-v1",
+            "map_version": "layout-v1",
+            "policy_version": "benchmark-v1",
+            "site_id": "paired-corridors"
+          },
+          "source_share_limit": 0.5
+        }
+      ],
+      "model_calls": 0
+    },
+    {
+      "completed": true,
+      "modeled_time_s": 24.0,
+      "distance_m": 12,
+      "restricted_edges": 0,
+      "route": [
+        [
+          0,
+          0
+        ],
+        [
+          1,
+          1
+        ],
+        [
+          2,
+          0
+        ]
+      ],
+      "seed": 18,
+      "condition": "stale",
+      "queue_s": 14.9,
+      "acquisition_queue_s": 14.9,
+      "acquisition_sources": [
+        "robot-A",
+        "robot-C"
+      ],
+      "accepted_experiences": 0,
+      "excluded_experiences": 2,
+      "quarantine": 0,
+      "retrieval": [
+        {
+          "id": "robot-A:18:1:0:STOP:a1afdd6fc1fb2e1d53e5987651427c8eadece936615373be5ad5feccf07002ec:robot-A",
+          "status": "excluded",
+          "reason": "map_version_mismatch",
+          "source_robot_id": "robot-A",
+          "age_s": 0,
+          "context": {
+            "capability_profile_version": "graph-amr-v1",
+            "map_version": "layout-v1",
+            "policy_version": "benchmark-v1",
+            "site_id": "paired-corridors"
+          }
+        },
+        {
+          "id": "robot-C:18:1:0:STOP:a1afdd6fc1fb2e1d53e5987651427c8eadece936615373be5ad5feccf07002ec:robot-C",
+          "status": "excluded",
+          "reason": "map_version_mismatch",
+          "source_robot_id": "robot-C",
+          "age_s": 0,
+          "context": {
+            "capability_profile_version": "graph-amr-v1",
+            "map_version": "layout-v1",
+            "policy_version": "benchmark-v1",
+            "site_id": "paired-corridors"
+          }
+        }
+      ],
+      "model_calls": 0
+    },
+    {
+      "completed": true,
+      "modeled_time_s": 38.8,
+      "distance_m": 8,
+      "restricted_edges": 0,
+      "route": [
+        [
+          0,
+          0
+        ],
+        [
+          1,
+          0
+        ],
+        [
+          2,
+          0
+        ]
+      ],
+      "seed": 19,
+      "condition": "disabled",
+      "queue_s": 22.8,
+      "acquisition_queue_s": 22.8,
+      "acquisition_sources": [
+        "robot-A",
+        "robot-C"
+      ],
+      "accepted_experiences": 0,
+      "excluded_experiences": 0,
+      "quarantine": 0,
+      "retrieval": [
+        {
+          "id": "robot-A:19:1:0:STOP:a1afdd6fc1fb2e1d53e5987651427c8eadece936615373be5ad5feccf07002ec:robot-A",
+          "status": "accepted",
+          "reason": null,
+          "source_robot_id": "robot-A",
+          "age_s": 0,
+          "context": {
+            "capability_profile_version": "graph-amr-v1",
+            "map_version": "layout-v1",
+            "policy_version": "benchmark-v1",
+            "site_id": "paired-corridors"
+          },
+          "source_share_limit": 0.5
+        },
+        {
+          "id": "robot-C:19:1:0:STOP:a1afdd6fc1fb2e1d53e5987651427c8eadece936615373be5ad5feccf07002ec:robot-C",
+          "status": "accepted",
+          "reason": null,
+          "source_robot_id": "robot-C",
+          "age_s": 0,
+          "context": {
+            "capability_profile_version": "graph-amr-v1",
+            "map_version": "layout-v1",
+            "policy_version": "benchmark-v1",
+            "site_id": "paired-corridors"
+          },
+          "source_share_limit": 0.5
+        }
+      ],
+      "model_calls": 0
+    },
+    {
+      "completed": true,
+      "modeled_time_s": 24.0,
+      "distance_m": 12,
+      "restricted_edges": 0,
+      "route": [
+        [
+          0,
+          0
+        ],
+        [
+          1,
+          1
+        ],
+        [
+          2,
+          0
+        ]
+      ],
+      "seed": 19,
+      "condition": "shared",
+      "queue_s": 22.8,
+      "acquisition_queue_s": 22.8,
+      "acquisition_sources": [
+        "robot-A",
+        "robot-C"
+      ],
+      "accepted_experiences": 2,
+      "excluded_experiences": 0,
+      "quarantine": 0,
+      "retrieval": [
+        {
+          "id": "robot-A:19:1:0:STOP:a1afdd6fc1fb2e1d53e5987651427c8eadece936615373be5ad5feccf07002ec:robot-A",
+          "status": "accepted",
+          "reason": null,
+          "source_robot_id": "robot-A",
+          "age_s": 0,
+          "context": {
+            "capability_profile_version": "graph-amr-v1",
+            "map_version": "layout-v1",
+            "policy_version": "benchmark-v1",
+            "site_id": "paired-corridors"
+          },
+          "source_share_limit": 0.5
+        },
+        {
+          "id": "robot-C:19:1:0:STOP:a1afdd6fc1fb2e1d53e5987651427c8eadece936615373be5ad5feccf07002ec:robot-C",
+          "status": "accepted",
+          "reason": null,
+          "source_robot_id": "robot-C",
+          "age_s": 0,
+          "context": {
+            "capability_profile_version": "graph-amr-v1",
+            "map_version": "layout-v1",
+            "policy_version": "benchmark-v1",
+            "site_id": "paired-corridors"
+          },
+          "source_share_limit": 0.5
+        }
+      ],
+      "model_calls": 0
+    },
+    {
+      "completed": true,
+      "modeled_time_s": 24.0,
+      "distance_m": 12,
+      "restricted_edges": 0,
+      "route": [
+        [
+          0,
+          0
+        ],
+        [
+          1,
+          1
+        ],
+        [
+          2,
+          0
+        ]
+      ],
+      "seed": 19,
+      "condition": "stale",
+      "queue_s": 22.8,
+      "acquisition_queue_s": 22.8,
+      "acquisition_sources": [
+        "robot-A",
+        "robot-C"
+      ],
+      "accepted_experiences": 0,
+      "excluded_experiences": 2,
+      "quarantine": 0,
+      "retrieval": [
+        {
+          "id": "robot-A:19:1:0:STOP:a1afdd6fc1fb2e1d53e5987651427c8eadece936615373be5ad5feccf07002ec:robot-A",
+          "status": "excluded",
+          "reason": "map_version_mismatch",
+          "source_robot_id": "robot-A",
+          "age_s": 0,
+          "context": {
+            "capability_profile_version": "graph-amr-v1",
+            "map_version": "layout-v1",
+            "policy_version": "benchmark-v1",
+            "site_id": "paired-corridors"
+          }
+        },
+        {
+          "id": "robot-C:19:1:0:STOP:a1afdd6fc1fb2e1d53e5987651427c8eadece936615373be5ad5feccf07002ec:robot-C",
+          "status": "excluded",
+          "reason": "map_version_mismatch",
+          "source_robot_id": "robot-C",
+          "age_s": 0,
+          "context": {
+            "capability_profile_version": "graph-amr-v1",
+            "map_version": "layout-v1",
+            "policy_version": "benchmark-v1",
+            "site_id": "paired-corridors"
+          }
+        }
+      ],
+      "model_calls": 0
+    }
+  ]
+}

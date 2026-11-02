@@ -23,7 +23,9 @@ def memory(tmp_path):
 
 def _record(mem, **kwargs):
     args = {"context": CONTEXT, "source_robot_id": "robot-A", **kwargs}
-    return mem.record("run-A", [((10, 7), 4.0, "STOP")], **args)
+    result = mem.record("run-A", [((10, 7), 4.0, "STOP")], **args)
+    mem.record('corroboration', [((10, 7), 4.0, 'STOP')], **dict(args, source_robot_id='robot-peer'))
+    return result
 
 
 @pytest.mark.parametrize("field", list(CONTEXT))
@@ -44,7 +46,7 @@ def test_compatible_robots_share_experience_and_writes_are_idempotent(memory):
     assert _record(mem) == 0
     assert _record(mem, source_robot_id="robot-B") == 1
     assert mem.load(context=CONTEXT)[0] == {(10, 7): 4.0}
-    assert {d["source_robot_id"] for d in mem.last_retrieval} == {"robot-A", "robot-B"}
+    assert {d["source_robot_id"] for d in mem.last_retrieval} == {"robot-A", "robot-B", "robot-peer"}
 
 
 def test_missing_context_fails_closed(memory):
@@ -83,9 +85,10 @@ def test_signed_context_tampering_is_quarantined(memory, field):
     _record(mem)
     conn = sqlite3.connect(mem.db_path)
     with conn:
-        metadata = json.loads(conn.execute("SELECT metadata FROM experience_context").fetchone()[0])
+        ident, raw = conn.execute("SELECT id,metadata FROM experience_context").fetchone()
+        metadata = json.loads(raw)
         metadata["context"][field] = "forged"
-        conn.execute("UPDATE experience_context SET metadata=?", (json.dumps(metadata),))
+        conn.execute("UPDATE experience_context SET metadata=? WHERE id=?", (json.dumps(metadata), ident))
     conn.close()
     costs, quarantined = mem.load(context=CONTEXT)
     assert costs == {} and len(quarantined) == 1
@@ -104,7 +107,7 @@ def test_invalidation_is_durable_idempotent_and_visible_to_other_instances(memor
     assert other.last_retrieval[0]["reason"] == "invalidated:layout-change-1"
     restarted = RouteMemory(mem.db_path, SECRET, clock=lambda: now[0])
     assert restarted.load(context=CONTEXT)[0] == {}
-    assert restarted.status(context=CONTEXT)["records"] == 1
+    assert restarted.status(context=CONTEXT)["records"] == 2
     # Fresh records under the same invalidated generation cannot restore reuse.
     _record(mem, source_robot_id="robot-C")
     assert mem.load(context=CONTEXT)[0] == {}
@@ -141,6 +144,11 @@ def test_postrun_learning_uses_original_decision_time_and_context(memory):
                 proposal_intent="MOVE_TO", proposal_json="{}",
                 telemetry_summary=json.dumps(dict(telemetry, x=5.2, y=3.5)),
                 was_executed="false", escalated="false", policy_version=CONTEXT["policy_version"]))
+        db.commit()
+        from app.services.governance_engine import GovernanceEngine
+        from app.utils import signing
+        for decision in db.query(GovernanceDecisionRecord).filter(GovernanceDecisionRecord.run_id.like('context-capture-%')).all():
+            decision.signature, decision.signing_key_id = signing.sign(GovernanceEngine.signing_payload(decision))
         db.commit()
         assert mem.record_run(db, "context-capture-known") == 1
         assert mem.record_run(db, "context-capture-legacy") == 0

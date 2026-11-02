@@ -79,6 +79,16 @@ class EnvironmentLifecycle:
         return event if inserted else None
 
     def observe(self, state: dict, policy_version: str) -> list[dict]:
+        from app.services.memory_ledger import MemoryIntegrityError
+        try:
+            return self._observe(state, policy_version)
+        except MemoryIntegrityError as exc:
+            # Memory corruption disables reuse; it must not hide fresh telemetry
+            # from the independent stop/permit/controller checks.
+            self.memory.integrity_error = str(exc)
+            return []
+
+    def _observe(self, state: dict, policy_version: str) -> list[dict]:
         current = context_from_state(state, policy_version)
         if not current or not self.memory.enabled:
             return []

@@ -124,6 +124,22 @@ async function until(fn, description, timeout = 45000) {
     await until(async () => (await (await request.get(`${base}/api/runs/${runId}`)).json()).status === 'running', 'operator resume');
     report.steps.push('Pause, kill, refused resume, authenticated reset and UI resume match API/controller state');
 
+    await request.post(`${base}/api/runs/${runId}/stop`, { headers });
+    await page.goto(`${base}/authority`);
+    await page.getByTestId('experience-checks').waitFor();
+    const drillReply = page.waitForResponse(r => r.url().endsWith('/api/authority/drills') && r.request().method() === 'POST');
+    await page.getByRole('button', { name: 'Run all drills', exact: true }).click();
+    const drillResponse = await drillReply;
+    assert.equal(drillResponse.status(), 200);
+    const drillResult = await drillResponse.json();
+    assert.equal(drillResult.all_passed, true, JSON.stringify(drillResult));
+    report.poisoning = drillResult.results.find(r => r.drill === 'poisoning');
+    assert.equal(report.poisoning.passed, true);
+    assert.equal(report.poisoning.checks.length, 7);
+    await page.getByText('PASS · mild flood cannot dilute stop', { exact: true }).waitFor();
+    await page.screenshot({ path: path.join(out, 'poisoning-drill.png'), fullPage: true });
+    report.steps.push('Authority UI runs real security drills and displays all seven poisoning sub-checks');
+
     // Force a real WebGL initialization failure, without adding a product test hook.
     const fallbackContext = await browser.newContext();
     await fallbackContext.addInitScript(() => {
