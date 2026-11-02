@@ -186,6 +186,10 @@ class TrafficWorld(World):
             if len(actor.route) < 2:
                 actor.activity = "standing"
                 continue
+            if getattr(actor, "resume_route", None) and actor.idx + 1 >= len(actor.route):
+                # Back where its circuit starts after turning back: carry on with the normal route
+                actor.route, actor.idx = actor.resume_route, 0
+                del actor.resume_route
             previous = vars(actor).copy()
             origin = actor.pos
             actor.step(self.t, dt, (self.robot.x, self.robot.y))
@@ -225,6 +229,20 @@ class TrafficWorld(World):
                 actor.actual_speed = 0.0   # waiting means standing still (the restore kept the old speed)
                 actor.activity = reason
                 actor.traffic_wait_s = getattr(actor, "traffic_wait_s", 0) + dt
+                # Standoffs (two people face to face, a forklift and a person each giving way):
+                # after a while one side turns back along the path it came by, as people and
+                # drivers do. People give up after 6-10 s, staggered by name so one usually goes
+                # first; a driver after 6 s. Retracing its own path is always clear of structure.
+                give_up = 6.0 + (sum(map(ord, actor.name)) % 5 if actor.kind == "person" else 0)
+                if (reason in ("waiting_for_person", "waiting_for_forklift")
+                        and actor.traffic_wait_s > give_up and actor.pos != actor.route[0]):
+                    if not hasattr(actor, "resume_route"):
+                        actor.resume_route = list(actor.route)   # its normal circuit, resumed at the start
+                    actor.route = [actor.pos] + list(reversed(actor.route[: actor.idx + 1]))
+                    actor.idx, actor.traffic_wait_s, actor.pause_until = 0, 0.0, 0.0
+                    actor.activity = "turning_back"
+                    sweeps[id(actor)] = (origin, actor.pos)
+                    continue
                 stopped_traffic = all(getattr(v, "actual_speed", 0) < 0.05 for v in self.vehicles())
                 if actor.kind == "person" and actor.traffic_wait_s >= 1.5 and (reason != "waiting_for_forklift" or stopped_traffic):
                     extra = [*static, Circle(self.robot.x, self.robot.y, ROBOT_R)]
