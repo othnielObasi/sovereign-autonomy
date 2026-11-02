@@ -10,7 +10,7 @@ const API_BASE = process.env.NEXT_PUBLIC_API_BASE || "/api";
 // Six destinations. /demo (guided demo) is reached from the Overview page;
 // /compliance and /audit live under Evidence.
 const links = [
-  { href: "/", label: "Overview", match: (p: string) => p === "/" || p.startsWith("/demo") },
+  { href: "/overview", label: "Overview", match: (p: string) => p.startsWith("/overview") || p.startsWith("/demo") },
   { href: "/missions", label: "Missions", match: (p: string) => p.startsWith("/missions") },
   { href: "/runs", label: "Runs", match: (p: string) => p.startsWith("/runs") },
   { href: "/policies", label: "Governance", match: (p: string) => p.startsWith("/policies") },

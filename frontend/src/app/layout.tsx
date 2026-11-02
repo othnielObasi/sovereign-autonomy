@@ -15,7 +15,7 @@ export const metadata = {
 
 function Logo() {
   return (
-    <Link href="/" className="flex items-center gap-2.5 shrink-0" aria-label="Sovereign Autonomy home">
+    <Link href="/overview" className="flex items-center gap-2.5 shrink-0" aria-label="Sovereign Autonomy overview">
       <span className="relative w-8 h-8 rounded-lg bg-mc-raise border border-mc-accent/40 flex items-center justify-center">
         {/* gate mark: a path through a checkpoint */}
         <svg viewBox="0 0 24 24" className="w-5 h-5" fill="none" stroke="#22d3ee" strokeWidth={2} strokeLinecap="round">
