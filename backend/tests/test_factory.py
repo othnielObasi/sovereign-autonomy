@@ -100,7 +100,7 @@ def test_live_simulator_runs_the_factory(factory_sim):
     assert png.status_code == 200 and png.content[:4] == b"\x89PNG"
 
 
-def test_permitted_move_on_the_factory_floor(factory_sim, tmp_path):
+def test_permitted_move_on_the_factory_floor(factory_sim, tmp_path, bind_redemption):
     from app.services.execution_authority import ExecutionAuthority
     from app.services.sim_adapter import SimAdapter
     server, _ = factory_sim
@@ -108,6 +108,8 @@ def test_permitted_move_on_the_factory_floor(factory_sim, tmp_path):
     adapter = SimAdapter(base_url="http://sim")
     adapter._client = httpx.AsyncClient(transport=httpx.ASGITransport(app=server.app), base_url="http://sim")
     authority = ExecutionAuthority(secret=SECRET, db_path=str(tmp_path / "f.db"))
+    bind_redemption(server, authority)
+    from app.policies.versioning import policy_version_hash
 
     async def go():
         tel = await adapter.get_telemetry()
@@ -115,7 +117,7 @@ def test_permitted_move_on_the_factory_floor(factory_sim, tmp_path):
         authority.observe(tel)
         action, token = authority.authorize(run_id="f", mission_id="mf", intent="MOVE_TO",
                                             params={"x": 9.0, "y": 3.5, "max_speed": 0.3},
-                                            decision="APPROVED", policy_version="v")
+                                            decision="APPROVED", policy_version=policy_version_hash())
         return await authority.dispatch("f", action, token, adapter), await adapter.get_telemetry()
 
     result, tel = asyncio.run(go())

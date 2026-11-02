@@ -109,6 +109,9 @@ Check every Meta model with `cd backend && python ../scripts/check_meta.py`.
 | `AUTH_REQUIRED`        | `true` in production, else `false` | Enforce authentication            |
 | `CORS_ORIGINS`         | `http://localhost:3000`         | Allowed CORS origins (comma-separated) |
 | `SIM_BASE_URL`         | `http://localhost:8090`         | Simulator endpoint                   |
+| `AUTHORITY_BASE_URL`   | `http://127.0.0.1:8080`        | Simulator's callback to backend; Compose sets `http://backend:8080` |
+| `SIM_REDEEM_TIMEOUT_S` | `1.0`                         | Simulator admission callback timeout, greater than zero and at most 2 s |
+| `SIM_STATE_DB`         | `data/controller.db`          | Persistent controller admissions, e-stops and used release tokens |
 | `NEXT_PUBLIC_API_BASE` | `/api`                          | Frontend → backend API prefix        |
 | `BACKEND_URL`          | `http://localhost:8080`         | Where the Next.js dev server proxies `/api` |
 | `SIM_TICK_HZ`          | `10`                            | Simulator physics rate               |

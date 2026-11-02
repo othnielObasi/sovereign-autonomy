@@ -95,6 +95,8 @@ class RunService:
 
         # --- Plan state (keyed by run_id) ---
         self._plans: Dict[str, List[Dict[str, Any]]] = {}  # ordered waypoint queue
+        self._plan_contexts: Dict[str, Any] = {}
+        self._environment_holds: set[str] = set()
         self._plans_lock = asyncio.Lock()  # protects concurrent reads/writes to _plans
 
         # --- Stagnation detection ---
@@ -516,6 +518,41 @@ class RunService:
     MAX_CONSECUTIVE_TICK_ERRORS = 5
     AGENT_PROPOSAL_TIMEOUT = 15  # seconds
 
+    async def _refresh_environment_plan(self, db, run_id, telemetry, goal):
+        """Stop and replace an obsolete plan before evaluating any new move."""
+        from app.autonomy.experience import context_from_state, context_from_world
+        from app.policies.versioning import policy_version_hash
+        from app.services.environment_lifecycle import constraints_key, get_lifecycle
+        from app.services.site_router import route_plan, last_route_info
+        context = context_from_state(telemetry, policy_version_hash())
+        if context is None:
+            return False
+        changes = get_lifecycle().observe(telemetry, policy_version_hash())
+        signature = {"context": context, "constraints": constraints_key(telemetry)}
+        previous = self._plan_contexts.get(run_id)
+        if previous == signature and run_id not in self._environment_holds:
+            return False
+        await self.sim_for(run_id).send_command({"intent": "STOP", "params": {}})
+        world = await self.sim_for(run_id).get_world()
+        if context_from_world(world, policy_version_hash()) != context:
+            raise Rejected("environment_changed_during_replan")
+        waypoints = route_plan(world, telemetry, goal, ZONE_SPEED_LIMITS, hazards=telemetry.get("site_constraints"))
+        was_holding = run_id in self._environment_holds
+        self._plans[run_id] = waypoints or []
+        self._plan_contexts[run_id] = signature
+        if waypoints:
+            self._environment_holds.discard(run_id)
+        else:
+            self._environment_holds.add(run_id)
+        if previous != signature or (was_holding and waypoints):
+            self._append_event(db, run_id, "ENVIRONMENT_CHANGE", {
+                "previous": previous, "current": signature,
+                "action": "replanned" if waypoints else "holding_no_route", "waypoints": len(waypoints or []),
+                "changes": [c["id"] for c in changes], "reason": "Environment assumptions changed; old plan discarded",
+            })
+            self._append_event(db, run_id, "EXPERIENCE_RETRIEVAL", dict(last_route_info))
+        return True
+
     async def _execute_permitted(self, db: Session, run_id: str, mission_id: str,
                                  intent: str, params: Dict[str, Any]) -> Dict[str, Any]:
         """Send an APPROVED command. A MOVE_TO only goes out with a single-use permit
@@ -672,6 +709,9 @@ class RunService:
                         logger.warning("Run %s: vision step failed: %s", run_id, vis_err)
 
                     # --- Anti-spoofing: validate telemetry plausibility ---
+                    if await self._refresh_environment_plan(db, run_id, telemetry, goal):
+                        await asyncio.sleep(0.2)
+                        continue
                     if run_id not in self._tel_validators:
                         self._tel_validators[run_id] = TelemetryValidator(run_id)
                     tv_result = self._tel_validators[run_id].validate(telemetry)
@@ -892,6 +932,9 @@ class RunService:
                             telemetry.update(await self.sim_for(run_id).get_telemetry())
                         except Exception as fresh_err:
                             logger.warning("Run %s: telemetry refresh failed: %s", run_id, fresh_err)
+                    if await self._refresh_environment_plan(db, run_id, telemetry, goal):
+                        await asyncio.sleep(0.2)
+                        continue
                     authority.observe(telemetry, robot_id=self.robot_for(run_id))
 
                     # Governance evaluates and persists decision
@@ -1429,3 +1472,5 @@ class RunService:
         self._executed_paths.pop(run_id, None)
         self._last_positions.pop(run_id, None)
         self._stagnant_counts.pop(run_id, None)
+        self._plan_contexts.pop(run_id, None)
+        self._environment_holds.discard(run_id)

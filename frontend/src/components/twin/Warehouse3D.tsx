@@ -378,7 +378,12 @@ function WarehouseEnvironment() {
   const [file, setFile] = useState<string | null>(null);
   useEffect(() => {
     let ok = true;
-    import("@pmndrs/assets/hdri/warehouse.exr").then((m) => ok && setFile(m.default)).catch(() => {});
+    // Optional IBL must not make the locally bundled scene depend on a CDN.
+    // Remote presets retain the existing local hemisphere/directional lights.
+    import("@pmndrs/assets/hdri/warehouse.exr").then((m) => {
+      const url = new URL(m.default, window.location.href);
+      if (ok && url.origin === window.location.origin) setFile(url.href);
+    }).catch(() => {});
     return () => {
       ok = false;
     };

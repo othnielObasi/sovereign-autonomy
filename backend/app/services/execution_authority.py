@@ -18,6 +18,7 @@ import os
 import sqlite3
 import threading
 import time
+import uuid
 from typing import Any, Dict, List, Optional
 
 from app.autonomy import permit as wire
@@ -82,7 +83,7 @@ class ExecutionAuthority:
         self.db_path = db_path or settings.authority_db_path
         os.makedirs(os.path.dirname(os.path.abspath(self.db_path)), exist_ok=True)
         self.world = WorldState(max_age_s=settings.world_max_age_s if max_age_s is None else max_age_s)
-        self.kills = KillSwitch()
+        self.kills = KillSwitch(self.db_path)
         self.checkpoints = CheckpointStore(self.db_path)
         self.permits = PermitStore(self.db_path, self.secret, self.kills, self.world) if self.enabled else None
         self.evidence = EvidenceLog()
@@ -93,7 +94,13 @@ class ExecutionAuthority:
         self._watchdogs: Dict[str, Watchdog] = {}
         self.reservations = CorridorReservations()
         self._mission_robot: Dict[str, str] = {}
-        self._init_kill_table()
+        conn = self._db()
+        try:
+            with conn:
+                conn.execute("CREATE TABLE IF NOT EXISTS mission_robots (mission TEXT PRIMARY KEY, robot TEXT NOT NULL)")
+            self._mission_robot.update(conn.execute("SELECT mission,robot FROM mission_robots").fetchall())
+        finally:
+            conn.close()
         if not self.enabled:
             logger.warning("PERMIT_SECRET is not set (32+ characters): no move can be authorized")
 
@@ -103,18 +110,6 @@ class ExecutionAuthority:
         conn = sqlite3.connect(self.db_path, timeout=10)
         conn.execute("PRAGMA busy_timeout=10000")
         return conn
-
-    def _init_kill_table(self) -> None:
-        conn = self._db()
-        try:
-            with conn:
-                conn.execute("CREATE TABLE IF NOT EXISTS kill_locks (scope TEXT, ident TEXT, reason TEXT, "
-                             "actor TEXT, ts REAL, PRIMARY KEY (scope, ident))")
-            rows = conn.execute("SELECT scope, ident FROM kill_locks").fetchall()
-        finally:
-            conn.close()
-        for scope, ident in rows:
-            self.kills.activate(scope, ident)   # survive restarts: a lock is only lifted by reset
 
     def kill_locks(self) -> List[Dict[str, Any]]:
         conn = self._db()
@@ -129,6 +124,9 @@ class ExecutionAuthority:
     def observe(self, telemetry: Dict[str, Any], robot_id: Optional[str] = None) -> int:
         """Record fresh telemetry for one robot; returns the new world version."""
         rid = robot_id or telemetry.get("robot_id") or self.robot_id
+        from app.services.environment_lifecycle import get_lifecycle
+        from app.policies.versioning import policy_version_hash
+        get_lifecycle().observe(dict(telemetry, robot_id=rid), policy_version_hash())
         with self._lock:
             self._version += 1
             version = self._version
@@ -162,6 +160,12 @@ class ExecutionAuthority:
         if version is None:
             raise Rejected("no_world_state")
         self._mission_robot[mission_id] = rid
+        conn = self._db()
+        try:
+            with conn:
+                conn.execute("INSERT OR REPLACE INTO mission_robots VALUES (?,?)", (mission_id, rid))
+        finally:
+            conn.close()
         if intent == "MOVE_TO":
             state = self.world.require(rid, version)
             self._check_path(state, params or {})
@@ -169,12 +173,44 @@ class ExecutionAuthority:
         with self._lock:
             self._seq += 1
             seq = self._seq
-        action = Action(rid, mission_id, f"{run_id}:{seq}:{int(time.time() * 1000)}",
+        action = Action(rid, mission_id, f"{run_id}:{seq}:{uuid.uuid4().hex}",
                         intent, dict(params or {}), version, policy_version or "")
         token = self.permits.issue(action, approved=(decision == "APPROVED"),
-                                   ttl_s=settings.permit_ttl_s, agent_id=agent_id)
+                                   ttl_s=settings.permit_ttl_s, agent_id=agent_id,
+                                   controller=wire.controller_context(self.world.require(rid, version)))
         metrics.inc("permits_issued_total")
         return action, token
+
+    def redeem(self, request: str) -> str:
+        """Authenticated controller callback. Never calls back into the simulator.
+
+        A valid signature alone cannot bypass dispatch budgets or checkpoints:
+        only a prepared, IN_DOUBT action can spend its permit at admission.
+        """
+        if not self.enabled:
+            raise Rejected("permit_secret_not_configured")
+        try:
+            incoming = wire.verify_redemption_request(self.secret, request)
+            action = Action(**incoming["action"])
+            permit = wire.verify_for_action(self.secret, incoming["permit"], action.as_dict())
+        except (wire.PermitError, TypeError, ValueError) as exc:
+            raise Rejected(str(exc)) from exc
+        if permit.get("controller") != incoming["controller"]:
+            raise Rejected("controller_context_mismatch")
+        from app.policies.params import admission_policy
+        with admission_policy() as current_policy:
+            if action.policy_version != current_policy:
+                raise Rejected("policy_version_changed")
+            # Check revocation before pending-action status, so killed actions
+            # fail even if never delivered through dispatch.
+            self.permits.validate(incoming["permit"], action)
+            stored = self.checkpoints.action(action.action_id)
+            if stored != action or self.checkpoints.status(action.action_id) != "IN_DOUBT":
+                raise Rejected("action_not_pending_dispatch")
+            payload = self.permits.consume(incoming["permit"], action)
+        self.evidence.emit("permit_redeemed", action.mission_id, action.action_id, permit_id=payload["id"])
+        metrics.inc("permit_redemptions_total", outcome="accepted")
+        return wire.redemption_response(self.secret, request, min(payload["expires"], incoming["expires"]))
 
     def authorize_or_count(self, **kw) -> tuple[Action, str]:
         """authorize(), counting refusals by reason for /metrics."""
@@ -230,20 +266,36 @@ class ExecutionAuthority:
         if isinstance(result, dict) and result.get("rejected"):
             # The controller refused it: verified not executed
             self.checkpoints.reconcile(action.action_id, controller_verified=True, executed=False)
+            try:
+                await sim.send_command({"intent": "STOP", "params": {}, "robot_id": action.robot_id})
+            except Exception:
+                logger.warning("Could not send containment stop for refused action %s", action.action_id)
         elif isinstance(result, dict) and (result.get("ok") or result.get("ack")):
             self.checkpoints.reconcile(action.action_id, controller_verified=True, executed=True)
         return result
 
     def reconcile_in_doubt(self, mission_id: str, telemetry: Dict[str, Any]) -> List[Dict[str, Any]]:
-        """Settle actions whose outcome was lost, using the controller's reported target.
+        """Settle lost outcomes from durable controller admission evidence.
 
-        A MOVE_TO counts as accepted only if the controller is now heading to exactly
-        that target; nothing is retried here."""
+        Unspent permits are retired before declaring a command unsent; spent
+        permits without evidence remain IN_DOUBT. Legacy controller test adapters
+        without boot identity retain target matching; nothing is retried here.
+        """
         settled = []
         target = telemetry.get("target") or None
         for action_id in self.checkpoints.in_doubt(mission_id):
             action = self.checkpoints.action(action_id)
             executed = False
+            if action and telemetry.get("boot_id"):
+                if action_id in (telemetry.get("accepted_actions") or []):
+                    executed = True
+                elif self.permits and self.permits.retire(action):
+                    executed = False
+                else:
+                    raise Rejected("controller_admission_unknown_cannot_reconcile")
+                self.checkpoints.reconcile(action_id, controller_verified=True, executed=executed)
+                settled.append({"action_id": action_id, "executed": executed})
+                continue
             if action and action.kind == "MOVE_TO" and isinstance(target, dict):
                 try:
                     executed = math.hypot(float(target["x"]) - float(action.params["x"]),
@@ -260,14 +312,7 @@ class ExecutionAuthority:
         """Revoke authority now; stop the robot at the controller and measure the stop."""
         t0 = time.monotonic()
         ident = "*" if scope == "global" else ident
-        self.kills.activate(scope, ident)
-        conn = self._db()
-        try:
-            with conn:
-                conn.execute("INSERT OR REPLACE INTO kill_locks VALUES (?,?,?,?,?)",
-                             (scope, ident, reason, actor or "anonymous", time.time()))
-        finally:
-            conn.close()
+        self.kills.activate(scope, ident, reason=reason, actor=actor or "anonymous")
         revoked_ms = (time.monotonic() - t0) * 1000
 
         controller: Dict[str, Any] = {}
@@ -279,6 +324,12 @@ class ExecutionAuthority:
             robots = [self._mission_robot.get(ident, self.robot_id)]
         else:   # agent: stop every robot it may have been driving
             robots = self.robots()
+        if scope in ("global", "agent"):
+            try:
+                fleet = await sim.get_fleet()
+                robots = sorted({r["robot_id"] for r in fleet["robots"]}) or robots
+            except Exception:
+                pass  # durable mission/robot bindings remain the fallback
         try:
             if scope == "global":
                 controller = await sim.estop(engaged=True, reason=reason)
@@ -310,7 +361,7 @@ class ExecutionAuthority:
             for rid in pending:
                 try:
                     tel = await (sim.get_telemetry(robot_id=rid) if rid != self.robot_id else sim.get_telemetry())
-                    if not (abs(float(tel.get("speed", 0.0))) < 0.02 and not tel.get("target")):
+                    if not ("speed" in tel and "target" in tel and abs(float(tel["speed"])) < 0.02 and not tel["target"]):
                         still.append(rid)
                 except Exception:
                     still.append(rid)
@@ -324,12 +375,6 @@ class ExecutionAuthority:
         """Lift one lock (caller must be an authenticated operator). Old permits stay void."""
         ident = "*" if scope == "global" else ident
         self.kills.reset(scope, ident, authorized=bool(actor))
-        conn = self._db()
-        try:
-            with conn:
-                conn.execute("DELETE FROM kill_locks WHERE scope=? AND ident=?", (scope, ident))
-        finally:
-            conn.close()
         controller: Dict[str, Any] = {}
         active = self.kills.active()
         if scope == "global":

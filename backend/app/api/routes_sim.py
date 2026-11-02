@@ -12,6 +12,7 @@ from app.db.models import Run, Mission
 from app.schemas.sim import SimWorld, PathPreview, Point
 from app.services.sim_adapter import SimAdapter
 from app.services.path_planner import plan_path
+from app.auth.roles import OPERATOR
 
 router = APIRouter()
 sim = SimAdapter()
@@ -114,7 +115,7 @@ class SeedIn(BaseModel):
 
 
 @router.post("/sim/seed")
-async def load_seed(body: SeedIn):
+async def load_seed(body: SeedIn, user=Depends(OPERATOR)):
     """Replay a benchmark scenario exactly (mode=benchmark) or load another live site (mode=live)."""
     try:
         return await sim.load_seed(body.seed, body.mode)
@@ -133,7 +134,7 @@ async def list_bays():
 
 
 @router.post("/sim/scenario")
-async def trigger_scenario(body: ScenarioIn):
+async def trigger_scenario(body: ScenarioIn, user=Depends(OPERATOR)):
     """Inject a deterministic scenario into the simulator for demo purposes.
 
     Valid scenarios: human_approach, human_too_close, path_blocked, clear.

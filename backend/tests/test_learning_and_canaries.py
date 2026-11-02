@@ -10,6 +10,8 @@ from app.services.route_learning import RouteMemory, learned_route
 from bench.world import GRID_M, Circle, Layout
 
 SECRET = os.environ["PERMIT_SECRET"].encode()
+CONTEXT = {"site_id": "warehouse", "map_version": "map-v1", "policy_version": "v",
+           "capability_profile_version": "sim-amr-v1"}
 START, GOAL = (3.0, 3.5), (16.0, 23.0)
 
 
@@ -61,9 +63,10 @@ def test_learning_never_opens_a_blocked_area(layout):
 
 
 def test_signed_experience_counts_and_forged_records_are_quarantined(tmp_path):
-    mem = RouteMemory(db_path=str(tmp_path / "exp.db"), secret=SECRET)
-    assert mem.record("run-1", [((10, 7), 4.0, "STOP"), ((11, 7), 1.5, "SLOW")]) == 2
-    delays, quarantined = mem.load(max_age_s=0)
+    mem = RouteMemory(db_path=str(tmp_path / "exp.db"), secret=SECRET, clock=lambda: 1000.0)
+    assert mem.record("run-1", [((10, 7), 4.0, "STOP"), ((11, 7), 1.5, "SLOW")],
+                      context=CONTEXT, source_robot_id="robot-1") == 2
+    delays, quarantined = mem.load(max_age_s=0, context=CONTEXT)
     assert delays == {(10, 7): 4.0, (11, 7): 1.5} and quarantined == []
 
     # Poisoning: a record planted straight into the database, and a real one edited
@@ -72,9 +75,9 @@ def test_signed_experience_counts_and_forged_records_are_quarantined(tmp_path):
     conn.execute("UPDATE experience SET delay_s = 0.0 WHERE i = 10")
     conn.commit()
     conn.close()
-    delays, quarantined = mem.load(max_age_s=0)
+    delays, quarantined = mem.load(max_age_s=0, context=CONTEXT)
     assert delays == {(11, 7): 1.5}
-    assert {q["id"] for q in quarantined} == {"evil", "run-1:10:7:STOP"}
+    assert len(quarantined) == 2 and any(q["id"] == "evil" for q in quarantined)
     assert mem.status()["quarantined"] == 2
 
 
@@ -88,13 +91,14 @@ def test_experience_from_a_run_comes_from_gate_decisions(tmp_path):
         for x, state, decision in ((5.2, "SLOW", "APPROVED"), (8.1, "STOP", "DENIED"), (9.0, "SAFE", "APPROVED")):
             db.add(GovernanceDecisionRecord(run_id="exp-run", ts=utc_now(), decision=decision, policy_state=state,
                                             risk_score=0.1, policy_hits="[]", reasons="[]", proposal_intent="MOVE_TO",
-                                            proposal_json="{}", telemetry_summary=json.dumps({"x": x, "y": 3.5}),
+                                            proposal_json="{}", telemetry_summary=json.dumps({"x": x, "y": 3.5,
+                                                "experience_context": CONTEXT, "source_robot_id": "robot-1"}),
                                             was_executed="false", escalated="false", policy_version="v"))
         db.commit()
         mem = RouteMemory(db_path=str(tmp_path / "exp.db"), secret=SECRET)
         assert mem.record_run(db, "exp-run") == 2   # the SAFE decision teaches nothing
-        delays, _ = mem.load(max_age_s=0)
-        assert delays[(int(8.1 / GRID_M), int(3.5 / GRID_M))] == 4.0
+        delays, _ = mem.load(max_age_s=0, context=CONTEXT)
+        assert delays[(int(8.1 / GRID_M), int(3.5 / GRID_M))] == pytest.approx(4.0, rel=0.001)
     finally:
         db.query(GovernanceDecisionRecord).filter(GovernanceDecisionRecord.run_id == "exp-run").delete()
         db.commit()

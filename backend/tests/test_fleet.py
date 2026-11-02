@@ -25,12 +25,16 @@ SECRET = os.environ["PERMIT_SECRET"]
 
 
 @pytest.fixture(scope="module")
-def sim_module():
+def sim_module(tmp_path_factory):
     sim_dir = str(Path(__file__).resolve().parents[2] / "sim" / "warehouse_sim")
     sys.path.insert(0, sim_dir)
     sys.modules.pop("server", None)
     try:
         server = importlib.import_module("server")
+        from app.autonomy.controller import ControllerJournal
+        server._journal = ControllerJournal(str(tmp_path_factory.mktemp("fleet-controller") / "controller.db"))
+        server._estop.update(engaged=False, reason="", since=None)
+        server._robot_estops.clear()
         with TestClient(server.app):
             yield server
     finally:
@@ -51,8 +55,10 @@ def sim(sim_module):
 
 
 @pytest.fixture
-def authority(tmp_path):
-    return ExecutionAuthority(secret=SECRET, db_path=str(tmp_path / "fleet.db"))
+def authority(tmp_path, sim_module, bind_redemption):
+    authority = ExecutionAuthority(secret=SECRET, db_path=str(tmp_path / "fleet.db"))
+    bind_redemption(sim_module, authority)
+    return authority
 
 
 def run(coro):
@@ -60,12 +66,13 @@ def run(coro):
 
 
 async def _issue(authority, view, robot, params, mission="mis-f"):
+    from app.policies.versioning import policy_version_hash
     tel = await view.get_telemetry()
     tel["walking_humans"] = []                 # permits, not pedestrians, are under test here
     tel["obstacles"] = [o for o in tel["obstacles"] if o.get("type") == "robot"]
     authority.observe(tel, robot_id=robot)
     return authority.authorize(run_id=f"run-{robot}", mission_id=mission, intent="MOVE_TO", params=params,
-                               decision="APPROVED", policy_version="v", robot_id=robot)
+                               decision="APPROVED", policy_version=policy_version_hash(), robot_id=robot)
 
 
 # --- the simulator -------------------------------------------------------------------------------

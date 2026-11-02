@@ -44,8 +44,13 @@ services:
     environment:
       SIM_TICK_HZ: "10"
       SIM_SEED: "42"
+      AUTHORITY_BASE_URL: "http://backend:8080"
+      SIM_STATE_DB: "/app/data/controller.db"
       SITE_LAYOUT: "${SITE_LAYOUT:-factory}"
       PERMIT_SECRET: "${PERMIT_SECRET:?Set PERMIT_SECRET (32+ characters) in .env}"
+
+    volumes:
+      - controller_data:/app/data
 
   # The original demo simulator, kept for comparison: docker compose --profile legacy up mock-sim
   mock-sim:
@@ -75,3 +80,4 @@ services:
 volumes:
   postgres_data:
   backend_data:
+  controller_data:

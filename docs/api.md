@@ -279,6 +279,14 @@ Message kinds: `telemetry`, `event`, `alert`.
 
 ## Simulator (port 8090)
 
+### Internal controller redemption
+
+`POST /authority/redeem` is a backend endpoint used only by the controller. Body: `{"request": "<signed envelope>"}`. Success: `{"redemption": "<signed admission response>"}`; refusal: HTTP 403. Operator JWTs do not authorize redemption. Requests are HMAC-authenticated with `PERMIT_SECRET`, short-lived, and bound to the permit, exact action and controller context. The response is bound to that exact request and expires within one second (or earlier with the request/permit).
+
+Dispatch validates and journals an action as pending but does not spend the permit. Redemption checks the active policy, current fresh world version, persisted authority epoch/kill locks, pending action and unused permit before atomically spending it. The controller checks the signed reply and its local generation again before admitting the command. This endpoint is excluded from the general per-IP dashboard rate limiter and has no model calls.
+
+Simulator telemetry now includes `boot_id`, `generation`, and the latest 200 `accepted_actions` for that robot, backed by the controller journal. Admission is not physical waypoint completion. A redeemed command with no controller evidence remains uncertain and cannot automatically resume; no matching target alone is used as proof for this protocol.
+
 The warehouse simulator ([`sim/warehouse_sim`](../sim/warehouse_sim/server.py)). When `SIM_TOKEN` is set, every call except `/health` needs the `X-Sim-Token` header.
 
 | Method | Endpoint | Description |

@@ -71,12 +71,13 @@ docker compose up -d
 Run each from the repository root, in its own terminal.
 
 ```bash
+# 0. Set the SAME value in the backend and simulator terminals before starting either.
+export PERMIT_SECRET=$(python -c "import secrets; print(secrets.token_hex(32))")
+
 # 1. Warehouse simulator (shares its engine with the benchmark in backend/bench)
 pip install -r sim/warehouse_sim/requirements.txt
+export AUTHORITY_BASE_URL="http://127.0.0.1:8080"
 PYTHONPATH=backend uvicorn server:app --app-dir sim/warehouse_sim --host 0.0.0.0 --port 8090
-
-# 0. Both processes need the same permit secret (nothing moves without it)
-export PERMIT_SECRET=$(python -c "import secrets; print(secrets.token_hex(32))")
 
 # 2. Backend
 cd backend && pip install -e ".[dev]"
@@ -86,6 +87,8 @@ uvicorn app.main:app --host 0.0.0.0 --port 8080 --reload
 # 3. Frontend (proxies /api to http://localhost:8080; override with BACKEND_URL)
 cd frontend && npm install && npm run dev
 ```
+
+The simulator redeems every move with the backend before accepting it. If that callback is unavailable, no new move is accepted. Keep `SIM_STATE_DB` (default `data/controller.db`) across simulator restarts; Compose persists it in `controller_data`.
 
 Without model keys the planner uses a clearly labelled deterministic fallback, and every safety control still applies.
 
@@ -107,6 +110,7 @@ cd frontend && npx tsc --noEmit
 - [docs/BUILD.md](docs/BUILD.md): build, run and configuration
 - [docs/api.md](docs/api.md): API reference
 - [docs/DEVELOPER.md](docs/DEVELOPER.md): where things live and conventions
+- [docs/EXPERIENCE_LEARNING_PLAN.md](docs/EXPERIENCE_LEARNING_PLAN.md): implementation and testing plan for context-aware experience reuse, freshness, permit revocation, and learning evaluation
 
 ## Safety scope
 

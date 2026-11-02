@@ -70,5 +70,29 @@ Copy backups off the server. A backup taken while the backend runs is consistent
 
 ## Drills
 
+### Experience memory after upgrade or layout changes
+
+The context-aware learning upgrade preserves legacy rows but excludes records without original site/map/policy/capability context. A lower eligible-cell count after upgrade is expected; do not assign the active site's identity to old data to restore the count. New runs accumulate scoped observations from decision receipts.
+
+Inspect `/authority/learning` for `experience_context`, `excluded`, `quarantined`, and per-record reasons. Missing current context means no memory is eligible. Corrupt lifecycle records disable memory retrieval; preserve the database for investigation. The current memory invalidation service only controls reuse; use the existing stop workflow for an operational incident. Controller redemption enforces authority revocation, but automatic change-event propagation into both paths remains planned.
+
+### Controller admission and journal incidents
+
+- Upgrade backend and warehouse simulator together. Set `AUTHORITY_BASE_URL` in the simulator to the reachable backend address and preserve `SIM_STATE_DB`; Compose mounts `controller_data:/app/data`.
+- A callback outage causes a definite controller refusal, followed by a best-effort containment STOP from dispatch. Check the backend callback address, reachability, and matching `PERMIT_SECRET`. Do not disable redemption to restore movement.
+- Authority restart advances its persisted epoch. Controller restart changes its boot identity. Old permits stay invalid even when numeric world versions start again. E-stops and consumed release tokens persist in the controller journal.
+- A lost command response remains `IN_DOUBT` until admission evidence settles it. If the authority spent a permit but the controller cannot prove admission, recovery deliberately stays blocked. Preserve both journals and investigate; do not clear checkpoints or reissue the action to force recovery.
+- The existing signed backup tool covers the application and authority databases, not `SIM_STATE_DB`. Preserve/snapshot the controller volume separately while services are stopped. If it is lost, a redeemed uncertain action may require manual investigation; target matching alone is insufficient.
+- These controls cover simulated navigation command admission. They do not establish safe retry semantics for physical manipulation or certify a physical emergency stop.
+
+### Security drills
+
 Run `/authority/drills` (Authority page) after any restore or upgrade: eight real attacks
 against the live simulator, all of which must be blocked.
+# Automatic environment revalidation
+
+Scenario/seed changes stop simulator targets and advance the operational map generation before new movement admission. Operators must re-observe telemetry and obtain fresh permits. Backend lifecycle snapshots and signed invalidation events use the authority database; preserve it together with the controller database across restarts.
+
+Active runs discard obsolete routes and audit `ENVIRONMENT_CHANGE` plus `EXPERIENCE_RETRIEVAL`. `holding_no_route` means the robot remains stopped while the planner retries; inspect constraints and restore a traversable route. `replanned` means a replacement exists, not that motion or the mission completed. Authority and mission learning panels show compatibility decisions and propagation delay. Constraint changes invalidate observations up to the event cutoff; map changes require a new generation.
+
+Run `python -m bench.experience_eval --seeds 20 --out bench/results/experience` from `backend` to reproduce the deterministic graph benchmark. For browser checks, build the frontend with `NEXT_DIST_DIR=.next-validation` and `BACKEND_URL=http://127.0.0.1:18080`, start `scripts/browser_validation_stack.py` with the project Python from the repository root, then run `node tests/experience.browser.cjs`. Ports 19300/18080/18090 are isolated loopback services; the fixture is synthetic and no model calls are made. Create `backend/data/browser-validation/stop` to terminate these services. Do not point this harness at a deployment.

@@ -3,6 +3,7 @@
 import React, { useCallback, useEffect, useState } from "react";
 import { getAuthorityEvidence, getRouteLearning, runDrills } from "@/lib/api";
 import { AuthorityPanel } from "@/components/AuthorityPanel";
+import { LearningEvidence } from "@/components/LearningEvidence";
 import { Button, Empty, KV, Mono, Notice, Page, PageHeader, Panel, Pill, Stat } from "@/components/ui";
 
 type Drill = { drill: string; passed: boolean; detail: string; skipped?: boolean };
@@ -63,6 +64,7 @@ export default function AuthorityPage() {
         </div>
 
         <div className="lg:col-span-2 space-y-4">
+          <LearningEvidence decisions={learning?.decisions} changes={learning?.lifecycle?.events} context={learning?.experience_context} />
           <Panel title="Security drills" subtitle="Real attacks against the live simulator, each with a pass/fail result"
             actions={<Button variant="primary" disabled={running} onClick={go}>{running ? "Running…" : "Run all drills"}</Button>}>
             {err && <Notice tone="stop">{err}</Notice>}

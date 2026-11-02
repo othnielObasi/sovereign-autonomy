@@ -10,6 +10,22 @@ Every capability in the Sovereign Autonomy plan, with its status and the evidenc
 
 Last checked: 1 Nov 2026. 303 backend tests passing; frontend type-checks; a live run with the simulator, backend and dashboard as separate processes (results at the end).
 
+## Experience learning implementation checkpoint (2 Nov 2026)
+
+See [EXPERIENCE_LEARNING_PLAN.md](EXPERIENCE_LEARNING_PLAN.md) for the staged implementation and remaining work.
+
+Checkpoint validation: **364 backend tests passed** using the project `.venv`; **62 focused tests passed** after final site identity/API schema additions. No new live-model or browser validation is claimed.
+
+Controller milestone validation: **394 backend tests passed**, including 30 new redemption/revocation cases and a real localhost HTTP callback. Compose configuration and the simulator image's isolated file-set imports passed; Docker is unavailable here, so an actual image build remains unverified.
+
+| Capability | Implementation and evidence |
+|---|---|
+| Context-scoped reuse | Simulator/benchmark identity captured in governance receipts; route memory and planner lessons filter site, map, policy, and capabilities. Legacy contextless data is audit-only. `test_experience_context.py`; context-isolation tests in `test_planner_lessons.py` |
+| Historical freshness | Configurable age decay and expiry; post-run recording preserves observation time. Fake-clock expiry/decay and original-time tests in `test_experience_context.py` |
+| Durable memory invalidation | Signed internal service; repeated/concurrent delivery and restart tests; lessons and route retrieval consult it. **Partial:** automatic change-event producers and execution revocation are not yet integrated |
+| Controller-enforced revocation | Signed controller redemption at admission; persisted authority epochs and controller admissions; local stop/reset fencing. `test_controller_redemption.py` covers outages, duplicate races, delayed replies, policy/world changes, restart, reconciliation, and a real HTTP callback |
+| Automatic lifecycle events, paired learning-benefit experiment, browser evidence | Remain planned; memory validation and controller redemption alone do not establish these capabilities |
+
 ## Execution contract (plan §3–4)
 
 | Requirement | Status | Evidence |
@@ -80,3 +96,14 @@ Simulator, backend and dashboard as separate processes, shared random permit sec
 3. The canary tripped: that planner copied the hidden instruction, so its plan was discarded and the aisle route used.
 4. After the run, its signed experience was recorded (3 learned cells, 0 quarantined).
 5. Earlier drill on the same system: direct command HTTP 403; global kill revoked authority in 16 ms with the stop verified in 453 ms; reset without login HTTP 401.
+# Environment lifecycle follow-up (2 November 2026)
+
+| Requirement | Implementation | Evidence |
+|---|---|---|
+| Invalidate changed assumptions durably | `environment_lifecycle.py`, controller environment journal, simulator scenario/seed hooks | `test_environment_lifecycle.py`, `test_environment_integration.py` |
+| Stop and replace obsolete routes, hold when unavailable | `RunService._refresh_environment_plan` | Hold/release unit case and real HTTP simulator integration |
+| Measure compatible reuse and stale rejection | `bench/experience_eval.py` | `backend/bench/results/experience/results.json` and README; 20 seeded graph trials |
+| Explain memory and revalidation | `LearningEvidence.tsx`, authority and mission panels | `tests/experience.browser.cjs`; saved evidence under `docs/validation/2026-11-02` |
+| Retain controls after scene failure | `SceneBoundary.tsx`, twin fleet stop; local lighting fallback | Browser harness forces WebGL failure and blocks external requests |
+
+Graph results concern modeled travel and queue costs. Physical contacts, hardware safety, and model-driven benefit remain outside this evidence.

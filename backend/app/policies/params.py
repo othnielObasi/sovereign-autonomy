@@ -18,6 +18,7 @@ import hashlib
 import json
 import logging
 import threading
+from contextlib import contextmanager
 from typing import Any, Dict, Optional
 
 from app.world_model import GEOFENCE as _WM_GEOFENCE
@@ -59,6 +60,13 @@ def active_params() -> Dict[str, Any]:
     """A copy of the parameters the gate is enforcing right now."""
     with _lock:
         return copy.deepcopy(_active)
+
+
+@contextmanager
+def admission_policy():
+    """Order permit redemption against activation of a different policy set."""
+    with _lock:
+        yield params_hash(_active)
 
 
 def params_hash(params: Dict[str, Any]) -> str:

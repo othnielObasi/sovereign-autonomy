@@ -50,9 +50,10 @@ async def run_drills(authority, sim, names: List[str] | None = None) -> Dict[str
     here = {"x": round(float(tel.get("x", 0)), 3), "y": round(float(tel.get("y", 0)), 3), "max_speed": 0.1}
 
     def probe():
+        from app.policies.versioning import policy_version_hash
         authority.observe(tel)
         return authority.authorize(run_id="drill", mission_id="drill", intent="MOVE_TO", params=here,
-                                   decision="APPROVED", policy_version="drill", agent_id="drill")
+                                   decision="APPROVED", policy_version=policy_version_hash(), agent_id="drill")
 
     if "bypass" in names:
         r = await sim.send_command({"intent": "MOVE_TO", "params": {"x": 30.0, "y": 20.0, "max_speed": 1.0}})

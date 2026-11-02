@@ -14,6 +14,7 @@ from pydantic import BaseModel, Field
 from app.auth.jwt import get_current_user
 from app.auth.roles import OPERATOR, OPERATOR_ALWAYS
 from app.services.execution_authority import get_authority
+from app.autonomy.core import Rejected
 
 router = APIRouter(prefix="/authority", tags=["authority"])
 
@@ -29,6 +30,21 @@ class KillRequest(BaseModel):
 class ResetRequest(BaseModel):
     scope: Scope
     id: str = "*"
+
+
+class RedemptionRequest(BaseModel):
+    request: str = Field(..., min_length=1, max_length=65536)
+
+
+@router.post("/redeem", include_in_schema=False)
+def redeem(req: RedemptionRequest):
+    """Controller-only signed request; no operator token can redeem a permit."""
+    try:
+        return {"redemption": get_authority().redeem(req.request)}
+    except Rejected as exc:
+        from app.observability import metrics
+        metrics.inc("permit_redemptions_total", outcome="refused")
+        raise HTTPException(status_code=403, detail=str(exc)) from exc
 
 
 def _sim():
@@ -125,11 +141,20 @@ async def drills(req: Optional[DrillRequest] = None, user: Optional[str] = Depen
 
 
 @router.get("/learning")
-def learning_status():
+async def learning_status():
     """Learned-routing memory: verified cells and quarantined records."""
     from app.services.route_learning import get_memory
     from app.services.site_router import last_route_info
-    return {**get_memory().status(), "last_route": dict(last_route_info)}
+    from app.autonomy.experience import context_from_world
+    from app.policies.versioning import policy_version_hash
+    try:
+        await _sim().get_telemetry()
+        context = context_from_world(await _sim().get_world(), policy_version_hash())
+    except Exception:
+        context = None
+    from app.services.environment_lifecycle import get_lifecycle
+    return {**get_memory().status(context=context), "last_route": dict(last_route_info),
+            "lifecycle": get_lifecycle().status()}
 
 
 @router.get("/evidence")

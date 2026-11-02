@@ -65,20 +65,22 @@ def capped_speed(x: float, y: float, speed: float, zones: Optional[List[Dict[str
 last_route_info: Dict[str, Any] = {}
 
 
-def _route(layout, start, goal, extra):
+def _route(layout, start, goal, extra, context=None):
     """NetworkX route with delays learned from signed experience; the A* grid router
     is the fallback. Either way racks and hazard zones stay impassable."""
     from app.config import settings
     if settings.learned_routing:
         try:
             from app.services.route_learning import get_memory, learned_route
-            delays, quarantined = get_memory().load()
+            delays, quarantined = get_memory().load(context=context)
             result = learned_route(layout, start, goal, extra, delays)
             if result:
                 last_route_info.clear()
                 last_route_info.update(router="networkx", learned_cells=len(delays),
                                        learned_delay_s=round(result["learned_delay"], 2),
                                        quarantined=len(quarantined))
+                last_route_info["experience_context"] = context
+                last_route_info["experience_decisions"] = get_memory().last_retrieval[-100:]
                 return result["points"]
         except Exception as exc:
             logger.warning("Learned routing failed, using grid A*: %s", exc)
@@ -99,7 +101,10 @@ def route_plan(world: Dict[str, Any], start: Dict[str, Any], goal: Dict[str, Any
         return None
     extra = [Circle(float(avoid["x"]), float(avoid["y"]), 0.8, "blocked")] if avoid else []
     extra += hazard_circles(hazards)
-    route = _route(layout, (float(start["x"]), float(start["y"])), (float(goal["x"]), float(goal["y"])), extra)
+    from app.autonomy.experience import context_from_world
+    from app.policies.versioning import policy_version_hash
+    context = context_from_world(world, policy_version_hash())
+    route = _route(layout, (float(start["x"]), float(start["y"])), (float(goal["x"]), float(goal["y"])), extra, context)
     if not route:
         return None
     wps = []

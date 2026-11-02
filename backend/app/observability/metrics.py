@@ -19,6 +19,7 @@ HELP = {
     "governance_decisions_total": "Gate decisions by verdict",
     "permits_issued_total": "Single-use permits issued",
     "permits_refused_total": "Moves refused before a permit, by reason",
+    "permit_redemptions_total": "Controller permit redemptions by outcome",
     "dispatch_total": "Commands through the dispatch path, by outcome",
     "kill_switch_total": "Kill switches activated, by scope",
     "kill_revoke_ms": "Time to revoke authority after a kill switch",
@@ -73,7 +74,8 @@ def render() -> str:
     # Gauges read at scrape time
     try:
         from app.services.route_learning import get_memory
-        delays, quarantined = get_memory().load()
+        from app.services.site_router import last_route_info
+        delays, quarantined = get_memory().load(context=last_route_info.get("experience_context"))
         lines += ["# TYPE learning_cells gauge", f"learning_cells {len(delays)}",
                   "# TYPE learning_quarantined_records gauge", f"learning_quarantined_records {len(quarantined)}"]
     except Exception:

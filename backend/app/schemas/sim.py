@@ -40,6 +40,9 @@ class Human(BaseModel):
 
 
 class SimWorld(BaseModel):
+    site_id: Optional[str] = None
+    map_version: Optional[str] = None
+    capability_profile_version: Optional[str] = None
     geofence: Geofence
     zones: List[Zone] = []
     obstacles: List[Dict[str, Any]] = []  # kept flexible for MVP

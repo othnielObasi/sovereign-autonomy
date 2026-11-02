@@ -133,6 +133,9 @@ class RateLimitMiddleware(BaseHTTPMiddleware):
             not settings.rate_limit_active
             or request.method == "OPTIONS"
             or path == "/"
+            # Controller admission is signed separately; dashboard traffic must
+            # not exhaust the bucket needed for an already-authorized move.
+            or path == "/authority/redeem"
             or path.startswith(_RATE_LIMIT_EXEMPT_PATHS)
             or _is_doc_path(path)
         ):

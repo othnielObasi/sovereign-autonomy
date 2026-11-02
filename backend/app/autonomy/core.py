@@ -117,24 +117,55 @@ class KillSwitch:
     """
     SCOPES = frozenset({"global", "robot", "mission", "agent"})
 
-    def __init__(self):
+    def __init__(self, path: str | None = None):
         self._locked: set[tuple[str, str]] = set()
         self._epoch = 0
         self._lock = threading.RLock()
+        self.path = path
+        if path:
+            with _sqlite(path, write=True) as c:
+                c.execute("CREATE TABLE IF NOT EXISTS kill_locks (scope TEXT, ident TEXT, reason TEXT, "
+                          "actor TEXT, ts REAL, PRIMARY KEY (scope, ident))")
+                c.execute("CREATE TABLE IF NOT EXISTS authority_epoch (singleton INTEGER PRIMARY KEY CHECK(singleton=1), "
+                          "epoch INTEGER NOT NULL)")
+                c.execute("INSERT OR IGNORE INTO authority_epoch VALUES (1,0)")
+                # A new authority process must never revive pre-restart permits,
+                # even when world versions start counting again from one.
+                c.execute("UPDATE authority_epoch SET epoch=epoch+1 WHERE singleton=1")
+                self._refresh(c)
+
+    def _refresh(self, conn=None) -> None:
+        if not self.path:
+            return
+        if conn is None:
+            with _sqlite(self.path) as c:
+                self._refresh(c)
+            return
+        self._epoch = conn.execute("SELECT epoch FROM authority_epoch WHERE singleton=1").fetchone()[0]
+        self._locked = set(conn.execute("SELECT scope,ident FROM kill_locks").fetchall())
 
     @property
     def epoch(self) -> int:
         with self._lock:
+            self._refresh()
             return self._epoch
 
     def active(self) -> list[tuple[str, str]]:
         with self._lock:
+            self._refresh()
             return sorted(self._locked)
 
-    def activate(self, scope: str, identifier: str = "*") -> None:
+    def activate(self, scope: str, identifier: str = "*", *, reason: str = "stop", actor: str = "system") -> None:
         if scope not in self.SCOPES:
             raise ValueError("invalid_scope")
         with self._lock:
+            if self.path:
+                with _sqlite(self.path, write=True) as c:
+                    c.execute("INSERT OR REPLACE INTO kill_locks VALUES (?,?,?,?,?)",
+                              (scope, identifier, reason, actor, time.time()))
+                    c.execute("UPDATE authority_epoch SET epoch=epoch+1 WHERE singleton=1")
+                    self._refresh(c)
+                return
             self._locked.add((scope, identifier))
             self._epoch += 1
 
@@ -142,6 +173,12 @@ class KillSwitch:
         if not authorized:
             raise Rejected("reset_requires_authorization")
         with self._lock:
+            if self.path:
+                with _sqlite(self.path, write=True) as c:
+                    c.execute("DELETE FROM kill_locks WHERE scope=? AND ident=?", (scope, identifier))
+                    c.execute("UPDATE authority_epoch SET epoch=epoch+1 WHERE singleton=1")
+                    self._refresh(c)
+                return
             self._locked.discard((scope, identifier))
             self._epoch += 1
 
@@ -150,6 +187,7 @@ class KillSwitch:
         if agent_id:
             keys.append(("agent", agent_id))
         with self._lock:
+            self._refresh()
             if any(k in self._locked for k in keys):
                 raise Rejected("kill_switch_active")
 
@@ -173,48 +211,79 @@ class PermitStore:
                 "id TEXT PRIMARY KEY, payload TEXT NOT NULL, used INTEGER NOT NULL DEFAULT 0)"
             )
 
-    def issue(self, action: Action, *, approved: bool, ttl_s: float = 5.0, agent_id: str = "") -> str:
+    def issue(self, action: Action, *, approved: bool, ttl_s: float = 5.0, agent_id: str = "",
+              controller: dict | None = None) -> str:
         if not approved:
             raise Rejected("governance_denied")
-        self.kills.require_active(action, agent_id)
-        self.world.require(action.robot_id, action.world_version)
         if not (0 < ttl_s <= 60):
             raise ValueError("invalid_ttl")
-        payload = {
-            "id": str(uuid.uuid4()),
-            "digest": action.digest(),
-            "robot": action.robot_id,
-            "mission": action.mission_id,
-            "world_version": action.world_version,
-            "agent": agent_id,
-            "epoch": self.kills.epoch,
-            "expires": time.time() + ttl_s,
-        }
-        with _sqlite(self.path, write=True) as c:
+        with self._lock, self.kills._lock, self.world._lock, _sqlite(self.path, write=True) as c:
+            self.kills.require_active(action, agent_id)
+            self.world.require(action.robot_id, action.world_version)
+            payload = {
+                "id": str(uuid.uuid4()),
+                "digest": action.digest(),
+                "robot": action.robot_id,
+                "mission": action.mission_id,
+                "world_version": action.world_version,
+                "agent": agent_id,
+                "epoch": self.kills.epoch,
+                "expires": time.time() + ttl_s,
+                "controller": controller,
+            }
             c.execute("INSERT INTO permits(id,payload) VALUES (?,?)", (payload["id"], canonical(payload)))
         return wire.sign(self.secret, payload)
 
-    def consume(self, token: str, action: Action) -> None:
-        """Verify and atomically use up a permit. Raises Rejected on any failure."""
+    def _check(self, token: str, action: Action, c) -> dict:
         try:
             payload, raw = wire.open_envelope(self.secret, token)
+            wire.verify_for_action(self.secret, token, action.as_dict())
+            if not isinstance(payload.get("agent"), str) or type(payload.get("epoch")) is not int:
+                raise wire.PermitError("malformed_permit")
         except wire.PermitError as exc:
             raise Rejected(str(exc)) from exc
         if (payload.get("digest") != action.digest() or payload.get("robot") != action.robot_id
                 or payload.get("mission") != action.mission_id):
             raise Rejected("action_mismatch")
-        with self._lock:
-            self.kills.require_active(action, payload["agent"])
-            if payload["epoch"] != self.kills.epoch:
-                raise Rejected("authority_epoch_changed")
-            self.world.require(action.robot_id, action.world_version)
-            if time.time() >= payload["expires"]:
-                raise Rejected("permit_expired")
-            with _sqlite(self.path, write=True) as c:
-                row = c.execute("SELECT payload,used FROM permits WHERE id=?", (payload["id"],)).fetchone()
-                if not row or row[0] != raw or row[1]:
-                    raise Rejected("unknown_or_replayed_permit")
-                c.execute("UPDATE permits SET used=1 WHERE id=?", (payload["id"],))
+        self.kills.require_active(action, payload["agent"])
+        if payload["epoch"] != self.kills.epoch:
+            raise Rejected("authority_epoch_changed")
+        self.world.require(action.robot_id, action.world_version)
+        if time.time() >= payload["expires"]:
+            raise Rejected("permit_expired")
+        row = c.execute("SELECT payload,used FROM permits WHERE id=?", (payload["id"],)).fetchone()
+        if not row or row[0] != raw or row[1]:
+            raise Rejected("unknown_or_replayed_permit")
+        return payload
+
+    def validate(self, token: str, action: Action) -> dict:
+        """Check before dispatch without spending the controller's single use."""
+        with self._lock, self.kills._lock, self.world._lock, _sqlite(self.path, write=True) as c:
+            return self._check(token, action, c)
+
+    def consume(self, token: str, action: Action) -> dict:
+        """Atomically redeem once at controller admission, serialized with revocation."""
+        with self._lock, self.kills._lock, self.world._lock, _sqlite(self.path, write=True) as c:
+            payload = self._check(token, action, c)
+            c.execute("UPDATE permits SET used=1 WHERE id=?", (payload["id"],))
+            return payload
+
+    def retire(self, action: Action) -> bool:
+        """Fence a never-redeemed uncertain dispatch before declaring it unsent.
+
+        False means a controller redeemed it: only controller evidence can settle
+        acceptance. BEGIN IMMEDIATE orders this transition against redemption.
+        """
+        with self._lock, _sqlite(self.path, write=True) as c:
+            rows = c.execute("SELECT id,payload,used FROM permits").fetchall()
+            matching = [(pid, used) for pid, raw, used in rows if json.loads(raw).get("digest") == action.digest()]
+            if not matching or any(used == 1 for _, used in matching):
+                return False
+            for pid, _ in matching:
+                # Retired (2) differs from redeemed (1), so a crash before the
+                # following checkpoint can safely repeat reconciliation.
+                c.execute("UPDATE permits SET used=2 WHERE id=?", (pid,))
+            return True
 
 
 class CheckpointStore:

@@ -411,7 +411,7 @@ def get_planner_lessons(
 
 
 @router.get("/agent/lessons/route")
-def get_lessons_for_route(
+async def get_lessons_for_route(
     sx: float = Query(..., description="Start x (m)"),
     sy: float = Query(..., description="Start y (m)"),
     gx: Optional[float] = Query(None, description="Goal x (m)"),
@@ -421,9 +421,17 @@ def get_lessons_for_route(
 ):
     """Preview the lessons the planner would receive for a route."""
     from app.services.planner_lessons import format_for_prompt, lessons_for_route
+    from app.autonomy.experience import context_from_world
+    from app.policies.versioning import policy_version_hash
+    from app.api.routes_runs import get_run_svc
 
     goal = {"x": gx, "y": gy} if gx is not None and gy is not None else None
-    lessons = lessons_for_route(db, {"x": sx, "y": sy}, goal, limit=limit)
+    try:
+        world = await get_run_svc().sim.get_world()
+        context = context_from_world(world, policy_version_hash())
+    except Exception:
+        context = None
+    lessons = lessons_for_route(db, {"x": sx, "y": sy}, goal, limit=limit, context=context)
     return {"lessons": lessons, "prompt_block": format_for_prompt(lessons)}
 
 

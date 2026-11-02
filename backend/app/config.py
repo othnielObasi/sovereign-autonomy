@@ -65,6 +65,8 @@ class Settings(BaseSettings):
     world_max_age_s: float = 2.0       # telemetry older than this cannot back a permit
     max_actions_per_run: int = 5000
     learned_routing: bool = True       # NetworkX routing with delays from signed experience
+    experience_decay_s: float = Field(86400.0, gt=0)  # advisory congestion influence e-folding time
+    experience_ttl_s: float = Field(604800.0, gt=0)  # reuse horizon; simulation defaults, not safety thresholds
     dispatch_watchdog_s: float = 30.0  # no loop heartbeat for this long blocks dispatch
 
     # Gazebo

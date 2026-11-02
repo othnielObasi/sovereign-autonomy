@@ -40,7 +40,7 @@ def live(tmp_path):
     conn = a._db()
     try:
         with conn:
-            conn.execute("INSERT INTO kill_locks VALUES ('mission', 'mis-2', 'drill', 'op', 0)")
+            conn.execute("INSERT OR REPLACE INTO kill_locks VALUES ('mission', 'mis-2', 'drill', 'op', 0)")
     finally:
         conn.close()
     return {"app_db": app_db, "auth_db": auth_db, "url": f"sqlite:///{app_db}", "token": token, "action": action,

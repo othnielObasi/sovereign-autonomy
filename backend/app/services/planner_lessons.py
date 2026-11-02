@@ -30,6 +30,7 @@ from sqlalchemy.orm import Session
 from app.db.models import AgentMemoryEntry, GovernanceDecisionRecord
 from app.policies.versioning import policy_version_hash
 from app.utils.time import utc_now
+from app.autonomy.experience import context_key, context_from_state
 
 logger = logging.getLogger("app.planner_lessons")
 
@@ -151,13 +152,16 @@ def distill_run(db: Session, run_id: str) -> List[Dict[str, Any]]:
         if "x" not in tel or "y" not in tel:
             continue
         version = r.policy_version or policy_version_hash()
+        context = tel.get("experience_context")
+        if context_from_state(context or {}, version) != context or not context or not tel.get("source_robot_id"):
+            continue  # historical context must be captured at decision time
         cell = _cell(float(tel["x"]), float(tel["y"]))
         zone = str(tel.get("zone") or "unknown")
 
         if r.decision == "APPROVED" and r.was_executed == "true" and r.proposal_intent == "MOVE_TO":
             speed = (prop.get("params") or {}).get("max_speed")
             if speed is not None:
-                k = (version, cell[0], cell[1])
+                k = (context_key(context), cell[0], cell[1])
                 approved_speed[k] = max(approved_speed.get(k, 0.0), float(speed))
             continue
 
@@ -169,11 +173,18 @@ def distill_run(db: Session, run_id: str) -> List[Dict[str, Any]]:
         for policy in hits or ["UNSPECIFIED"]:
             if policy == "CIRCUIT_BREAKER":
                 continue
-            key = _key(policy, zone, cell, version)
+            key = context_key(context) + "|" + _key(policy, zone, cell, version)
             a = agg.setdefault(key, {
                 "key": key, "policy": policy, "zone": zone, "policy_version": version,
                 "cell_x": cell[0], "cell_y": cell[1], "denials": 0, "example_reason": None,
+                "experience_context": context, "source_robots": [],
+                "observed_at": None, "schema_version": 2,
             })
+            from datetime import timezone
+            observed = r.ts.replace(tzinfo=timezone.utc).timestamp() if r.ts.tzinfo is None else r.ts.timestamp()
+            a["observed_at"] = max(a["observed_at"] or observed, observed)
+            if tel["source_robot_id"] not in a["source_robots"]:
+                a["source_robots"].append(tel["source_robot_id"])
             a["denials"] += 1
             if not a["example_reason"] and len(hits) == 1:  # reasons only map cleanly to a single hit
                 a["example_reason"] = next((s for s in reasons if not s.startswith("Circuit breaker")), None)
@@ -186,7 +197,7 @@ def distill_run(db: Session, run_id: str) -> List[Dict[str, Any]]:
     now = utc_now()
 
     for key, a in agg.items():
-        speed = approved_speed.get((a["policy_version"], a["cell_x"], a["cell_y"]))
+        speed = approved_speed.get((context_key(a["experience_context"]), a["cell_x"], a["cell_y"]))
         if key in existing:
             entry, c = existing[key]
             if run_id in c.get("runs", []):
@@ -194,6 +205,9 @@ def distill_run(db: Session, run_id: str) -> List[Dict[str, Any]]:
             c["denials"] += a["denials"]
             c["runs"] = (c.get("runs", []) + [run_id])[-50:]
             c["example_reason"] = c.get("example_reason") or a["example_reason"]
+            c["observed_at"] = max(c["observed_at"], a["observed_at"])
+            c["validated_at"] = now.timestamp()
+            c["source_robots"] = sorted(set(c.get("source_robots", []) + a["source_robots"]))
             if speed is not None:
                 prev = c.get("max_approved_speed")
                 c["max_approved_speed"] = speed if prev is None else max(prev, speed)
@@ -203,7 +217,7 @@ def distill_run(db: Session, run_id: str) -> List[Dict[str, Any]]:
             entry.importance = _importance(c)
             entry.run_id = run_id
         else:
-            c = dict(a, runs=[run_id], max_approved_speed=speed)
+            c = dict(a, runs=[run_id], max_approved_speed=speed, validated_at=now.timestamp())
             c["text"] = lesson_text(c)
             entry = AgentMemoryEntry(run_id=run_id, category=CATEGORY_SPATIAL, ts=now,
                                      content_json=json.dumps(c), importance=_importance(c))
@@ -247,12 +261,19 @@ def lessons_for_route(
     goal: Optional[Dict[str, Any]] = None,
     limit: int = MAX_LESSONS_IN_PROMPT,
     avoid: Optional[Dict[str, Any]] = None,
+    context: Optional[Dict[str, str]] = None,
 ) -> List[Dict[str, Any]]:
     """Lessons near the straight-line corridor from start to goal, current policy version only.
 
     `avoid` (e.g. a blocked waypoint during a replan) is treated as part of the route.
     """
     version = policy_version_hash()
+    context = context if context is not None else context_from_state(start, version)
+    if not context or context.get("policy_version") != version:
+        return []
+    from app.services.route_learning import get_memory
+    memory = get_memory()
+    events = memory.invalidations()
     sx, sy = float(start.get("x", 0)), float(start.get("y", 0))
     pts = [(sx, sy)]
     if avoid and "x" in avoid and "y" in avoid:
@@ -269,6 +290,11 @@ def lessons_for_route(
             continue
         if c.get("policy_version") != version:
             continue
+        observed = c.get("observed_at")
+        if (not isinstance(observed, (int, float)) or not math.isfinite(observed)
+                or observed > memory.clock() + 1
+                or memory.ineligible_reason(c.get("experience_context"), context, observed, events=events)):
+            continue
         cx, cy = c["cell_x"], c["cell_y"]
         if segments:
             d = min(_dist_to_segment(cx, cy, a[0], a[1], b[0], b[1]) for a, b in segments)
@@ -279,12 +305,15 @@ def lessons_for_route(
         if d > radius:
             continue
         weight = (2.0 if c["policy"] in HARD_POLICIES else 1.0) * c["denials"] * len(c.get("runs", [1]))
+        weight *= math.exp(-max(0, memory.clock() - observed) / memory.decay_s)
         scored.append((weight / (1.0 + d), entry.id, c))
 
     scored.sort(key=lambda s: (-s[0], s[1]))
     return [
         {"id": eid, "text": lesson_text(c), "policy": c["policy"], "zone": c["zone"],
-         "cell": [c["cell_x"], c["cell_y"]], "denials": c["denials"], "runs": len(c.get("runs", []))}
+         "cell": [c["cell_x"], c["cell_y"]], "denials": c["denials"], "runs": len(c.get("runs", [])),
+         "experience_context": c["experience_context"], "source_robots": c["source_robots"],
+         "observed_at": c["observed_at"], "status": "accepted"}
         for _, eid, c in scored[:limit]
     ]
 

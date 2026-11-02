@@ -403,6 +403,13 @@ async def start_run(
     if not seed_wps:
         seed_wps = [generate_fallback_waypoint(telemetry, json.loads(mission.goal_json))]
     svc._plans[run.id] = seed_wps
+    from app.autonomy.experience import context_from_state
+    from app.services.environment_lifecycle import constraints_key
+    from app.policies.versioning import policy_version_hash
+    if context := context_from_state(telemetry, policy_version_hash()):
+        svc._plan_contexts[run.id] = {"context": context, "constraints": constraints_key(telemetry)}
+    from app.services.site_router import last_route_info
+    svc._append_event(db, run.id, "EXPERIENCE_RETRIEVAL", dict(last_route_info))
     svc._append_event(db, run.id, "PLAN", {
         "mission_id": mission.id,
         "plan": {"waypoints": seed_wps, "model_used": "site_router" if len(seed_wps) > 1 else "step_fallback"},

@@ -127,6 +127,13 @@ class GovernanceEngine:
                 if isinstance(w, dict)
             ],
         }
+        # Capture context at decision time, never infer it from the site active
+        # later when a completed run is distilled into reusable experience.
+        from app.autonomy.experience import context_from_state
+        experience_context = context_from_state(telemetry, params_hash(params))
+        if experience_context:
+            tel_summary["experience_context"] = experience_context
+            tel_summary["source_robot_id"] = telemetry.get("robot_id")
         if telemetry.get("site_constraints"):
             # Hazard zones in force for this decision (geometry and limits only)
             tel_summary["site_constraints"] = [

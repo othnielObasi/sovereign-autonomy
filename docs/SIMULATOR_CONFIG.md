@@ -32,6 +32,16 @@ The original mock simulator (`sim/mock_sim`) is kept for comparison under the Do
 | `SIM_SPEED` | `1.0` | Time multiplier (`2.0` = twice real time) |
 | `SIM_SEED` | `42` | Seed for site activity; the same seed replays the same session |
 | `SIM_TOKEN` | empty | Shared secret; when set, every call except `/health` needs `X-Sim-Token` |
+| `PERMIT_SECRET` | empty (moves refused) | Must match the backend; signs action permits and controller redemption messages |
+| `AUTHORITY_BASE_URL` | `http://127.0.0.1:8080` | Controller-to-backend callback; use `http://backend:8080` in Compose |
+| `SIM_REDEEM_TIMEOUT_S` | `1.0` | Callback timeout in seconds, greater than zero and at most 2; no automatic retry |
+| `SIM_STATE_DB` | `data/controller.db` | Durable admission evidence, e-stops and single-use release tokens; keep across restarts |
+
+Every move requires a fresh, signed redemption response from `POST /authority/redeem`. The request is authenticated with `PERMIT_SECRET`, independently of operator JWTs. It is bound to the exact action, controller boot identity, robot generation, and site/map/capability context. The backend checks current policy, world freshness, revocation epoch, pending dispatch, and single use.
+
+The callback runs outside the simulator lock. STOP, e-stop, reset, scenario/seed changes and dead-man stops fence earlier replies, so a delayed response cannot restart motion after those operations. E-stops and used release tokens survive restart in the controller journal. A new controller boot identity invalidates pre-restart permits.
+
+Both services must be upgraded together. There is no offline signature-only admission fallback. The legacy simulator and external adapters do not establish this contract merely by exposing `/command`; adapters need controller-side redemption and equivalent local fencing.
 
 ### Backend environment
 

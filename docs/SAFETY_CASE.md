@@ -45,6 +45,7 @@ hackathon. Status of every capability: [`TRACEABILITY.md`](TRACEABILITY.md).
 | H14 | Evidence of what happened is lost or altered | Hash-chained events and signed receipts (earlier work); hash-chained action journal; signed, verified backups | `test_checkpoint_tamper_detected`; `test_tampered_or_foreign_backups_are_refused` |
 | H15 | A model outage leaves the robot without a plan | Labelled deterministic fallback; gate and permits unchanged | `test_model_outage_falls_back_to_labelled_deterministic_plan` |
 | H16 | Two robots collide | Each robot sees the others as obstacles (gate and path check); each move reserves its floor cells first, so overlapping paths are refused; one run per robot | `test_two_robots_cannot_hold_overlapping_paths`; `test_reservation_contention_has_one_winner`; `test_a_robot_never_sees_itself_as_an_obstacle`; live: two missions at once, 0 robot contacts |
+| H17 | Authentic but stale or incompatible experience shapes a plan | Site/map/policy/capability filtering, observation-age decay and expiry, and durable memory invalidation; learning remains advisory | `test_experience_context.py`; compatibility, legacy, expiry and invalidation cases in `test_planner_lessons.py` |
 
 ## Residual risks
 
@@ -57,9 +58,18 @@ hackathon. Status of every capability: [`TRACEABILITY.md`](TRACEABILITY.md).
 | R5 | Single backend process | Permit store, reservations and kill switches are per process (SQLite and memory); two robots are coordinated, but only by one backend | Shared transactional store, fencing tokens, a fleet scheduler |
 | R6 | Perception tested only in simulation | SAM 3.1 and the vision cross-check see rendered frames | Real cameras, calibration, and measured miss rates |
 | R7 | Model behaviour can change | Models may follow injected instructions (seen live) | Already contained by the gate and permits; keep the canary and drills running |
+| R8 | Redemption succeeds but controller admission evidence is unavailable | A lost reply or lost controller journal cannot prove whether a redeemed command was admitted; admission also does not prove physical completion | Current behavior keeps the action uncertain and blocks automatic recovery. Preserve the controller journal and investigate; no blind replay |
+| R9 | Lifecycle events are not automatically delivered, or lifecycle records are deleted | Memory invalidation is currently an internal primitive; signatures detect edits but not deletion without an external anchor | Wire authoritative change producers through to planning and execution; independently anchored lifecycle audit |
 
 ## How the argument is kept current
+
+Controller redemption now checks current policy, world freshness and durable authority epochs immediately before admission (`test_controller_redemption.py`). Controller boot/generation fences reject pre-restart or overtaken replies; stop/reset operations are locally serialized with admission. This closes the previous direct-delivery revocation gap for the warehouse controller. Automatic external change-event propagation remains partial (R9), and local safety/braking limitations remain (R1-R3).
 
 Every control above has an automated test that runs on each change, and the security drills
 run against the live system from the Authority page. When a control or test changes, update
 this table and [`TRACEABILITY.md`](TRACEABILITY.md) in the same commit.
+# Environment lifecycle evidence (2 November 2026)
+
+Simulator environment mutations fence controller generations and stop targets before new admission. Persisted, signed backend lifecycle events invalidate affected route memory; active runs stop, discard obsolete waypoints, and replan under current context and constraints. No replacement route causes a stopped retry hold. Tests cover restart/idempotency, missed source events, observation cutoffs, hold/release, and real simulator change propagation with old permit refusal.
+
+The learning benchmark is a deterministic graph experiment: 20 paired seeds show 28.6% lower modeled travel-plus-queue time, all 15 deliberately stale records rejected, and zero forbidden graph edges. These results do not measure physical contacts, stopping distance, motor safety, or model training. Signed records do not detect privileged deletion without an external anchor. Hardware adapters require their own authoritative context/event sources.

@@ -116,7 +116,8 @@ class Controller(Protocol):
 class SafeDispatcher:
     """The one path a command takes to the controller.
 
-    Order: watchdog, use up the permit, budget, mark the action IN_DOUBT, send.
+    Order: watchdog, validate permit, budget, mark IN_DOUBT, send. The controller
+    redeems the permit immediately before admission, rather than dispatch using it.
     If the controller's answer is lost, the action stays IN_DOUBT and is never
     retried automatically; it must be reconciled first. A controller
     acknowledgement is not proof the robot physically completed the move.
@@ -129,7 +130,7 @@ class SafeDispatcher:
 
     def _prepare(self, token: str, action: Action) -> None:
         self.watchdog.require_healthy()
-        self.permits.consume(token, action)
+        self.permits.validate(token, action)
         self.budget.consume()
         self.checkpoints.begin_action(action)
         self.evidence.emit("command_dispatched", action.mission_id, action.action_id)

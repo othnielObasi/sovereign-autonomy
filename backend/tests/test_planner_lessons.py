@@ -21,7 +21,13 @@ from app.services import planner_lessons as pl
 from app.services.governance_engine import GovernanceEngine
 from app.services.muse_planner import MusePlanner
 
-AISLE = {"x": 12.3, "y": 8.1, "zone": "aisle", "speed": 0.3, "human_detected": False, "nearest_obstacle_m": 5.0}
+IDENTITY = {"site_id": "warehouse", "map_version": "map-v1", "capability_profile_version": "sim-amr-v1"}
+AISLE = {**IDENTITY, "robot_id": "robot-1", "x": 12.3, "y": 8.1, "zone": "aisle", "speed": 0.3,
+         "human_detected": False, "nearest_obstacle_m": 5.0}
+
+
+def _start(x, y):
+    return dict(IDENTITY, x=x, y=y)
 
 
 @pytest.fixture
@@ -100,9 +106,9 @@ def test_distill_does_not_change_the_rules(db):
 def test_route_retrieval_keeps_corridor_lessons_only(db):
     pl.distill_run(db, _run_with_speeding(db))
 
-    on_route = pl.lessons_for_route(db, {"x": 2.0, "y": 8.0}, {"x": 30.0, "y": 8.0})
-    off_route = pl.lessons_for_route(db, {"x": 2.0, "y": 22.0}, {"x": 30.0, "y": 22.0})
-    replan = pl.lessons_for_route(db, {"x": 2.0, "y": 22.0}, {"x": 30.0, "y": 22.0}, avoid={"x": 13.0, "y": 9.0})
+    on_route = pl.lessons_for_route(db, _start(2, 8), {"x": 30.0, "y": 8.0})
+    off_route = pl.lessons_for_route(db, _start(2, 22), {"x": 30.0, "y": 22.0})
+    replan = pl.lessons_for_route(db, _start(2, 22), {"x": 30.0, "y": 22.0}, avoid={"x": 13.0, "y": 9.0})
 
     assert [l["policy"] for l in on_route] == ["SAFE_SPEED_01"]
     assert off_route == []
@@ -112,9 +118,49 @@ def test_route_retrieval_keeps_corridor_lessons_only(db):
 def test_lessons_from_older_policy_versions_are_not_retrieved(db, monkeypatch):
     pl.distill_run(db, _run_with_speeding(db))
     monkeypatch.setattr(pl, "policy_version_hash", lambda: "rules-changed")
-    assert pl.lessons_for_route(db, {"x": 2.0, "y": 8.0}, {"x": 30.0, "y": 8.0}) == []
+    assert pl.lessons_for_route(db, _start(2, 8), {"x": 30.0, "y": 8.0}) == []
     assert pl.all_lessons(db) == []
     assert len(pl.all_lessons(db, current_version_only=False)) == 1
+
+
+@pytest.mark.parametrize("field", ["site_id", "map_version", "capability_profile_version"])
+def test_lesson_retrieval_requires_compatible_environment_and_robot(db, field):
+    pl.distill_run(db, _run_with_speeding(db))
+    assert pl.lessons_for_route(db, _start(2, 8), {"x": 30, "y": 8})
+    start = dict(_start(2, 8), **{field: "changed"})
+    assert pl.lessons_for_route(db, start, {"x": 30, "y": 8}) == []
+
+
+def test_old_contextless_lessons_are_audit_only(db):
+    pl.distill_run(db, _run_with_speeding(db))
+    entry = db.query(AgentMemoryEntry).filter(AgentMemoryEntry.category == pl.CATEGORY_SPATIAL).first()
+    content = json.loads(entry.content_json)
+    del content["experience_context"]
+    entry.content_json = json.dumps(content)
+    db.commit()
+    assert len(pl.all_lessons(db)) == 1
+    assert pl.lessons_for_route(db, _start(2, 8), {"x": 30, "y": 8}) == []
+
+
+def test_lesson_freshness_and_invalidation_use_the_same_rules_as_route_memory(db, tmp_path, monkeypatch):
+    from app.services import route_learning
+    from app.services.route_learning import RouteMemory
+    now = [1000.0]
+    mem = RouteMemory(str(tmp_path / "lessons.db"), b"lesson-tests-secret-0123456789abcdef",
+                      clock=lambda: now[0], ttl_s=100, decay_s=10)
+    monkeypatch.setattr(route_learning, "_memory", mem)
+    pl.distill_run(db, _run_with_speeding(db))
+    entry = db.query(AgentMemoryEntry).filter(AgentMemoryEntry.category == pl.CATEGORY_SPATIAL).first()
+    content = json.loads(entry.content_json)
+    content["observed_at"] = 1000.0
+    entry.content_json = json.dumps(content)
+    db.commit()
+    assert pl.lessons_for_route(db, _start(2, 8), {"x": 30, "y": 8})
+    now[0] += 101
+    assert pl.lessons_for_route(db, _start(2, 8), {"x": 30, "y": 8}) == []
+    now[0] = 1000.0
+    mem.invalidate("maintenance", {"site_id": "warehouse"}, "layout unavailable")
+    assert pl.lessons_for_route(db, _start(2, 8), {"x": 30, "y": 8}) == []
 
 
 # -- planner integration ---------------------------------------------------------
@@ -141,7 +187,7 @@ def test_planner_prompt_carries_lessons_and_reports_ids(db, monkeypatch):
     monkeypatch.setattr(np_mod, "_client", httpx.AsyncClient(transport=httpx.MockTransport(handler)))
 
     pl.distill_run(db, _run_with_speeding(db))
-    lessons = pl.lessons_for_route(db, {"x": 2.0, "y": 8.0}, {"x": 30.0, "y": 8.0})
+    lessons = pl.lessons_for_route(db, _start(2, 8), {"x": 30.0, "y": 8.0})
     plan = asyncio.run(MusePlanner().generate_plan(
         {"x": 2.0, "y": 8.0}, "deliver to dock", {"x": 30.0, "y": 8.0}, lessons=lessons))
 
@@ -168,7 +214,10 @@ def test_no_lessons_means_no_lesson_block(monkeypatch):
 
 # -- API -------------------------------------------------------------------------
 
-def test_lesson_endpoints(db):
+def test_lesson_endpoints(db, monkeypatch):
+    from unittest.mock import AsyncMock
+    from app.api.routes_runs import get_run_svc
+    monkeypatch.setattr(get_run_svc().sim, "get_world", AsyncMock(return_value=IDENTITY))
     pl.distill_run(db, _run_with_speeding(db))
     with TestClient(app) as client:
         all_ = client.get("/agent/lessons").json()

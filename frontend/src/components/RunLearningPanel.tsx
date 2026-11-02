@@ -4,6 +4,7 @@ import React, { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { getLessons } from "@/lib/api";
 import { Mono, Pill, Verdict, cx } from "@/components/ui";
+import { LearningEvidence } from "@/components/LearningEvidence";
 
 type Ev = { id?: number | string; type: string; ts?: string; payload?: any; payload_json?: any };
 
@@ -40,6 +41,8 @@ export function RunLearningPanel({ runId, events, ended }: { runId: string; even
 
   return (
     <div className="space-y-3">
+      <LearningEvidence decisions={payloadOf(events.filter(e => e.type === "EXPERIENCE_RETRIEVAL").slice(-1)[0] || { type: "" }).experience_decisions || []}
+        changes={events.filter(e => e.type === "ENVIRONMENT_CHANGE").slice().reverse().map(payloadOf)} />
       {/* Task focus */}
       <section className="rounded-xl border border-mc-line bg-mc-panel p-4">
         <div className="flex items-center justify-between gap-2 mb-2">

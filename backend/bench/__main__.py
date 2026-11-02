@@ -48,11 +48,16 @@ def _bench_db():
     return sessionmaker(bind=engine)()
 
 
-def _lessons(db) -> List[Dict[str, Any]]:
+def _lessons(db, context) -> List[Dict[str, Any]]:
     from app.services.planner_lessons import all_lessons
+    from app.services.route_learning import get_memory
+    memory = get_memory()
+    events = memory.invalidations()
     return [{"id": l["id"], "text": l["text"], "policy": l["policy"], "cell": [l["cell_x"], l["cell_y"]],
              "max_approved_speed": l.get("max_approved_speed"), "denials": l["denials"]}
-            for l in all_lessons(db)]
+            for l in all_lessons(db)
+            if isinstance(l.get("observed_at"), (int, float))
+            and not memory.ineligible_reason(l.get("experience_context"), context, l["observed_at"], events=events)]
 
 
 def _git_commit() -> str:
@@ -82,6 +87,8 @@ def run(args) -> Dict[str, Any]:
         P._set_active(params)   # lessons are scoped to the rules version in force
 
     layout = Layout()
+    from app.autonomy.experience import context_from_state
+    experience_context = context_from_state(layout.experience_identity, P.params_hash(rules))
     planner = PLANNERS[args.planner](layout)
     arms = [a for a in args.arms.split(",") if a]
     shard_i, shard_n = (int(x) for x in args.shard.split("/"))
@@ -93,7 +100,7 @@ def run(args) -> Dict[str, Any]:
     for rnd in range(1, args.rounds + 1):
         first = args.first_seed + (rnd - 1) * args.seeds_per_round
         seeds = [s for s in range(first, first + args.seeds_per_round) if s % shard_n == shard_i]
-        lessons = _lessons(db)
+        lessons = _lessons(db, experience_context)
         round_rows: List[Dict[str, Any]] = []
         learning_runs = []
         for k, seed in enumerate(seeds):

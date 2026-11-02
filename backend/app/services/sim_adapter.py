@@ -43,14 +43,18 @@ class SimAdapter:
     async def get_telemetry(self, robot_id: Optional[str] = None) -> Dict[str, Any]:
         r = await self._client.get(f"{self.base_url}/telemetry", params={"robot_id": robot_id} if robot_id else None)
         r.raise_for_status()
-        return r.json()
+        state = r.json()
+        from app.services.environment_lifecycle import get_lifecycle
+        from app.policies.versioning import policy_version_hash
+        get_lifecycle().observe(state, policy_version_hash())
+        return state
 
     async def send_command(self, command: Dict[str, Any]) -> Dict[str, Any]:
         """Send a command. A move the simulator refuses (missing, invalid or reused
         permit; e-stop engaged) comes back as {"ok": False, "rejected": True, ...}:
         a definite "not executed", not an unknown outcome."""
         r = await self._client.post(f"{self.base_url}/command", json=command)
-        if r.status_code in (403, 423):
+        if r.status_code in (403, 409, 423, 503):
             try:
                 detail = r.json().get("detail")
             except ValueError:

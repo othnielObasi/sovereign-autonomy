@@ -86,6 +86,8 @@ class Layout:
     def __init__(self, data: Optional[Dict[str, Any]] = None):
         data = data or load_layout()
         self.data = data
+        from app.autonomy.experience import world_identity, SIM_CAPABILITY
+        self.experience_identity = dict(world_identity(data), capability_profile_version=SIM_CAPABILITY)
         self.geofence = data["geofence"]
         self.zones = data["zones"]
         self.bays = {b["id"]: b for b in data["bays"]}
@@ -349,6 +351,8 @@ class World:
                    for p in self.people()
                    if math.hypot(p.pos[0] - r.x, p.pos[1] - r.y) < DETECT_RANGE_M]
         return {
+            **self.layout.experience_identity,
+            "robot_id": "robot-1",
             "x": round(r.x, 3), "y": round(r.y, 3), "theta": round(r.theta, 3), "speed": round(r.speed, 3),
             "zone": self.layout.zone(r.x, r.y),
             "nearest_obstacle_m": round(near[0] - ROBOT_R, 3),

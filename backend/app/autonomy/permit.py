@@ -10,6 +10,7 @@ from __future__ import annotations
 import hashlib
 import hmac
 import json
+import math
 import time
 import uuid
 from typing import Any
@@ -70,9 +71,61 @@ def verify_for_action(secret: bytes, token: str, action: dict, now: float | None
         raise PermitError("malformed_permit") from exc
     if digest != action_digest(action) or robot != action["robot_id"]:
         raise PermitError("action_mismatch")
+    if not math.isfinite(expires) or not isinstance(payload.get("id"), str):
+        raise PermitError("malformed_permit")
     if (time.time() if now is None else now) >= expires:
         raise PermitError("permit_expired")
     return payload
+
+
+CONTROLLER_FIELDS = ("boot_id", "generation", "site_id", "map_version", "capability_profile_version")
+
+
+def controller_context(telemetry: dict) -> dict | None:
+    context = {k: telemetry.get(k) for k in CONTROLLER_FIELDS}
+    if (not all(isinstance(context[k], str) and context[k] for k in CONTROLLER_FIELDS if k != "generation")
+            or type(context["generation"]) is not int or context["generation"] < 0):
+        return None
+    return context
+
+
+def redemption_request(secret: bytes, token: str, action: dict, controller: dict, ttl_s: float = 2.0) -> str:
+    return sign(secret, {"kind": "controller_redemption", "request_id": str(uuid.uuid4()),
+                         "permit": token, "action": action, "controller": controller,
+                         "expires": time.time() + ttl_s})
+
+
+def verify_redemption_request(secret: bytes, envelope: str) -> dict:
+    payload, _ = open_envelope(secret, envelope)
+    try:
+        expires = float(payload["expires"])
+        if (payload["kind"] != "controller_redemption" or not payload["request_id"]
+                or not isinstance(payload["action"], dict) or not isinstance(payload["permit"], str)
+                or controller_context(payload["controller"]) != payload["controller"]):
+            raise PermitError("malformed_redemption")
+        if not math.isfinite(expires) or not time.time() < expires <= time.time() + 3:
+            raise PermitError("redemption_expired")
+    except (KeyError, ValueError, TypeError, AttributeError) as exc:
+        raise PermitError("malformed_redemption") from exc
+    return payload
+
+
+def redemption_response(secret: bytes, request: str, expires: float) -> str:
+    return sign(secret, {"kind": "controller_admission", "request_digest": hashlib.sha256(request.encode()).hexdigest(),
+                         "expires": min(expires, time.time() + 1.0)})
+
+
+def verify_redemption_response(secret: bytes, response: str, request: str) -> None:
+    payload, _ = open_envelope(secret, response)
+    try:
+        expires = float(payload["expires"])
+        if (payload["kind"] != "controller_admission"
+                or payload["request_digest"] != hashlib.sha256(request.encode()).hexdigest()):
+            raise PermitError("redemption_response_mismatch")
+        if not math.isfinite(expires) or time.time() >= expires:
+            raise PermitError("redemption_expired")
+    except (KeyError, TypeError, ValueError) as exc:
+        raise PermitError("malformed_redemption") from exc
 
 
 def release_token(secret: bytes, robot_id: str, ttl_s: float = 10.0) -> str:
@@ -85,6 +138,12 @@ def verify_release(secret: bytes, token: str, robot_id: str) -> dict:
     payload, _ = open_envelope(secret, token)
     if payload.get("kind") != "estop_release" or payload.get("robot") != robot_id:
         raise PermitError("not_a_release_token")
-    if time.time() >= float(payload.get("expires", 0)):
+    try:
+        expires = float(payload.get("expires", 0))
+        if not isinstance(payload.get("id"), str) or not math.isfinite(expires):
+            raise PermitError("malformed_permit")
+    except (TypeError, ValueError) as exc:
+        raise PermitError("malformed_permit") from exc
+    if time.time() >= expires:
         raise PermitError("permit_expired")
     return payload

@@ -1,4 +1,5 @@
 {
+ "name": "warehouse",
  "geofence": {
   "min_x": 0,
   "max_x": 40,

@@ -19,11 +19,16 @@ current state. Randomness comes from SIM_SEED, so a session replays exactly.
 from __future__ import annotations
 
 import asyncio
+import json
 import math
 import os
 import random
 import threading
 import time
+import sqlite3
+import uuid
+import urllib.error
+import urllib.request
 from contextlib import asynccontextmanager
 from typing import Any, Dict, List, Optional
 
@@ -31,6 +36,7 @@ from fastapi import FastAPI, HTTPException, Request, Response
 from pydantic import BaseModel, Field
 
 from app.autonomy import permit as permits
+from app.autonomy.controller import ControllerJournal
 from bench.scenarios import HOTSPOTS, generate
 from bench.world import ROBOT_R, Circle, Layout, RobotState, Walker, World, drive_robot, load_layout
 from traffic import ActorNavigation, FORKLIFT_RADIUS, TrafficWorld
@@ -42,6 +48,11 @@ SIM_TOKEN = os.getenv("SIM_TOKEN", "").strip()
 # Every MOVE_TO must carry a permit signed with this secret (shared with the backend).
 # Unset = no move is accepted (fails closed). STOP and WAIT never need a permit.
 PERMIT_SECRET = os.getenv("PERMIT_SECRET", "").strip().encode()
+AUTHORITY_BASE_URL = os.getenv("AUTHORITY_BASE_URL", "http://127.0.0.1:8080").rstrip("/")
+SIM_REDEEM_TIMEOUT_S = float(os.getenv("SIM_REDEEM_TIMEOUT_S", "1.0"))
+SIM_STATE_DB = os.getenv("SIM_STATE_DB", "data/controller.db")
+if not math.isfinite(SIM_REDEEM_TIMEOUT_S) or not 0 < SIM_REDEEM_TIMEOUT_S <= 2:
+    raise ValueError("SIM_REDEEM_TIMEOUT_S must be in (0, 2]")
 SIM_ROBOT_ID = os.getenv("SIM_ROBOT_ID", "robot-1")
 # Dead-man stop: if no permitted move arrives for this long, the robot brakes on its
 # own, so a crashed or cut-off backend cannot leave it driving. 0 disables it.
@@ -80,6 +91,60 @@ _deadman: Dict[str, Any] = {"last_move": None, "tripped": 0}                    
 _others: Dict[str, RobotState] = {rid: RobotState(*xy) for rid, xy in FLEET_PARKING.items()}
 _other_deadman: Dict[str, Dict[str, Any]] = {rid: {"last_move": None, "tripped": 0} for rid in FLEET_PARKING}
 _contacts: Dict[str, int] = {"robot_contact": 0}
+_boot_id = uuid.uuid4().hex
+_generations: Dict[str, int] = {}
+_journal = ControllerJournal(SIM_STATE_DB)
+for _stopped_id, _stop in _journal.stops().items():
+    if _stopped_id == "*":
+        _estop.update(engaged=True, **_stop)
+    else:
+        _robot_estops[_stopped_id] = _stop
+
+
+def _fence(robot_id: Optional[str] = None) -> None:
+    """Called under _lock. A stop/reset overtakes every earlier pending reply."""
+    for rid in [robot_id] if robot_id else fleet_ids():
+        _generations[rid] = _generations.get(rid, 0) + 1
+
+
+def _controller_context(w: World, robot_id: str) -> dict:
+    return dict(_journal.environment(w.layout.experience_identity), boot_id=_boot_id, generation=_generations.get(robot_id, 0))
+
+
+def _environment_change(w: World, reason: str) -> None:
+    _fence()
+    for rid in fleet_ids():
+        _robot(w, rid).target = None
+    _journal.environment(w.layout.experience_identity, reason)
+
+
+def _http_redemption(envelope: str) -> str:
+    """Bounded callback, outside _lock; never retry a spent permit automatically."""
+    request = urllib.request.Request(AUTHORITY_BASE_URL + "/authority/redeem",
+                                     data=json.dumps({"request": envelope}).encode(),
+                                     headers={"Content-Type": "application/json"}, method="POST")
+    try:
+        # Do not send signed controller requests through an ambient HTTP proxy.
+        opener = urllib.request.build_opener(urllib.request.ProxyHandler({}))
+        with opener.open(request, timeout=SIM_REDEEM_TIMEOUT_S) as response:
+            result = json.loads(response.read(131072))
+            if not isinstance(result, dict) or not isinstance(result.get("redemption"), str):
+                raise ValueError("missing redemption")
+            return result["redemption"]
+    except urllib.error.HTTPError as exc:
+        if exc.code == 403:
+            try:
+                detail = json.loads(exc.read(65536)).get("detail", "authority_refused")
+            except (ValueError, TypeError):
+                detail = "authority_refused"
+            raise HTTPException(status_code=403, detail=detail) from exc
+        raise HTTPException(status_code=503, detail="authority_unavailable") from exc
+    except (OSError, ValueError, TypeError, KeyError) as exc:
+        raise HTTPException(status_code=503, detail="authority_unavailable") from exc
+
+
+def _post_redemption(envelope: str) -> str:
+    return _http_redemption(envelope)
 
 
 def fleet_ids() -> List[str]:
@@ -188,6 +253,7 @@ async def _clock() -> None:
             if (SIM_DEADMAN_S > 0 and w.robot.target is not None and last is not None
                     and time.monotonic() - last > SIM_DEADMAN_S):
                 w.command("STOP")
+                _fence(SIM_ROBOT_ID)
                 _deadman["tripped"] += 1
                 _deadman["last_move"] = None
             for rid, r in _others.items():
@@ -195,6 +261,7 @@ async def _clock() -> None:
                 if (SIM_DEADMAN_S > 0 and r.target is not None and dm["last_move"] is not None
                         and time.monotonic() - dm["last_move"] > SIM_DEADMAN_S):
                     r.target = None
+                    _fence(rid)
                     dm["tripped"] += 1
                     dm["last_move"] = None
                 drive_robot(r, dt * SIM_SPEED)
@@ -282,6 +349,9 @@ def _telemetry_one(w: World, robot_id: str, bodies: List[Circle]) -> Dict[str, A
     people = _people(w)
     nearest = min(people, key=lambda p: math.hypot(p["x"] - w.robot.x, p["y"] - w.robot.y), default=None)
     tel.update({
+        **_controller_context(w, robot_id),
+        "environment_changes": _journal.environment_changes(),
+        "accepted_actions": _journal.accepted(robot_id),
         "events": events,
         "human": dict(nearest, type="human", id="nearest", role="primary") if nearest else None,
         "walking_humans": people,
@@ -322,7 +392,7 @@ class EstopRequest(BaseModel):
     robot_id: Optional[str] = None      # None = every robot
 
 
-def _check_permit(cmd: Command) -> None:
+def _check_permit(cmd: Command) -> dict:
     """Refuse a move unless its permit is valid for exactly this command and unused."""
     if len(PERMIT_SECRET) < 32:
         raise HTTPException(status_code=403, detail="permit_verification_not_configured")
@@ -338,9 +408,11 @@ def _check_permit(cmd: Command) -> None:
     now = time.time()
     for pid in [p for p, exp in _used_permits.items() if exp < now]:
         del _used_permits[pid]
-    if payload["id"] in _used_permits:
+    if payload["id"] in _used_permits or _journal.seen(payload["id"]):
         raise HTTPException(status_code=403, detail="permit_replayed")
-    _used_permits[payload["id"]] = float(payload["expires"])
+    if payload.get("controller") != _controller_context(_world(), action["robot_id"]):
+        raise HTTPException(status_code=403, detail="controller_context_changed")
+    return payload
 
 
 class ScenarioRequest(BaseModel):
@@ -387,6 +459,7 @@ def world(request: Request):
         d = w.layout.data
         people = _people(w)
         return {
+            **_journal.environment(w.layout.experience_identity),
             "geofence": d["geofence"], "zones": d["zones"], "racks": d.get("racks", []),
             "features": d.get("features", []), "bays": d["bays"], "obstacles": _obstacles(w),
             "human": people[0] if people else None, "walking_humans": people, "idle_robots": [],
@@ -402,6 +475,7 @@ def reset_robot(request: Request, robot_id: Optional[str] = None):
     with _lock:
         w = _world()
         rid = robot_id or SIM_ROBOT_ID
+        _fence(rid)
         if rid != SIM_ROBOT_ID:
             _robot(w, rid)
             _others[rid] = RobotState(*FLEET_PARKING[rid])
@@ -416,23 +490,52 @@ def reset_robot(request: Request, robot_id: Optional[str] = None):
 @app.post("/command")
 def command(request: Request, cmd: Command):
     _require_token(request)
-    with _lock:
-        w = _world()
-        g = w.layout.geofence
-        if cmd.intent == "MOVE_TO":
+    if cmd.intent == "MOVE_TO":
+        # Snapshot under the local lock, then release it for the network call.
+        # STOP/e-stop and physics remain responsive during an authority outage.
+        with _lock:
+            w = _world()
             rid = (cmd.action or {}).get("robot_id") or SIM_ROBOT_ID
             if _estopped(rid):
                 raise HTTPException(status_code=423, detail="estop_engaged")
-            _check_permit(cmd)
+            payload = _check_permit(cmd)
+            action = dict(cmd.action, kind=cmd.intent, params=cmd.params)
+            context = _controller_context(w, rid)
+            try:
+                x, y, speed = float(cmd.params["x"]), float(cmd.params["y"]), float(cmd.params.get("max_speed", 0.5))
+                g = w.layout.geofence
+                if (not all(math.isfinite(v) for v in (x, y, speed)) or speed < 0
+                        or not (g["min_x"] <= x <= g["max_x"] and g["min_y"] <= y <= g["max_y"])):
+                    raise ValueError("outside geofence or invalid speed")
+            except (KeyError, TypeError, ValueError) as exc:
+                raise HTTPException(status_code=403, detail="invalid_move_parameters") from exc
+            envelope = permits.redemption_request(PERMIT_SECRET, cmd.permit, action, context)
+        response = _post_redemption(envelope)
+        with _lock:
+            w = _world()
+            if _estopped(rid) or context != _controller_context(w, rid):
+                raise HTTPException(status_code=403, detail="controller_context_changed")
+            try:
+                permits.verify_redemption_response(PERMIT_SECRET, response, envelope)
+                permits.verify_for_action(PERMIT_SECRET, cmd.permit, action)
+            except permits.PermitError as exc:
+                raise HTTPException(status_code=403, detail=str(exc)) from exc
+            try:
+                _journal.accept(action, payload["id"])
+            except sqlite3.IntegrityError as exc:
+                raise HTTPException(status_code=403, detail="permit_replayed") from exc
+            except sqlite3.Error as exc:
+                raise HTTPException(status_code=503, detail="controller_journal_unavailable") from exc
+            _used_permits[payload["id"]] = float(payload["expires"])
+            _fence(rid)
             r = _robot(w, rid)
+            r.target = {"x": x, "y": y, "max_speed": speed}
             (_deadman if rid == SIM_ROBOT_ID else _other_deadman[rid])["last_move"] = time.monotonic()
-            x = float(cmd.params.get("x", r.x))
-            y = float(cmd.params.get("y", r.y))
-            if not (g["min_x"] <= x <= g["max_x"] and g["min_y"] <= y <= g["max_y"]):
-                return {"ok": False, "error": f"Target ({x},{y}) outside geofence"}
-            r.target = {"x": x, "y": y, "max_speed": float(cmd.params.get("max_speed", 0.5))}
-            return {"ok": True, "set_target": r.target, "robot_id": rid}
+            return {"ok": True, "set_target": r.target, "robot_id": rid, "action_id": action["action_id"]}
+    with _lock:
+        w = _world()
         if cmd.intent in ("STOP", "WAIT"):
+            _fence(cmd.robot_id or SIM_ROBOT_ID)
             r = _robot(w, cmd.robot_id)
             r.target = None
             if cmd.intent == "STOP":
@@ -449,6 +552,7 @@ def estop(request: Request, body: EstopRequest):
     with _lock:
         w = _world()
         if body.engaged:
+            _fence(body.robot_id)
             if body.robot_id:                       # one robot
                 _robot(w, body.robot_id).target = None
                 _robot_estops.setdefault(body.robot_id, {"reason": body.reason, "since": time.time()})
@@ -457,13 +561,18 @@ def estop(request: Request, body: EstopRequest):
                     _robot(w, rid).target = None
                 if not _estop["engaged"]:
                     _estop.update(engaged=True, reason=body.reason, since=time.time())
+            _journal.stop(body.robot_id or "*", body.reason)
             return {"ok": True, "engaged": True, "robot_id": body.robot_id}
         if len(PERMIT_SECRET) < 32:
             raise HTTPException(status_code=403, detail="permit_verification_not_configured")
         try:
-            permits.verify_release(PERMIT_SECRET, body.release_token, body.robot_id or "*")
+            release = permits.verify_release(PERMIT_SECRET, body.release_token, body.robot_id or "*")
+            _journal.release(body.robot_id or "*", release["id"])
         except permits.PermitError as exc:
             raise HTTPException(status_code=403, detail=str(exc))
+        except sqlite3.IntegrityError as exc:
+            raise HTTPException(status_code=403, detail="release_replayed") from exc
+        _fence(body.robot_id)
         if body.robot_id:
             _robot_estops.pop(body.robot_id, None)
         else:
@@ -499,6 +608,9 @@ def inject_scenario(request: Request, body: ScenarioRequest):
     _require_token(request)
     with _lock:
         w = _world()
+        if body.scenario not in SCENARIOS:
+            raise HTTPException(status_code=422, detail="unknown_scenario")
+        _environment_change(w, f"scenario:{body.scenario}")
         s = body.scenario
         if s in ("human_approach", "human_too_close"):
             w.walkers = [v for v in w.walkers if v.name != "Injected worker"]
@@ -548,6 +660,7 @@ def load_seed(request: Request, body: SeedRequest):
     """Load a benchmark scenario exactly (mode=benchmark) or a different live site (mode=live)."""
     _require_token(request)
     with _lock:
+        _environment_change(_world(), f"seed:{body.mode}:{body.seed}")
         if body.mode == "benchmark":
             sc = generate(body.seed, layout)
             _state["world"] = sc.build_world(layout)
