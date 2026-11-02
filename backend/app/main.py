@@ -91,7 +91,7 @@ async def lifespan(app: FastAPI):
     # Startup
     logger.info(f"🚀 Starting Sovereign Autonomy API")
     logger.info(f"   Environment: {settings.environment}")
-    logger.info(f"   Planner: {settings.planner_provider} (Nemotron: {'on' if settings.nemotron_configured else 'off'}, Gemini: {'on' if settings.gemini_configured else 'off'})")
+    logger.info(f"   Planner: {settings.planner_provider} (Muse: {'on' if settings.muse_configured else 'off'}, Gemini: {'on' if settings.gemini_configured else 'off'})")
     
     init_database()
 

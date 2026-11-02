@@ -86,7 +86,7 @@ def render() -> str:
     except Exception:
         pass
     try:
-        from app.services.nemotron_planner import usage_log
+        from app.services.model_runtime import usage_log
         for row in usage_log.summary().get("by_model", []):
             lab = _fmt_labels((("model", str(row["model"])), ("tier", str(row["tier"]))))
             lines.append(f"model_calls_total{lab} {row['calls']}")

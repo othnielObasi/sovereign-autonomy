@@ -20,7 +20,7 @@ const assert = require('node:assert/strict');
       racks: [{ id: 'R-1', x1: 9, x2: 11, y: 5, depth: 1 }],
       zones: [{ name: 'aisle', rect: { min_x: 0, max_x: 12, min_y: 0, max_y: 10 } }],
       features: [], bays: [{ id: 'A-01', ...goal, type: 'pick', side: 'north' }] };
-    const events = [{ id: 1, type: 'PLAN', ts: new Date().toISOString(), payload: { source: 'nemotron', plan } },
+    const events = [{ id: 1, type: 'PLAN', ts: new Date().toISOString(), payload: { source: 'muse', plan } },
       { id: 2, type: 'DECISION', ts: new Date().toISOString(), payload: { proposal: { intent: 'WAIT', params: {} }, governance: { decision: 'DENIED', risk_score: 0.9, reasons: ['Worker nearby'], required_action: 'STOP', policy_results: [] } } }];
     let socket;
     await page.routeWebSocket('**/ws/runs/parity-fixture', ws => {

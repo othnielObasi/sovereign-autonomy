@@ -6,7 +6,7 @@ How Sovereign Autonomy learns (the "fast loop"):
    *where* a policy denied moves (a 2 m grid cell + zone), how often, across
    which runs, and which speeds the gate approved in that same cell.
 2. Before planning or replanning, lessons near the route corridor are retrieved
-   and handed to the Nemotron planner as advisory context.
+   and handed to the planner (Muse Spark) as advisory context.
 3. Every PLAN / REPLAN event records which lesson IDs were applied, so the
    effect of learning is auditable and replayable.
 

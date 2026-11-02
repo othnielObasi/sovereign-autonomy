@@ -135,31 +135,14 @@ class Settings(BaseSettings):
     baseten_base_url: str = "https://inference.baseten.co/v1"
     muse_open_model: str = "meta-models/muse-spark-open-1026"
 
-    # ------------------------------------------------------------
-    # NVIDIA Nemotron on Nebius Token Factory (OpenAI-compatible)
-    # ------------------------------------------------------------
-    # When configured, Nemotron replaces Gemini as the planner everywhere.
-    # Tiered routing: fast models handle per-step proposals and analysis;
-    # the reasoning model handles mission planning and replanning after a
-    # governance denial. Model IDs are configurable because Token Factory's
-    # catalogue changes — run scripts/check_token_factory.py to list yours.
-    nebius_api_key: Optional[str] = None
-
     # Tavily: live site intelligence, always treated as untrusted input
     tavily_api_key: Optional[str] = None
     tavily_search_depth: str = "advanced"
     tavily_timeout_s: float = 12.0
-    nebius_base_url: str = "https://api.tokenfactory.nebius.com/v1"
-    nemotron_enabled: bool = True
-    nemotron_fast_models: str = "nvidia/Nemotron-3_5-Lightning,nvidia/nemotron-3-super-120b-a12b"
-    nemotron_reasoning_model: str = "nvidia/Nemotron-3-Ultra-550b-a55b"
-    nemotron_fast_timeout_s: float = 10.0  # fast models reason too; 2048-token cap
-    nemotron_reasoning_timeout_s: float = 30.0  # Ultra may think ~8k tokens (~20 s)
 
-    # Vision: an NVIDIA vision-language model reads the robot camera. Its output is
-    # cross-checked against the simulator and can only add caution, never remove it.
+    # Vision: SAM 3.1 reads the robot camera. Its output is cross-checked against
+    # the simulator and can only add caution, never remove it.
     vision_enabled: bool = True
-    vision_model: str = "nvidia/Nemotron-3.5-Super-VL"
     vision_interval_s: float = 5.0      # one check per run every N seconds
     vision_timeout_s: float = 15.0
     vision_match_m: float = 1.2         # a sighting within this distance of a real object counts as a match
@@ -167,7 +150,7 @@ class Settings(BaseSettings):
 
     @property
     def vision_configured(self) -> bool:
-        return self.vision_enabled and (self.sam_configured or bool(self.nebius_api_key))
+        return self.vision_enabled and self.sam_configured
 
     @property
     def sam_configured(self) -> bool:
@@ -175,7 +158,7 @@ class Settings(BaseSettings):
 
     @property
     def vision_provider(self) -> str:
-        return "sam" if self.sam_configured else "nemotron-vl"
+        return "sam" if self.sam_configured else "off"
 
     # Public demo guardrails (see app/demo_guard.py). Off by default.
     public_demo: bool = False
@@ -189,7 +172,7 @@ class Settings(BaseSettings):
     # LLM / Agent Configuration
     # ------------------------------------------------------------
     llm_enabled: bool = False
-    llm_provider: str = "muse"  # muse | nemotron | gemini | agentic | mock (muse/nemotron/gemini all use the best configured model)
+    llm_provider: str = "muse"  # muse | gemini | agentic | mock (muse/gemini both use the best configured model)
     # If true, starting a run will fail unless an LLM multi-waypoint plan is produced
     require_llm_plan_at_start: bool = True
 
@@ -279,27 +262,17 @@ class Settings(BaseSettings):
         return out
 
     @property
-    def nemotron_configured(self) -> bool:
-        return bool(self.nebius_api_key and self.nemotron_enabled)
-
-    @property
     def planner_configured(self) -> bool:
         """True when any LLM planner backend (Meta Muse preferred) is available."""
-        return self.muse_configured or self.muse_open_configured or self.nemotron_configured or self.gemini_configured
+        return self.muse_configured or self.muse_open_configured or self.gemini_configured
 
     @property
     def planner_provider(self) -> str:
         if self.muse_configured or self.muse_open_configured:
             return "muse"
-        if self.nemotron_configured:
-            return "nemotron"
         if self.gemini_configured:
             return "gemini"
         return "fallback"
-
-    @property
-    def nemotron_fast_models_list(self) -> List[str]:
-        return [m.strip() for m in self.nemotron_fast_models.split(",") if m.strip()]
 
     def validate_runtime(self) -> None:
         """Fail fast on missing critical config in production."""

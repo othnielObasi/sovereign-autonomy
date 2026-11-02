@@ -230,7 +230,7 @@ curl -X POST http://localhost:8080/site-intel/screen \
 
 | Method | Endpoint | Description |
 |--------|----------|-------------|
-| GET | `/evidence/benchmarks` | Benchmark suites committed with the code (per-arm totals, rounds, model usage, Nebius job manifest) |
+| GET | `/evidence/benchmarks` | Benchmark suites committed with the code (per-arm totals, rounds, model usage) |
 | GET | `/evidence/learning` | Live counts: lessons learned, plans shaped by lessons, replans, task checks, drift caught |
 
 ---
@@ -240,7 +240,7 @@ curl -X POST http://localhost:8080/site-intel/screen \
 | Method | Endpoint | Description |
 |--------|----------|-------------|
 | GET | `/perception/status` | Vision model, settings, slow zones in force, latest checks |
-| POST | `/perception/check` | Read the robot camera now with Nemotron 3.5 Super VL and compare with the sensors |
+| POST | `/perception/check` | Read the robot camera now with SAM 3.1 and compare with the sensors |
 
 Each result has a `verdict`: `agree`, `missed_hazard` (the model missed something the sensors see; the gate keeps using the sensors), `unconfirmed_sighting` (the model saw something the sensors don't; a short slow zone is added) or `no_answer`.
 

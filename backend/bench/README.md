@@ -5,7 +5,7 @@ Seeded warehouse scenarios driven through Sovereign Autonomy, measuring what the
 ```bash
 cd backend
 python -m bench run --planner rule_based --rounds 5 --seeds-per-round 30 --out bench/results/rule_based
-python -m bench run --planner nemotron --rounds 3 --seeds-per-round 20 --out bench/results/nemotron   # needs NEBIUS_API_KEY
+python -m bench run --planner muse --rounds 3 --seeds-per-round 20 --out bench/results/muse   # needs MODEL_API_KEY
 ```
 
 Each run writes `results.json` (every scenario, every arm), `README.md` (tables) and `chart.png`.
@@ -28,22 +28,13 @@ Each run writes `results.json` (every scenario, every arm), `README.md` (tables)
 |---|---|
 | `rule_based` | Grid route at each zone's limit. Uses lessons: slows near learned hotspots, caps speed where only slower moves were approved, routes around learned obstacle spots |
 | `reckless` | Same route at 0.9 m/s, ignores lessons; a stress test for the speed rules, not a model of a real planner |
-| `nemotron` | NVIDIA Nemotron on Nebius Token Factory plans and replans (reasoning tier), with lessons in its prompt |
+| `muse` | Meta Muse Spark plans and replans (reasoning tier), with lessons in its prompt |
 
 Models are called only to plan and replan; the 5 Hz step loop is mechanical, as in the live system.
 
-## On Nebius Serverless Jobs
+## Running large jobs
 
-The benchmark is CPU-only and self-contained. One large single round can be split into shards, one per job, then merged:
-
-```bash
-# each job (i = 0..3)
-python -m bench run --rounds 1 --seeds-per-round 500 --shard i/4 --out /results/shard-i
-# then
-python -m bench merge /results/shard-*/results.json --out /results/full
-```
-
-Learning rounds share lessons, so a learning run is one job. Container: the backend image (`backend/Dockerfile`) with `python -m bench ...` as the command; for `nemotron`, pass `NEBIUS_API_KEY` as a job secret.
+Large runs can be split with `--shard i/n` across machines and combined with `python -m bench merge`.
 
 ## Known limits
 

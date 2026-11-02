@@ -11,7 +11,7 @@ docker compose up -d
 # Simulator: http://localhost:8090/health
 ```
 
-For model planning, set `NEBIUS_API_KEY`, `LLM_ENABLED=true` and `LLM_PROVIDER=nemotron` in `.env` before starting. Without a key, a deterministic planner runs; every move is still governed. Without `TAVILY_API_KEY`, hazard lookups use clearly labelled offline sample text.
+For model planning, set `MODEL_API_KEY` (and `BASETEN_API_KEY`) and `LLM_ENABLED=true` in `.env` before starting. Without a key, a deterministic planner runs; every move is still governed. Without `TAVILY_API_KEY`, hazard lookups use clearly labelled offline sample text.
 
 The hazard buttons used below sit on the run page. The same hazards can be injected from a terminal:
 
@@ -26,7 +26,7 @@ curl -X POST http://localhost:8080/sim/scenario -H "Content-Type: application/js
 
 1. Open the **Dashboard**. Workers are already moving through the warehouse, and the forklift is on the corridor.
 2. **Plan a mission**: choose a destination bay (for example `A-07`) or pick a point on the floor, then start it.
-3. On the run page, show the **Planner Output**: Nemotron Ultra's waypoint plan, each waypoint with its own speed cap. The plan follows the aisles, not straight lines through racking.
+3. On the run page, show the **Planner Output**: Muse Spark's waypoint plan, each waypoint with its own speed cap. The plan follows the aisles, not straight lines through racking.
 4. Switch between **3D warehouse** and **Floor plan**. Both show the same data: proposed path (blue), approved plan (purple), executed path (green), safety rings round people, and risk cells.
 5. Point out the **Chain-of-Trust** feed: every decision is hash-chained and signed.
 
@@ -50,7 +50,7 @@ Talking point: the planner only proposes. A denied move never executes, and ever
 
 - Open the run's **Learning & task** tab.
 - **Task focus:** each plan and replan was checked: it ends at the mission's destination and doesn't wander. A plan that fails would be replaced by the aisle route to the same place.
-- **Lessons the planner was given:** the exact advice Nemotron received from earlier runs, marked "used by Nemotron".
+- **Lessons the planner was given:** the exact advice the planner received from earlier runs, marked "used by the planner".
 - **Replans:** the policy that blocked the robot and the new plan Ultra produced.
 - Talking point: the planner learns from the gate; the gate never drifts.
 
@@ -80,7 +80,7 @@ Talking point: the planner only proposes. A denied move never executes, and ever
 
 ## Key Talking Points
 
-- **"It learns, and it stays on task."** Lessons from the gate's own denials shape Nemotron's next plans; every plan must still end at the mission's destination without wandering.
+- **"It learns, and it stays on task."** Lessons from the gate's own denials shape Muse Spark's next plans; every plan must still end at the mission's destination without wandering.
 
 - **"The planner proposes; the gate decides."** 11 deterministic policies check every move before it runs.
 - **"Proof, not logs."** SHA-256 hash-chained events and Ed25519-signed receipts anyone can verify.

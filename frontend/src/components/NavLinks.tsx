@@ -37,7 +37,7 @@ export function StatusPill() {
   }, []);
   const ok = !down && h?.status === "ok";
   const sim = h?.checks?.simulator === "ok";
-  const planner = h?.planner_provider === "muse" ? "Muse Spark" : h?.planner_provider === "nemotron" ? "Nemotron" : h?.planner_provider || "…";
+  const planner = h?.planner_provider === "muse" ? "Muse Spark" : h?.planner_provider || "…";
   return (
     <div className={cx("hidden lg:flex items-center gap-2 rounded-full border px-3 py-1 text-xs",
       ok ? "border-mc-ok/30 bg-mc-ok/10 text-mc-ok" : "border-mc-stop/30 bg-mc-stop/10 text-mc-stop")}

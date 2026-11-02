@@ -3,7 +3,7 @@
 import React, { useState, useEffect, useMemo, useRef } from 'react'
 import { WarehouseView } from '@/components/WarehouseView'
 
-// Simulated API responses (same format the Nemotron planner sends)
+// Simulated API responses (same format the planner sends)
 const generateApiResponse = (scenario, robotPos, waypointIndex) => ({
   timestamp: new Date().toISOString(),
   run_id: 'run-demo-001',

@@ -36,7 +36,7 @@ Last checked: 1 Nov 2026. 303 backend tests passing; frontend type-checks; a liv
 | 5. Execution governance and gateway | **Working** | Our own execution authority; the separate AIRG product is not integrated |
 | 6. Observability | **Working** (Prometheus); LangSmith **ready, needs key** | `GET /metrics`: decisions, permits issued/refused by reason, dispatch outcomes, kill switches with revoke and stop times, quarantined memory, model calls; `infra/grafana/dashboard.json` uses these names. LangSmith: one trace per mission linking each model call to the gate decisions and permits that followed, plus kill switches and drills (`test_tracing.py`; check with `scripts/check_langsmith.py`). OpenTelemetry: the same mission spans over OTLP/HTTP when `OTEL_EXPORTER_OTLP_ENDPOINT` is set (prompt sizes only) |
 | 7. AI security | **Working** | A planner cannot authorize a move; injection firewall (pre-existing, drill `injection`); poisoned memory quarantined; canary tripwire |
-| 8. Canary assurance | **Working** | Every mission plan carries a canary inside the untrusted context; a plan that obeys it is discarded. Live: Nemotron Ultra obeyed it and its plan was discarded |
+| 8. Canary assurance | **Working** | Every mission plan carries a canary inside the untrusted context; a plan that obeys it is discarded. Live: Muse Spark ignored it; an earlier non-Meta planner (since removed) obeyed it and its plan was discarded |
 | 9. Emergency control | **Working** | Global, robot, mission and agent kill switches; controller e-stop; verified stop; survive restarts; reset needs login; spoken stop via Muse Voice Transcribe (ready, needs key) |
 
 ## Reliability capabilities
@@ -73,10 +73,10 @@ Last checked: 1 Nov 2026. 303 backend tests passing; frontend type-checks; a liv
 
 ## Live check (1 Nov 2026)
 
-Simulator, backend and dashboard as separate processes, shared random permit secret, Nemotron as the planner (no Meta key yet):
+Simulator, backend and dashboard as separate processes, shared random permit secret, an earlier non-Meta planner (since removed; no Meta key yet):
 
 1. Security drills from the dashboard: **8 of 8 passed** (bypass, tamper, replay, forged, poison, injection, canary, kill).
 2. Mission to B-03: NetworkX route; **16 of 16 moves sent with permits**; dead-man stop never tripped.
-3. The canary tripped: Nemotron Ultra copied the hidden instruction, so its plan was discarded and the aisle route used.
+3. The canary tripped: that planner copied the hidden instruction, so its plan was discarded and the aisle route used.
 4. After the run, its signed experience was recorded (3 learned cells, 0 quarantined).
 5. Earlier drill on the same system: direct command HTTP 403; global kill revoked authority in 16 ms with the stop verified in 453 ms; reset without login HTTP 401.

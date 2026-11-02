@@ -181,7 +181,7 @@ export default function RunPage({ params }: { params: { runId: string } }) {
       setEvents(rows);
 
       // Auto-populate llmPlan from backend PLAN events.  Always prefer the
-      // latest LLM plan (source: "nemotron" / "gemini") over a seed fallback so the map
+      // latest LLM plan (source: "muse" / "gemini") over a seed fallback so the map
       // shows the plan the robot is *actually* following — even if a seed
       // fallback was loaded first.
       const planEvents = rows.filter((e: any) => e.type === "PLAN");

@@ -52,7 +52,7 @@ function Benchmarks() {
   useEffect(() => { getBenchmarks().then((d) => setSuites(d.suites || [])).catch((e) => setErr(e.message)); }, []);
   if (err) return <Notice tone="stop">{err}</Notice>;
   if (!suites) return <div className="text-sm text-mc-dim">Loading benchmark results…</div>;
-  const order = ["nemotron", "rule_based", "reckless"];
+  const order = ["muse", "rule_based", "reckless"];
   return (
     <div className="space-y-6">
       <Notice tone="info">
@@ -67,7 +67,7 @@ function Benchmarks() {
 function SuiteCard({ s }: { s: Suite }) {
   const t = s.totals;
   const maxUnsafe = Math.max(1, ...ARMS.map((a) => Number(t[a.id]?.unsafe_executed || 0)));
-  const ultra = s.model_usage?.by_model?.find((m: any) => String(m.model).includes("Ultra"));
+  const ultra = s.model_usage?.by_model?.find((m: any) => m.tier === "reasoning");
   const last = s.rounds_detail?.[s.rounds_detail.length - 1];
   return (
     <Panel
@@ -75,8 +75,7 @@ function SuiteCard({ s }: { s: Suite }) {
       subtitle={`${s.summary}${s.generated_at ? ` · ${s.generated_at}` : ""}`}
       actions={
         <div className="flex flex-wrap gap-1.5 justify-end">
-          {s.execution === "nebius-serverless-job" && <Pill tone="accent">Nebius Serverless Job</Pill>}
-          {s.planner === "nemotron" && <Pill tone="nv">NVIDIA Nemotron</Pill>}
+          {s.planner === "muse" && <Pill tone="accent">Meta Muse Spark</Pill>}
           {s.source_commit && <Pill><Mono className="text-mc-mute">{s.source_commit.slice(0, 7)}</Mono></Pill>}
         </div>
       }>
@@ -98,7 +97,7 @@ function SuiteCard({ s }: { s: Suite }) {
           })}
           {ultra && (
             <div className="text-xs text-mc-mute pt-1">
-              <span className="text-mc-nv">{ultra.ok}/{ultra.calls}</span> Nemotron Ultra calls succeeded · p50 {(ultra.p50_latency_ms / 1000).toFixed(1)} s
+              <span className="text-mc-accent">{ultra.ok}/{ultra.calls}</span> {ultra.model} planning calls succeeded · p50 {(ultra.p50_latency_ms / 1000).toFixed(1)} s
               {s.wall_time_s ? ` · ${Math.round(s.wall_time_s / 60)} min` : ""}
             </div>
           )}

@@ -3,10 +3,10 @@
     # learning curve: 5 rounds of 40 fresh scenarios, rule-based planner
     python -m bench run --planner rule_based --rounds 5 --seeds-per-round 40
 
-    # Nemotron on Token Factory (needs NEBIUS_API_KEY)
-    python -m bench run --planner nemotron --rounds 3 --seeds-per-round 20
+    # Meta Muse Spark planning (needs MODEL_API_KEY)
+    python -m bench run --planner muse --rounds 3 --seeds-per-round 20
 
-    # one large round split across Nebius Serverless Jobs, then merged
+    # one large round split into shards (e.g. across machines), then merged
     python -m bench run --rounds 1 --seeds-per-round 500 --shard 0/4 --out results/shard0
     python -m bench merge results/shard*/results.json --out results/full
 
@@ -32,7 +32,7 @@ from sqlalchemy.orm import sessionmaker
 from sqlalchemy.pool import StaticPool
 
 logging.basicConfig(level=logging.WARNING, format="%(message)s")
-for noisy in ("app", "app.governance", "app.planner_lessons", "app.nemotron_planner", "httpx"):
+for noisy in ("app", "app.governance", "app.planner_lessons", "app.muse_planner", "app.meta_models", "httpx"):
     logging.getLogger(noisy).setLevel(logging.WARNING)
 logging.getLogger("app.governance").setLevel(logging.ERROR)
 
@@ -65,7 +65,7 @@ def _git_commit() -> str:
 
 def run(args) -> Dict[str, Any]:
     from app.policies import params as P
-    from app.services.nemotron_planner import usage_log
+    from app.services.model_runtime import usage_log
     from app.services.planner_lessons import distill_run
     from bench.planners import PLANNERS
     from bench.runner import aggregate, run_arm
@@ -140,7 +140,7 @@ def main(argv=None) -> int:
                                  formatter_class=argparse.RawDescriptionHelpFormatter)
     sub = ap.add_subparsers(dest="cmd", required=True)
     r = sub.add_parser("run")
-    r.add_argument("--planner", default="rule_based", choices=["rule_based", "reckless", "nemotron"])
+    r.add_argument("--planner", default="rule_based", choices=["rule_based", "reckless", "muse"])
     r.add_argument("--rounds", type=int, default=3)
     r.add_argument("--seeds-per-round", type=int, default=30)
     r.add_argument("--first-seed", type=int, default=1000)

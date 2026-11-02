@@ -1,6 +1,6 @@
 """Evidence: the safety benchmark results committed with the code.
 
-Serves the summaries in bench/results/<suite>/results.json (and the Nebius job
+Serves the summaries in bench/results/<suite>/results.json (and the benchmark job
 manifest when present) so the dashboard can show what the gate prevented.
 """
 from __future__ import annotations

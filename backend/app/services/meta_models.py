@@ -27,12 +27,12 @@ logger = logging.getLogger("app.meta_models")
 
 
 def _client():
-    from app.services.nemotron_planner import _get_client   # shared, event-loop-safe client
+    from app.services.model_runtime import _get_client   # shared, event-loop-safe client
     return _get_client()
 
 
 def _log(**record: Any) -> None:
-    from app.services.nemotron_planner import usage_log
+    from app.services.model_runtime import usage_log
     usage_log.record(**record)
 
 
@@ -85,7 +85,7 @@ async def chat(model: str, system: str, prompt: str, *, image_png: Optional[byte
         text = (choice.get("message") or {}).get("content") or ""
         if isinstance(text, list):   # some providers return content parts
             text = "".join(p.get("text", "") for p in text if isinstance(p, dict))
-        from app.services.nemotron_planner import strip_reasoning
+        from app.services.model_runtime import strip_reasoning
         text = strip_reasoning(text)
         if not text:
             return None

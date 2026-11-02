@@ -21,7 +21,7 @@ from typing import Any, Dict, List, Optional
 from app.config import settings
 from app.services import meta_models
 from app.services.gemini_planner import GeminiPlanner
-from app.services.nemotron_planner import TIER_FAST, TIER_REASONING, _tier, reasoning_tier
+from app.services.model_runtime import TIER_FAST, TIER_REASONING, _tier, reasoning_tier
 
 logger = logging.getLogger("app.muse_planner")
 

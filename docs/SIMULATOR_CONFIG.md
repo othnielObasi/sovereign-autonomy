@@ -44,7 +44,7 @@ The original mock simulator (`sim/mock_sim`) is kept for comparison under the Do
 |-------------|-------|
 | Local (same machine) | `http://localhost:8090` |
 | Docker Compose (dev) | `http://warehouse-sim:8090` |
-| Nebius VM (production compose) | `http://sim:8090` |
+| Production compose | `http://sim:8090` |
 
 ### Generate a token
 

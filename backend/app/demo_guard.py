@@ -1,7 +1,7 @@
 """Public-demo guardrails (PUBLIC_DEMO=true).
 
 A public link means strangers share one simulated robot and the operator's
-Token Factory and Tavily credits. In demo mode:
+model API and Tavily credits. In demo mode:
 
 - Shared settings are read-only: rule changes, rollbacks and deleting missions
   return 403. Everyone sees the same rules.

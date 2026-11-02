@@ -1,8 +1,8 @@
-"""The shared Token Factory client must survive callers that use asyncio.run() per
+"""The shared model API client must survive callers that use asyncio.run() per
 call (the benchmark): a client bound to a closed event loop is replaced."""
 import asyncio
 
-import app.services.nemotron_planner as npl
+import app.services.model_runtime as npl
 
 
 def test_new_client_after_previous_loop_closed(monkeypatch):

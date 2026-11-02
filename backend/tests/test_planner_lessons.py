@@ -1,5 +1,5 @@
 """Planner learning loop: lessons distilled from gate decisions, retrieved per route,
-fed to the Nemotron planner, and never able to change the rules."""
+fed to the planner (Muse Spark), and never able to change the rules."""
 from __future__ import annotations
 
 import asyncio
@@ -16,10 +16,10 @@ from app.db.models import AgentMemoryEntry
 from app.main import app
 from app.policies.versioning import policy_version_hash
 from app.schemas.governance import ActionProposal
-from app.services import nemotron_planner as np_mod
+from app.services import model_runtime as np_mod
 from app.services import planner_lessons as pl
 from app.services.governance_engine import GovernanceEngine
-from app.services.nemotron_planner import NemotronPlanner
+from app.services.muse_planner import MusePlanner
 
 AISLE = {"x": 12.3, "y": 8.1, "zone": "aisle", "speed": 0.3, "human_detected": False, "nearest_obstacle_m": 5.0}
 
@@ -123,10 +123,15 @@ PLAN_JSON = json.dumps({"waypoints": [{"x": 6, "y": 8, "max_speed": 0.45}, {"x":
                         "rationale": "slow through aisle", "estimated_time_s": 60})
 
 
+def _muse(monkeypatch):
+    """Muse Spark with a fake key; no camera frame (no simulator in these tests)."""
+    monkeypatch.setattr(settings, "model_api_key", "LLM_test")
+    monkeypatch.setattr(settings, "baseten_api_key", None)
+    monkeypatch.setattr(settings, "muse_plan_with_camera", False)
+
+
 def test_planner_prompt_carries_lessons_and_reports_ids(db, monkeypatch):
-    monkeypatch.setattr(settings, "nebius_api_key", "k")
-    monkeypatch.setattr(settings, "nemotron_fast_models", "nvidia/fast")
-    monkeypatch.setattr(settings, "nemotron_reasoning_model", "nvidia/ultra")
+    _muse(monkeypatch)
     seen = []
 
     def handler(request):
@@ -137,7 +142,7 @@ def test_planner_prompt_carries_lessons_and_reports_ids(db, monkeypatch):
 
     pl.distill_run(db, _run_with_speeding(db))
     lessons = pl.lessons_for_route(db, {"x": 2.0, "y": 8.0}, {"x": 30.0, "y": 8.0})
-    plan = asyncio.run(NemotronPlanner().generate_plan(
+    plan = asyncio.run(MusePlanner().generate_plan(
         {"x": 2.0, "y": 8.0}, "deliver to dock", {"x": 30.0, "y": 8.0}, lessons=lessons))
 
     prompt = seen[0]["messages"][-1]["content"]
@@ -148,7 +153,7 @@ def test_planner_prompt_carries_lessons_and_reports_ids(db, monkeypatch):
 
 
 def test_no_lessons_means_no_lesson_block(monkeypatch):
-    monkeypatch.setattr(settings, "nebius_api_key", "k")
+    _muse(monkeypatch)
     seen = []
 
     def handler(request):
@@ -156,7 +161,7 @@ def test_no_lessons_means_no_lesson_block(monkeypatch):
         return httpx.Response(200, json={"choices": [{"message": {"content": PLAN_JSON}}], "usage": {}})
 
     monkeypatch.setattr(np_mod, "_client", httpx.AsyncClient(transport=httpx.MockTransport(handler)))
-    plan = asyncio.run(NemotronPlanner().generate_plan({"x": 2, "y": 8}, "go", {"x": 30, "y": 8}))
+    plan = asyncio.run(MusePlanner().generate_plan({"x": 2, "y": 8}, "go", {"x": 30, "y": 8}))
     assert "LESSONS FROM PAST RUNS" not in seen[0]["messages"][-1]["content"]
     assert plan["lessons_applied"] == []
 

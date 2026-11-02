@@ -3,8 +3,7 @@
 With a Meta Model API key, SAM 3.1 segments the robot's camera frame: one short
 prompt per object type (person, forklift, spill, pallet), run in parallel, each
 returning pixel boxes. Each box centre is projected onto the warehouse floor with
-the camera geometry, so a detection becomes a position in metres. Without the
-key, the earlier Nemotron vision-language model is used. Either way the output
+the camera geometry, so a detection becomes a position in metres. The output
 is never trusted on its own:
 
 - Every report is compared with the simulator's ground truth in the same view.
@@ -42,13 +41,6 @@ KINDS = ("person", "forklift", "spill", "pallet")
 _TRUTH_KIND = {"spill": "spill", "forklift": "forklift", "dropped_pallet": "pallet", "pallet": "pallet"}
 # Slow zone placed round an unconfirmed sighting: (slow radius m, max speed m/s)
 CAUTION = {"person": (2.0, 0.3), "forklift": (2.5, 0.3), "spill": (1.5, 0.2), "pallet": (1.2, 0.3)}
-
-PROMPT = """Top-down warehouse camera image, robot = blue triangle pointing up.
-Find every PERSON (orange circle with a dark centre), FORKLIFT (yellow), SPILL (light-cyan blotchy patch) and
-PALLET (brown square). Dark-brown long bars are racks: do not report them. Report only what is clearly visible.
-For each object give the centre of the object in image coordinates on a 0-1000 grid (x from left, y from top).
-JSON only: {"objects": [{"type": "person|forklift|spill|pallet", "x": 0, "y": 0}]}"""
-
 
 def image_to_robot(px: float, py: float) -> Tuple[float, float]:
     """0-1000 image coordinates -> (ahead_m, right_m) relative to the robot."""
@@ -173,48 +165,7 @@ class Perception:
         return {"objects": objects}, record
 
     async def _ask(self, png: bytes) -> Tuple[Optional[Any], Dict[str, Any]]:
-        if settings.sam_configured:
-            return await self._ask_sam(png)
-        return await self._ask_vlm(png)
-
-    async def _ask_vlm(self, png: bytes) -> Tuple[Optional[Any], Dict[str, Any]]:
-        from app.services.gemini_planner import _extract_json
-        from app.services.nemotron_planner import _get_client, usage_log
-        body = {
-            "model": settings.vision_model, "temperature": 0, "max_tokens": 1024,
-            # Thinking off: with it on, the model spends its whole budget reasoning
-            # about the image and returns no answer; off, it answers in about a second.
-            "chat_template_kwargs": {"enable_thinking": False},
-            "messages": [{"role": "user", "content": [
-                {"type": "text", "text": PROMPT},
-                {"type": "image_url", "image_url": {"url": "data:image/png;base64," + base64.b64encode(png).decode()}},
-            ]}],
-        }
-        record: Dict[str, Any] = {"model": settings.vision_model, "tier": "vision", "ok": False}
-        t0 = time.monotonic()
-        try:
-            r = await _get_client().post(
-                f"{settings.nebius_base_url.rstrip('/')}/chat/completions",
-                headers={"Authorization": f"Bearer {settings.nebius_api_key}"}, json=body,
-                timeout=settings.vision_timeout_s)
-            record.update(latency_ms=round((time.monotonic() - t0) * 1000), status=r.status_code)
-            if r.status_code >= 400:
-                logger.warning("Vision model HTTP %s: %s", r.status_code, r.text[:200])
-                return None, record
-            data = r.json()
-            usage = data.get("usage") or {}
-            record.update(prompt_tokens=usage.get("prompt_tokens"), completion_tokens=usage.get("completion_tokens"))
-            text = ((data.get("choices") or [{}])[0].get("message") or {}).get("content") or ""
-            obj = _extract_json(text)
-            record["ok"] = True
-            return obj, record
-        except Exception as e:
-            record.setdefault("latency_ms", round((time.monotonic() - t0) * 1000))
-            record["error"] = type(e).__name__
-            logger.warning("Vision check failed: %s", e)
-            return None, record
-        finally:
-            usage_log.record(**record)
+        return await self._ask_sam(png)
 
     # ----------------------------------------------------------------- check
     async def check(self, sim, telemetry: Optional[Dict[str, Any]] = None, run_id: Optional[str] = None) -> Dict[str, Any]:
@@ -226,7 +177,7 @@ class Perception:
         self._seq += 1
         result: Dict[str, Any] = {
             "id": f"vis-{self._seq}", "ts": time.time(), "run_id": run_id,
-            "model": settings.sam_model if settings.sam_configured else settings.vision_model,
+            "model": settings.sam_model,
             "latency_ms": call.get("latency_ms"), "robot": {k: tel.get(k) for k in ("x", "y", "theta")},
             "truth": truth,
         }
@@ -294,7 +245,7 @@ class Perception:
     def status(self) -> Dict[str, Any]:
         return {
             "enabled": settings.vision_configured,
-            "model": settings.sam_model if settings.sam_configured else settings.vision_model,
+            "model": settings.sam_model,
             "provider": settings.vision_provider,
             "interval_s": settings.vision_interval_s, "match_m": settings.vision_match_m,
             "caution_ttl_s": settings.vision_caution_ttl_s, "caution_zones": self.caution_zones(),

@@ -48,7 +48,6 @@ async def health():
         "muse_open_enabled": settings.muse_open_configured,
         "vision_provider": settings.vision_provider if settings.vision_configured else None,
         "voice_enabled": settings.voice_configured,
-        "nemotron_enabled": settings.nemotron_configured,
         "planner_provider": settings.planner_provider,
         "version": "0.1.0",
         "checks": {

@@ -5,8 +5,8 @@
   slower moves were approved, and routes around spots with obstacle denials.
 - reckless: same route at 0.9 m/s everywhere and ignores lessons. A stress
   baseline that exercises the speed rules; not a model of any real planner.
-- nemotron: NVIDIA Nemotron on Nebius Token Factory plans and replans (the
-  reasoning tier), with lessons in its prompt. Needs NEBIUS_API_KEY.
+- muse: Meta Muse Spark plans and replans (the reasoning tier), with lessons in
+  its prompt. Needs MODEL_API_KEY (or BASETEN_API_KEY for Muse Spark Open).
 
 The executor turns the current waypoint into a per-step proposal. With
 lessons, it also yields (WAIT) when a person is close at a spot where the gate
@@ -104,17 +104,17 @@ class Reckless(RuleBased):
     learns = False
 
 
-class Nemotron(Planner):
-    name = "nemotron"
+class Muse(Planner):
+    name = "muse"
     uses_model = True
 
     def __init__(self, layout: Layout):
         super().__init__(layout)
         from app.config import settings
-        if not settings.nemotron_configured:
-            raise RuntimeError("planner 'nemotron' needs NEBIUS_API_KEY (and NEMOTRON_ENABLED) set")
-        from app.services.nemotron_planner import NemotronPlanner
-        self.llm = NemotronPlanner()
+        if not (settings.muse_configured or settings.muse_open_configured):
+            raise RuntimeError("planner 'muse' needs MODEL_API_KEY (or BASETEN_API_KEY) set")
+        from app.services.muse_planner import MusePlanner
+        self.llm = MusePlanner()
         self.llm.set_bays(list(layout.bays.values()))
 
     @staticmethod
@@ -153,7 +153,7 @@ class Nemotron(Planner):
         return self._call(tel, instruction, {"x": sc.goal[0], "y": sc.goal[1]}, lessons)
 
 
-PLANNERS = {"rule_based": RuleBased, "reckless": Reckless, "nemotron": Nemotron}
+PLANNERS = {"rule_based": RuleBased, "reckless": Reckless, "muse": Muse}
 
 
 class Executor:

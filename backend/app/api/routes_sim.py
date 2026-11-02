@@ -81,7 +81,7 @@ async def perception_check():
     from app.config import settings
     from app.services.perception import perception
     if not settings.vision_configured:
-        raise HTTPException(status_code=503, detail="Vision needs NEBIUS_API_KEY (and VISION_ENABLED=true)")
+        raise HTTPException(status_code=503, detail="Vision needs MODEL_API_KEY (SAM 3.1) and VISION_ENABLED=true")
     try:
         return await perception.check(sim)
     except Exception as e:

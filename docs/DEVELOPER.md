@@ -4,7 +4,7 @@ The developer handbook for Sovereign Autonomy: where things live, how a run work
 
 ## Project Overview
 
-**Sovereign Autonomy** is a real-time governance layer for autonomous robots. An NVIDIA Nemotron planner (on Nebius Token Factory) proposes each move; a deterministic gate of 11 policies approves, slows or blocks it before it runs; every decision is hash-chained and signed with Ed25519.
+**Sovereign Autonomy** is a real-time governance layer for autonomous robots. Meta's Muse Spark plans each mission and Muse Spark Open proposes each move; a deterministic gate of 11 policies approves, slows or blocks it before it runs; every decision is hash-chained and signed with Ed25519.
 
 ## Architecture Essentials
 
@@ -36,7 +36,7 @@ The warehouse simulator imports the benchmark engine, so changes to `backend/ben
 
 ## Run Lifecycle
 
-1. `start_run()` — creates the run, snapshots the policy version, requests a mission plan (Nemotron Ultra, with lessons near the route), spawns the loop
+1. `start_run()` — creates the run, snapshots the policy version, requests a mission plan (Muse Spark with the camera frame, and lessons near the route), spawns the loop
 2. `_run_loop()` — about once a second: poll telemetry (plus hazard zones) → next waypoint or planner proposal → `evaluate_and_record` → execute or STOP → append events → broadcast
 3. `pause_run()` / `resume_run()` — sets the pause flag, logs an INTERVENTION event
 4. `stop_run()` — sets the stop flag, marks the run `stopped`
@@ -109,8 +109,8 @@ APP_URL=http://127.0.0.1:3000 node tests/warehouse-parity.smoke.cjs
 # Safety benchmark
 cd backend && python -m bench run --planner rule_based --rounds 5 --seeds-per-round 30 --out bench/results/rule_based
 
-# Check the Token Factory catalogue and both Nemotron tiers
-NEBIUS_API_KEY=... python scripts/check_token_factory.py
+# Check every Meta model with real keys (Muse Spark, Muse Spark Open, SAM 3.1)
+cd backend && python ../scripts/check_meta.py
 
 # Inject a hazard
 curl -X POST http://localhost:8080/sim/scenario \
@@ -128,7 +128,7 @@ curl http://localhost:8080/governance/decisions/{run_id}/stats
 | Governance engine | `backend/app/services/governance_engine.py` |
 | Policies | `backend/app/policies/rules_python.py`, `policy_catalog.yaml` |
 | Governed rule changes | `backend/app/policies/proposals.py`, `params.py`, `api/routes_policy_proposals.py` |
-| Nemotron planner | `backend/app/services/nemotron_planner.py`, `llm_factory.py` |
+| Muse planner | `backend/app/services/muse_planner.py`, `meta_models.py`, `model_runtime.py`, `llm_factory.py` |
 | Planner lessons | `backend/app/services/planner_lessons.py` |
 | Site intelligence | `backend/app/services/site_intel/`, `api/routes_site_intel.py` |
 | Receipt signing | `backend/app/utils/signing.py` |

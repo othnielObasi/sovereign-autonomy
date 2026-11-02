@@ -26,7 +26,7 @@ router = APIRouter(prefix="/llm", tags=["llm"])
 class PlanRequest(BaseModel):
     instruction: str = Field(..., description="Natural-language instruction for the robot")
     goal: Optional[Dict[str, Any]] = Field(None, description="Optional {x, y, zone?} goal coordinate")
-    model: Optional[str] = Field(None, description="Preferred starting model (e.g. nvidia/nemotron-3-super-120b-a12b). Falls back through cascade.")
+    model: Optional[str] = Field(None, description="Preferred starting model (e.g. muse-spark-1.3). Falls back through cascade.")
 
 
 class ExecuteRequest(BaseModel):
@@ -137,12 +137,12 @@ def _get_planner() -> GeminiPlanner:
 
 @router.get("/usage")
 async def llm_usage(limit: int = 50):
-    """Per-model latency and token usage for Nemotron calls (process-local).
+    """Per-model latency and token usage for model calls (process-local).
 
     Powers the 'cost and latency per decision' view: which tier handled the
     call, p50/p95 latency, and prompt/completion tokens.
     """
-    from app.services.nemotron_planner import usage_log
+    from app.services.model_runtime import usage_log
     return {
         "provider": settings.planner_provider,
         "summary": usage_log.summary(),
@@ -155,7 +155,7 @@ async def list_models():
     """List the active planner provider, its model tiers and cascade order."""
     from app.services.gemini_planner import MODEL_CASCADE
     planner = _get_planner()
-    if getattr(planner, "provider", None) in ("muse", "nemotron"):
+    if getattr(planner, "provider", None) == "muse":
         return {
             "provider": planner.provider,
             "primary": planner.primary_model,

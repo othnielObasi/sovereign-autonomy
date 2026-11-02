@@ -10,9 +10,12 @@ import tempfile
 os.environ.setdefault("PERMIT_SECRET", "test-permit-secret-0123456789abcdef0123")
 # Tests never use real credentials from backend/.env: no paid model calls, no traces sent.
 # (Environment variables override the .env file, so blanking them here is enough.)
-for _secret in ("MODEL_API_KEY", "BASETEN_API_KEY", "LANGSMITH_API_KEY", "NEBIUS_API_KEY", "GEMINI_API_KEY",
+for _secret in ("MODEL_API_KEY", "BASETEN_API_KEY", "LANGSMITH_API_KEY", "GEMINI_API_KEY",
                 "TAVILY_API_KEY", "OTEL_EXPORTER_OTLP_ENDPOINT"):
     os.environ[_secret] = ""
+# Tests never talk to a real simulator running on this machine (another project may own
+# the default port 8090): a closed port fails fast, and tests that need one start their own.
+os.environ["SIM_BASE_URL"] = "http://127.0.0.1:9"
 # Most tests check the benchmark warehouse's exact geometry; the factory has its own tests.
 os.environ.setdefault("SITE_LAYOUT", "warehouse")
 os.environ.setdefault("AUTHORITY_DB_PATH", os.path.join(tempfile.mkdtemp(prefix="authority-"), "authority.db"))

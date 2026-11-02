@@ -2,7 +2,7 @@
 
 ## System Overview
 
-Sovereign Autonomy is a runtime governance layer for autonomous robots. An NVIDIA Nemotron planner proposes each move; a deterministic gate of 11 policies approves, slows or blocks it before it runs; every decision is hash-chained and signed.
+Sovereign Autonomy is a runtime governance layer for autonomous robots. Meta's Muse Spark plans each mission (seeing the robot camera) and Muse Spark Open proposes each step; a deterministic gate of 11 policies approves, slows or blocks every move; only an approved move gets a single-use permit the robot controller checks again; every decision is hash-chained and signed.
 
 ```
 ┌─────────────────────────────────────────────────────────────┐
@@ -34,8 +34,8 @@ Sovereign Autonomy is a runtime governance layer for autonomous robots. An NVIDI
 │            │                 └───────────────────────────┘  │
 │  ┌─────────▼──────────┐      ┌───────────────────────────┐  │
 │  │ Planner            │      │ Site intelligence         │  │
-│  │ Nemotron fast tier │      │ Tavily → firewall →       │  │
-│  │ Nemotron Ultra     │      │ two-source rule →         │  │
+│  │ Muse Spark Open    │      │ Tavily → firewall →       │  │
+│  │ Muse Spark (camera)│      │ two-source rule →         │  │
 │  │ (plan / replan)    │      │ tighten-only hazard zones │  │
 │  │ Gemini (secondary) │      │ (gate reads geometry only)│  │
 │  │ Deterministic      │      └───────────────────────────┘  │
@@ -169,8 +169,8 @@ Each governance decision is also signed with Ed25519 (what was proposed, what th
 | Input | Trusted? | Where it can go |
 |---|---|---|
 | Gate decision records | Yes (deterministic) | Audit chain, receipts, planner lessons |
-| Nemotron / Gemini output | No | Proposals only; every one passes the gate |
-| Vision model output (Nemotron 3.5 Super VL) | No | Cross-checked with the sensors; misses are logged; unconfirmed sightings become short slow zones (tighten only) |
+| Muse Spark / Muse Spark Open output | No | Proposals only; every one passes the gate, and no model can issue a permit |
+| Perception output (SAM 3.1) | No | Cross-checked with the sensors; misses are logged; unconfirmed sightings become short slow zones (tighten only) |
 | Tavily results, bulletins | No | Firewall → fixed rules → tighten-only zones; planner gets sanitised notes in a fenced untrusted block; the gate gets none |
 | Planner lessons | Advisory | Planner prompt only; scoped to the policy version |
 
@@ -178,7 +178,7 @@ Each governance decision is also signed with Ed25519 (what was proposed, what th
 
 ```
 ┌──────────────────────────────────────────┐
-│        Nebius AI Cloud VM (cpu-d3)        │
+│        Single VM (e.g. Scaleway)         │
 │                                          │
 │  ┌──────────────────────────────────┐    │
 │  │ Caddy :80/443 (automatic HTTPS)  │    │
@@ -186,8 +186,8 @@ Each governance decision is also signed with Ed25519 (what was proposed, what th
 │       │ /                   │ /api /ws   │
 │  ┌────▼─────┐        ┌──────▼───────┐    │
 │  │ frontend │        │   backend    │    │
-│  │ :3000    │        │   :8080      │────┼──▶ Nebius Token Factory
-│  └──────────┘        └──┬────────┬──┘    │    (NVIDIA Nemotron)
+│  │ :3000    │        │   :8080      │────┼──▶ Meta Model API, Baseten
+│  └──────────┘        └──┬────────┬──┘    │    (Muse Spark, SAM 3.1, Open)
 │                         │        │       │
 │               ┌─────────▼──┐ ┌───▼──────┐│
 │               │ sim :8090  │ │PostgreSQL││

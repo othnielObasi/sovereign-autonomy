@@ -92,15 +92,14 @@ cp .env.example .env
 
 | Variable               | Default                         | Description                          |
 |------------------------|---------------------------------|--------------------------------------|
-| `NEBIUS_API_KEY`       | —                               | Nebius Token Factory key (Nemotron)  |
-| `LLM_ENABLED`          | `false`                         | Must be `true` for any model to plan |
-| `LLM_PROVIDER`         | `nemotron`                      | `nemotron`, `gemini`, `agentic` or `mock` |
-| `NEMOTRON_FAST_MODELS` | Lightning, Super                | Fast tier (per-step proposals; top two raced) |
-| `NEMOTRON_REASONING_MODEL` | Nemotron 3 Ultra            | Mission planning and replanning      |
-| `TAVILY_API_KEY`       | —                               | Live hazard lookups (labelled offline samples without it) |
-| `GEMINI_API_KEY`, `GEMINI_PROJECT_ID`, `GEMINI_ENABLED` | — | Gemini, the secondary provider |
+| `MODEL_API_KEY`        | —                               | Meta Model API key: Muse Spark, SAM 3.1, Muse Voice Transcribe |
+| `BASETEN_API_KEY`      | —                               | Baseten key: Muse Spark Open (per-step proposals) |
+| `LLM_ENABLED`          | `false`                         | `true` lets the models propose each step too |
+| `LLM_PROVIDER`         | `muse`                          | `muse`, `gemini`, `agentic` or `mock` |
+| `MUSE_REASONING_MODEL` | `muse-spark-1.3`                | Mission planning and replanning |
+| `MUSE_OPEN_MODEL`      | `meta-models/muse-spark-open-1026` | Per-step proposals |
 
-Check the Token Factory catalogue and both tiers with `python scripts/check_token_factory.py`.
+Check every Meta model with `cd backend && python ../scripts/check_meta.py`.
 
 ### Other Optional Variables
 
@@ -130,9 +129,9 @@ The fastest way to get everything running:
 git clone https://github.com/othnielObasi/sovereign-autonomy.git
 cd sovereign-autonomy
 
-# 2. Optional: create a .env file for API keys (Nemotron, Tavily)
+# 2. Optional: create a .env file for API keys (Meta, Baseten, Tavily)
 cp .env.example .env
-# Set NEBIUS_API_KEY, LLM_ENABLED=true, LLM_PROVIDER=nemotron, TAVILY_API_KEY
+# Set MODEL_API_KEY, BASETEN_API_KEY, LLM_ENABLED=true, PERMIT_SECRET, TAVILY_API_KEY
 
 # 3. Build and start all services
 docker compose up --build
@@ -292,7 +291,7 @@ Key test files:
 | `tests/test_governance.py`      | Governance engine logic           |
 | `tests/test_live_safety.py`     | Live run loop: denied moves stop the robot; nothing unapproved executes |
 | `tests/test_bench.py`           | Benchmark engine, arms and report |
-| `tests/test_nemotron_planner.py`| Nemotron tier routing and fallback |
+| `tests/test_model_runtime.py`   | Muse planner tiers, fallback and usage log |
 | `tests/test_planner_lessons.py` | Lessons from gate decisions       |
 | `tests/test_governed_rules_and_signing.py` | Rule-change workflow and Ed25519 receipts |
 | `tests/test_site_intel.py`      | Tavily firewall, corroboration, hazard zones |
@@ -392,7 +391,7 @@ Build the warehouse simulator image from the repository root
 
 ### Planning always uses the deterministic fallback
 
-`LLM_ENABLED` must be `true` and `NEBIUS_API_KEY` set in the backend's own
+`LLM_ENABLED` must be `true` and `MODEL_API_KEY` set in the backend's own
 environment. Check with `GET /llm/models`.
 
 ### Frontend shows "loading" indefinitely

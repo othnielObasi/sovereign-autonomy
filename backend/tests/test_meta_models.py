@@ -60,7 +60,7 @@ class FakeMeta:
 @pytest.fixture
 def meta(monkeypatch):
     """Turn on Meta (and Baseten) with fake keys and route HTTP to a FakeMeta."""
-    import app.services.nemotron_planner as np_mod
+    import app.services.model_runtime as np_mod
     monkeypatch.setattr(settings, "model_api_key", "LLM_test_key")
     monkeypatch.setattr(settings, "baseten_api_key", None)
     fakes = {}
