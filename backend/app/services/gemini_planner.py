@@ -280,7 +280,7 @@ Output STRICT JSON: {{"intent":"MOVE_TO|STOP|WAIT","params":{{...}},"rationale":
 
         goal_text = f"GOAL: {json.dumps(goal)}" if goal else "No specific goal."
         bays_text = bay_directory_text(self._bays) if self._bays else ""
-        prompt = f"""You are a robot planner in a 40x25m warehouse.
+        prompt = f"""You are a robot planner on a 40x25m industrial site (stores, transport corridor, production or staging floor, dispatch). Use the Bay Directory for destinations.
 
 INSTRUCTION: {instruction}
 

@@ -9,7 +9,7 @@ import {
 import type { Mission, MissionStatus } from "@/lib/types";
 import { Button, Empty, Mono, Notice, Page, PageHeader, Panel, Pill, Tabs, Verdict, cx } from "@/components/ui";
 
-const BAY_PATTERN = /\b([ABSR])-?(\d{1,2})\b/i;
+const BAY_PATTERN = /\b([A-Z])-(\d{1,2})\b/i;   // e.g. B-03, L-05, D-02
 function resolveBayGoal(text: string, bays: any[]): { x: number; y: number } | null {
   const m = text?.match(BAY_PATTERN);
   if (!m || !bays?.length) return null;
@@ -36,6 +36,7 @@ export default function MissionsPage() {
   const setFilter = (v: string) => setFilterState(v as any);
   const [bays, setBays] = useState<any[]>([]);
   // create
+  const [presets, setPresets] = useState<Array<{ title: string; bay: string }>>(PRESETS);
   const [title, setTitle] = useState(PRESETS[0].title);
   const [bayId, setBayId] = useState(PRESETS[0].bay);
   const [robots, setRobots] = useState<string[]>(["robot-1"]);
@@ -51,7 +52,10 @@ export default function MissionsPage() {
   }
   useEffect(() => {
     reload();
-    getWorld().then((w: any) => setBays(w?.bays || [])).catch(() => {});
+    getWorld().then((w: any) => {
+      setBays(w?.bays || []);
+      if (w?.presets?.length) { setPresets(w.presets); setTitle(w.presets[0].title); setBayId(w.presets[0].bay); }
+    }).catch(() => {});
     getFleet().then((f: any) => { const ids = (f?.robots || []).map((r: any) => r.robot_id); if (ids.length) setRobots(ids); }).catch(() => {});
   }, []);
 
@@ -95,7 +99,7 @@ export default function MissionsPage() {
         {/* Create */}
         <Panel title="New mission" className="lg:self-start">
           <div className="flex flex-wrap gap-1.5 mb-4">
-            {PRESETS.map((p) => (
+            {presets.map((p) => (
               <button key={p.bay} onClick={() => { setTitle(p.title); setBayId(p.bay); }}
                 className={cx("rounded-md border px-2.5 py-1 text-xs", bayId === p.bay && title === p.title ? "border-mc-accent bg-mc-accent/10 text-mc-ink" : "border-mc-line2 text-mc-mute hover:text-mc-ink")}>
                 {p.title}

@@ -139,7 +139,7 @@ class RunService:
         of an event breaks the chain, which is detected by the audit verifier
         (see ``replay_service.verify_chain``).
 
-        Returns the newly created Event ORM row (already flushed to DB).
+        Returns the newly created Event ORM row (already committed).
         """
         # Get previous event hash for chain linking
         prev = (
@@ -169,7 +169,10 @@ class RunService:
             prev_hash=prev_hash,
         )
         db.add(row)
-        db.flush()  # ensure subsequent _append_event calls see this row for chain linking
+        # Commit at once (not just flush): an open write transaction holds SQLite's single
+        # write lock, and with two robots the other run's synchronous wait for that lock
+        # froze the whole event loop. Events are append-only, so committing early loses nothing.
+        db.commit()
         return row
 
     def start_run(self, db: Session, mission_id: str) -> Run:
@@ -1114,11 +1117,21 @@ class RunService:
                                     logger.warning("Run %s: lesson retrieval failed: %s", run_id, les_err)
                                 planner = self.agent._gemini_planner()
                                 from app.services.site_intel.service import site_intel as _si
+                                from app.services.muse_planner import planning_robot
+                                from app.observability import tracing as _tr
+                                # Never hold a database transaction open across a model call: with
+                                # two robots, a long replan would block the other robot's writes.
+                                db.commit()
+                                _robot_token = planning_robot.set(self.robot_for(run_id))
                                 try:
-                                    new_plan = await planner.generate_plan(telemetry, replan_instruction, goal, lessons=lessons,
-                                                                           untrusted_context=_si.planner_context())
-                                except TypeError:  # planners without the parameter
-                                    new_plan = await planner.generate_plan(telemetry, replan_instruction, goal, lessons=lessons)
+                                    with _tr.within_mission(run_id):
+                                        try:
+                                            new_plan = await planner.generate_plan(telemetry, replan_instruction, goal, lessons=lessons,
+                                                                                   untrusted_context=_si.planner_context())
+                                        except TypeError:  # planners without the parameter
+                                            new_plan = await planner.generate_plan(telemetry, replan_instruction, goal, lessons=lessons)
+                                finally:
+                                    planning_robot.reset(_robot_token)
                                 try:
                                     from app.services.site_router import repair_plan, route_plan
                                     site = await self.sim_for(run_id).get_world()

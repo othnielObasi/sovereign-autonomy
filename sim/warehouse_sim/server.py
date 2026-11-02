@@ -32,7 +32,7 @@ from pydantic import BaseModel, Field
 
 from app.autonomy import permit as permits
 from bench.scenarios import HOTSPOTS, generate
-from bench.world import ROBOT_R, Circle, Layout, RobotState, Walker, World, drive_robot
+from bench.world import ROBOT_R, Circle, Layout, RobotState, Walker, World, drive_robot, load_layout
 from traffic import ActorNavigation, FORKLIFT_RADIUS, TrafficWorld
 
 SIM_TICK_HZ = float(os.getenv("SIM_TICK_HZ", "10"))
@@ -46,9 +46,15 @@ SIM_ROBOT_ID = os.getenv("SIM_ROBOT_ID", "robot-1")
 # Dead-man stop: if no permitted move arrives for this long, the robot brakes on its
 # own, so a crashed or cut-off backend cannot leave it driving. 0 disables it.
 SIM_DEADMAN_S = float(os.getenv("SIM_DEADMAN_S", "5"))
-PARKING = (3.0, 3.5)
-# Other robots in the live warehouse: "id@x,y;id@x,y" (parking spots). Empty = one robot.
-SIM_FLEET = os.getenv("SIM_FLEET", "robot-2@3.0,21.5")
+# Which site the live simulator runs: "factory" (default) or "warehouse" (the benchmark site)
+SITE_LAYOUT = os.getenv("SITE_LAYOUT", "factory").strip() or "factory"
+SITE = load_layout(site=SITE_LAYOUT)
+PARKING = tuple((SITE.get("parking") or {}).get(os.getenv("SIM_ROBOT_ID", "robot-1"), (3.0, 3.5)))
+# Other robots: "id@x,y;id@x,y" (parking spots). Default: the site's own parking list.
+SIM_FLEET = os.getenv("SIM_FLEET", ";".join(f"{rid}@{xy[0]},{xy[1]}" for rid, xy in (SITE.get("parking") or {}).items())
+                      or "robot-2@3.0,21.5")
+SITE_HOTSPOTS = [tuple(h) for h in SITE.get("hotspots") or []]
+VEHICLE_LANE = [tuple(p) for p in SITE.get("vehicle_lane") or [(2.0, 13.5), (38.0, 13.5)]]
 
 
 def _parse_fleet(spec: str) -> Dict[str, tuple]:
@@ -64,7 +70,7 @@ def _parse_fleet(spec: str) -> Dict[str, tuple]:
 
 FLEET_PARKING = _parse_fleet(SIM_FLEET)
 
-layout = Layout()
+layout = Layout(SITE)
 _lock = threading.RLock()
 _state: Dict[str, Any] = {"world": None, "mode": "live", "seed": SIM_SEED, "events": []}
 _used_permits: Dict[str, float] = {}     # permit id -> expiry; a permit works once
@@ -114,7 +120,7 @@ def _require_token(request: Request) -> None:
 
 def _crossing_loop(rng: random.Random, hotspot, name: str, nav: ActorNavigation):
     """Someone who keeps crossing at a hotspot: across, pause, back."""
-    vertical = hotspot[1] in (13.5,) or rng.random() < 0.5
+    vertical = abs(hotspot[1] - VEHICLE_LANE[0][1]) < 0.5 or rng.random() < 0.5   # across the vehicle lane
     reach = rng.uniform(2.5, 3.5)
     if vertical:
         a, b = (hotspot[0], hotspot[1] - reach), (hotspot[0], hotspot[1] + reach)
@@ -137,7 +143,7 @@ def build_live_world(seed: int) -> World:
     world = TrafficWorld(layout=layout, robot=RobotState(*PARKING), seed=seed)
     nav = world.pedestrian_nav
     pick_bays = [b for b in layout.bays.values() if b.get("type") == "pick" and math.hypot(b["x"] - PARKING[0], b["y"] - PARKING[1]) > 3]
-    stations = [f for f in layout.data.get("features", []) if f["type"] == "packing_station"]
+    stations = [f for f in layout.data.get("features", []) if f["type"] in ("packing_station", "work_station", "qc_station")]
     for k, bay in enumerate(rng.sample(pick_bays, min(3, len(pick_bays)))):
         station = stations[k % len(stations)] if stations else bay
         start = nav.safe_point((bay["x"], bay["y"]))
@@ -153,11 +159,11 @@ def build_live_world(seed: int) -> World:
             if shelf:
                 worker.work_faces.append((start, shelf.nearest_point(*start)))
             world.walkers.append(worker)
-    for k, hs in enumerate(rng.sample(HOTSPOTS, 3)):
+    for k, hs in enumerate(rng.sample(SITE_HOTSPOTS or HOTSPOTS, 3)):
         worker = _crossing_loop(rng, hs, f"Runner {k + 1}", nav)
         if worker:
             world.walkers.append(worker)
-    start, end = world.vehicle_nav.safe_point((2.0, 13.5)), world.vehicle_nav.safe_point((38.0, 13.5))
+    start, end = world.vehicle_nav.safe_point(VEHICLE_LANE[0]), world.vehicle_nav.safe_point(VEHICLE_LANE[-1])
     route = world.vehicle_nav.route(start, end) if start and end else None
     if route and len(route) > 1:
         vehicle = Walker("Forklift", route, 1.4, start_t=5.0, loop=True, pause_s=6.0, radius=FORKLIFT_RADIUS, kind="forklift")
@@ -384,7 +390,9 @@ def world(request: Request):
             "geofence": d["geofence"], "zones": d["zones"], "racks": d.get("racks", []),
             "features": d.get("features", []), "bays": d["bays"], "obstacles": _obstacles(w),
             "human": people[0] if people else None, "walking_humans": people, "idle_robots": [],
-            "hotspots": [{"x": x, "y": y} for x, y in HOTSPOTS], "mode": _state["mode"], "seed": _state["seed"],
+            "hotspots": [{"x": x, "y": y} for x, y in (SITE_HOTSPOTS or HOTSPOTS)], "mode": _state["mode"], "seed": _state["seed"],
+            "site": {"name": SITE.get("name", SITE_LAYOUT), "title": SITE.get("title", "Warehouse")},
+            "presets": SITE.get("presets", []), "parking": SITE.get("parking", {}),
         }
 
 

@@ -110,7 +110,7 @@ class MissionService:
                     # Try to fetch world (reuse same fallbacks as _normalize_goal)
                     world = None
                     try:
-                        backend_url = f"http://127.0.0.1:{settings.backend_port}/sim/world"
+                        backend_url = settings.sim_base_url.rstrip("/") + "/world"   # the simulator itself, never a self-call
                         with httpx.Client(timeout=1.0) as client:
                             r = client.get(backend_url)
                             r.raise_for_status()
@@ -128,13 +128,9 @@ class MissionService:
                             world = None
                     if world is None:
                         # last resort local file
-                        from pathlib import Path
-
-                        repo_root = Path(__file__).resolve().parents[4]
-                        world_path = repo_root / "sim" / "mock_sim" / "world.json"
-                        if world_path.exists():
-                            with world_path.open() as fh:
-                                world = json.load(fh)
+                        import os as _os
+                        from bench.world import load_layout
+                        world = load_layout(site=_os.getenv("SITE_LAYOUT", "factory"))   # the site the simulator runs
                     bays = (world or {}).get("bays") or []
                     resolved = resolve_bay_from_instruction(payload.title or "", bays)
                     if resolved:
@@ -208,7 +204,7 @@ class MissionService:
         world = None
         # First try local backend proxy to sim
         try:
-            backend_url = f"http://127.0.0.1:{settings.backend_port}/sim/world"
+            backend_url = settings.sim_base_url.rstrip("/") + "/world"   # the simulator itself, never a self-call
             with httpx.Client(timeout=2.0) as client:
                 r = client.get(backend_url)
                 r.raise_for_status()
@@ -228,15 +224,11 @@ class MissionService:
                 world = None
 
         if world is None:
-            # Fallback: try to read local sim/mock_sim/world.json from repository (useful in dev)
+            # Fallback: the local copy of the site the simulator runs (SITE_LAYOUT)
             try:
-                from pathlib import Path
-
-                repo_root = Path(__file__).resolve().parents[4]
-                world_path = repo_root / "sim" / "mock_sim" / "world.json"
-                if world_path.exists():
-                    with world_path.open() as fh:
-                        world = json.load(fh)
+                import os as _os
+                from bench.world import load_layout
+                world = load_layout(site=_os.getenv("SITE_LAYOUT", "factory"))   # the site the simulator runs
             except Exception:
                 world = None
 
@@ -287,7 +279,7 @@ class MissionService:
             # Try fetching world similar to _normalize_goal
             world = None
             try:
-                backend_url = f"http://127.0.0.1:{settings.backend_port}/sim/world"
+                backend_url = settings.sim_base_url.rstrip("/") + "/world"   # the simulator itself, never a self-call
                 with httpx.Client(timeout=1.0) as client:
                     r = client.get(backend_url)
                     r.raise_for_status()
@@ -305,8 +297,9 @@ class MissionService:
                     world = None
             if world is None:
                 # The same warehouse layout the simulator runs on
+                import os as _os
                 from bench.world import load_layout
-                world = load_layout()
+                world = load_layout(site=_os.getenv("SITE_LAYOUT", "factory"))
             bays = (world or {}).get("bays") or []
             for b in bays:
                 if str(b.get("id", "")).upper() == str(bay_id).upper():

@@ -8,6 +8,8 @@ import tempfile
 # Execution authority: a test-only permit secret (the simulator under test reads the
 # same variable) and a throwaway database, set before the app is imported.
 os.environ.setdefault("PERMIT_SECRET", "test-permit-secret-0123456789abcdef0123")
+# Most tests check the benchmark warehouse's exact geometry; the factory has its own tests.
+os.environ.setdefault("SITE_LAYOUT", "warehouse")
 os.environ.setdefault("AUTHORITY_DB_PATH", os.path.join(tempfile.mkdtemp(prefix="authority-"), "authority.db"))
 
 import pytest

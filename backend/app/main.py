@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import asyncio
 import logging
 import time
 from contextlib import asynccontextmanager
@@ -106,6 +107,14 @@ async def lifespan(app: FastAPI):
     except Exception as _perr:
         logger.error(f"Could not load active policy version, enforcing defaults: {_perr}")
 
+    # Point the gate's site map at the site the simulator is running
+    try:
+        from app.api.routes_runs import get_run_svc as _svc_for_map
+        await asyncio.wait_for(_svc_for_map().sim.get_world(), timeout=2.0)
+    except Exception as _map_err:
+        logger.warning("Could not read the site from the simulator yet (%s); using %s",
+                       _map_err, __import__("os").getenv("SITE_LAYOUT", "factory"))
+
     # Runs interrupted by a restart are paused, not resumed automatically and not
     # failed: an operator resumes them, and resume first checks kill switches,
     # settles any move whose outcome was lost, and restores the plan from the last
@@ -156,7 +165,6 @@ async def lifespan(app: FastAPI):
         for run_id in list(run_service._stop_flags.keys()):
             run_service._stop_flags[run_id].set()
         # Wait briefly for tasks to finish
-        import asyncio
         tasks = list(run_service._tasks.values())
         if tasks:
             await asyncio.gather(*tasks, return_exceptions=True)

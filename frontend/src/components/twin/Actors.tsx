@@ -596,7 +596,7 @@ export function Features({ features }: { features: { type: string; x: number; y:
               </mesh>
             </group>
           );
-        if (f.type === "packing_station")
+        if (f.type === "packing_station" || f.type === "work_station" || f.type === "qc_station")
           return (
             <group key={f.label} position={[f.x, 0, -f.y - 0.55]}>
               <mesh position={[0, 0.9, 0]} castShadow receiveShadow>

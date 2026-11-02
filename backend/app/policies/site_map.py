@@ -38,6 +38,18 @@ def _load_default() -> List[Rect]:
 
 
 RACKS: List[Rect] = _load_default()
+SITE_NAME: Optional[str] = None
+
+
+def use_world(world: Dict[str, Any]) -> None:
+    """Point the gate at the site the simulator is actually running. Called whenever the
+    backend reads the world from the simulator, so the gate never checks paths against a
+    different site's structure."""
+    global RACKS, SITE_NAME
+    racks = _racks_from_world(world or {})
+    if racks:
+        RACKS = racks
+        SITE_NAME = ((world or {}).get("site") or {}).get("name") or SITE_NAME
 
 
 def _rect_distance(x: float, y: float, r: Rect) -> float:

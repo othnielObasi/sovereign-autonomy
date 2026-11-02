@@ -114,6 +114,12 @@ class TrafficWorld(World):
         return math.cos(getattr(actor, "heading", 0)), math.sin(getattr(actor, "heading", 0))
 
     def _yield_to_vehicle(self, person, candidate):
+        # Right of way: a pedestrian who has already waited for a forklift that is itself
+        # standing still goes first (the driver is waiting for them). Without this the two
+        # could wait for each other forever.
+        if (getattr(person, "traffic_wait_s", 0) >= 2.0
+                and all(getattr(v, "actual_speed", 0) < 0.05 for v in self.vehicles())):
+            return False
         for vehicle in self.vehicles():
             direction = self._direction(vehicle)
             offset = (person.pos[0] - vehicle.pos[0], person.pos[1] - vehicle.pos[1])
@@ -216,6 +222,7 @@ class TrafficWorld(World):
                     reason = "waiting_for_person" if other.kind == "person" else "waiting_for_forklift"
             if reason:
                 vars(actor).update(previous)
+                actor.actual_speed = 0.0   # waiting means standing still (the restore kept the old speed)
                 actor.activity = reason
                 actor.traffic_wait_s = getattr(actor, "traffic_wait_s", 0) + dt
                 stopped_traffic = all(getattr(v, "actual_speed", 0) < 0.05 for v in self.vehicles())

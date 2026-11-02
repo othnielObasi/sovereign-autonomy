@@ -29,6 +29,14 @@ _world: Dict[str, Any] = {}
 # benchmark layout (same site, same zone speed limits) instead of bare defaults.
 _LAYOUT_PATH = _HERE.parent / "bench" / "layout.json"
 
+import os as _os
+
+_SITE = _os.getenv("SITE_LAYOUT", "factory").strip() or "factory"
+if _SITE != "warehouse":
+    _site_path = _HERE.parent / "bench" / "sites" / f"{_SITE}.json"
+    if _site_path.exists():
+        _WORLD_PATH = _site_path     # the site the simulator runs; refreshed from it at runtime
+
 try:
     _path = _WORLD_PATH if _WORLD_PATH.exists() else _LAYOUT_PATH
     with _path.open("r", encoding="utf-8") as f:

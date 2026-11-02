@@ -287,7 +287,7 @@ export function Map2D({
       ctx.font = `bold ${Math.max(10, 11 * zoom)}px system-ui`;
       ctx.textAlign = "left";
       ctx.textBaseline = "top";
-      const zoneText = z.name.toUpperCase().replace("_", " ");
+      const zoneText = String(z.label || z.name).toUpperCase().replace("_", " ");
       ctx.strokeStyle = "rgba(0,0,0,0.5)";
       ctx.lineWidth = 3;
       ctx.strokeText(zoneText, tl.x + 6, tl.y + 4);
@@ -418,13 +418,52 @@ export function Map2D({
     }
 
     /* ── rack rows (data-driven from world.racks) ──────────── */
-    const racks: { id: string; x1: number; x2: number; y: number; depth: number; levels?: number }[] = world?.racks ?? [];
+    const racks: { id: string; x1: number; x2: number; y: number; depth: number; levels?: number; kind?: string; label?: string }[] = world?.racks ?? [];
     for (const rack of racks) {
       const depth = rack.depth ?? 1.0;
       const tl = w2c({ x: rack.x1, y: rack.y + depth });
       const br = w2c({ x: rack.x2, y: rack.y });
       const rw = br.x - tl.x,
         rh = br.y - tl.y;
+      /* factory equipment: machines, the fenced robot cell, the assembly line */
+      if (rack.kind && rack.kind !== "rack") {
+        const style: Record<string, { fill: string; edge: string; dash?: number[] }> = {
+          machine: { fill: "rgba(71,85,105,0.85)", edge: "rgba(148,163,184,0.9)" },
+          cell: { fill: "rgba(127,29,29,0.28)", edge: "rgba(248,113,113,0.85)", dash: [5, 3] },
+          conveyor: { fill: "rgba(30,64,175,0.55)", edge: "rgba(96,165,250,0.85)" },
+        };
+        const st = style[rack.kind] || style.machine;
+        ctx.fillStyle = st.fill;
+        ctx.strokeStyle = st.edge;
+        ctx.lineWidth = rack.kind === "cell" ? 2 : 1.2;
+        ctx.setLineDash(st.dash || []);
+        ctx.fillRect(tl.x, tl.y, rw, rh);
+        ctx.strokeRect(tl.x, tl.y, rw, rh);
+        ctx.setLineDash([]);
+        if (rack.kind === "conveyor") {          /* rollers */
+          const n = Math.max(2, Math.round((rack.x2 - rack.x1) / 0.6));
+          ctx.strokeStyle = "rgba(147,197,253,0.35)";
+          for (let i = 1; i < n; i++) {
+            const px = tl.x + (rw * i) / n;
+            ctx.beginPath(); ctx.moveTo(px, tl.y + 1); ctx.lineTo(px, tl.y + rh - 1); ctx.stroke();
+          }
+        }
+        if (rack.kind === "cell") {              /* keep-out hatching */
+          ctx.save();
+          ctx.beginPath(); ctx.rect(tl.x, tl.y, rw, rh); ctx.clip();
+          ctx.strokeStyle = "rgba(248,113,113,0.25)";
+          for (let s = -rh; s < rw; s += 8) {
+            ctx.beginPath(); ctx.moveTo(tl.x + s, tl.y + rh); ctx.lineTo(tl.x + s + rh, tl.y); ctx.stroke();
+          }
+          ctx.restore();
+        }
+        ctx.fillStyle = rack.kind === "cell" ? "rgba(254,202,202,0.9)" : "rgba(226,232,240,0.85)";
+        ctx.font = `600 ${Math.max(7, 8.5 * zoom)}px sans-serif`;
+        ctx.textAlign = "center";
+        ctx.textBaseline = "middle";
+        ctx.fillText(rack.label || rack.id, tl.x + rw / 2, tl.y + rh / 2, Math.max(20, rw - 4));
+        continue;
+      }
       /* rack body */
       ctx.fillStyle = C.shelf;
       ctx.strokeStyle = C.shelfTop;
@@ -482,7 +521,7 @@ export function Map2D({
         ctx.textAlign = "center";
         ctx.textBaseline = "middle";
         ctx.fillText("⚡", p.x, p.y);
-      } else if (feat.type === "packing_station") {
+      } else if (feat.type === "packing_station" || feat.type === "work_station" || feat.type === "qc_station") {
         ctx.fillStyle = "rgba(168,85,247,0.12)";
         ctx.strokeStyle = "rgba(168,85,247,0.4)";
         ctx.lineWidth = 1.5;
@@ -494,7 +533,7 @@ export function Map2D({
         ctx.font = `bold ${Math.max(8, 9 * zoom)}px system-ui`;
         ctx.textAlign = "center";
         ctx.textBaseline = "middle";
-        ctx.fillText("📦", p.x, p.y);
+        ctx.fillText(feat.type === "work_station" ? "🔧" : feat.type === "qc_station" ? "✔" : "📦", p.x, p.y);
       } else if (feat.type === "fire_exit") {
         ctx.fillStyle = "rgba(239,68,68,0.15)";
         ctx.strokeStyle = "rgba(239,68,68,0.5)";

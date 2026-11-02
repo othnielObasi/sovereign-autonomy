@@ -50,7 +50,7 @@ Last checked: 1 Nov 2026. 303 backend tests passing; frontend type-checks; a liv
 | 5 | Watchdogs and degraded mode | **Working** | Dispatch watchdog; simulator dead-man stop; no permit secret means nothing moves; model outage falls back |
 | 6 | Human-in-the-loop supervision | **Pre-existing, working** | Approve/deny/override; approvals expire after 120 s; operator kill and reset in the dashboard |
 | 7 | Multi-robot coordination | **Working** (2 robots) | The simulator runs a fleet (robot-1, robot-2); each robot has its own permits, e-stop and dead-man stop and sees the others as obstacles. Before each permit the move's floor cells are reserved, all or nothing, so two robots never hold overlapping paths; a conflict is refused like a path check. One active run per robot. Live: two missions at once, 67 permits, 0 robot contacts (`test_fleet.py`). No central scheduler or deadlock resolution beyond waiting and replanning |
-| 8 | Digital-twin scenario testing | **Working** | Seeded scenarios (pre-existing) plus `/authority/drills`: eight real attacks against the live simulator, pass/fail |
+| 8 | Digital-twin scenario testing | **Working** | Two sites: the benchmark warehouse (pre-existing) and a new precision-parts factory (`test_factory.py`); seeded scenarios plus `/authority/drills`, eight real attacks against the live simulator |
 | 9 | Model and learning lifecycle | **Pre-existing, partial** | Governed rule changes with replay, approval and rollback. No model shadow rollout |
 | 10 | Incident replay | **Pre-existing, partial** | Hash-chained events, replay service, benchmark replay by seed |
 | 11 | Resource budgets | **Working** | Per-run action budget on the dispatch path; STOP never goes through it |

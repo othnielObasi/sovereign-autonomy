@@ -117,3 +117,29 @@ class LiveTrafficTests(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+def test_waiting_forklift_reports_zero_speed_and_pedestrian_gets_right_of_way():
+    """Regression: a waiting forklift kept its old speed, so a person waiting for it
+    and the forklift waiting for the person could stand there forever."""
+    import importlib, os, sys
+    from pathlib import Path
+    sim_dir = str(Path(__file__).resolve().parents[1] / "sim" / "warehouse_sim")
+    sys.path.insert(0, sim_dir)
+    try:
+        traffic = importlib.import_module("traffic")
+        from bench.world import Walker, load_layout, Layout, RobotState
+        layout = Layout(load_layout(site="factory"))
+        w = traffic.TrafficWorld(layout=layout, robot=RobotState(3.0, 3.5), seed=1)
+        fork = Walker("Forklift", [(10.0, 10.5), (30.0, 10.5)], 1.4, start_t=0.0, loop=False, radius=1.9, kind="forklift")
+        fork.navigation_ready = True
+        person = Walker("Worker", [(14.0, 12.8), (14.0, 8.5)], 0.9, start_t=0.0, loop=False)
+        person.navigation_ready = True
+        w.walkers = [fork, person]
+        for _ in range(400):                       # 40 s of simulated time
+            w.step(0.1)
+        assert person.done or person.pos[1] < 9.5, (person.pos, person.activity)
+        assert fork.pos[0] > 14.0, (fork.pos, fork.activity)
+    finally:
+        sys.path.remove(sim_dir)
+        sys.modules.pop("traffic", None)

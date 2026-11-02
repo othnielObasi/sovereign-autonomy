@@ -13,6 +13,7 @@ import { RiskHeatmap, RobotSafety, Trail, CameraFootprint, MiniMap } from "./Map
 import { FrameBudget } from "./FrameBudget";
 import { Building } from "./Building";
 import { Racking } from "./Racking";
+import { Equipment } from "./Equipment";
 import { Features, Forklift, Obstacle, Robot, VERDICT_COLOURS, Worker, ZoneCones, ZoneMarking } from "./Actors";
 import type { WorldLayout } from "./textures";
 
@@ -274,7 +275,8 @@ function Scene(props: TwinProps & { focus: Pt | null; onCameraFootprint: (points
         e.stopPropagation();
         props.onGoalPick?.({ x: Math.round(e.point.x * 100) / 100, y: Math.round(-e.point.z * 100) / 100 });
       }}><planeGeometry args={[g.max_x - g.min_x, g.max_y - g.min_y]} /><meshBasicMaterial color="#38bdf8" transparent opacity={0.07} depthWrite={false} /></mesh>}
-      <StaticRacking racks={layout.racks} />
+      <StaticRacking racks={layout.racks.filter((r: any) => !r.kind || r.kind === "rack")} />
+      <Equipment items={layout.racks as any} />
       <StaticFeatures features={layout.features ?? []} />
 
       {statics.map((o, i) => (

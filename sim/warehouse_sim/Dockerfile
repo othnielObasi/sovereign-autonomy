@@ -9,6 +9,7 @@ RUN pip install --no-cache-dir -r /app/requirements.txt
 
 # The engine is shared with the safety benchmark
 COPY backend/bench/__init__.py backend/bench/world.py backend/bench/scenarios.py backend/bench/layout.json /app/bench/
+COPY backend/bench/sites /app/bench/sites
 # Permit checks share one standard-library module with the backend
 COPY backend/app/__init__.py /app/app/__init__.py
 COPY backend/app/autonomy/__init__.py backend/app/autonomy/permit.py /app/app/autonomy/

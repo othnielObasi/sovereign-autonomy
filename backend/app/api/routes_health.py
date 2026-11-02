@@ -43,6 +43,7 @@ async def health():
         "status": "ok" if db_ok and sim_ok else "degraded",
         "environment": settings.environment,
         "gemini_enabled": settings.gemini_configured,
+        "site": __import__("app.policies.site_map", fromlist=["SITE_NAME"]).SITE_NAME,
         "muse_enabled": settings.muse_configured,
         "muse_open_enabled": settings.muse_open_configured,
         "vision_provider": settings.vision_provider if settings.vision_configured else None,

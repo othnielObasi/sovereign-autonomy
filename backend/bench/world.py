@@ -34,7 +34,14 @@ GRID_M = 0.5             # route grid resolution
 ROUTE_CLEARANCE_M = 1.0  # robot centre to static surfaces: body radius 0.4 + the gate's 0.5 m clearance + margin
 
 
-def load_layout(path: Path = BENCH_LAYOUT) -> Dict[str, Any]:
+SITES_DIR = Path(__file__).resolve().parent / "sites"
+
+
+def load_layout(path: Optional[Path] = None, site: Optional[str] = None) -> Dict[str, Any]:
+    """A site layout. Default: the benchmark warehouse. `site` picks another site by name
+    ("warehouse" or "factory"; the live simulator chooses with SITE_LAYOUT)."""
+    if path is None:
+        path = BENCH_LAYOUT if site in (None, "", "warehouse") else SITES_DIR / f"{site}.json"
     with path.open() as f:
         return json.load(f)
 

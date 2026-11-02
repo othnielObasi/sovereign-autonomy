@@ -23,6 +23,7 @@ Everything in this section was built from 26 October 2026 onward. The git histor
 | **Muse Spark** plans each mission from the map and the robot camera; **Muse Spark Open** (Baseten) proposes steps | Ready: runs when `MODEL_API_KEY` / `BASETEN_API_KEY` are set |
 | **SAM 3.1** perception: detections projected onto the floor, cross-checked with sensors | Ready: runs with `MODEL_API_KEY` |
 | **Muse Voice Transcribe** stop: say "stop" and the robot stops; voice can never start it | Ready: runs with `MODEL_API_KEY` |
+| **Precision parts factory** (new live site): raw-material stores, a transport corridor with a forklift, a production floor with CNC machines, a press, a fenced welding cell and an assembly line, QC and dispatch. Two robots deliver parts line-side. The benchmark keeps the original warehouse (`SITE_LAYOUT` picks the site) | Working |
 | Execution authority: every approved move gets a signed, single-use permit after a full-path check; the simulator checks it again | Working |
 | Kill switches (global, robot, mission, agent), controller e-stop, verified stop, dead-man stop | Working |
 | Restart recovery: interrupted runs pause; resume settles uncertain moves and continues from the last confirmed waypoint | Working |

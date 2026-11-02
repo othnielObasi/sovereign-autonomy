@@ -1,0 +1,441 @@
+{
+  "name": "factory",
+  "title": "Precision parts factory",
+  "geofence": {
+    "min_x": 0,
+    "max_x": 40,
+    "min_y": 0,
+    "max_y": 25
+  },
+  "zone_speed_limits": {
+    "aisle": 0.5,
+    "corridor": 0.7,
+    "staging": 0.3,
+    "loading_bay": 0.4
+  },
+  "zones": [
+    {
+      "name": "aisle",
+      "label": "Raw-material stores",
+      "rect": {
+        "min_x": 0,
+        "max_x": 40,
+        "min_y": 0,
+        "max_y": 9
+      }
+    },
+    {
+      "name": "corridor",
+      "label": "Transport corridor",
+      "rect": {
+        "min_x": 0,
+        "max_x": 40,
+        "min_y": 9,
+        "max_y": 12
+      }
+    },
+    {
+      "name": "staging",
+      "label": "Production floor",
+      "rect": {
+        "min_x": 0,
+        "max_x": 40,
+        "min_y": 12,
+        "max_y": 20
+      }
+    },
+    {
+      "name": "loading_bay",
+      "label": "QC and dispatch",
+      "rect": {
+        "min_x": 0,
+        "max_x": 40,
+        "min_y": 20,
+        "max_y": 25
+      }
+    }
+  ],
+  "racks": [
+    {
+      "id": "RA-1",
+      "kind": "rack",
+      "label": "Bar stock",
+      "x1": 1,
+      "x2": 11,
+      "y": 1,
+      "depth": 1.0,
+      "levels": 4
+    },
+    {
+      "id": "RA-2",
+      "kind": "rack",
+      "label": "Sheet metal",
+      "x1": 14,
+      "x2": 24,
+      "y": 1,
+      "depth": 1.0,
+      "levels": 4
+    },
+    {
+      "id": "RA-3",
+      "kind": "rack",
+      "label": "Fasteners",
+      "x1": 27,
+      "x2": 37,
+      "y": 1,
+      "depth": 1.0,
+      "levels": 4
+    },
+    {
+      "id": "RB-1",
+      "kind": "rack",
+      "label": "Castings",
+      "x1": 1,
+      "x2": 11,
+      "y": 5,
+      "depth": 1.0,
+      "levels": 3
+    },
+    {
+      "id": "RB-2",
+      "kind": "rack",
+      "label": "Bearings",
+      "x1": 14,
+      "x2": 24,
+      "y": 5,
+      "depth": 1.0,
+      "levels": 3
+    },
+    {
+      "id": "RB-3",
+      "kind": "rack",
+      "label": "Electronics",
+      "x1": 27,
+      "x2": 37,
+      "y": 5,
+      "depth": 1.0,
+      "levels": 3
+    },
+    {
+      "id": "M-CNC1",
+      "kind": "machine",
+      "label": "CNC 1",
+      "x1": 2,
+      "x2": 6,
+      "y": 13.5,
+      "depth": 3.0
+    },
+    {
+      "id": "M-CNC2",
+      "kind": "machine",
+      "label": "CNC 2",
+      "x1": 8.5,
+      "x2": 12.5,
+      "y": 13.5,
+      "depth": 3.0
+    },
+    {
+      "id": "M-PRESS",
+      "kind": "machine",
+      "label": "Press",
+      "x1": 15,
+      "x2": 19,
+      "y": 13.5,
+      "depth": 3.0
+    },
+    {
+      "id": "C-WELD",
+      "kind": "cell",
+      "label": "Welding cell (robot arm)",
+      "x1": 21.5,
+      "x2": 26.5,
+      "y": 13,
+      "depth": 4.0
+    },
+    {
+      "id": "L-ASSY",
+      "kind": "conveyor",
+      "label": "Assembly line",
+      "x1": 28.5,
+      "x2": 38.5,
+      "y": 14.5,
+      "depth": 1.0
+    }
+  ],
+  "obstacles": [
+    {
+      "x": 35.5,
+      "y": 8.3,
+      "type": "tote_stack",
+      "r": 0.3
+    },
+    {
+      "x": 1.0,
+      "y": 19.0,
+      "type": "handcart",
+      "r": 0.4
+    },
+    {
+      "x": 37.5,
+      "y": 23.6,
+      "type": "pallet",
+      "r": 0.5
+    }
+  ],
+  "human": {
+    "x": 30.0,
+    "y": 17.0
+  },
+  "features": [
+    {
+      "type": "work_station",
+      "x": 4.0,
+      "y": 17.6,
+      "label": "CNC 1 operator"
+    },
+    {
+      "type": "work_station",
+      "x": 10.5,
+      "y": 17.6,
+      "label": "CNC 2 operator"
+    },
+    {
+      "type": "work_station",
+      "x": 17.0,
+      "y": 17.6,
+      "label": "Press operator"
+    },
+    {
+      "type": "work_station",
+      "x": 31.0,
+      "y": 16.6,
+      "label": "Assembly station 1"
+    },
+    {
+      "type": "work_station",
+      "x": 35.0,
+      "y": 16.6,
+      "label": "Assembly station 2"
+    },
+    {
+      "type": "qc_station",
+      "x": 8.0,
+      "y": 22.0,
+      "label": "Quality control"
+    },
+    {
+      "type": "charging_station",
+      "x": 36.0,
+      "y": 21.0,
+      "label": "CHG-01"
+    },
+    {
+      "type": "charging_station",
+      "x": 38.5,
+      "y": 21.0,
+      "label": "CHG-02"
+    }
+  ],
+  "bays": [
+    {
+      "id": "P-01",
+      "x": 6.0,
+      "y": 3.5,
+      "side": "bottom",
+      "type": "pick",
+      "label": "Bar stock bin"
+    },
+    {
+      "id": "P-02",
+      "x": 19.0,
+      "y": 3.5,
+      "side": "bottom",
+      "type": "pick",
+      "label": "Sheet metal bin"
+    },
+    {
+      "id": "P-03",
+      "x": 32.0,
+      "y": 3.5,
+      "side": "bottom",
+      "type": "pick",
+      "label": "Fasteners bin"
+    },
+    {
+      "id": "P-04",
+      "x": 6.0,
+      "y": 7.5,
+      "side": "bottom",
+      "type": "pick",
+      "label": "Castings bin"
+    },
+    {
+      "id": "P-05",
+      "x": 19.0,
+      "y": 7.5,
+      "side": "bottom",
+      "type": "pick",
+      "label": "Bearings bin"
+    },
+    {
+      "id": "P-06",
+      "x": 32.0,
+      "y": 7.5,
+      "side": "bottom",
+      "type": "pick",
+      "label": "Electronics bin"
+    },
+    {
+      "id": "L-01",
+      "x": 4.0,
+      "y": 18.6,
+      "side": "top",
+      "type": "line",
+      "label": "CNC 1 infeed"
+    },
+    {
+      "id": "L-02",
+      "x": 10.5,
+      "y": 18.6,
+      "side": "top",
+      "type": "line",
+      "label": "CNC 2 infeed"
+    },
+    {
+      "id": "L-03",
+      "x": 17.0,
+      "y": 18.6,
+      "side": "top",
+      "type": "line",
+      "label": "Press infeed"
+    },
+    {
+      "id": "L-04",
+      "x": 24.0,
+      "y": 18.6,
+      "side": "top",
+      "type": "line",
+      "label": "Welding cell infeed"
+    },
+    {
+      "id": "L-05",
+      "x": 33.0,
+      "y": 18.2,
+      "side": "top",
+      "type": "line",
+      "label": "Assembly line kitting"
+    },
+    {
+      "id": "Q-01",
+      "x": 11.0,
+      "y": 22.0,
+      "side": "top",
+      "type": "qc",
+      "label": "QC hand-off"
+    },
+    {
+      "id": "D-01",
+      "x": 14.0,
+      "y": 23.5,
+      "side": "top",
+      "type": "dock",
+      "label": "Dock 1"
+    },
+    {
+      "id": "D-02",
+      "x": 20.0,
+      "y": 23.5,
+      "side": "top",
+      "type": "dock",
+      "label": "Dock 2"
+    },
+    {
+      "id": "D-03",
+      "x": 26.0,
+      "y": 23.5,
+      "side": "top",
+      "type": "dock",
+      "label": "Dock 3"
+    },
+    {
+      "id": "D-04",
+      "x": 32.0,
+      "y": 23.5,
+      "side": "top",
+      "type": "dock",
+      "label": "Dock 4"
+    }
+  ],
+  "parking": {
+    "robot-1": [
+      3.0,
+      3.5
+    ],
+    "robot-2": [
+      3.0,
+      21.5
+    ]
+  },
+  "hotspots": [
+    [
+      12.5,
+      10.5
+    ],
+    [
+      25.5,
+      10.5
+    ],
+    [
+      7.2,
+      18.6
+    ],
+    [
+      14.0,
+      18.6
+    ],
+    [
+      30.0,
+      18.4
+    ],
+    [
+      17.0,
+      21.5
+    ],
+    [
+      29.0,
+      21.5
+    ]
+  ],
+  "vehicle_lane": [
+    [
+      2.0,
+      10.5
+    ],
+    [
+      38.0,
+      10.5
+    ]
+  ],
+  "presets": [
+    {
+      "title": "Bring bar stock to CNC 1",
+      "bay": "L-01"
+    },
+    {
+      "title": "Kit the assembly line from bin P-06",
+      "bay": "L-05"
+    },
+    {
+      "title": "Take finished parts to QC",
+      "bay": "Q-01"
+    },
+    {
+      "title": "Deliver castings to the press",
+      "bay": "L-03"
+    },
+    {
+      "title": "Send an order to dock 3",
+      "bay": "D-03"
+    }
+  ]
+}

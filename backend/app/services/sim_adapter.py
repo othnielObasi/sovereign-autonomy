@@ -35,7 +35,10 @@ class SimAdapter:
     async def get_world(self) -> Dict[str, Any]:
         r = await self._client.get(f"{self.base_url}/world")
         r.raise_for_status()
-        return r.json()
+        world = r.json()
+        from app.policies import site_map
+        site_map.use_world(world)          # the gate always checks paths against this site
+        return world
 
     async def get_telemetry(self, robot_id: Optional[str] = None) -> Dict[str, Any]:
         r = await self._client.get(f"{self.base_url}/telemetry", params={"robot_id": robot_id} if robot_id else None)

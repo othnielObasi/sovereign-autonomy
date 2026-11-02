@@ -49,10 +49,18 @@ def render(world, size: int = 512, view_m: float = 12.0) -> bytes:
     d.polygon([to_px(g["min_x"], g["min_y"]), to_px(g["max_x"], g["min_y"]),
                to_px(g["max_x"], g["max_y"]), to_px(g["min_x"], g["max_y"])], fill=FLOOR)
     # main corridor floor marking
-    d.polygon([to_px(g["min_x"], 12.0), to_px(g["max_x"], 12.0), to_px(g["max_x"], 15.0), to_px(g["min_x"], 15.0)],
-              fill=LANE)
+    lane = next((z["rect"] for z in world.layout.zones if z.get("name") == "corridor"), {"min_y": 12.0, "max_y": 15.0})
+    d.polygon([to_px(g["min_x"], lane["min_y"]), to_px(g["max_x"], lane["min_y"]),
+               to_px(g["max_x"], lane["max_y"]), to_px(g["min_x"], lane["max_y"])], fill=LANE)
 
+    kinds = {(r["x1"], r["y"]): r.get("kind", "rack") for r in world.layout.data.get("racks", [])}
     for rack in world.layout.racks:
+        kind = kinds.get((rack.x1, rack.y1), "rack")
+        if kind != "rack":
+            colour = {"machine": (88, 100, 118), "cell": (150, 60, 60), "conveyor": (40, 70, 150)}.get(kind, (88, 100, 118))
+            d.polygon([to_px(rack.x1, rack.y1), to_px(rack.x2, rack.y1), to_px(rack.x2, rack.y2), to_px(rack.x1, rack.y2)],
+                      fill=colour)
+            continue
         d.polygon([to_px(rack.x1, rack.y1), to_px(rack.x2, rack.y1), to_px(rack.x2, rack.y2), to_px(rack.x1, rack.y2)],
                   fill=RACK)
 
