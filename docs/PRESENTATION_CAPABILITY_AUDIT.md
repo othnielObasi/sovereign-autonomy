@@ -1,5 +1,9 @@
 # Landing page and workspace: capability and pain-point audit
 
+Implementation follow-up: all twelve presentation findings are addressed in
+[Presentation fixes](PRESENTATION_FIXES.md), with build, backend and browser
+evidence. The original audit and its captured observations remain below.
+
 Audited 3 November 2026 against the current repository and the isolated local
 preview at `http://127.0.0.1:19300`. This is an audit of communication,
 discoverability, scope and operational feedback, not a new certification of every

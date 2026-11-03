@@ -37,7 +37,7 @@ export function Panel({ title, subtitle, actions, children, className, padded = 
   children?: React.ReactNode; className?: string; padded?: boolean; id?: string;
 }) {
   return (
-    <section id={id} className={cx("rounded-xl border border-mc-line bg-mc-panel", className)}>
+    <section id={id} className={cx("min-w-0 rounded-xl border border-mc-line bg-mc-panel", className)}>
       {(title || actions) && (
         <div className="flex items-start justify-between gap-3 px-4 pt-3.5 pb-2.5 border-b border-mc-line/70">
           <div className="min-w-0">

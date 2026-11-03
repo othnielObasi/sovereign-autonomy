@@ -27,15 +27,29 @@ def list_policies():
     with open(catalog_path, "r", encoding="utf-8") as f:
         doc = yaml.safe_load(f) or {}
     policies = doc.get("policies", [])
+    # The catalog describes the policy. Effective values come from current rules
+    # and the site map synchronized with the simulator, not catalog defaults.
+    from app.policies import params as P
+    active = P.active_params()
+    values = {
+        'GEOFENCE_01': dict(active['GEOFENCE']),
+        'HUMAN_CLEARANCE_02': {'min_confidence': active['MIN_HUMAN_CONF'], 'max_speed_near_human_ms': active['MAX_SPEED_NEAR_HUMAN']},
+        'HITL_05': {'risk_threshold': active['REVIEW_RISK_THRESHOLD']},
+        'SAFE_SPEED_01': dict(active['ZONE_SPEED_LIMITS']),
+        'OBSTACLE_CLEARANCE_03': {'min_clearance_m': active['MIN_OBSTACLE_CLEARANCE_M']},
+        'HUMAN_PROXIMITY_02': {'slow_radius_m': active['HUMAN_SLOW_RADIUS_M'], 'stop_radius_m': active['HUMAN_STOP_RADIUS_M'], 'max_speed_near_human_ms': active['MAX_SPEED_NEAR_HUMAN']},
+        'WORKER_PROXIMITY_06': {'slow_radius_m': active['HUMAN_SLOW_RADIUS_M'], 'stop_radius_m': active['HUMAN_STOP_RADIUS_M']},
+        'UNCERTAINTY_04': {'min_confidence': active['MIN_HUMAN_CONF'], 'min_confidence_for_move': active['MIN_CONF_FOR_MOVE']},
+    }
     return [
         PolicyInfo(
             policy_id=p["policy_id"],
             name=p["name"],
             description=p["description"],
             severity=p.get("severity", "MEDIUM"),
-            parameters=p.get("parameters"),
-            trigger=p.get("trigger"),
-            action=p.get("action"),
+            parameters=values.get(p['policy_id'], p.get("parameters")),
+            trigger={"HUMAN_PROXIMITY_02": "Human/worker within the effective proximity radii", "WORKER_PROXIMITY_06": "Walking worker within the effective proximity radii", "HUMAN_CLEARANCE_02": "Confident human detection and speed above the effective limit", "OBSTACLE_CLEARANCE_03": "Obstacle distance below the effective clearance", "UNCERTAINTY_04": "Human detected below the effective confidence threshold", "HITL_05": "Risk at or above the effective review threshold"}.get(p["policy_id"], p.get("trigger")),
+            action="STOP inside stop radius; SLOW inside slow radius" if p["policy_id"] in ("HUMAN_PROXIMITY_02", "WORKER_PROXIMITY_06") else p.get("action"),
         )
         for p in policies
     ]

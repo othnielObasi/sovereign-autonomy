@@ -29,6 +29,7 @@ const num = (v: number | null | undefined) => (v == null ? "—" : v.toLocaleStr
 export default function EvidencePage() {
   type TabId = "bench" | "receipts" | "ops";
   const [tab, setTabState] = useState<TabId>("bench");
+  useEffect(() => { const q = new URLSearchParams(window.location.search).get("tab"); if (q && ["bench","receipts","ops"].includes(q)) setTabState(q as TabId); }, []);
   const setTab = (id: string) => setTabState(id as TabId);
   return (
     <Page wide>
@@ -56,7 +57,7 @@ function Benchmarks() {
   return (
     <div className="space-y-6">
       <Notice tone="info">
-        A move is labelled unsafe by fixed safety floors in code, not by the rules under test. Person contacts are physical
+        Learning can reduce false blocks while increasing mission time; compare both measures. A move is labelled unsafe by fixed safety floors in code, not by the rules under test. Person contacts are simulated body contacts
         (bodies within 0.7 m while the robot moves); &ldquo;while braking&rdquo; means the gate had already told the robot to stop.
       </Notice>
       {order.map((id) => suites.find((s) => s.id === id)).filter(Boolean).map((s) => <SuiteCard key={s!.id} s={s!} />)}

@@ -5,7 +5,7 @@ const path = require('node:path');
 
 // Read-only checks: never create missions or send robot commands.
 const base = process.env.PUBLIC_BASE_URL || 'http://127.0.0.1:19300';
-const output = path.resolve('docs/validation/2026-11-03-public-pages');
+const output = path.resolve(process.env.BROWSER_EVIDENCE_DIR || 'docs/validation/2026-11-03-public-pages');
 fs.mkdirSync(output, { recursive: true });
 (async () => {
   const browser = await chromium.launch({ headless: true });
@@ -17,10 +17,15 @@ fs.mkdirSync(output, { recursive: true });
   });
   try {
     assert.equal((await page.goto(base)).status(), 200);
-    assert.match(await page.locator('h1').innerText(), /Intelligence that acts/);
+    assert.match(await page.locator('h1').innerText(), /Give robots a mission/);
     assert.equal(await page.locator('.family-card').count(), 5);
     assert.deepEqual(await page.locator('main > section').evaluateAll(els => els.slice(0, 2).map(el => el.id)), ['top', 'experience']);
-    assert.equal(await page.locator('main > section').count(), 7);
+    assert.equal(await page.locator('main > section').count(), 8);
+    assert.equal(await page.locator('#mission-lifecycle .cap').count(), 3);
+    const liveProof = await (await page.request.get(base + '/landing/live-validation.json')).json();
+    assert.equal(liveProof.run_id, 'run_84fa654ec55a');
+    assert.equal(liveProof.verification.total_entries, 88);
+    assert.equal(liveProof.valid_receipt_count, 25);
     assert.equal(await page.locator('#authority .flow-node').count(), 3);
     await page.locator('#story-interface-details summary').click();
     await page.locator('.facility-preview img').scrollIntoViewIfNeeded();

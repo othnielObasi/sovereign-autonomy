@@ -6,6 +6,7 @@ import {
   listPolicies, testPolicy,
 } from "@/lib/api";
 import { Button, Empty, KV, Mono, Notice, Page, PageHeader, Panel, Pill, Tabs, Verdict, cx } from "@/components/ui";
+import { RulesWorkflow } from "@/components/RulesWorkflow";
 import { DriftDemo } from "@/components/DriftDemo";
 
 type Policy = { policy_id: string; name: string; description: string; severity: string; parameters?: Record<string, any>; trigger?: string; action?: string };
@@ -20,6 +21,7 @@ const GROUPS: Array<{ title: string; ids: string[] }> = [
 
 export default function GovernancePage() {
   const [tab, setTabState] = useState<TabId>("policies");
+  useEffect(() => { const q = new URLSearchParams(window.location.search).get("tab"); if (q && ["policies","rules","learning","sandbox"].includes(q)) setTabState(q as TabId); }, []);
   const setTab = (id: string) => setTabState(id as TabId);
   return (
     <Page wide>
@@ -34,7 +36,7 @@ export default function GovernancePage() {
       {tab === "policies" && <Policies />}
       {tab === "rules" && <Rules />}
       {tab === "learning" && <Learning />}
-      {tab === "sandbox" && <div className="space-y-4"><Sandbox /><DriftDemo /></div>}
+      {tab === "sandbox" && <div className="space-y-4 min-w-0"><Sandbox /><DriftDemo /></div>}
     </Page>
   );
 }
@@ -105,7 +107,7 @@ function Rules() {
   const value = (path: string) => path.split(".").reduce((o: any, k) => (o == null ? o : o[k]), active?.parameters);
   return (
     <div className="grid lg:grid-cols-3 gap-4">
-      <div className="lg:col-span-2 space-y-4">
+      <div className="lg:col-span-2 space-y-4 min-w-0">
         <Panel title="Changeable thresholds" subtitle="Current value and the hard bounds in code no proposal can cross"
           actions={active && <Pill tone={active.is_default ? "neutral" : "warn"}>version <Mono className="ml-1">{active.version}</Mono></Pill>}>
           {!active ? <div className="text-xs text-mc-dim">Loading…</div> : (
@@ -128,6 +130,7 @@ function Rules() {
             </div>
           )}
         </Panel>
+        <RulesWorkflow active={active} onChange={() => { getActivePolicies().then(setActive); getPolicyProposals().then(setProposals); getPolicyActivations().then(setActivations); }} />
         <Panel title="Change history" subtitle="Every activation is an append-only record">
           {activations.length === 0 && proposals.length === 0 ? (
             <Empty title="Running on the default rules">No rule change has been proposed or activated on this deployment.</Empty>
@@ -144,7 +147,7 @@ function Rules() {
           )}
         </Panel>
       </div>
-      <div className="space-y-4">
+      <div className="space-y-4 min-w-0">
         <Panel title="How rules change">
           <ol className="space-y-2.5">
             {WORKFLOW.map(([t, d], i) => (
@@ -154,7 +157,7 @@ function Rules() {
               </li>
             ))}
           </ol>
-          <div className="mt-3"><Notice tone="warn">Read-only on the public demo: everyone shares the same rules.</Notice></div>
+          <div className="mt-3"><Notice tone="warn">Activation requires an administrator and no active runs. Approval requires a different named operator from the proposer.</Notice></div>
         </Panel>
         <Panel title="Safety floors" subtitle="Fixed in code; label moves safe or unsafe in replay and benchmarks">
           {active?.safety_floors ? Object.entries(active.safety_floors).filter(([k]) => k !== "geofence").map(([k, v]) => (
@@ -199,7 +202,7 @@ function Learning() {
           </ul>
         )}
       </Panel>
-      <div className="space-y-4">
+      <div className="space-y-4 min-w-0">
         <Panel title="How learning works">
           <ol className="space-y-2.5 text-xs text-mc-mute">
             <li><span className="text-mc-ink font-semibold">Distil.</span> After each run, denials are grouped by 2 m floor cell and policy, with the fastest speed the gate approved there.</li>
@@ -353,7 +356,7 @@ function Sandbox() {
                 ))}
                 {res.required_action && <Notice tone="warn">Required: {res.required_action}</Notice>}
               </div>
-            ) : <div className="mt-4"><Notice tone="ok">All 11 policies passed. The move would execute.</Notice></div>}
+            ) : <div className="mt-4"><Notice tone="ok">Policy checks passed. Controller admission and a valid permit are still required before movement.</Notice></div>}
           </div>
         )}
       </Panel>

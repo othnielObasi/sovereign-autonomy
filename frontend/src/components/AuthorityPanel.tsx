@@ -9,11 +9,13 @@ import React, { useCallback, useEffect, useRef, useState } from "react";
 import { getAuthorityStatus, getFleet, killSwitch, resetKillSwitch, voiceStop } from "@/lib/api";
 import { startRecording, type Recorder } from "@/lib/wav";
 import { Button, KV, Notice, Panel, Pill, cx } from "@/components/ui";
+import { useRuntimeCapabilities } from './RuntimeCapabilities';
 
 type Lock = { scope: string; id: string; reason: string; actor: string; since: number };
 type Status = { enabled: boolean; robot_id: string; epoch: number; kill_locks: Lock[]; world_version: number | null; journal_intact: boolean };
 
 export function AuthorityPanel({ compact = false }: { compact?: boolean }) {
+  const capabilities = useRuntimeCapabilities();
   const [s, setS] = useState<Status | null>(null);
   const [busy, setBusy] = useState<string | null>(null);
   const [msg, setMsg] = useState<{ tone: "ok" | "warn" | "stop" | "info"; text: string } | null>(null);
@@ -78,15 +80,15 @@ export function AuthorityPanel({ compact = false }: { compact?: boolean }) {
 
   const locked = (s?.kill_locks?.length || 0) > 0;
   return (
-    <Panel title="Execution authority"
+    <Panel id="execution-authority" title="Execution authority"
       subtitle={compact ? undefined : "Nothing moves without a single-use permit. Stopping never needs a login."}
       actions={s && <Pill tone={!s.enabled ? "stop" : locked ? "stop" : "ok"} dot>{!s.enabled ? "No permit secret" : locked ? "Stopped" : "Permits enforced"}</Pill>}>
       <div className={cx("grid gap-2", compact ? "grid-cols-1" : "sm:grid-cols-3")}>
         <Button variant="danger" disabled={!!busy} onClick={() => stop("robot")}>{busy === "robot" ? "Stopping…" : "Stop robot"}</Button>
         <Button variant="danger" disabled={!!busy} onClick={() => stop("global")}>{busy === "global" ? "Stopping…" : "Stop everything"}</Button>
-        <Button variant={recording ? "primary" : "secondary"} disabled={busy === "voice"} onClick={voice}
-          title="Muse Voice Transcribe: a spoken stop fires a kill switch">
-          {recording ? "● Listening — press to send" : busy === "voice" ? "Transcribing…" : "🎙 Voice stop"}
+        <Button variant={recording ? "primary" : "secondary"} disabled={busy === "voice" || (!recording && !capabilities?.voice_enabled)} onClick={voice}
+          title={capabilities?.voice_enabled ? 'Spoken stop can only halt movement' : 'Voice transcription is not configured. Ordinary stop controls remain available.'}>
+          {recording ? "● Listening — press to send" : busy === "voice" ? "Transcribing…" : capabilities?.voice_enabled ? "🎙 Voice stop" : "Voice not configured"}
         </Button>
       </div>
 

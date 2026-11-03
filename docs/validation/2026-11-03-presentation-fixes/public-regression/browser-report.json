@@ -1,0 +1,19 @@
+{
+  "base": "http://127.0.0.1:19310",
+  "checks": [
+    "Landing preserves hero, exposes five groups, authority flow, simulator image and application links",
+    "Five mission moments cite actual archived events and positions; navigation works and audit limitations are disclosed",
+    "Capability details start collapsed and expand or collapse with pointer and keyboard",
+    "Landing capability links reach the matching guide section; all 22 cards render",
+    "Lifecycle shortcuts filter related capabilities; result counts and reset restore the full list",
+    "Lifecycle stages respond to pointer and keyboard input without losing focus",
+    "Scenario selection changes explanation and illustrated route or refusal state",
+    "Search, no-results, family and configuration filters work; every capability links to a workspace",
+    "All linked workspace destinations and the recorded validation report return HTTP 200",
+    "Both pages fit 390, 768, 1024 and 1440px; mobile/tablet navigation opens and closes",
+    "Public navigation and capability deep links resolve to existing sections",
+    "Public pages load their fonts and assets locally without third-party requests",
+    "Reduced motion is respected and both pages have no JavaScript errors"
+  ],
+  "errors": []
+}

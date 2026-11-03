@@ -15,6 +15,7 @@ export function IntrospectionPanel({ runId }: { runId: string }) {
   const [searchResults, setSearchResults] = useState<any[] | null>(null);
   const [searchLoading, setSearchLoading] = useState(false);
 
+  useEffect(() => { if (new URLSearchParams(window.location.search).get("focus") === "memory") setTab("memory"); }, []);
   useEffect(() => {
     let cancelled = false;
     (async () => {

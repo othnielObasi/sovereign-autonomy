@@ -6,6 +6,7 @@ import { useEffect, useRef, useState } from "react";
 import { Icon, BrandMark } from "./control/Icon";
 import { SignIn } from "./SignIn";
 import { killSwitch } from '@/lib/api';
+import { RuntimeCapabilitiesProvider } from './RuntimeCapabilities';
 
 const navigation = [
   { href: '/mission-control', label: 'Mission control', icon: 'command', match: ['/mission-control', '/twin'] },
@@ -14,6 +15,7 @@ const navigation = [
   { href: '/authority', label: 'Trust & security', icon: 'shield', match: ['/authority'] },
   { href: '/policies', label: 'Governance', icon: 'layers', match: ['/policies'] },
   { href: '/evidence', label: 'Evidence', icon: 'chart', match: ['/evidence', '/audit', '/compliance'] },
+  { href: '/capabilities', label: 'Capabilities & tools', icon: 'layers', match: ['/capabilities', '/operations'] },
 ];
 
 export function AppShell({ children }: { children: React.ReactNode }) {
@@ -47,7 +49,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
     finally { setStopping(false); }
   }
   const current = navigation.find(n => n.match.some(p => pathname.startsWith(p)));
-  return <div className="sa-shell">
+  return <RuntimeCapabilitiesProvider><div className="sa-shell">
     <a href="#main-content" className="sa-skip">Skip to content</a>
     {open && <button className="sa-nav-backdrop" aria-label="Dismiss navigation overlay" tabIndex={-1} onClick={() => setOpen(false)} />}
     <aside ref={drawer} className={`sa-sidebar ${open ? 'is-open' : ''}`} aria-label="Primary navigation">
@@ -56,7 +58,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
       <div className="sa-workspace-label"><span className="sa-workspace-monogram">S</span><div>Operations workspace<small>Simulation environment</small></div><Icon name="down" size={14}/></div>
       <p className="sa-nav-caption">WORKSPACE</p>
       <nav className="sa-navigation">{navigation.map(n => <Link key={n.href} href={n.href} onClick={() => setOpen(false)} aria-current={current?.href === n.href ? 'page' : undefined} className={current?.href === n.href ? 'is-active' : ''}><Icon name={n.icon}/><span>{n.label}</span>{current?.href === n.href && <span className="sa-active-dot"/>}</Link>)}</nav>
-      <div className="sa-sidebar-guide"><span className="sa-tiny-icon"><Icon name="bolt"/></span><h3>Intelligence proposes.<br/>Authority decides.</h3><p>Follow every move from a plan to its permission to act.</p><Link href="/mission-control?showcase=1" onClick={() => setOpen(false)}>Explore the showcase <Icon name="arrow" size={16}/></Link></div>
+      <div className="sa-sidebar-guide"><span className="sa-tiny-icon"><Icon name="bolt"/></span><h3>Plan. Adapt.<br/>Learn. Explain.</h3><p>Assign a mission, follow its progress and inspect the experience behind it.</p><Link href="/capabilities" onClick={() => setOpen(false)}>Explore the platform <Icon name="arrow" size={16}/></Link></div>
       <div className="sa-sidebar-bottom"><Link href="/overview" onClick={() => setOpen(false)}><Icon name="info" size={17}/> About the system</Link><div className="sa-sidebar-foot"><span className="sa-orbit-dot"/> Sovereign Autonomy <span>v0.1</span></div></div>
     </aside>
     <div className="sa-workspace">
@@ -65,5 +67,5 @@ export function AppShell({ children }: { children: React.ReactNode }) {
       <main id="main-content">{children}</main>
       {!pathname.startsWith('/mission-control') && <footer className="sa-footer"><span>Sovereign Autonomy · NOVTIA</span><Link href="/mission-control">Return to mission control <Icon name="arrow" size={14}/></Link></footer>}
     </div>
-  </div>;
+  </div></RuntimeCapabilitiesProvider>;
 }

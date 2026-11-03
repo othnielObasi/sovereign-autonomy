@@ -50,6 +50,8 @@ async def health():
         "voice_enabled": settings.voice_configured,
         "planner_provider": settings.planner_provider,
         "version": "0.1.0",
+        "public_demo": settings.public_demo,
+        "effective_geofence": dict(__import__('app.policies.params', fromlist=['active_params']).active_params()['GEOFENCE']),
         "checks": {
             "database": "ok" if db_ok else "error",
             "simulator": "ok" if sim_ok else "error",

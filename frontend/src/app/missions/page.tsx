@@ -8,6 +8,7 @@ import {
 } from "@/lib/api";
 import type { Mission, MissionStatus } from "@/lib/types";
 import { Button, Empty, Mono, Notice, Page, PageHeader, Panel, Pill, Tabs, Verdict, cx } from "@/components/ui";
+import { RuntimeCapabilities } from '@/components/RuntimeCapabilities';
 
 const BAY_PATTERN = /\b([A-Z])-(\d{1,2})\b/i;   // e.g. B-03, L-05, D-02
 function resolveBayGoal(text: string, bays: any[]): { x: number; y: number } | null {
@@ -16,14 +17,6 @@ function resolveBayGoal(text: string, bays: any[]): { x: number; y: number } | n
   const bay = bays.find((b: any) => b.id?.toUpperCase() === `${m[1].toUpperCase()}-${m[2].padStart(2, "0")}`);
   return bay && typeof bay.x === "number" ? { x: bay.x, y: bay.y } : null;
 }
-
-const PRESETS = [
-  { title: "Deliver pallet to dock B-03", bay: "B-03" },
-  { title: "Pick items from rack A-04", bay: "A-04" },
-  { title: "Restock rack A-08", bay: "A-08" },
-  { title: "Move goods to staging S-01", bay: "S-01" },
-  { title: "Hazmat container to dock B-05", bay: "B-05" },
-];
 
 const STATUS_LABEL: Record<string, string> = { draft: "DRAFT", executing: "RUNNING", paused: "PAUSED", completed: "COMPLETED", deleted: "DELETED", failed: "FAILED" };
 
@@ -36,9 +29,9 @@ export default function MissionsPage() {
   const setFilter = (v: string) => setFilterState(v as any);
   const [bays, setBays] = useState<any[]>([]);
   // create
-  const [presets, setPresets] = useState<Array<{ title: string; bay: string }>>(PRESETS);
-  const [title, setTitle] = useState(PRESETS[0].title);
-  const [bayId, setBayId] = useState(PRESETS[0].bay);
+  const [presets, setPresets] = useState<Array<{ title: string; bay: string }>>([]);
+  const [title, setTitle] = useState('');
+  const [bayId, setBayId] = useState('');
   const [robots, setRobots] = useState<string[]>(["robot-1"]);
   const [robotId, setRobotId] = useState("robot-1");
   const [creating, setCreating] = useState(false);
@@ -54,7 +47,9 @@ export default function MissionsPage() {
     reload();
     getWorld().then((w: any) => {
       setBays(w?.bays || []);
-      if (w?.presets?.length) { setPresets(w.presets); setTitle(w.presets[0].title); setBayId(w.presets[0].bay); }
+      const current = (w?.bays || []).slice(0, 6).map((b: any) => ({ title: `Navigate to ${b.label || b.id}`, bay: b.id }));
+      setPresets(current);
+      if (current.length) { setTitle(current[0].title); setBayId(current[0].bay); }
     }).catch(() => {});
     getFleet().then((f: any) => { const ids = (f?.robots || []).map((r: any) => r.robot_id); if (ids.length) setRobots(ids); }).catch(() => {});
   }, []);
@@ -92,8 +87,10 @@ export default function MissionsPage() {
   return (
     <Page wide>
       <PageHeader eyebrow="Missions" title="Missions"
-        subtitle="A mission is a destination for the robot. Muse Spark plans the route; the gate approves every move, and each approved move needs its own permit."
+        subtitle="Assign a robot a navigation objective, save a draft and supervise execution. A configured model or deterministic fallback proposes the route; controller admission is checked separately."
         actions={<Button href="/twin">Pick a bay on the warehouse →</Button>} />
+      <RuntimeCapabilities />
+      <Notice>Current actions are navigation, stop and wait. Loading, picking, restocking and humanoid manipulation are outside this simulator's scope.</Notice>
 
       <div className="grid lg:grid-cols-3 gap-4">
         {/* Create */}
@@ -127,10 +124,10 @@ export default function MissionsPage() {
             </select>
           </>)}
           <div className="grid grid-cols-2 gap-2 mt-4">
-            <Button onClick={() => create(false)} disabled={creating || !title.trim()}>Save draft</Button>
-            <Button variant="primary" onClick={() => create(true)} disabled={creating || !title.trim()}>{creating ? "Starting…" : "Start governed run"}</Button>
+            <Button onClick={() => create(false)} disabled={creating || !title.trim() || !bays.some(b => b.id === bayId)}>Save draft</Button>
+            <Button variant="primary" onClick={() => create(true)} disabled={creating || !title.trim() || !bays.some(b => b.id === bayId)}>{creating ? "Starting…" : "Start governed run"}</Button>
           </div>
-          <p className="mt-3 text-[11px] text-mc-dim leading-relaxed">Each robot runs one mission at a time. Two robots never get overlapping paths: each move reserves its stretch of floor before it gets a permit.</p>
+          <p className="mt-3 text-xs text-mc-mute leading-relaxed">Each robot runs one mission at a time. Path reservations and peer-obstacle checks help coordinate the simulated fleet; there is no general fleet scheduler or deadlock solver.</p>
         </Panel>
 
         {/* List */}

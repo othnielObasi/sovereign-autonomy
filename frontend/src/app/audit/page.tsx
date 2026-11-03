@@ -51,7 +51,7 @@ export default function AuditTrailPage() {
   return (
     <div className="max-w-[1600px] mx-auto px-4 sm:px-6 py-6 sm:py-8">
       <PageHeader eyebrow="Evidence" title="Audit trail"
-        subtitle={`${entries.length} entries across ${uniqueMissions.size} mission${uniqueMissions.size !== 1 ? "s" : ""}. Mission changes, recorded and append-only.`} />
+        subtitle={`${entries.length} entries across ${uniqueMissions.size} mission${uniqueMissions.size !== 1 ? "s" : ""}. Mission changes, recorded and append-only. For execution decisions and signed receipts, open Evidence or a run record.`} />
       <EvidenceNav />
 
       {/* Filter */}

@@ -44,7 +44,7 @@ export function OperationalGraphPanel() {
     finally { setBusy(false); }
   }
   const connected = status?.state === 'connected';
-  return <Panel title="Operational knowledge graph" subtitle="Explore how robot missions, decisions, locations and policies connect"
+  return <Panel id="knowledge-graph" title="Operational knowledge graph" subtitle="Explore how robot missions, decisions, locations and policies connect"
     actions={<Pill tone={connected ? 'ok' : 'neutral'}>{!status ? 'Checking' : connected ? 'Memgraph connected' : status.state === 'disabled' ? 'Memgraph disabled' : 'Memgraph unavailable'}</Pill>}>
     <p className="text-sm text-mc-mute mb-3">NetworkX calculates routes. Memgraph connects historical evidence; every displayed decision is rechecked against the original signed record.</p>
     {error && <Notice tone="stop">{error}</Notice>}

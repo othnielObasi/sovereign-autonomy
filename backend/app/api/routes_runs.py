@@ -466,6 +466,15 @@ def get_run(run_id: str, db: Session = Depends(get_db)):
     )
 
 
+@router.get('/runs/{run_id}/presentation')
+def get_run_presentation(run_id: str, db: Session = Depends(get_db)):
+    from app.services.run_presentation import run_presentation
+    result = run_presentation(db, run_id)
+    if result is None:
+        raise HTTPException(404, 'Run not found')
+    return result
+
+
 @router.post("/runs/{run_id}/stop")
 async def stop_run(
     run_id: str,

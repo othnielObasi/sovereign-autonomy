@@ -14,11 +14,16 @@ import time
 import httpx
 
 ROOT = Path(__file__).resolve().parents[1]
+FRONTEND_PORT = int(os.environ.get("BROWSER_FRONTEND_PORT", "19300"))
+BACKEND_PORT = int(os.environ.get("BROWSER_BACKEND_PORT", "18080"))
+SIM_PORT = int(os.environ.get("BROWSER_SIM_PORT", "18090"))
 STATE = ROOT / "backend/data/browser-validation"
+if FRONTEND_PORT != 19300:
+    STATE = STATE / f"ports-{FRONTEND_PORT}"
 
 
 def main():
-    for port in (19300, 18080, 18090):
+    for port in (FRONTEND_PORT, BACKEND_PORT, SIM_PORT):
         with socket.socket() as probe:
             probe.bind(('127.0.0.1', port))
     STATE.mkdir(parents=True, exist_ok=True)
@@ -45,8 +50,8 @@ def main():
                AUTHORITY_DB_PATH=str(STATE / f"authority-{session}.db"), SIM_STATE_DB=str(STATE / f"controller-{session}.db"),
                EXPERIENCE_ANCHOR_PATH=str(STATE / f'anchor-{session}.sqlite'), RECEIPT_SIGNING_KEY='',
                RECEIPT_SIGNING_KEY_FILE=str(STATE / f'receipt-{session}.key'),
-               SIM_BASE_URL="http://127.0.0.1:18090", AUTHORITY_BASE_URL="http://127.0.0.1:18080",
-               BACKEND_URL="http://127.0.0.1:18080", NEXT_DIST_DIR=os.environ.get("BROWSER_NEXT_DIST_DIR", ".next-validation"),
+               SIM_BASE_URL=f"http://127.0.0.1:{SIM_PORT}", AUTHORITY_BASE_URL=f"http://127.0.0.1:{BACKEND_PORT}",
+               BACKEND_URL=f"http://127.0.0.1:{BACKEND_PORT}", NEXT_DIST_DIR=os.environ.get("BROWSER_NEXT_DIST_DIR", ".next-validation"),
                PERMIT_SECRET="browser-validation-only-secret-0123456789abcdef", SIM_TOKEN="",
                JWT_SECRET="browser-validation-only-jwt-0123456789abcdef", PYTHONPATH=str(ROOT / "backend"))
     env['MEMGRAPH_ENABLED'] = 'true' if os.environ.get('BROWSER_MEMGRAPH_URI') else 'false'
@@ -54,9 +59,9 @@ def main():
         env['MEMGRAPH_URI'] = os.environ['BROWSER_MEMGRAPH_URI']
         env['MEMGRAPH_NAMESPACE'] = 'browser-validation-' + session
     commands = [
-        ("sim", ROOT, [sys.executable, "-m", "uvicorn", "server:app", "--app-dir", "sim/warehouse_sim", "--host", "127.0.0.1", "--port", "18090"]),
-        ("backend", ROOT / "backend", [sys.executable, "-m", "uvicorn", "app.main:app", "--host", "127.0.0.1", "--port", "18080"]),
-        ("frontend", ROOT / "frontend", ["node", "node_modules/next/dist/bin/next", "start", "--hostname", "127.0.0.1", "--port", "19300"]),
+        ("sim", ROOT, [sys.executable, "-m", "uvicorn", "server:app", "--app-dir", "sim/warehouse_sim", "--host", "127.0.0.1", "--port", str(SIM_PORT)]),
+        ("backend", ROOT / "backend", [sys.executable, "-m", "uvicorn", "app.main:app", "--host", "127.0.0.1", "--port", str(BACKEND_PORT)]),
+        ("frontend", ROOT / "frontend", ["node", "node_modules/next/dist/bin/next", "start", "--hostname", "127.0.0.1", "--port", str(FRONTEND_PORT)]),
     ]
     processes, logs = [], []
     try:
@@ -66,7 +71,7 @@ def main():
             processes.append(subprocess.Popen(command, cwd=cwd, env=env, stdout=log, stderr=subprocess.STDOUT,
                                                creationflags=subprocess.CREATE_NO_WINDOW if os.name == "nt" else 0))
         deadline = time.monotonic() + 180
-        for url in ("http://127.0.0.1:18090/health", "http://127.0.0.1:18080/health", "http://127.0.0.1:19300/authority"):
+        for url in (f"http://127.0.0.1:{SIM_PORT}/health", f"http://127.0.0.1:{BACKEND_PORT}/health", f"http://127.0.0.1:{FRONTEND_PORT}/authority"):
             while True:
                 if any(p.poll() is not None for p in processes):
                     raise RuntimeError("validation service exited; inspect local logs")
@@ -78,7 +83,7 @@ def main():
                 if time.monotonic() > deadline:
                     raise TimeoutError("validation stack not ready")
                 time.sleep(0.25)
-        print("Validation stack ready at http://127.0.0.1:19300", flush=True)
+        print(f"Validation stack ready at http://127.0.0.1:{FRONTEND_PORT}", flush=True)
         if live_integrations:
             print('Live validation: no synthetic experience seeded', flush=True)
         else:
@@ -88,8 +93,8 @@ def main():
             sys.path.insert(0, str(ROOT / "backend"))
             from app.autonomy.experience import context_from_state
             from app.services.route_learning import RouteMemory
-            telemetry = httpx.get("http://127.0.0.1:18090/telemetry", trust_env=False).json()
-            policy = httpx.get("http://127.0.0.1:18080/agent/lessons", trust_env=False).json()["policy_version"]
+            telemetry = httpx.get(f"http://127.0.0.1:{SIM_PORT}/telemetry", trust_env=False).json()
+            policy = httpx.get(f"http://127.0.0.1:{BACKEND_PORT}/agent/lessons", trust_env=False).json()["policy_version"]
             context = context_from_state(telemetry, policy)
             fixture = RouteMemory(env["AUTHORITY_DB_PATH"], env["PERMIT_SECRET"].encode(), anchor_path=env['EXPERIENCE_ANCHOR_PATH'])
             for source in ['robot-A (fixture)', 'robot-C (fixture)']:

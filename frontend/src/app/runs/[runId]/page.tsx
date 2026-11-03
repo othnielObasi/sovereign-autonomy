@@ -14,9 +14,12 @@ import type { WsMessage } from "@/lib/types";
 import Link from "next/link";
 import { Tabs } from "@/components/ui";
 import { RunLearningPanel } from "@/components/RunLearningPanel";
+import { RunProgressView, useRunPresentation } from '@/components/RunProgress';
+import { executionPresentation } from '@/lib/runPresentation';
+import { RuntimeCapabilities } from '@/components/RuntimeCapabilities';
 
 /* ── Bay resolver (matches backend resolve_bay_from_instruction) ── */
-const BAY_PATTERN = /\b([ABSR])-?(\d{1,2})\b/i;
+const BAY_PATTERN = /\b([A-Z])-?(\d{1,2})\b/i;
 function resolveBayGoal(instruction: string, bays: any[]): { x: number; y: number } | null {
   if (!instruction || !bays?.length) return null;
   const match = instruction.match(BAY_PATTERN);
@@ -32,9 +35,9 @@ function resolveBayGoal(instruction: string, bays: any[]): { x: number; y: numbe
 // Strip decorative emoji from panel titles: the mission-control style keeps titles plain
 const plain = (t: string) => t.replace(/^[^\p{L}\p{N}]+/u, "").trim();
 
-function Card({ title, children, className = "" }: { title: string; children: React.ReactNode; className?: string }) {
+function Card({ title, children, className = "", id }: { title: string; children: React.ReactNode; className?: string; id?: string }) {
   return (
-    <div className={`bg-mc-panel border border-mc-line rounded-xl p-4 ${className}`}>
+    <div id={id} className={`min-w-0 bg-mc-panel border border-mc-line rounded-xl p-4 ${className}`}>
       <div className="text-[13px] font-semibold uppercase tracking-[0.08em] text-mc-ink mb-3">{plain(title)}</div>
       {children}
     </div>
@@ -95,9 +98,12 @@ export default function RunPage({ params }: { params: { runId: string } }) {
   const [world, setWorld] = useState<any>(null);
   const [showHeatmap, setShowHeatmap] = useState<boolean>(true);
   const [sideTab, setSideTab] = useState<string>("learning");
+  const progress = useRunPresentation(runId);
   const [mapView, setMapView] = useState<"3d" | "2d">("3d");
   useEffect(() => {
     if (new URLSearchParams(window.location.search).get("view") === "2d") setMapView("2d");
+    const tab = new URLSearchParams(window.location.search).get('tab');
+    if (tab && ['learning', 'intel', 'chain', 'alerts', 'analysis'].includes(tab)) setSideTab(tab);
   }, []);
   const [showTrail, setShowTrail] = useState<boolean>(true);
   const [pathPoints, setPathPoints] = useState<Array<{x:number;y:number}> | null>(null);
@@ -108,6 +114,8 @@ export default function RunPage({ params }: { params: { runId: string } }) {
   const [status, setStatus] = useState<string>("");
   const missionRobot = useRef("robot-1");
   const [pollConnected, setPollConnected] = useState(false);
+  const [telemetryAt, setTelemetryAt] = useState(0), [displayNow, setDisplayNow] = useState(Date.now());
+  useEffect(() => { const t = setInterval(() => setDisplayNow(Date.now()), 1000); return () => clearInterval(t); }, []);
   const [wsConnected, setWsConnected] = useState(false);
   const wsRef = useRef<WebSocket | null>(null);
   const reconnectTimer = useRef<any>(null);
@@ -184,25 +192,11 @@ export default function RunPage({ params }: { params: { runId: string } }) {
       const rows = await listEvents(runId);
       setEvents(rows);
 
-      // Auto-populate llmPlan from backend PLAN events.  Always prefer the
-      // latest LLM plan (source: "muse" / "gemini") over a seed fallback so the map
-      // shows the plan the robot is *actually* following — even if a seed
-      // fallback was loaded first.
-      const planEvents = rows.filter((e: any) => e.type === "PLAN");
-      // Prefer the latest PLAN event (LLM upgrade over seed fallback)
-      for (let i = planEvents.length - 1; i >= 0; i--) {
-        const payload = typeof planEvents[i].payload === "string"
-          ? JSON.parse(planEvents[i].payload)
-          : planEvents[i].payload || {};
-        const plan = payload.plan;
-        const source = payload.source;
-        if (plan?.waypoints?.length) {
-          // Always accept an LLM plan; only accept a fallback if nothing set yet
-          if (source !== "fallback" || !llmPlan) {
-            setLlmPlan(plan);
-          }
-          break;
-        }
+      // Newest recorded plan wins, including fallback replans and empty holds.
+      const latest = rows.filter((e: any) => e.type === "PLAN").at(-1);
+      if (latest) {
+        const payload = typeof latest.payload === "string" ? JSON.parse(latest.payload) : latest.payload || {};
+        setLlmPlan(payload.plan || null);
       }
     } catch (_) {}
   }
@@ -361,7 +355,7 @@ export default function RunPage({ params }: { params: { runId: string } }) {
         const [sample, record] = await Promise.allSettled([getTelemetry(robotId), getRun(runId)]);
         if (!live) return;
         if (sample.status === "fulfilled" && sample.value.robot_id === robotId) {
-          setTelemetry(sample.value); setPollConnected(true);
+          setTelemetry(sample.value); setTelemetryAt(Date.now()); setPollConnected(true);
           if (!version || version !== sample.value.map_version) {
             const layout = await getWorld();
             if (live) setWorld(layout);
@@ -590,6 +584,7 @@ export default function RunPage({ params }: { params: { runId: string } }) {
   }, [lastDecision, livePolicyState]);
 
   const currentStatus = status || run?.status || "—";
+  const executionState = executionPresentation(progress.current && progress.value?.run_id === runId ? progress.value : null, telemetry, pollConnected && displayNow - telemetryAt < 4000 && progress.current, currentStatus);
 
   // True when the backend is auto-planning/executing (user did NOT trigger the
   // manual "Plan →" pipeline).  Used to show an explanatory banner.
@@ -606,6 +601,9 @@ export default function RunPage({ params }: { params: { runId: string } }) {
 
   return (
     <div className="warehouse-run max-w-[1400px] mx-auto px-4 py-4 space-y-3">
+      <RuntimeCapabilities />
+      <section id="planner-context" className="my-3 rounded-lg border border-mc-line p-3"><h2 className="font-semibold">Recorded planning context</h2><p className="text-sm text-mc-mute">Latest plan source: {progress.value?.plan?.payload?.source || "Not recorded"}. Model: {progress.value?.plan?.payload?.plan?.model_used || "Not recorded"}. Planner inputs are advice; each action still requires policy checks and controller admission.</p><a className="text-sm underline text-mc-accent" href="#agentic-planning">Open mission planning and tool controls below</a>{progress.value?.plan?.payload?.plan?.graph_history && <pre className="text-xs whitespace-pre-wrap break-all mt-2">{JSON.stringify(progress.value.plan.payload.plan.graph_history, null, 2)}</pre>}</section>
+      <RunProgressView value={progress.value} current={progress.current && progress.value?.run_id === runId} telemetry={telemetry} fresh={pollConnected && displayNow - telemetryAt < 4000} status={currentStatus}/>
       {/* Scenario toast notification (floating) */}
       {scenarioToast && (
         <div className="fixed top-20 right-4 z-50 bg-mc-panel/95 border border-cyan-500/40 rounded-xl px-4 py-3 shadow-lg shadow-black/30 backdrop-blur animate-slide-in max-w-xs">
@@ -706,16 +704,8 @@ export default function RunPage({ params }: { params: { runId: string } }) {
         {/* Execution Safety */}
         <div className="flex flex-col items-center text-center">
           <span className="text-[9px] uppercase tracking-wider text-mc-dim font-semibold">Execution</span>
-          <span className={`text-xs font-bold ${
-            safety.state === "OK" ? "text-emerald-700" :
-            safety.state === "STOP" ? "text-red-400" :
-            safety.state === "SLOW" ? "text-amber-800" : "text-blue-400"
-          }`}>
-            {safety.state === "OK" ? "Within Bounds" :
-             safety.state === "STOP" ? "Stopped" :
-             safety.state === "SLOW" ? "Speed Limited" : "Replanning"}
-          </span>
-        </div>
+          <span className="text-xs font-bold text-mc-ink">{executionState.label}</span>
+      </div>
       </div>
 
       {/* ── MAIN LAYOUT: Hero Map (left 60%) + Sidebar (right 40%) ── */}
@@ -786,13 +776,13 @@ export default function RunPage({ params }: { params: { runId: string } }) {
               <span className="flex items-center gap-1 text-[10px] text-mc-mute"><span className="w-2.5 h-2.5 rounded-full bg-emerald-400 inline-block" /> Goal</span>
               <span className="flex items-center gap-1 text-[10px] text-mc-mute"><span className="w-2.5 h-2.5 rounded-sm bg-red-400/50 inline-block" /> Risk Zone</span>
               {/* Mission Alignment badge */}
-              {llmPlan && executedPathData.length > 0 && (
+              {llmPlan && executedPathData.length > 0 && divergenceExplanation && (
                 <span className={`ml-auto flex items-center gap-1 text-[10px] font-semibold px-2 py-0.5 rounded-full border ${
                   divergenceExplanation?.divergence_detected
                     ? "bg-yellow-500/15 text-amber-800 border-yellow-500/30"
                     : "bg-green-500/15 text-emerald-700 border-green-500/30"
                 }`}>
-                  {divergenceExplanation?.divergence_detected ? "⚠ Plan Diverged" : "✓ Following Approved Plan"}
+                  {divergenceExplanation?.divergence_detected ? "⚠ Plan Diverged" : "Recorded path matches plan"}
                 </span>
               )}
               {!llmPlan && <span className="text-[10px] text-mc-dim ml-auto">Scroll to zoom · Drag to pan</span>}
@@ -801,7 +791,7 @@ export default function RunPage({ params }: { params: { runId: string } }) {
 
           {/* ── Unified AI Mission Planner ── */}
           {!isFullscreen && (
-          <Card title="🤖 AI Mission Planner">
+          <Card id="agentic-planning" title="🤖 AI Mission Planner">
             {/* Autonomous Mode + Memory + Replan badges */}
             <div className="flex items-center gap-2 mb-2 flex-wrap">
               <button onClick={() => setAutonomousMode(!autonomousMode)}
@@ -831,7 +821,7 @@ export default function RunPage({ params }: { params: { runId: string } }) {
                 { key: "reasoning", label: "1. Reasoning", icon: "🧠" },
                 { key: "planning", label: "2. Plan", icon: "🗺️" },
                 { key: "governing", label: "3. Governance", icon: "🛡️" },
-                { key: "executing", label: "4. Execute", icon: "🚀" },
+                { key: "executing", label: "4. Admission & outcome", icon: "🚀" },
                 { key: "done", label: "5. Audit", icon: "📋" },
               ] as const).map((stage, i) => {
                 const stageOrder = ["idle", "reasoning", "planning", "governing", "ready", "executing", "done"];
@@ -861,12 +851,12 @@ export default function RunPage({ params }: { params: { runId: string } }) {
                 <span className="text-teal-700 text-base mt-0.5">{currentStatus === "planning" ? "🗺️" : "🚀"}</span>
                 <div>
                   <div className="text-sm font-semibold text-cyan-300">
-                    {currentStatus === "planning" ? "AI is generating a plan…" : "Mission running autonomously"}
+                    {currentStatus === "planning" ? "Preparing a mission plan..." : executionState.label}
                   </div>
                   <div className="text-[11px] text-mc-mute mt-0.5">
                     {currentStatus === "planning"
-                      ? "Muse Spark is planning the route from the map and the robot camera. The robot will not move until planning and governance review complete."
-                      : "The robot is following the approved plan. Watch the map and chain-of-trust below for live progress."}
+                      ? "The configured planner is preparing a route. Its source is recorded with the plan; movement requires independent admission."
+                      : executionState.detail}
                   </div>
                 </div>
               </div>
@@ -899,7 +889,7 @@ export default function RunPage({ params }: { params: { runId: string } }) {
               <button onClick={onRunPipeline}
                 disabled={pipelineStage !== "idle" || !missionInstruction.trim()}
                 className="bg-purple-500 hover:bg-purple-600 disabled:bg-mc-line2 text-white text-sm font-semibold px-4 py-2 rounded-lg transition whitespace-nowrap">
-                {currentStatus === "paused" ? "Paused" : pipelineStage === "reasoning" ? "🧠 Reasoning..." : pipelineStage === "planning" ? "🗺️ Planning..." : pipelineStage === "executing" ? "🚀 Executing..." : pipelineStage === "done" ? "✓ Done" : "Plan →"}
+                {currentStatus === "paused" ? "Paused" : pipelineStage === "reasoning" ? "🧠 Reasoning..." : pipelineStage === "planning" ? "🗺️ Planning..." : pipelineStage === "executing" ? "Awaiting execution outcome" : pipelineStage === "done" ? "✓ Done" : "Plan →"}
               </button>
             </div>
             )}
@@ -1229,7 +1219,7 @@ export default function RunPage({ params }: { params: { runId: string } }) {
               </button>
             )}
             {pipelineStage === "executing" && (
-              <div className="text-xs text-purple-300 animate-pulse text-center py-2">Executing waypoints…</div>
+              <div className="text-xs text-purple-300 animate-pulse text-center py-2">{executionState.label}</div>
             )}
 
             {/* Stage 3 result: Execution */}
@@ -1287,7 +1277,7 @@ export default function RunPage({ params }: { params: { runId: string } }) {
                         : lastDecision.governance?.decision || "—"}
                     </span>
                   </div>
-                  <span className="text-mc-mute">Execution Risk: {lastDecision.governance?.risk_score != null ? (lastDecision.governance.risk_score * 100).toFixed(0) + "%" : "—"}</span>
+                  <span className="text-mc-mute">Policy risk score: {lastDecision.governance?.risk_score != null ? (lastDecision.governance.risk_score * 100).toFixed(0) + "%" : "—"}</span>
                 </div>
                 {/* Scope clarification: what exactly was approved/denied */}
                 {!isFullscreen && (
@@ -1360,7 +1350,7 @@ export default function RunPage({ params }: { params: { runId: string } }) {
               { id: "alerts", label: "Alerts", count: alerts.length },
               { id: "analysis", label: "Analysis" },
             ]} />
-            <div className="pt-3 space-y-3">
+            <div id="run-inspection" className="pt-3 space-y-3 scroll-mt-24">
             <AuthorityPanel compact />
             {sideTab === "learning" && (
               <RunLearningPanel runId={runId} events={events}
@@ -1539,7 +1529,7 @@ export default function RunPage({ params }: { params: { runId: string } }) {
 
             {/* Optimization Analysis (#7) */}
             {!isFullscreen && (
-            <CollapsibleCard title="⚡ Optimization Analysis" defaultOpen={false}
+            <CollapsibleCard title="⚡ Optimization Analysis" defaultOpen={true}
               hint={optimizationAnalysis ? <span className="text-teal-700">Eff: {((optimizationAnalysis.scorecard?.scores?.efficiency ?? 0) * 100).toFixed(0)}% · Safety: {((optimizationAnalysis.scorecard?.scores?.safety ?? 0) * 100).toFixed(0)}%</span> : <span className="text-mc-dim">Click to load</span>}>
               {!optimizationAnalysis ? (
                 <div className="text-center py-2">
@@ -1643,7 +1633,7 @@ export default function RunPage({ params }: { params: { runId: string } }) {
                 { key: "idle", label: "Idle" },
                 { key: "planning", label: "Plan" },
                 { key: "governing", label: "Gov" },
-                { key: "executing", label: "Exec" },
+                { key: "executing", label: "Outcome" },
                 { key: "done", label: "Done" },
               ] as const).map((st) => (
                 <div key={st.key} className={`text-[9px] px-1.5 py-0.5 rounded-full border ${pipelineStage === st.key || (st.key === "planning" && pipelineStage === "reasoning") || (st.key === "executing" && pipelineStage === "ready") ? "bg-purple-500 text-white border-purple-600" : "bg-mc-panel text-mc-dim border-mc-line"}`}>
@@ -1657,7 +1647,7 @@ export default function RunPage({ params }: { params: { runId: string } }) {
               <div className="flex items-center gap-1.5 bg-cyan-500/10 border border-cyan-500/30 rounded p-2 mb-2">
                 <span className="text-[10px]">{currentStatus === "planning" ? "🗺️" : "🚀"}</span>
                 <span className="text-[10px] text-cyan-300 font-semibold">
-                  {currentStatus === "planning" ? "AI generating plan…" : "Running autonomously"}
+                  {currentStatus === "planning" ? "Preparing a mission plan..." : executionState.label}
                 </span>
               </div>
             )}

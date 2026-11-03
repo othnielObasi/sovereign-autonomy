@@ -5,6 +5,7 @@ import { getAuthorityEvidence, getRouteLearning, runDrills } from "@/lib/api";
 import { AuthorityPanel } from "@/components/AuthorityPanel";
 import { LearningEvidence } from "@/components/LearningEvidence";
 import { OperationalGraphPanel } from "@/components/OperationalGraphPanel";
+import { RuntimeCapabilities } from '@/components/RuntimeCapabilities';
 import { Button, Empty, KV, Mono, Notice, Page, PageHeader, Panel, Pill, Stat } from "@/components/ui";
 
 type Drill = { drill: string; passed: boolean; detail: string; skipped?: boolean; checks?: { check: string; passed: boolean }[] };
@@ -48,12 +49,13 @@ export default function AuthorityPage() {
   return (
     <Page>
       <PageHeader eyebrow="Built during the hackathon" title="Execution authority"
-        subtitle="Meta's models plan and perceive; this layer decides what may actually move. Every move needs a signed, single-use permit for exactly that move, checked again by the robot controller." />
+        subtitle="Inspect execution permissions, verified experience and connected mission evidence. Every move requires current controller admission, whether a model or fallback planner proposed it." />
+      <RuntimeCapabilities />
 
       <div className="grid lg:grid-cols-3 gap-4">
-        <div className="lg:col-span-1 space-y-4">
+        <div className="lg:col-span-1 space-y-4 min-w-0">
           <AuthorityPanel />
-          <Panel title="Learned routing" subtitle="NetworkX over the warehouse floor; only signed experience counts">
+          <Panel id="route-learning" title="Learned routing" subtitle="NetworkX over the warehouse floor; only signed experience counts">
             {!learning ? <Empty title="Loading…" /> : (
               <>
                 <KV k="Router" v={learning.last_route?.router || "—"} mono />
@@ -65,10 +67,10 @@ export default function AuthorityPage() {
           </Panel>
         </div>
 
-        <div className="lg:col-span-2 space-y-4">
+        <div className="lg:col-span-2 space-y-4 min-w-0">
           <OperationalGraphPanel />
           <LearningEvidence decisions={learning?.decisions} changes={learning?.lifecycle?.events} context={learning?.experience_context} security={learning} />
-          <Panel title="Security drills" subtitle="Real attacks against the live simulator, each with a pass/fail result"
+          <Panel id="security-drills" title="Security drills" subtitle="Real attacks against the live simulator, each with a pass/fail result"
             actions={<Button variant="primary" disabled={running} onClick={go}>{running ? "Running…" : "Run all drills"}</Button>}>
             {err && <Notice tone="stop">{err}</Notice>}
             {!drills ? <Empty title="No drills run yet">Runs only while no mission is active. The probe move targets the robot&apos;s own position, and everything is cleaned up afterwards.</Empty> : (
@@ -98,10 +100,10 @@ export default function AuthorityPage() {
             {events.length === 0 ? <Empty title="No events yet">Start a mission to see each permit used.</Empty> : (
               <div className="max-h-[420px] overflow-y-auto mc-scroll divide-y divide-mc-line/60">
                 {events.map((e, i) => (
-                  <div key={i} className="flex items-center justify-between gap-3 py-1.5 text-xs">
-                    <div className="flex items-center gap-2 min-w-0">
+                  <div key={i} className="flex flex-wrap items-start justify-between gap-2 py-2 text-xs min-w-0">
+                    <div className="flex flex-wrap items-center gap-2 min-w-0 flex-1 basis-48">
                       <Pill tone={e.kind.includes("kill") ? "stop" : e.kind.includes("unknown") ? "warn" : e.kind.includes("drill") ? "info" : "ok"}>{e.kind.replace(/_/g, " ")}</Pill>
-                      <Mono className="truncate">{e.action_id || e.scope || ""}</Mono>
+                      <span className="font-mono text-xs text-mc-ink break-all min-w-0">{e.action_id || e.scope || ""}</span>
                     </div>
                     <span className="text-mc-dim tabular shrink-0">{new Date(e.timestamp * 1000).toLocaleTimeString()}</span>
                   </div>

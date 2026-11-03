@@ -1,0 +1,77 @@
+{
+  "base": "http://127.0.0.1:19310",
+  "scope": "Isolated key-free stack; one short navigation run and rejected rule proposal; refusal and long dispatch IDs use labelled browser fixtures",
+  "checks": [
+    "Displayed geofence matches the current facility",
+    "Outcome headline and full lifecycle are visible",
+    "Live proof supplements the original fallback disclosure",
+    "All 22 guide capability cards link to workspace tools",
+    "Site intelligence opens run site/vision inspection",
+    "Memory opens memory inspection",
+    "Presets use destinations from the current facility",
+    "Planner status reports fallback consistently",
+    "Unconfigured voice control is disabled",
+    "Short isolated mission starts through existing API",
+    "Memory link opens run Analysis and memory search",
+    "Execution progress renders recorded evidence",
+    "Graph provenance reads the saved plan metadata",
+    "Approved but refused action is shown as refused",
+    "Scenario deep link opens the correct tab",
+    "Floor view query is honored",
+    "Rules deep link exposes staged controls",
+    "Operator can create a proposal without activating rules",
+    "Public workspace blocks rule mutation controls",
+    "Mobile fits: /",
+    "Mobile fits: /how-it-works",
+    "Mobile fits: /mission-control?view=2d",
+    "Mobile fits: /authority",
+    "Mobile fits: /capabilities",
+    "Mobile fits: /operations",
+    "Mobile fits: /policies?tab=rules",
+    "Mobile fits: /runs/run_2e377a52c249?view=2d",
+    "No page JavaScript errors"
+  ],
+  "dimensions": [
+    {
+      "route": "/",
+      "viewport": 390,
+      "document": 390
+    },
+    {
+      "route": "/how-it-works",
+      "viewport": 390,
+      "document": 390
+    },
+    {
+      "route": "/mission-control?view=2d",
+      "viewport": 390,
+      "document": 390
+    },
+    {
+      "route": "/authority",
+      "viewport": 390,
+      "document": 390
+    },
+    {
+      "route": "/capabilities",
+      "viewport": 390,
+      "document": 390
+    },
+    {
+      "route": "/operations",
+      "viewport": 390,
+      "document": 390
+    },
+    {
+      "route": "/policies?tab=rules",
+      "viewport": 390,
+      "document": 390
+    },
+    {
+      "route": "/runs/run_2e377a52c249?view=2d",
+      "viewport": 390,
+      "document": 390
+    }
+  ],
+  "errors": []
+}

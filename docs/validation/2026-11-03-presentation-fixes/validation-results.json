@@ -1,0 +1,32 @@
+{
+  "scope": "Presentation audit corrections A01-A12; key-free isolated preview; original 19300 mission untouched",
+  "backend": {
+    "passed": 513,
+    "skipped": 4,
+    "seconds": 266.37,
+    "command": "python -m pytest backend/tests -q"
+  },
+  "latest_backend_followup": {
+    "passed": 4,
+    "command": "python -m pytest backend/tests/test_run_presentation.py -q"
+  },
+  "execution_presentation": {
+    "passed": 15,
+    "command": "node scripts/test_execution_presentation.cjs"
+  },
+  "frontend_build": {
+    "passed": true,
+    "dist_dir": ".next-presentation-final",
+    "backend_url": "http://127.0.0.1:18081"
+  },
+  "workspace_browser": {
+    "checks": 28,
+    "errors": [],
+    "report": "checks.json"
+  },
+  "public_browser": {
+    "checks": 13,
+    "errors": [],
+    "report": "public-regression/browser-report.json"
+  }
+}

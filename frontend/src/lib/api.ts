@@ -10,6 +10,8 @@
  */
 
 const API_BASE = process.env.NEXT_PUBLIC_API_BASE || "/api";
+export const getRunPresentation = (id: string) => getJson(`/runs/${encodeURIComponent(id)}/presentation`, 'run progress');
+export const getHealth = () => getJson('/health', 'runtime capabilities');
 
 async function knowledgeRequest(path: string, method = 'GET') {
   const token = await authToken();
@@ -640,3 +642,5 @@ export async function voiceStop(wav: Blob) {
 }
 
 export const getOperatorReview = (runId: string) => getJson(`/operator/review/${runId}`, "operator review");
+
+export const policyWorkflow = (action: string, body: any, id?: string) => postJson(action === 'create' ? '/policies/proposals' : action === 'rollback' ? '/policies/rollback' : `/policies/proposals/${encodeURIComponent(id || '')}/${action}`, body, 'Governed rule change');
