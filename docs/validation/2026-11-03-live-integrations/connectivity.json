@@ -1,0 +1,170 @@
+[
+  {
+    "integration": "meta",
+    "model": "muse-spark-1.3",
+    "answered": true,
+    "usage": [
+      {
+        "model": "muse-spark-1.3",
+        "tier": "fast",
+        "provider": "meta",
+        "ok": true,
+        "with_image": false,
+        "latency_ms": 3703,
+        "status": 200,
+        "prompt_tokens": 22,
+        "completion_tokens": 33,
+        "reasoning_tokens": 19,
+        "ts": 1793727591.910309
+      }
+    ]
+  },
+  {
+    "integration": "baseten",
+    "model": "meta-models/muse-spark-open-1026",
+    "answered": true,
+    "usage": [
+      {
+        "model": "meta-models/muse-spark-open-1026",
+        "tier": "fast",
+        "provider": "baseten",
+        "ok": true,
+        "with_image": false,
+        "latency_ms": 1250,
+        "status": 200,
+        "prompt_tokens": 155,
+        "completion_tokens": 218,
+        "reasoning_tokens": 203,
+        "ts": 1793727593.174269
+      }
+    ]
+  },
+  {
+    "integration": "tavily",
+    "mode": "live",
+    "tavily": {
+      "latency_ms": 2968.3,
+      "credits": 2,
+      "request_id": "0f0b6f99-63dd-42d4-92f9-a38203124921",
+      "error": null,
+      "params": {
+        "search_depth": "advanced",
+        "chunks_per_source": 3,
+        "max_results": 6,
+        "include_domains": [
+          "hse.gov.uk",
+          "gov.uk",
+          "osha.gov",
+          "cdc.gov",
+          "epa.gov",
+          "noaa.gov",
+          "echa.europa.eu",
+          "europa.eu",
+          "pubchem.ncbi.nlm.nih.gov",
+          "nih.gov",
+          "who.int",
+          "ilo.org",
+          "ccohs.ca",
+          "safeworkaustralia.gov.au"
+        ],
+        "include_answer": false,
+        "include_raw_content": false,
+        "include_usage": true
+      }
+    },
+    "result_count": 6,
+    "sources": [
+      {
+        "domain": "osha.gov",
+        "trusted_source": true,
+        "verdict": "accepted",
+        "classes": [],
+        "content_sha256": "61ccc526e5b91923c753c9a0d8853b08e0874f310acb2483d3ede9a1a60956f4"
+      },
+      {
+        "domain": "assets.publishing.service.gov.uk",
+        "trusted_source": true,
+        "verdict": "accepted",
+        "classes": [],
+        "content_sha256": "b89125b818c911a2a42fb3f0c77309ba69ce5531ab336c92aaaca3a239b94c9a"
+      },
+      {
+        "domain": "cameochemicals.noaa.gov",
+        "trusted_source": true,
+        "verdict": "accepted",
+        "classes": [
+          "flammable"
+        ],
+        "content_sha256": "68d52a03ed0623be1860b5b2a84552271e8a20bfc68b50b6e55ec5f1ab5a4564"
+      },
+      {
+        "domain": "hero.epa.gov",
+        "trusted_source": true,
+        "verdict": "accepted",
+        "classes": [
+          "oxidiser"
+        ],
+        "content_sha256": "e3776e169c8f51f906d1d0e95f2f6689f3a38e7ca24f79fd9b59af2eed45084f"
+      },
+      {
+        "domain": "stacks.cdc.gov",
+        "trusted_source": true,
+        "verdict": "accepted",
+        "classes": [],
+        "content_sha256": "6b69e4282cba6e27afaee2b835ba6c93a3899772cf2b3c003bf8b099c3053b87"
+      },
+      {
+        "domain": "osha.gov",
+        "trusted_source": true,
+        "verdict": "accepted",
+        "classes": [
+          "flammable"
+        ],
+        "content_sha256": "2723c3d4a83d717005861056c97991df77e5e22bd198e0ee221e65d5c5961baf"
+      }
+    ],
+    "assessment": {
+      "substance": "isopropyl alcohol",
+      "classes_enforced": [
+        "flammable"
+      ],
+      "classes_advisory": [
+        "oxidiser"
+      ],
+      "evidence": {
+        "flammable": [
+          "cameochemicals.noaa.gov",
+          "osha.gov"
+        ],
+        "oxidiser": [
+          "hero.epa.gov"
+        ]
+      },
+      "radius": 3.0,
+      "slow_radius": 6.0,
+      "max_speed": 0.2,
+      "basis": "flammable, reported by 2 authoritative sources"
+    },
+    "constraint": {
+      "id": "zone-validation",
+      "hazard_id": "validation",
+      "label": "Validation spill",
+      "x": 6,
+      "y": 13,
+      "radius": 3.0,
+      "slow_radius": 6.0,
+      "max_speed": 0.2,
+      "basis": "flammable, reported by 2 authoritative sources",
+      "sources": [
+        "cameochemicals.noaa.gov",
+        "osha.gov"
+      ],
+      "live": true,
+      "created_at": 1793727593.175279,
+      "updated_at": 1793727596.1792428
+    },
+    "malicious_bulletin_quarantined": true,
+    "rules_changed": false,
+    "scope": "Live HTTP search; local in-process constraint store"
+  }
+]

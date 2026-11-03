@@ -1,0 +1,310 @@
+{
+  "revision": "2d3a984",
+  "scope": "Original source, original dark palette, factory simulator, isolated state; no model calls",
+  "rendering": "Original 3D inspection and robot-eye screenshots captured separately; detailed workflow uses WebGL fallback because software rendering reached about 1 FPS",
+  "steps": [
+    {
+      "name": "Original 3D views inspected separately",
+      "screens": [
+        "01-original-twin-inspection.png",
+        "02-original-robot-eye.png"
+      ]
+    },
+    {
+      "name": "Draft checkpoint",
+      "observed": "×\nPlan a mission\n\nChoose a destination, save a draft, then start a governed run.\n\nDraft saved: Original design study: factory line-side delivery\n\nThe planner builds the route when the run starts. Every move is checked by the safety gate.\n\nStart governed run\nView saved missions\nPlan another mission"
+    },
+    {
+      "name": "Start navigates into detailed run",
+      "runId": "run_787c962bf60f",
+      "eventTypes": [
+        "EXPERIENCE_RETRIEVAL",
+        "PLAN",
+        "MISSION_REVIEW",
+        "DECISION",
+        "AUTHORITY",
+        "EXECUTION"
+      ],
+      "latestDecision": {
+        "context": {
+          "telemetry": {
+            "site_id": "factory",
+            "map_version": "b4b17d6d99e309fe9a7ba008d8cf9d69ad50caf3d6cb6072ce6663806125109c",
+            "capability_profile_version": "sim-amr-radius-0.4m-v1",
+            "robot_id": "robot-1",
+            "x": 3.868,
+            "y": 3.525,
+            "theta": 0.029,
+            "speed": 0.5,
+            "zone": "aisle",
+            "nearest_obstacle_m": 1.075,
+            "nearest_obstacle_xy": [
+              3.868,
+              5
+            ],
+            "human_detected": false,
+            "human_conf": 0,
+            "human_distance_m": 8.49,
+            "walking_humans": [
+              {
+                "x": 11.76,
+                "y": 6.66,
+                "name": "Worker A",
+                "type": "worker",
+                "role": "worker",
+                "conf": 0.9,
+                "speed": 0.71,
+                "heading": 2.125,
+                "activity": "walking",
+                "destination": "CNC 1 operator"
+              },
+              {
+                "x": 27.45,
+                "y": 8.68,
+                "name": "Worker B",
+                "type": "worker",
+                "role": "worker",
+                "conf": 0.9,
+                "speed": 0.871,
+                "heading": 2.82,
+                "activity": "walking",
+                "destination": "CNC 2 operator"
+              },
+              {
+                "x": 13.14,
+                "y": 12.9,
+                "name": "Worker C",
+                "type": "worker",
+                "role": "worker",
+                "conf": 0.9,
+                "speed": 0,
+                "heading": 0.653,
+                "activity": "waiting_for_forklift",
+                "destination": "Press operator"
+              },
+              {
+                "x": 33.02,
+                "y": 18.25,
+                "name": "Runner 1",
+                "type": "worker",
+                "role": "worker",
+                "conf": 0.9,
+                "speed": 1.081,
+                "heading": 0,
+                "activity": "walking",
+                "destination": "Crossing destination"
+              },
+              {
+                "x": 28.75,
+                "y": 24.25,
+                "name": "Runner 2",
+                "type": "worker",
+                "role": "worker",
+                "conf": 0.9,
+                "speed": 0,
+                "heading": 1.571,
+                "activity": "waiting_at_crossing",
+                "destination": "Crossing destination"
+              }
+            ],
+            "t": 14.1,
+            "boot_id": "1d8e3388b06c423fad6ec5d64f679d38",
+            "generation": 2,
+            "environment_changes": [],
+            "accepted_actions": [
+              "run_787c962bf60f:1:35c2522b0f70430a9b6733b42881a20e"
+            ],
+            "events": [],
+            "human": {
+              "x": 11.76,
+              "y": 6.66,
+              "name": "Worker A",
+              "type": "human",
+              "role": "primary",
+              "conf": 0.9,
+              "speed": 0.71,
+              "heading": 2.125,
+              "activity": "walking",
+              "destination": "CNC 1 operator",
+              "id": "nearest"
+            },
+            "idle_robots": [],
+            "obstacles": [
+              {
+                "x": 35.5,
+                "y": 8.3,
+                "r": 0.3,
+                "type": "tote_stack"
+              },
+              {
+                "x": 1,
+                "y": 19,
+                "r": 0.4,
+                "type": "handcart"
+              },
+              {
+                "x": 37.5,
+                "y": 23.6,
+                "r": 0.5,
+                "type": "pallet"
+              },
+              {
+                "x": 9.95,
+                "y": 10.36,
+                "r": 1.9,
+                "type": "forklift",
+                "heading": 0.014
+              },
+              {
+                "x": 3,
+                "y": 21.5,
+                "r": 0.4,
+                "type": "robot"
+              }
+            ],
+            "bounds": {
+              "min_x": 0,
+              "max_x": 40,
+              "min_y": 0,
+              "max_y": 25
+            },
+            "target": {
+              "x": 4.75,
+              "y": 3.55,
+              "max_speed": 0.5
+            },
+            "estop": {
+              "engaged": false,
+              "reason": "",
+              "since": null,
+              "robot": null
+            },
+            "deadman_trips": 0,
+            "robot_contacts": 0,
+            "sim_time": 14.1,
+            "mode": "live",
+            "seed": 42,
+            "timestamp": 1793702614.4976854,
+            "site_constraints": []
+          },
+          "mission_goal": {
+            "x": 33,
+            "y": 18.2,
+            "zone": "staging"
+          }
+        },
+        "proposal": {
+          "intent": "MOVE_TO",
+          "params": {
+            "x": 4.75,
+            "y": 3.55,
+            "max_speed": 0.5
+          },
+          "rationale": "Following plan waypoint"
+        },
+        "governance": {
+          "decision": "APPROVED",
+          "policy_hits": [],
+          "reasons": [],
+          "required_action": null,
+          "risk_score": 0,
+          "policy_state": "SAFE",
+          "hard_fail": false,
+          "hard_fail_policies": []
+        }
+      }
+    },
+    {
+      "name": "Run tab: Learning & task",
+      "observed": "Sovereign Autonomy\nRUNTIME GOVERNANCE\nOverview\nMissions\nRuns\nGovernance\nAuthority\nEvidence\nGate live · fallback\nSign in\nLive warehouse\nRuns\n/\nrun_787c962bf60f\nOriginal design study: factory line-side delivery\nPAUSED\nOffline\ngoal (33, 18.2)\nStop robot\n▶ Override & Resume\nMISSION\nPaused\nACTION VERDICT\nApproved\nENVIRONMENT\nClear\nPLANNER\nSovereign Autonomy Approved\nEXECUTION\nWithin Bounds\nWAREHOUSE SIMULATION\nHeatmap\nTrail\n🚶\nHuman Near\n🛑\nToo Close\n🚧\nBlocked\n💧\nSpill\n🚜\nForklift\n✅\nClear\n3D warehouse\nFloor plan\n⛶ Fullscreen\nRobot\nObstacles\nHuman\nProposed Path\nApproved Plan\nExecuted Path\nGoal\nRisk Zone\nAI MISSION PLANNER\nAutonomous: ON\n🧠\n1. Reasoning\n🗺️\n2. Plan\n🛡️\n3. Governance\n🚀\n4. Execute\n📋\n5. Audit\nPlan →\nPLANNER'S REASONING\nPlan review passed · 4 checks\n\nRoute along the aisles to the destination.\n\nShow details\nWAYPOINT PLAN\n22 waypoints · hover one to find it on the map\n1: (5,4) @0.5\n2: (7,4) @0.5\n3: (8,4) @0.5\n4: (10,4) @0.5\n5: (12,4) @0.5\n6: (13,6) @0.5\n7: (13,7) @0.5\n8: (15,8) @0.5\n9: (16,9) @0.5\n10: (17,11) @0.5\n11: (19,12) @0.5\n12: (20,13) @0.3\n13: (20,14) @0.3\n14: (20,16) @0.3\n15: (20,18) @0.3\n16: (22,18) @0.3\n17: (24,18) @0.3\n18: (26,18) @0.3\n19: (27,18) @0.3\n20: (29,18) @0.3\n21: (31,18) @0.3\n22: (33,18) @0.3\nGOVERNANCE DECISION\n✅\nAPPROVED\nExecution Risk: 0%\nScope:\nCurrent action only\nIntent:\nMOVE_TO\n→ (4.8, 3.5)\nPolicies:\n✓ 0 violations (11 active)\nALL 11 POLICIES PASSED\n0 denied · 0 constrained\n✓\nGEOFENCE_01\npos (4.7,3.5) inside boundary\n✓\nSAFE_SPEED_01\nspeed 0.00 m/s within aisle limit\n✓\nHUMAN_PROXIMITY_02\nhuman 10.0m away (>1m safe)\n✓\nHUMAN_CLEARANCE_02\nclearance 10.0m (>3m ideal)\n✓\nOBSTACLE_CLEARANCE_03\nobstacle 1.1m (>0.5m)\n✓\nUNCERTAINTY_04\nconfidence above threshold\n✓\nHITL_05\nno operator override required\n✓\nWORKER_PROXIMITY_06\nworker zone clear (10.0m)\n✓\nPATH_CLEARANCE_07\npath clear of racking\n✓\nHAZARD_EXCLUSION_08\nno hazard zones in force\n✓\nHAZARD_SLOW_09\nno hazard speed caps\nLearning & task\nSite & vision\nChain & telemetry\nAlerts0\nAnalysis\nEXECUTION AUTHORITY\nPermits enforced\nStop robot\nStop everything\n🎙 Voice stop\nStop robot-1\n0.00 m/s\nStop robot-2\n0.00 m/s\nEXPERIENCE AND ENVIRONMENT\n\nPast experience is advisory. Current conditions decide whether it can be reused.\n\nShared routing requires two distinct robot identities. Repeated missions from one robot count as one source.\n\n2 eligible\n0 advisory\n0 excluded\nExperience checks\nEligible\nrobot-A (fixture)\n3 s old\nbrowser-fixture-robot-A (fixture)-1793702607308183200:6:7:STOP:818a164e9896f16646b01d97b6425726091d238cda6080a49016effc7f57a397:robot-A (fixture)\nContext and freshness checks passed\nEligible\nrobot-C (fixture)\n3 s old\nbrowser-fixture-robot-C (fixture)-1793702607345181900:6:7:STOP:818a164e9896f16646b01d97b6425726091d238cda6080a49016effc7f57a397:robot-C (fixture)\nContext and freshness checks passed\nEnvironment changes\n\nNo environment changes recorded.\n\nTASK FOCUS\n\nEach plan must end at the mission's destination without wandering, or the aisle route is used.\n\nNo plan checked yet.\nLESSONS THE PLANNER WAS GIVEN\n0\nNo lessons near this route yet. They come from earlier runs where the gate denied moves nearby.\nREPLANS AFTER A DENIAL\n0\nNo replans: the gate hasn't blocked the same waypoint three times.\nWHAT THIS RUN TAUGHT THE PLANNER\nLessons are distilled from the gate's decisions when the run ends.\nLessons only change what the planner proposes; the gate still judges every move. All lessons →\nAI INTELLIGENCE CONSOLE: SCENE ANALYSIS, TELEMETRY INSIGHTS, FAILURE DETECTION\n▾\nSovereign Autonomy · NOVTIA · MIT licensed\nPlanning by Muse Spark · perception by SAM 3.1 · Meta Global AI Developer Hackathon"
+    },
+    {
+      "name": "Run tab: Chain & telemetry",
+      "observed": "Sovereign Autonomy\nRUNTIME GOVERNANCE\nOverview\nMissions\nRuns\nGovernance\nAuthority\nEvidence\nGate live · fallback\nSign in\nLive warehouse\nRuns\n/\nrun_787c962bf60f\nOriginal design study: factory line-side delivery\nPAUSED\nOffline\ngoal (33, 18.2)\nStop robot\n▶ Override & Resume\nMISSION\nPaused\nACTION VERDICT\nApproved\nENVIRONMENT\nClear\nPLANNER\nSovereign Autonomy Approved\nEXECUTION\nWithin Bounds\nWAREHOUSE SIMULATION\nHeatmap\nTrail\n🚶\nHuman Near\n🛑\nToo Close\n🚧\nBlocked\n💧\nSpill\n🚜\nForklift\n✅\nClear\n3D warehouse\nFloor plan\n⛶ Fullscreen\nRobot\nObstacles\nHuman\nProposed Path\nApproved Plan\nExecuted Path\nGoal\nRisk Zone\nAI MISSION PLANNER\nAutonomous: ON\n🧠\n1. Reasoning\n🗺️\n2. Plan\n🛡️\n3. Governance\n🚀\n4. Execute\n📋\n5. Audit\nPlan →\nPLANNER'S REASONING\nPlan review passed · 4 checks\n\nRoute along the aisles to the destination.\n\nShow details\nWAYPOINT PLAN\n22 waypoints · hover one to find it on the map\n1: (5,4) @0.5\n2: (7,4) @0.5\n3: (8,4) @0.5\n4: (10,4) @0.5\n5: (12,4) @0.5\n6: (13,6) @0.5\n7: (13,7) @0.5\n8: (15,8) @0.5\n9: (16,9) @0.5\n10: (17,11) @0.5\n11: (19,12) @0.5\n12: (20,13) @0.3\n13: (20,14) @0.3\n14: (20,16) @0.3\n15: (20,18) @0.3\n16: (22,18) @0.3\n17: (24,18) @0.3\n18: (26,18) @0.3\n19: (27,18) @0.3\n20: (29,18) @0.3\n21: (31,18) @0.3\n22: (33,18) @0.3\nGOVERNANCE DECISION\n✅\nAPPROVED\nExecution Risk: 0%\nScope:\nCurrent action only\nIntent:\nMOVE_TO\n→ (4.8, 3.5)\nPolicies:\n✓ 0 violations (11 active)\nALL 11 POLICIES PASSED\n0 denied · 0 constrained\n✓\nGEOFENCE_01\npos (4.7,3.5) inside boundary\n✓\nSAFE_SPEED_01\nspeed 0.00 m/s within aisle limit\n✓\nHUMAN_PROXIMITY_02\nhuman 10.0m away (>1m safe)\n✓\nHUMAN_CLEARANCE_02\nclearance 10.0m (>3m ideal)\n✓\nOBSTACLE_CLEARANCE_03\nobstacle 1.1m (>0.5m)\n✓\nUNCERTAINTY_04\nconfidence above threshold\n✓\nHITL_05\nno operator override required\n✓\nWORKER_PROXIMITY_06\nworker zone clear (10.0m)\n✓\nPATH_CLEARANCE_07\npath clear of racking\n✓\nHAZARD_EXCLUSION_08\nno hazard zones in force\n✓\nHAZARD_SLOW_09\nno hazard speed caps\nLearning & task\nSite & vision\nChain & telemetry\nAlerts0\nAnalysis\nEXECUTION AUTHORITY\nPermits enforced\nStop robot\nStop everything\n🎙 Voice stop\nStop robot-1\n0.00 m/s\nStop robot-2\n0.00 m/s\nLIVE TELEMETRY\n▾\nCHAIN-OF-TRUST\n🟠\n10:43:42\nINTERVENTION\nsha256:e…\n🟠\n10:43:41\nALERT\nsha256:2…\n🟠\n10:43:41\nEXECUTION\nsha256:f…\n🟠\n10:43:41\nAUTHORITY\nsha256:c…\n🔵\n10:43:35\nDECISION\nsha256:a…\n🟠\n10:43:31\nEXECUTION\nsha256:d…\n🟠\n10:43:31\nAUTHORITY\nsha256:9…\n🔵\n10:43:31\nDECISION\nsha256:b…\n🟠\n10:43:30\nMISSION_REVIEW\nsha256:2…\n🟠\n10:43:30\nPLAN\nsha256:f…\nAI INTELLIGENCE CONSOLE: SCENE ANALYSIS, TELEMETRY INSIGHTS, FAILURE DETECTION\n▾\nSovereign Autonomy · NOVTIA · MIT licensed\nPlanning by Muse Spark · perception by SAM 3.1 · Meta Global AI Developer Hackathon"
+    },
+    {
+      "name": "Run tab: Alerts",
+      "observed": "Sovereign Autonomy\nRUNTIME GOVERNANCE\nOverview\nMissions\nRuns\nGovernance\nAuthority\nEvidence\nGate live · fallback\nSign in\nLive warehouse\nRuns\n/\nrun_787c962bf60f\nOriginal design study: factory line-side delivery\nPAUSED\nOffline\ngoal (33, 18.2)\nStop robot\n▶ Override & Resume\nMISSION\nPaused\nACTION VERDICT\nApproved\nENVIRONMENT\nClear\nPLANNER\nSovereign Autonomy Approved\nEXECUTION\nWithin Bounds\nWAREHOUSE SIMULATION\nHeatmap\nTrail\n🚶\nHuman Near\n🛑\nToo Close\n🚧\nBlocked\n💧\nSpill\n🚜\nForklift\n✅\nClear\n3D warehouse\nFloor plan\n⛶ Fullscreen\nRobot\nObstacles\nHuman\nProposed Path\nApproved Plan\nExecuted Path\nGoal\nRisk Zone\nAI MISSION PLANNER\nAutonomous: ON\n🧠\n1. Reasoning\n🗺️\n2. Plan\n🛡️\n3. Governance\n🚀\n4. Execute\n📋\n5. Audit\nPlan →\nPLANNER'S REASONING\nPlan review passed · 4 checks\n\nRoute along the aisles to the destination.\n\nShow details\nWAYPOINT PLAN\n22 waypoints · hover one to find it on the map\n1: (5,4) @0.5\n2: (7,4) @0.5\n3: (8,4) @0.5\n4: (10,4) @0.5\n5: (12,4) @0.5\n6: (13,6) @0.5\n7: (13,7) @0.5\n8: (15,8) @0.5\n9: (16,9) @0.5\n10: (17,11) @0.5\n11: (19,12) @0.5\n12: (20,13) @0.3\n13: (20,14) @0.3\n14: (20,16) @0.3\n15: (20,18) @0.3\n16: (22,18) @0.3\n17: (24,18) @0.3\n18: (26,18) @0.3\n19: (27,18) @0.3\n20: (29,18) @0.3\n21: (31,18) @0.3\n22: (33,18) @0.3\nGOVERNANCE DECISION\n✅\nAPPROVED\nExecution Risk: 0%\nScope:\nCurrent action only\nIntent:\nMOVE_TO\n→ (4.8, 3.5)\nPolicies:\n✓ 0 violations (11 active)\nALL 11 POLICIES PASSED\n0 denied · 0 constrained\n✓\nGEOFENCE_01\npos (4.7,3.5) inside boundary\n✓\nSAFE_SPEED_01\nspeed 0.00 m/s within aisle limit\n✓\nHUMAN_PROXIMITY_02\nhuman 10.0m away (>1m safe)\n✓\nHUMAN_CLEARANCE_02\nclearance 10.0m (>3m ideal)\n✓\nOBSTACLE_CLEARANCE_03\nobstacle 1.1m (>0.5m)\n✓\nUNCERTAINTY_04\nconfidence above threshold\n✓\nHITL_05\nno operator override required\n✓\nWORKER_PROXIMITY_06\nworker zone clear (10.0m)\n✓\nPATH_CLEARANCE_07\npath clear of racking\n✓\nHAZARD_EXCLUSION_08\nno hazard zones in force\n✓\nHAZARD_SLOW_09\nno hazard speed caps\nLearning & task\nSite & vision\nChain & telemetry\nAlerts0\nAnalysis\nEXECUTION AUTHORITY\nPermits enforced\nStop robot\nStop everything\n🎙 Voice stop\nStop robot-1\n0.00 m/s\nStop robot-2\n0.00 m/s\nALERTS\n●\nPWR\nBattery at 96% — normal operating range\n●\nNAV\nPath deviation 0.12m — within ±0.5m tolerance\n●\nSEN\nMotor temp 42°C — below 65°C threshold\n●\nCOM\nPosition update latency 12ms — below 100ms threshold\nAI INTELLIGENCE CONSOLE: SCENE ANALYSIS, TELEMETRY INSIGHTS, FAILURE DETECTION\n▾\nSovereign Autonomy · NOVTIA · MIT licensed\nPlanning by Muse Spark · perception by SAM 3.1 · Meta Global AI Developer Hackathon"
+    },
+    {
+      "name": "Run tab: Analysis",
+      "observed": "Sovereign Autonomy\nRUNTIME GOVERNANCE\nOverview\nMissions\nRuns\nGovernance\nAuthority\nEvidence\nGate live · fallback\nSign in\nLive warehouse\nRuns\n/\nrun_787c962bf60f\nOriginal design study: factory line-side delivery\nPAUSED\nOffline\ngoal (33, 18.2)\nStop robot\n▶ Override & Resume\nMISSION\nPaused\nACTION VERDICT\nApproved\nENVIRONMENT\nClear\nPLANNER\nSovereign Autonomy Approved\nEXECUTION\nWithin Bounds\nWAREHOUSE SIMULATION\nHeatmap\nTrail\n🚶\nHuman Near\n🛑\nToo Close\n🚧\nBlocked\n💧\nSpill\n🚜\nForklift\n✅\nClear\n3D warehouse\nFloor plan\n⛶ Fullscreen\nRobot\nObstacles\nHuman\nProposed Path\nApproved Plan\nExecuted Path\nGoal\nRisk Zone\nAI MISSION PLANNER\nAutonomous: ON\n🧠\n1. Reasoning\n🗺️\n2. Plan\n🛡️\n3. Governance\n🚀\n4. Execute\n📋\n5. Audit\nPlan →\nPLANNER'S REASONING\nPlan review passed · 4 checks\n\nRoute along the aisles to the destination.\n\nShow details\nWAYPOINT PLAN\n22 waypoints · hover one to find it on the map\n1: (5,4) @0.5\n2: (7,4) @0.5\n3: (8,4) @0.5\n4: (10,4) @0.5\n5: (12,4) @0.5\n6: (13,6) @0.5\n7: (13,7) @0.5\n8: (15,8) @0.5\n9: (16,9) @0.5\n10: (17,11) @0.5\n11: (19,12) @0.5\n12: (20,13) @0.3\n13: (20,14) @0.3\n14: (20,16) @0.3\n15: (20,18) @0.3\n16: (22,18) @0.3\n17: (24,18) @0.3\n18: (26,18) @0.3\n19: (27,18) @0.3\n20: (29,18) @0.3\n21: (31,18) @0.3\n22: (33,18) @0.3\nGOVERNANCE DECISION\n✅\nAPPROVED\nExecution Risk: 0%\nScope:\nCurrent action only\nIntent:\nMOVE_TO\n→ (4.8, 3.5)\nPolicies:\n✓ 0 violations (11 active)\nALL 11 POLICIES PASSED\n0 denied · 0 constrained\n✓\nGEOFENCE_01\npos (4.7,3.5) inside boundary\n✓\nSAFE_SPEED_01\nspeed 0.00 m/s within aisle limit\n✓\nHUMAN_PROXIMITY_02\nhuman 10.0m away (>1m safe)\n✓\nHUMAN_CLEARANCE_02\nclearance 10.0m (>3m ideal)\n✓\nOBSTACLE_CLEARANCE_03\nobstacle 1.1m (>0.5m)\n✓\nUNCERTAINTY_04\nconfidence above threshold\n✓\nHITL_05\nno operator override required\n✓\nWORKER_PROXIMITY_06\nworker zone clear (10.0m)\n✓\nPATH_CLEARANCE_07\npath clear of racking\n✓\nHAZARD_EXCLUSION_08\nno hazard zones in force\n✓\nHAZARD_SLOW_09\nno hazard speed caps\nLearning & task\nSite & vision\nChain & telemetry\nAlerts0\nAnalysis\nEXECUTION AUTHORITY\nPermits enforced\nStop robot\nStop everything\n🎙 Voice stop\nStop robot-1\n0.00 m/s\nStop robot-2\n0.00 m/s\nPERFORMANCE SCORECARD\n▾\nLoading scorecard…\nAGENT INTROSPECTION\n▾\nLoading introspection…\nSAFETY REPORT\n⚠ undefined · 0 checks\n▾\nOPTIMIZATION ANALYSIS\nClick to load\n▾\nDIVERGENCE EXPLANATION\n▾\nAnalyze Path Divergence\nAI INTELLIGENCE CONSOLE: SCENE ANALYSIS, TELEMETRY INSIGHTS, FAILURE DETECTION\n▾\nSovereign Autonomy · NOVTIA · MIT licensed\nPlanning by Muse Spark · perception by SAM 3.1 · Meta Global AI Developer Hackathon"
+    },
+    {
+      "name": "Blocked-route response",
+      "environmentEvents": [
+        {
+          "previous": {
+            "context": {
+              "site_id": "factory",
+              "map_version": "b4b17d6d99e309fe9a7ba008d8cf9d69ad50caf3d6cb6072ce6663806125109c",
+              "policy_version": "aa01208d5790c6c5",
+              "capability_profile_version": "sim-amr-radius-0.4m-v1"
+            },
+            "constraints": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+          },
+          "current": {
+            "context": {
+              "site_id": "factory",
+              "map_version": "95ac62786c6ad0389c20e204662260f3c1dce860425ce2618ef67cd17e2abffd",
+              "policy_version": "aa01208d5790c6c5",
+              "capability_profile_version": "sim-amr-radius-0.4m-v1"
+            },
+            "constraints": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+          },
+          "action": "holding_no_route",
+          "waypoints": 0,
+          "changes": [],
+          "reason": "Environment assumptions changed; old plan discarded"
+        }
+      ],
+      "recentDecisions": [
+        {
+          "decision": "APPROVED",
+          "policy_hits": [],
+          "reasons": [],
+          "required_action": null,
+          "risk_score": 0,
+          "policy_state": "SAFE",
+          "hard_fail": false,
+          "hard_fail_policies": []
+        },
+        {
+          "decision": "APPROVED",
+          "policy_hits": [],
+          "reasons": [],
+          "required_action": null,
+          "risk_score": 0,
+          "policy_state": "SAFE",
+          "hard_fail": false,
+          "hard_fail_policies": []
+        }
+      ]
+    },
+    {
+      "name": "Paused run",
+      "responseStatus": 200,
+      "state": {
+        "id": "run_787c962bf60f",
+        "mission_id": "mis_3d40c7ae32a8",
+        "status": "paused",
+        "started_at": "2026-11-03T10:43:30.564918",
+        "ended_at": null
+      }
+    }
+  ],
+  "pageErrors": [],
+  "screens": [
+    "03-original-mission-draft.png",
+    "04-original-active-run.png",
+    "05-learning-task.png",
+    "05-chain-telemetry.png",
+    "05-alerts.png",
+    "05-analysis.png",
+    "06-original-blocked-route.png",
+    "failure.png"
+  ],
+  "completed": false,
+  "failure": "locator.waitFor: Timeout 45000ms exceeded.\nCall log:\n\u001b[2m  - waiting for getByRole('button', { name: /Override & Resume/ }) to be visible\u001b[22m\n\n    at C:\\othnielObasi\\sovereignAutonomy\\backend\\data\\original-ui-review\\review.cjs:60:81",
+  "failurePage": "Sovereign Autonomy\nRUNTIME GOVERNANCE\nOverview\nMissions\nRuns\nGovernance\nAuthority\nEvidence\nGate offline\nSign in\nLive warehouse\nRuns\n/\nrun_787c962bf60f\nGoverned run\n—\nOffline\nStop robot\nMISSION\nIdle\nACTION VERDICT\nApproved\nENVIRONMENT\nClear\nPLANNER\nSovereign Autonomy Approved\nEXECUTION\nWithin Bounds\nWAREHOUSE SIMULATION\nHeatmap\nTrail\n🚶\nHuman Near\n🛑\nToo Close\n🚧\nBlocked\n💧\nSpill\n🚜\nForklift\n✅\nClear\n3D warehouse\nFloor plan\nWaiting for the warehouse simulator…\nRobot\nObstacles\nHuman\nProposed Path\nApproved Plan\nExecuted Path\nGoal\nRisk Zone\nAI MISSION PLANNER\nAutonomous: ON\n🧠\n1. Reasoning\n🗺️\n2. Plan\n🛡️\n3. Governance\n🚀\n4. Execute\n📋\n5. Audit\nPlan →\nPLANNER'S REASONING\nPlan review passed · 4 checks\n\nRoute along the aisles to the destination.\n\nShow details\nWAYPOINT PLAN\n22 waypoints · hover one to find it on the map\n1: (5,4) @0.5\n2: (7,4) @0.5\n3: (8,4) @0.5\n4: (10,4) @0.5\n5: (12,4) @0.5\n6: (13,6) @0.5\n7: (13,7) @0.5\n8: (15,8) @0.5\n9: (16,9) @0.5\n10: (17,11) @0.5\n11: (19,12) @0.5\n12: (20,13) @0.3\n13: (20,14) @0.3\n14: (20,16) @0.3\n15: (20,18) @0.3\n16: (22,18) @0.3\n17: (24,18) @0.3\n18: (26,18) @0.3\n19: (27,18) @0.3\n20: (29,18) @0.3\n21: (31,18) @0.3\n22: (33,18) @0.3\nGOVERNANCE DECISION\n✅\nAPPROVED\nExecution Risk: 0%\nScope:\nCurrent action only\nIntent:\nMOVE_TO\n→ (6.5, 3.6)\nPolicies:\n✓ 0 violations (11 active)\nALL 11 POLICIES PASSED\n0 denied · 0 constrained\n✓\nGEOFENCE_01\nposition inside boundary\n✓\nSAFE_SPEED_01\nwithin zone limit\n✓\nHUMAN_PROXIMITY_02\nno human nearby\n✓\nHUMAN_CLEARANCE_02\nno human in zone\n✓\nOBSTACLE_CLEARANCE_03\n> 0.5m buffer\n✓\nUNCERTAINTY_04\nconfidence above threshold\n✓\nHITL_05\nno operator override required\n✓\nWORKER_PROXIMITY_06\nworker zone clear\n✓\nPATH_CLEARANCE_07\npath clear of racking\n✓\nHAZARD_EXCLUSION_08\nno hazard zones in force\n✓\nHAZARD_SLOW_09\nno hazard speed caps\nLearning & task\nSite & vision\nChain & telemetry\nAlerts0\nAnalysis\nEXECUTION AUTHORITY\nPermits enforced\nStop robot\nStop everything\n🎙 Voice stop\nEXPERIENCE AND ENVIRONMENT\n\nPast experience is advisory. Current conditions decide whether it can be reused.\n\nShared routing requires two distinct robot identities. Repeated missions from one robot count as one source.\n\n0 eligible\n0 advisory\n0 excluded\nNo experience considered yet\nA mission records which signed experiences its route considered.\nEnvironment changes\nEnvironment assumptions changed; old plan discarded\nb4b17d6d99e3 → 95ac62786c6a\nHolding: no valid route\nTASK FOCUS\n\nEach plan must end at the mission's destination without wandering, or the aisle route is used.\n\nNo plan checked yet.\nLESSONS THE PLANNER WAS GIVEN\n0\nNo lessons near this route yet. They come from earlier runs where the gate denied moves nearby.\nREPLANS AFTER A DENIAL\n0\nNo replans: the gate hasn't blocked the same waypoint three times.\nWHAT THIS RUN TAUGHT THE PLANNER\nLessons are distilled from the gate's decisions when the run ends.\nLessons only change what the planner proposes; the gate still judges every move. All lessons →\nAI INTELLIGENCE CONSOLE: SCENE ANALYSIS, TELEMETRY INSIGHTS, FAILURE DETECTION\n▾\nSovereign Autonomy · NOVTIA · MIT licensed\nPlanning by Muse Spark · perception by SAM 3.1 · Meta Global AI Developer Hackathon"
+}

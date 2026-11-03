@@ -1,8 +1,8 @@
 "use client";
 
 /**
- * Mission-control UI primitives. One accent colour (cyan); green / amber / red
- * are reserved for gate verdicts so a decision always reads at a glance.
+ * Shared detail-page primitives using the Mission Control palette.
+ * Gate verdicts retain explicit labels and semantic colours.
  */
 import React, { useState } from "react";
 import Link from "next/link";

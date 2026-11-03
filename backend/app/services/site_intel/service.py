@@ -47,9 +47,19 @@ class SiteIntel:
 
     # ------------------------------------------------------------------ status
     def status(self) -> Dict[str, Any]:
+        configured = tavily.configured()
+        latest = self.lookups[0] if self.lookups else None
+        state = ('offline' if not configured else 'not_checked' if latest is None
+                 else 'live' if latest['mode'] == 'live' else 'error')
+        modes = {'offline': 'Offline samples (no Tavily key configured)',
+                 'not_checked': 'Tavily configured; no lookup completed yet',
+                 'live': 'Live Tavily search succeeded',
+                 'error': 'Live search failed; labelled offline samples are in use'}
         return {
             "tavily_live": tavily.configured(),
-            "mode": "live Tavily search" if tavily.configured() else "offline samples (set TAVILY_API_KEY for live search)",
+            "tavily_configured": configured,
+            "lookup_state": state,
+            "mode": modes[state],
             "trusted_domains": list(firewall.TRUSTED_DOMAINS),
             "corroboration_required": hazards.CORROBORATION,
             "class_rules": {k: {"radius_m": v[0], "slow_radius_m": v[1], "max_speed": v[2]} for k, v in hazards.CLASS_RULES.items()},

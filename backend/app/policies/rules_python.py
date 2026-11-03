@@ -6,6 +6,7 @@ from app.schemas.governance import GovernanceDecision, ActionProposal
 from app.policies.params import DEFAULT_PARAMS, active_params
 from app.policies.retreat import is_slow_retreat
 from app.policies.site_map import path_blocked
+from app.autonomy.robot_profiles import observed_profile
 
 
 # --- Policy parameters ---
@@ -227,9 +228,12 @@ def evaluate_policies(
     # --- SAFE_SPEED_01 ---
     if intent == "MOVE_TO":
         limit = float(ZONE_SPEED_LIMITS.get(zone, 0.5))
+        profile = observed_profile(telemetry)
+        if profile and profile.max_speed_mps is not None:
+            limit = min(limit, profile.max_speed_mps)
         if max_speed > limit:
             policy_hits.append("SAFE_SPEED_01")
-            reasons.append(f"Speed too high for zone '{zone}': {max_speed:.2f} > {limit:.2f}.")
+            reasons.append(f"Speed too high for zone/platform '{zone}': {max_speed:.2f} > {limit:.2f}.")
             required_action = f"Reduce max_speed to <= {limit:.2f}."
             risk_score = max(risk_score, 0.85)
             if policy_state == "SAFE":

@@ -33,7 +33,7 @@ const C = {
   path: "#3b82f6",
   target: "#10b981",
   plan: "#a855f7",
-  zoneLabel: "rgba(148,163,184,0.50)",
+  zoneLabel: "#e2e8f0",
   text: "#cbd5e1",
   textDim: "#64748b",
 };
@@ -236,6 +236,12 @@ export function Map2D({
     if (!cv) return;
     const ctx = cv.getContext("2d");
     if (!ctx) return;
+    // Match the drawing buffer to the display: a CSS-stretched low-DPI canvas
+    // makes thin static partitions shimmer and small labels blur.
+    const dpr = Math.min(window.devicePixelRatio || 1, 2);
+    if (cv.width !== Math.round(W*dpr)) cv.width = Math.round(W*dpr);
+    if (cv.height !== Math.round(H*dpr)) cv.height = Math.round(H*dpr);
+    ctx.setTransform(dpr,0,0,dpr,0,0); ctx.setLineDash([]);
     const pulse = Math.sin(tick * 0.12) * 0.5 + 0.5;
 
     /* background */
@@ -282,9 +288,10 @@ export function Map2D({
         ctx.fillStyle = C.floorAisle;
         ctx.fillRect(tl.x, tl.y, zw, zh);
       }
+      if ((world?.features || []).some((f:any)=>f.type==='room')) continue;
       /* zone name tucked into the zone's top-left corner, clear of robots and people */
       ctx.fillStyle = C.zoneLabel;
-      ctx.font = `bold ${Math.max(10, 11 * zoom)}px system-ui`;
+      ctx.font = `bold ${Math.max(13, 13 * zoom)}px system-ui`;
       ctx.textAlign = "left";
       ctx.textBaseline = "top";
       const zoneText = String(z.label || z.name).toUpperCase().replace("_", " ");
@@ -375,7 +382,7 @@ export function Map2D({
         : isStaging ? "rgba(168,85,247,0.5)"
         : "rgba(148,163,184,0.5)";
       ctx.fillStyle = labelColor;
-      ctx.font = `bold ${Math.max(7, 8 * zoom)}px monospace`;
+      ctx.font = `bold ${Math.max(11, 8 * zoom)}px monospace`;
       ctx.textAlign = "center";
       ctx.textBaseline = isDock ? "top" : "middle";
       ctx.fillText(bay.id, p.x, isDock ? p.y + bh / 2 + 2 : p.y + (isPick ? 8 * zoom : 0));
@@ -403,7 +410,7 @@ export function Map2D({
 
     /* axis labels */
     ctx.fillStyle = C.textDim;
-    ctx.font = `${Math.max(8, 9 * zoom)}px monospace`;
+    ctx.font = `${Math.max(11, 9 * zoom)}px monospace`;
     ctx.textAlign = "center";
     ctx.textBaseline = "top";
     for (let wx = 0; wx <= geo.max_x; wx += 5) {
@@ -425,6 +432,11 @@ export function Map2D({
       const br = w2c({ x: rack.x2, y: rack.y });
       const rw = br.x - tl.x,
         rh = br.y - tl.y;
+      if (rack.kind === "partition") {
+        ctx.fillStyle = "#93b9af"; ctx.strokeStyle = "#d9eee7";
+        ctx.lineWidth = 1; ctx.fillRect(tl.x,tl.y,rw,rh); ctx.strokeRect(tl.x,tl.y,rw,rh);
+        continue; // A wall is a boundary, not a tiny text container.
+      }
       /* factory equipment: machines, the fenced robot cell, the assembly line */
       if (rack.kind && rack.kind !== "rack") {
         const style: Record<string, { fill: string; edge: string; dash?: number[] }> = {
@@ -458,10 +470,11 @@ export function Map2D({
           ctx.restore();
         }
         ctx.fillStyle = rack.kind === "cell" ? "rgba(254,202,202,0.9)" : "rgba(226,232,240,0.85)";
-        ctx.font = `600 ${Math.max(7, 8.5 * zoom)}px sans-serif`;
+        ctx.font = `600 ${Math.max(12, 12 * zoom)}px sans-serif`;
         ctx.textAlign = "center";
         ctx.textBaseline = "middle";
-        ctx.fillText(rack.label || rack.id, tl.x + rw / 2, tl.y + rh / 2, Math.max(20, rw - 4));
+        const label = rack.label || rack.id;
+        if (rh >= 18 && ctx.measureText(label).width <= rw-8) ctx.fillText(label, tl.x+rw/2,tl.y+rh/2);
         continue;
       }
       /* rack body */
@@ -496,15 +509,27 @@ export function Map2D({
       }
       /* rack label */
       ctx.fillStyle = "rgba(148,163,184,0.45)";
-      ctx.font = `${Math.max(7, 8 * zoom)}px monospace`;
+      ctx.font = `${Math.max(11, 8 * zoom)}px monospace`;
       ctx.textAlign = "center";
       ctx.textBaseline = "middle";
       ctx.fillText(rack.id, tl.x + rw / 2, tl.y + rh / 2);
     }
 
     /* ── features (charging, packing, fire exits) ───────────── */
+    // Room labels are a separate pass so equipment can never paint over them.
+    for (const room of (world?.features || []).filter((f:any)=>f.type==='room')) {
+      const y = room.y < (geo.min_y+geo.max_y)/2 ? room.y+3 : room.y-3;
+      const point = w2c({x:room.x,y});
+      const label = String(room.label);
+      ctx.font = "600 13px system-ui"; ctx.textAlign = "center"; ctx.textBaseline = "middle";
+      const width = ctx.measureText(label).width;
+      ctx.fillStyle = "rgba(15,23,42,0.92)";
+      ctx.fillRect(point.x-width/2-5,point.y-10,width+10,20);
+      ctx.fillStyle = "#f1f5f9";ctx.fillText(label,point.x,point.y);
+    }
     const features: { type: string; x: number; y: number; label: string }[] = world?.features ?? [];
     for (const feat of features) {
+      if (feat.type === "room") continue; // Room names are provided by the zone labels.
       const p = w2c({ x: feat.x, y: feat.y });
       const sz = Math.max(6, 7 * zoom);
       if (feat.type === "charging_station") {
@@ -517,7 +542,7 @@ export function Map2D({
         ctx.stroke();
         /* lightning bolt */
         ctx.fillStyle = "rgba(34,197,94,0.7)";
-        ctx.font = `bold ${Math.max(10, 12 * zoom)}px system-ui`;
+        ctx.font = `bold ${Math.max(11, 12 * zoom)}px system-ui`;
         ctx.textAlign = "center";
         ctx.textBaseline = "middle";
         ctx.fillText("⚡", p.x, p.y);
@@ -530,7 +555,7 @@ export function Map2D({
         ctx.fill();
         ctx.stroke();
         ctx.fillStyle = "rgba(168,85,247,0.6)";
-        ctx.font = `bold ${Math.max(8, 9 * zoom)}px system-ui`;
+        ctx.font = `bold ${Math.max(11, 9 * zoom)}px system-ui`;
         ctx.textAlign = "center";
         ctx.textBaseline = "middle";
         ctx.fillText(feat.type === "work_station" ? "🔧" : feat.type === "qc_station" ? "✔" : "📦", p.x, p.y);
@@ -543,14 +568,14 @@ export function Map2D({
         ctx.fill();
         ctx.stroke();
         ctx.fillStyle = "rgba(239,68,68,0.7)";
-        ctx.font = `bold ${Math.max(8, 9 * zoom)}px system-ui`;
+        ctx.font = `bold ${Math.max(11, 9 * zoom)}px system-ui`;
         ctx.textAlign = "center";
         ctx.textBaseline = "middle";
         ctx.fillText("🚪", p.x, p.y);
       }
       /* feature label */
       ctx.fillStyle = "rgba(148,163,184,0.5)";
-      ctx.font = `${Math.max(6, 7 * zoom)}px monospace`;
+      ctx.font = `${Math.max(11, 7 * zoom)}px monospace`;
       ctx.textAlign = "center";
       ctx.textBaseline = "top";
       ctx.fillText(feat.label, p.x, p.y + sz + 2);
@@ -709,7 +734,7 @@ export function Map2D({
 
         /* Destination label */
         ctx.fillStyle = "#10b981";
-        ctx.font = `bold ${Math.max(9, 11 * zoom)}px system-ui`;
+        ctx.font = `bold ${Math.max(11, 11 * zoom)}px system-ui`;
         ctx.textAlign = "center";
         ctx.textBaseline = isDock ? "bottom" : "top";
         const labelY = isDock ? dp.y - bh / 2 - highlightR - 4 : dp.y + bh / 2 + highlightR + 4;
@@ -753,7 +778,7 @@ export function Map2D({
         ctx.ellipse(p.x + r * 0.6, p.y - r * 0.4, r * 0.7, r * 0.55, 0, 0, Math.PI * 2);
         ctx.fill();
         ctx.fillStyle = "rgba(255,255,255,0.8)";
-        ctx.font = `bold ${Math.max(7, 8 * zoom)}px system-ui`;
+        ctx.font = `bold ${Math.max(11, 8 * zoom)}px system-ui`;
         ctx.textAlign = "center";
         ctx.textBaseline = "bottom";
         ctx.fillText(ot.label, p.x, p.y - r * 1.4);
@@ -777,7 +802,7 @@ export function Map2D({
         ctx.fillRect(r, r * 0.25, r * 0.7, r * 0.2);
         ctx.restore();
         ctx.fillStyle = "rgba(255,255,255,0.8)";
-        ctx.font = `bold ${Math.max(7, 8 * zoom)}px system-ui`;
+        ctx.font = `bold ${Math.max(11, 8 * zoom)}px system-ui`;
         ctx.textAlign = "center";
         ctx.textBaseline = "bottom";
         ctx.fillText(ot.label, p.x, p.y - r - 3);
@@ -805,7 +830,7 @@ export function Map2D({
       ctx.stroke();
 
       ctx.fillStyle = "rgba(255,255,255,0.7)";
-      ctx.font = `bold ${Math.max(7, 8 * zoom)}px system-ui`;
+      ctx.font = `bold ${Math.max(11, 8 * zoom)}px system-ui`;
       ctx.textAlign = "center";
       ctx.textBaseline = "bottom";
       if (zoom >= 1.6 || ob.type === "dropped_pallet") ctx.fillText(ot.label, p.x, p.y - bs - 3); // parked clutter: label only when zoomed in
@@ -834,7 +859,7 @@ export function Map2D({
       ctx.stroke();
       ctx.setLineDash([]);
       ctx.fillStyle = noEntry ? "#fecaca" : "#fde68a";
-      ctx.font = `bold ${Math.max(8, 9 * zoom)}px system-ui`;
+      ctx.font = `bold ${Math.max(11, 9 * zoom)}px system-ui`;
       ctx.textAlign = "center";
       ctx.textBaseline = "bottom";
       ctx.fillText(noEntry ? `NO ENTRY ${Number(z.radius).toFixed(1)}m`
@@ -869,7 +894,7 @@ export function Map2D({
 
       /* ring labels */
       ctx.fillStyle = "rgba(239,68,68,0.6)";
-      ctx.font = `${Math.max(7, 8 * zoom)}px system-ui`;
+      ctx.font = `${Math.max(11, 8 * zoom)}px system-ui`;
       ctx.textAlign = "center";
       ctx.fillText("STOP 1m", p.x, p.y - dr - 2);
       ctx.fillStyle = "rgba(245,158,11,0.5)";
@@ -896,7 +921,7 @@ export function Map2D({
       ctx.stroke();
 
       ctx.fillStyle = C.human;
-      ctx.font = `bold ${Math.max(8, 9 * zoom)}px system-ui`;
+      ctx.font = `bold ${Math.max(11, 9 * zoom)}px system-ui`;
       ctx.textAlign = "center";
       ctx.fillText("PERSON", p.x, p.y + 12 * zoom);
 
@@ -907,7 +932,7 @@ export function Map2D({
           { x: +human.x, y: +human.y },
         );
         ctx.fillStyle = d < 1 ? "#ef4444" : d < 3 ? "#f59e0b" : "#22c55e";
-        ctx.font = `bold ${Math.max(9, 10 * zoom)}px monospace`;
+        ctx.font = `bold ${Math.max(11, 10 * zoom)}px monospace`;
         ctx.fillText(`${d.toFixed(1)}m`, p.x, p.y + 22 * zoom);
       }
     }
@@ -973,7 +998,7 @@ export function Map2D({
       const label = wh.label ?? wh.name ?? "Worker";
       if (!nearRobot) {
       ctx.fillStyle = "rgba(251,191,36,0.8)";
-      ctx.font = `${Math.max(7, 8 * zoom)}px system-ui`;
+      ctx.font = `${Math.max(11, 8 * zoom)}px system-ui`;
       ctx.textAlign = "center";
       ctx.fillText(label, p.x, p.y + 9 * zoom);
       }
@@ -986,7 +1011,7 @@ export function Map2D({
         );
         if (d < 5) {
           ctx.fillStyle = d < 1 ? "#ef4444" : d < 3 ? "#f59e0b" : "#22c55e";
-          ctx.font = `bold ${Math.max(7, 8 * zoom)}px monospace`;
+          ctx.font = `bold ${Math.max(11, 8 * zoom)}px monospace`;
           ctx.fillText(`${d.toFixed(1)}m`, p.x, p.y + 17 * zoom);
         }
       }
@@ -1048,13 +1073,13 @@ export function Map2D({
         ctx.arc(p.x, p.y, 8, 0, Math.PI * 2);
         ctx.fill();
         ctx.fillStyle = "#fff";
-        ctx.font = `bold ${Math.max(9, 10 * zoom)}px system-ui`;
+        ctx.font = `bold ${Math.max(11, 10 * zoom)}px system-ui`;
         ctx.textAlign = "center";
         ctx.textBaseline = "middle";
         ctx.fillText(String(i + 1), p.x, p.y);
-        if (wp.max_speed != null) {
+        if (wp.max_speed != null && (zoom>=1.5 || hoveredWaypointIdx===i)) {
           ctx.fillStyle = C.textDim;
-          ctx.font = `${Math.max(7, 8 * zoom)}px monospace`;
+          ctx.font = `${Math.max(11, 8 * zoom)}px monospace`;
           ctx.textBaseline = "top";
           ctx.fillText(`${wp.max_speed.toFixed(1)}m/s`, p.x, p.y + 14);
         }
@@ -1076,6 +1101,13 @@ export function Map2D({
     }
 
     /* ── idle robots ──────────────────────────────────────────── */
+    const humanoidGlyph=(x:number,y:number,colour:string)=>{
+      ctx.fillStyle=colour;ctx.strokeStyle=colour;ctx.lineWidth=2.5;
+      ctx.beginPath();ctx.arc(x,y-7,3,0,Math.PI*2);ctx.fill();
+      ctx.beginPath();ctx.moveTo(x,y-3);ctx.lineTo(x,y+4);
+      ctx.moveTo(x-6,y);ctx.lineTo(x+6,y);
+      ctx.moveTo(x-5,y+10);ctx.lineTo(x,y+4);ctx.lineTo(x+5,y+10);ctx.stroke();
+    };
     for (const ir of idleRobots) {
       if (typeof ir.x !== "number") continue;
       const p = w2c({ x: +ir.x, y: +ir.y });
@@ -1089,8 +1121,11 @@ export function Map2D({
       ctx.arc(p.x, p.y, 14, 0, Math.PI * 2);
       ctx.fill();
 
-      /* body (gray) */
       const rb = 8;
+      /* Fleet platform glyph. */
+      if(ir.robot_kind==='humanoid') humanoidGlyph(p.x,p.y,"#8ab9eb");
+      else {
+      /* body (gray) */
       ctx.fillStyle = "#475569";
       ctx.strokeStyle = "#334155";
       ctx.lineWidth = 1.5;
@@ -1109,6 +1144,7 @@ export function Map2D({
       ctx.arc(p.x, p.y, 2, 0, Math.PI * 2);
       ctx.fill();
 
+      }
       /* heading arrow (dim) */
       const irt = +(ir.theta ?? 0);
       const al = 14;
@@ -1122,9 +1158,9 @@ export function Map2D({
       ctx.stroke();
 
       /* label */
-      const lbl = ir.label ?? "Robot (Idle)";
+      const lbl = ir.label ?? ir.robot_id ?? "Robot";
       ctx.fillStyle = "#94a3b8";
-      ctx.font = `bold ${Math.max(7, 8 * zoom)}px system-ui`;
+      ctx.font = `bold ${Math.max(11, 8 * zoom)}px system-ui`;
       ctx.textAlign = "center";
       ctx.textBaseline = "bottom";
       ctx.fillText(lbl, p.x, p.y - rb - 3);
@@ -1136,10 +1172,10 @@ export function Map2D({
       ctx.roundRect(p.x - bw / 2, p.y + rb + 2, bw, 12, 2);
       ctx.fill();
       ctx.fillStyle = "#94a3b8";
-      ctx.font = `bold ${Math.max(7, 8 * zoom)}px system-ui`;
+      ctx.font = `bold ${Math.max(11, 8 * zoom)}px system-ui`;
       ctx.textAlign = "center";
       ctx.textBaseline = "middle";
-      ctx.fillText("IDLE", p.x, p.y + rb + 8);
+      ctx.fillText(ir.speed>.01?"MOVE":"IDLE", p.x, p.y + rb + 8);
     }
     ctx.textAlign = "start";
     ctx.textBaseline = "alphabetic";
@@ -1192,8 +1228,10 @@ export function Map2D({
       ctx.arc(p.x, p.y, 20, 0, Math.PI * 2);
       ctx.fill();
 
-      /* body */
       const rb = 10;
+      if(telemetry.robot_kind==='humanoid') humanoidGlyph(p.x,p.y,C.robot);
+      else {
+      /* body */
       ctx.fillStyle = C.robot;
       ctx.strokeStyle = C.robotDark;
       ctx.lineWidth = 2;
@@ -1210,6 +1248,7 @@ export function Map2D({
       ctx.arc(p.x, p.y, 2.5, 0, Math.PI * 2);
       ctx.fill();
 
+      }
       /* heading arrow */
       const al = 20;
       const ax = p.x + Math.cos(rt) * al;
@@ -1232,12 +1271,12 @@ export function Map2D({
 
       /* labels */
       ctx.fillStyle = "#22d3ee";
-      ctx.font = `bold ${Math.max(9, 10 * zoom)}px system-ui`;
+      ctx.font = `bold ${Math.max(11, 10 * zoom)}px system-ui`;
       ctx.textAlign = "center";
       ctx.textBaseline = "bottom";
-      ctx.fillText("ROBOT", p.x, p.y - rb - 4);
+      ctx.fillText(telemetry.robot_kind==='humanoid'?"HUMANOID":"ROBOT", p.x, p.y - rb - 4);
       ctx.fillStyle = C.textDim;
-      ctx.font = `${Math.max(8, 9 * zoom)}px monospace`;
+      ctx.font = `${Math.max(11, 9 * zoom)}px monospace`;
       ctx.textBaseline = "top";
       ctx.fillText(`${spd.toFixed(2)} m/s`, p.x, p.y + rb + 4);
 
@@ -1255,7 +1294,7 @@ export function Map2D({
         ctx.roundRect(p.x - bw / 2, p.y - rb - 22, bw, 14, 3);
         ctx.fill();
         ctx.fillStyle = c.fg;
-        ctx.font = `bold ${Math.max(8, 9 * zoom)}px system-ui`;
+        ctx.font = `bold ${Math.max(11, 9 * zoom)}px system-ui`;
         ctx.textAlign = "center";
         ctx.textBaseline = "middle";
         ctx.fillText(st, p.x, p.y - rb - 15);
@@ -1296,7 +1335,7 @@ export function Map2D({
         ctx.arc(tp.x, tp.y, 3, 0, Math.PI * 2);
         ctx.fill();
         ctx.fillStyle = C.target;
-        ctx.font = `bold ${Math.max(8, 9 * zoom)}px system-ui`;
+        ctx.font = `bold ${Math.max(11, 9 * zoom)}px system-ui`;
         ctx.textAlign = "center";
         ctx.fillText(tgtLabel, tp.x, tp.y - cr - 5);
         ctx.textAlign = "start";
@@ -1327,7 +1366,7 @@ export function Map2D({
       ctx.beginPath();
       ctx.arc(tp.x, tp.y, 3, 0, Math.PI * 2);
       ctx.fill();
-      ctx.font = `bold ${Math.max(8, 9 * zoom)}px system-ui`;
+      ctx.font = `bold ${Math.max(11, 9 * zoom)}px system-ui`;
       ctx.textAlign = "center";
       ctx.fillText("GOAL", tp.x, tp.y - cr - 5);
       ctx.textAlign = "start";
@@ -1452,7 +1491,7 @@ export function Map2D({
   return (
     <div
       ref={containerRef}
-      className="relative w-full border border-slate-700"
+      className="relative w-full border border-slate-700" aria-label="Interactive facility floor plan"
       style={{ minHeight: 300, height: isFullscreen ? "100vh" : "100%", borderRadius: 12, overflow: "hidden", background: C.floor }}
     >
       <canvas

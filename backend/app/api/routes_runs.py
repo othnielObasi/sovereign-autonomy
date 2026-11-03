@@ -520,16 +520,19 @@ def list_events(
     run_id: str,
     limit: int = Query(200, ge=1, le=1000),
     offset: int = Query(0, ge=0),
+    latest: bool = Query(False, description="Return the newest events in chronological order"),
     db: Session = Depends(get_db),
 ):
     rows = (
         db.query(Event)
         .filter(Event.run_id == run_id)
-        .order_by(Event.ts.asc())
+        .order_by(Event.ts.desc() if latest else Event.ts.asc())
         .offset(offset)
         .limit(limit)
         .all()
     )
+    if latest:
+        rows.reverse()
     return [
         EventOut(
             id=r.id,

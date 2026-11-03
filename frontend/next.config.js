@@ -5,8 +5,11 @@ const nextConfig = {
   async rewrites() {
     const backendUrl = process.env.BACKEND_URL || "http://localhost:8080";
     return {
-      // The public landing page is a static file; the app starts at /overview
-      beforeFiles: [{ source: "/", destination: "/landing/index.html" }],
+      // The public landing page is static; operations start at /mission-control.
+      beforeFiles: [
+        { source: "/", destination: "/landing/index.html" },
+        { source: "/how-it-works", destination: "/how-it-works/index.html" },
+      ],
       afterFiles: [
         {
           source: "/api/:path*",

@@ -2,6 +2,19 @@
 
 Every capability in the Sovereign Autonomy plan, with its status and the evidence for it.
 
+The frontend overhaul is documented in [UI_UX_OVERHAUL.md](UI_UX_OVERHAUL.md):
+one Mission Control workspace, a new facility renderer and floor-plan fallback,
+real mission and stop actions, mobile operator access, and an optional cleanroom
+layout. `tests/mission-control.browser.cjs` exercises the real-service workflow;
+`backend/tests/test_mission_control.py` covers recent evidence windows, world
+metadata and clear routes to all six cleanroom destinations.
+
+The redesign remains incomplete: existing controls and capabilities must be
+preserved. The original landing page is restored. Mission Control and run/twin
+views share static facility geometry through `FacilityEnvironment`; the focused
+`tests/facility-parity.browser.cjs` checks the actual mounted 3D meshes and retained
+run controls. See the overhaul document for remaining presentation gaps.
+
 - **Working**: implemented, wired into the running system, and covered by automated tests.
 - **Ready, needs key**: implemented and tested against Meta's documented API shapes; runs as soon as the key is set.
 - **Partial**: some of the requirement is met; the gap is stated.
@@ -121,3 +134,18 @@ Graph results concern modeled travel and queue costs. Physical contacts, hardwar
 | Measure benefit under hardened policy | `bench/results/experience-hardened`: two acquisition sources, 20 graph seeds, 28.6% modeled reduction, 30/30 stale records rejected |
 
 See [LEARNING_POISONING_DEFENSES.md](LEARNING_POISONING_DEFENSES.md) for deployment, recovery and remaining assumptions. Source IDs do not establish independent sensor truth. A two-robot fleet alone cannot supply the two peers required to identify an outlier source.
+
+Workspace follow-up (3 November 2026): [slate contrast, full warehouse inspection and simulated mixed fleet](validation/2026-11-03-workspace/README.md). The new versioned humanoid profile is bounded planar navigation; physical locomotion/manipulation remain outside the implemented action set.
+
+Current runtime and capability boundaries were checked on 3 November 2026: [capability audit](CAPABILITY_AUDIT.md). Earlier dated counts in this document are historical; current pharma simulation has two AMRs and one humanoid navigator, with the same MOVE_TO/STOP/WAIT action set and separate platform limits. Role-specific task eligibility and cross-platform learning transfer are not implemented.
+
+The [expanded platform audit](CAPABILITY_AUDIT.md) inventories 22 capability areas and records 115 live OpenAPI HTTP operations. It distinguishes code presence, conditional integrations, UI discoverability and partial handlers; the initial finding that force_approve/replan only recorded requests has since been addressed in [operational oversight](OPERATOR_CONTROLS.md).
+
+Operator oversight follow-up (3 November 2026): route replacement now stops and
+holds the assigned robot, persists its replacement plan and requires explicit
+resume. Human review is restricted to signed, current uncertainty decisions and
+bound to exact action/context/expiry; fresh gate and controller permit checks
+remain mandatory. The shared UI shows these controls in Mission Control and the
+run page. See [implementation and validation](OPERATOR_CONTROLS.md).
+
+Final oversight validation: **489 backend tests passed**, including **33 oversight cases**; production build passed; **15 browser checks passed** (5 oversight and 10 existing Mission Control checks). See [saved results](validation/2026-11-03-operator-controls/README.md).

@@ -12,11 +12,27 @@ Entry to the **Meta Global AI Developer Hackathon** (Startup track, theme: *Push
 
 > **Status:** work in progress during the hackathon build period (27 Oct – 4 Nov 2026).
 
+Fresh live validation and submission draft: [submission evidence](docs/HACKATHON_SUBMISSION.md).
+On 3 November, a camera-informed Muse Spark mission completed with 88 verified
+original audit events and 25 verified decision signatures. Tavily also completed
+a live spill lookup and the gate denied a move into its tightened exclusion zone.
+The [three-minute demo script](docs/demo-script.md) is ready; video publication
+and the final submission remain pending. Team and participant fields are blank.
+
 ---
 
 ## Built during the hackathon
 
-Everything in this section was built from 26 October 2026 onward. The git history starts with a single commit containing the pre-existing codebase, so every later commit is hackathon work; [`CHANGELOG.md`](CHANGELOG.md) lists each change with its date.
+The redesigned workspace starts at **`/mission-control`**, with the facility,
+fleet, mission desk and decision trail together. See
+[UI / UX overhaul](docs/UI_UX_OVERHAUL.md) for the workflow, default cleanroom
+layout and browser validation.
+
+The git history starts with a baseline containing the pre-existing codebase.
+Later commits record the additions below; [`CHANGELOG.md`](CHANGELOG.md) lists
+changes. Git history alone does not establish original creation dates. The
+[submission draft](docs/HACKATHON_SUBMISSION.md) separates new additions from
+the supporting foundation, including the pre-existing Tavily integration.
 
 | Capability | Status |
 |---|---|

@@ -6,6 +6,7 @@ Reconstructs the full timeline of a run for audit / replay / export.
 from __future__ import annotations
 
 import json
+from datetime import datetime, timezone
 from typing import Any, Dict, List
 
 from sqlalchemy.orm import Session
@@ -72,7 +73,7 @@ def get_run_timeline(
             })
 
     # Verify chain integrity
-    chain_valid = verify_chain(events)
+    chain_valid = verify_chain(events, run_id=run_id)
 
     return {
         "run_id": run.id,
@@ -87,7 +88,7 @@ def get_run_timeline(
     }
 
 
-def verify_chain(events: List[Dict[str, Any]]) -> bool:
+def verify_chain(events: List[Dict[str, Any]], *, run_id: str | None = None) -> bool:
     """Walk the event list and verify prev_hash linkage.
 
     Returns True if:
@@ -105,6 +106,20 @@ def verify_chain(events: List[Dict[str, Any]]) -> bool:
     for i in range(1, len(events)):
         if events[i].get("prev_hash") != events[i - 1].get("hash"):
             return False
+
+    if run_id is not None:
+        for event in events:
+            try:
+                timestamp = datetime.fromisoformat(event["ts"])
+                if timestamp.tzinfo is None:
+                    timestamp = timestamp.replace(tzinfo=timezone.utc)
+                original = {"run_id": run_id, "ts": timestamp.isoformat(),
+                            "type": event["type"], "payload": event["payload"],
+                            "prev_hash": event.get("prev_hash", zero_hash)}
+                if sha256_canonical(original) != event["hash"]:
+                    return False
+            except (KeyError, TypeError, ValueError):
+                return False
 
     return True
 

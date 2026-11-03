@@ -1,0 +1,26 @@
+{
+  "checks": [
+    {
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "width": 390,
+      "scrollWidth": 390,
+      "toolbarBottom": 569,
+      "sceneTop": 569
+    },
+    {
+      "viewport": {
+        "width": 1440,
+        "height": 1050
+      },
+      "width": 1440,
+      "scrollWidth": 1440,
+      "toolbarBottom": 418.5,
+      "sceneTop": 418.5
+    }
+  ],
+  "errors": [],
+  "passed": true
+}

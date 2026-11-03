@@ -1,0 +1,22 @@
+{
+  "revision": "2d3a984",
+  "review_status": "completed_with_limitations",
+  "automated_walkthrough_completed": false,
+  "observed": [
+    "Original 3D factory inspection and robot-eye views",
+    "Explicit mission draft save and start",
+    "Navigation into original run record",
+    "Planning, route waypoints and governance panel",
+    "Learning/task, chain/telemetry, alerts and analysis tabs",
+    "Real obstruction produced environment-change hold event",
+    "Pause endpoint returned 200 and backend status paused",
+    "Retained stopped record reopened successfully"
+  ],
+  "limitations": [
+    "Full 3D performance not validated: software rendering around 1 FPS; detailed workflow used WebGL fallback",
+    "Paused-state reload did not populate run metadata/world before timeout, although backend pause was confirmed",
+    "Model credentials disabled: no live model planning/perception/analysis validation",
+    "Full mission arrival/completion was not exercised; study runs were stopped for cleanup"
+  ],
+  "page_errors": []
+}

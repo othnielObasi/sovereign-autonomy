@@ -1,0 +1,41 @@
+{
+  "checks": [
+    "Root serves the exact restored landing file and original app link",
+    "Mission Control mounts full cleanroom geometry from the simulator world",
+    "All 16 partitions, six open entrances, four perimeter walls and ceiling are modeled; expanded overview and interior camera work",
+    "Run mounts identical facility geometry while retaining fullscreen, reset, minimap and governance panel",
+    "Switching floor plan to 3D preserves the complete facility"
+  ],
+  "errors": [],
+  "scope": "Shared static facility geometry in real Mission Control and run canvases; isolated pharma simulator; no model calls",
+  "world": {
+    "site": {
+      "name": "pharma",
+      "title": "Meridian Life Sciences"
+    },
+    "geofence": {
+      "min_x": 0,
+      "max_x": 36,
+      "min_y": 0,
+      "max_y": 26
+    },
+    "bays": [
+      "C-01",
+      "Q-01",
+      "F-01",
+      "G-01",
+      "R-01",
+      "P-01"
+    ],
+    "racks": 28
+  },
+  "architecture": {
+    "partitions": 16,
+    "entrances": 6,
+    "perimeterWalls": 4,
+    "ceiling": true
+  },
+  "runId": "run_4f552d1ff6ee",
+  "meshes": 714,
+  "passed": true
+}

@@ -1,0 +1,17 @@
+{
+  "scope": "Real isolated simulator/backend; no model calls",
+  "checks": [
+    "Perspective overview, robot follow and robot-eye cameras retain the new dashboard",
+    "Original landing restored with its app link; Mission Control loads the real pharma world and fleet",
+    "Keyboard robot selection and accessible operator dialog work",
+    "Scenario lab changes real world geometry and records environment revalidation",
+    "Mission creation, controller admission evidence and pause update real backend state",
+    "New mission opens composer; busy robot blocked and second robot selectable",
+    "Persistent stop confirms controller stop; release does not resume paused mission",
+    "Mobile has no horizontal overflow; navigation, operator access and stop remain available",
+    "Lost connection marks positions stale and disables launching",
+    "Unavailable WebGL falls back to real floor plan while keeping controls"
+  ],
+  "errors": [],
+  "passed": true
+}

@@ -11,6 +11,7 @@ a parameter) because approvals may be issued from HTTP endpoints that run
 outside the run loop’s session scope.
 """
 
+import json
 from typing import Dict, Any
 from datetime import datetime, timedelta, timezone
 
@@ -88,6 +89,82 @@ def list_for_run(run_id: str) -> Dict[str, Any]:
     db = SessionLocal()
     try:
         rows = db.query(OperatorApproval).filter(OperatorApproval.run_id == run_id).all()
-        return {r.proposal_hash: {"approved_by": r.approved_by, "approved_at": r.approved_at.isoformat(), "notes": r.notes} for r in rows}
+        result = {}
+        for row in rows:
+            notes = row.notes
+            try:
+                metadata = json.loads(notes or '{}')
+                if isinstance(metadata,dict) and metadata.get('schema') == 'operator-review-v1':
+                    notes = metadata.get('reason')
+            except (ValueError,TypeError):
+                pass
+            result[row.proposal_hash] = {'approved_by':row.approved_by,
+                'approved_at':row.approved_at.isoformat(), 'notes':notes,
+                'expires_at':row.expires_at.isoformat() if row.expires_at else None}
+        return result
     finally:
         db.close()
+
+
+# Review is an exception for uncertainty, never permission to break a limit.
+REVIEWABLE_POLICIES = frozenset({'UNCERTAINTY_04', 'HITL_05'})
+
+
+def reviewable(decision) -> bool:
+    return (decision.decision == 'NEEDS_REVIEW' and not decision.hard_fail
+            and bool(decision.policy_hits)
+            and set(decision.policy_hits) <= REVIEWABLE_POLICIES)
+
+
+def review_key(telemetry, proposal, decision, policy_version):
+    from app.autonomy.permit import controller_context
+    from app.services.execution_authority import get_authority
+    from app.services.environment_lifecycle import constraints_key
+    from app.utils.hashing import sha256_canonical
+    context = controller_context(telemetry)
+    if context is None:
+        return None
+    return sha256_canonical({'kind': 'operator-review-v1',
+        'robot_id': telemetry.get('robot_id'), 'controller': context,
+        'authority_epoch': get_authority().kills.epoch,
+        'constraints': constraints_key(telemetry), 'policy_version': policy_version,
+        'intent': proposal.intent, 'params': proposal.params,
+        'policy_hits': sorted(decision.policy_hits)})
+
+
+def matching_review(db, run_id, telemetry, proposal, decision, policy_version):
+    if not reviewable(decision):
+        return None
+    key = review_key(telemetry, proposal, decision, policy_version)
+    if not key:
+        return None
+    now = datetime.now(timezone.utc)
+    rows = db.query(OperatorApproval).filter(OperatorApproval.run_id == run_id,
+        OperatorApproval.proposal_hash == key).order_by(OperatorApproval.id.desc()).all()
+    for row in rows:
+        exp = row.expires_at
+        if exp and (exp.replace(tzinfo=timezone.utc) if exp.tzinfo is None else exp) > now:
+            try:
+                metadata = json.loads(row.notes or '{}')
+                from app.utils import signing
+                if (isinstance(metadata,dict) and metadata.get('schema') == 'operator-review-v1' and row.approved_by
+                        and signing.verify(lease_payload(row, metadata), metadata['signature'], metadata['key_id'])['valid']):
+                    return row
+            except (ValueError,TypeError,KeyError):
+                continue
+    return None
+
+
+def lease_payload(row, metadata):
+    from app.utils.signing import canonical_ts
+    return {'kind':'operator-review-v1','id':row.id,'run_id':row.run_id,
+            'proposal_hash':row.proposal_hash,'approved_by':row.approved_by,
+            'approved_at':canonical_ts(row.approved_at),'expires_at':canonical_ts(row.expires_at),
+            'decision_event_id':metadata['decision_event_id'],'reason':metadata['reason']}
+
+
+def seal_review(row, decision_event_id, reason):
+    from app.utils import signing
+    metadata={'schema':'operator-review-v1','decision_event_id':decision_event_id,'reason':reason}
+    metadata['signature'],metadata['key_id']=signing.sign(lease_payload(row,metadata))
+    row.notes=json.dumps(metadata)

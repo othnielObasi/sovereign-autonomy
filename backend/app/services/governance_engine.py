@@ -85,8 +85,21 @@ class GovernanceEngine:
         `params` overrides the active rules (used by the benchmark to test a candidate
         rule set); live runs always use the active rules."""
         # Pin the rules for this decision so the recorded version is exactly what was enforced
+        live_review = params is None
         params = params if params is not None else active_params()
         decision = evaluate_policies(telemetry, proposal, params)
+
+        # Only a context-bound human review may clear eligible uncertainty.
+        # Re-evaluate first on every tick: changed hazards/limits cannot be overridden.
+        from app.services.operator_approval import matching_review
+        approval = matching_review(db, run_id, telemetry, proposal, decision, params_hash(params)) if live_review else None
+        if approval:
+            decision = decision.model_copy(update={
+                'decision': 'APPROVED', 'required_action': None,
+                'reasons': [*decision.reasons,
+                    f'Operator review {approval.id} approved by {approval.approved_by}; '
+                    'exact action and current context rechecked.'],
+            })
 
         # Circuit-breaker: track consecutive denials (persistent)
         escalated = False

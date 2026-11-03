@@ -1,0 +1,481 @@
+{
+  "checks": [
+    "Two retained AMRs and a keyboard-selectable humanoid have distinct live metadata and floor-plan glyphs",
+    "Visible shell and workspace text meet 4.5:1 contrast against computed solid backgrounds; slate canvas and crisp surfaces",
+    "Coordinate floor selection saves a real draft assigned to robot-3 and causes no motion",
+    "Detailed workspace mounts the articulated humanoid, recorded waypoint speed caps and original camera/inspection/layer tools",
+    "Real governed humanoid delivery completes with consumed permits, measured travel, speed at or below 0.30 m/s and zero robot contacts",
+    "Workspace including expanded mission tools fits a 390px mobile viewport",
+    "The retained run viewer renders the same humanoid platform; no browser errors"
+  ],
+  "errors": [],
+  "samples": [
+    {
+      "x": 18,
+      "y": 2.943,
+      "speed": 0,
+      "contacts": 0
+    },
+    {
+      "x": 18,
+      "y": 2.943,
+      "speed": 0,
+      "contacts": 0
+    },
+    {
+      "x": 18,
+      "y": 2.835,
+      "speed": 0.3,
+      "contacts": 0
+    },
+    {
+      "x": 18,
+      "y": 9,
+      "speed": 0,
+      "contacts": 0
+    }
+  ],
+  "contrast": [
+    {
+      "text": "Skip to content",
+      "ratio": 12.64
+    },
+    {
+      "text": "SovereignAUTONOMY",
+      "ratio": 10.17
+    },
+    {
+      "text": "AUTONOMY",
+      "ratio": 6.97
+    },
+    {
+      "text": "S",
+      "ratio": 6.49
+    },
+    {
+      "text": "Operations workspaceSimulation environment",
+      "ratio": 10.17
+    },
+    {
+      "text": "Simulation environment",
+      "ratio": 5.45
+    },
+    {
+      "text": "WORKSPACE",
+      "ratio": 7.06
+    },
+    {
+      "text": "Mission control",
+      "ratio": 8.85
+    },
+    {
+      "text": "Missions",
+      "ratio": 6.81
+    },
+    {
+      "text": "Mission history",
+      "ratio": 6.81
+    },
+    {
+      "text": "Trust & security",
+      "ratio": 6.81
+    },
+    {
+      "text": "Governance",
+      "ratio": 6.81
+    },
+    {
+      "text": "Evidence",
+      "ratio": 6.81
+    },
+    {
+      "text": "Intelligence proposes.Authority decides.",
+      "ratio": 10.17
+    },
+    {
+      "text": "Follow every move from a plan to its permission to act.",
+      "ratio": 5.57
+    },
+    {
+      "text": "Explore the showcase",
+      "ratio": 9.3
+    },
+    {
+      "text": "About the system",
+      "ratio": 6.89
+    },
+    {
+      "text": "Sovereign Autonomy v0.1",
+      "ratio": 4.75
+    },
+    {
+      "text": "v0.1",
+      "ratio": 4.75
+    },
+    {
+      "text": "Workspace",
+      "ratio": 7.19
+    },
+    {
+      "text": "Mission control",
+      "ratio": 7.29
+    },
+    {
+      "text": "SIMULATION",
+      "ratio": 7.19
+    },
+    {
+      "text": "Stop fleet",
+      "ratio": 5.85
+    },
+    {
+      "text": "V",
+      "ratio": 5.3
+    },
+    {
+      "text": "validationadmin · Sign out",
+      "ratio": 6.65
+    },
+    {
+      "text": "admin · Sign out",
+      "ratio": 7.19
+    },
+    {
+      "text": "AUTONOMOUS OPERATIONS, UNDER YOUR AUTHORITY",
+      "ratio": 5.97
+    },
+    {
+      "text": "Mission control",
+      "ratio": 10.92
+    },
+    {
+      "text": "Your fleet, its decisions, and the proof behind every move.",
+      "ratio": 5.97
+    },
+    {
+      "text": "Guided showcase",
+      "ratio": 8.18
+    },
+    {
+      "text": "New mission",
+      "ratio": 7.17
+    },
+    {
+      "text": "Fleet connected",
+      "ratio": 7.33
+    },
+    {
+      "text": "03robots",
+      "ratio": 13.39
+    },
+    {
+      "text": "robots",
+      "ratio": 7.33
+    },
+    {
+      "text": "Execution authority",
+      "ratio": 7.33
+    },
+    {
+      "text": "Permits enforced",
+      "ratio": 13.39
+    },
+    {
+      "text": "Current mission",
+      "ratio": 7.33
+    },
+    {
+      "text": "Ready to begin",
+      "ratio": 13.39
+    },
+    {
+      "text": "Shared experience",
+      "ratio": 7.33
+    },
+    {
+      "text": "1corroborated cells",
+      "ratio": 13.39
+    },
+    {
+      "text": "corroborated cells",
+      "ratio": 7.33
+    },
+    {
+      "text": "FACILITY TWIN",
+      "ratio": 7.6
+    },
+    {
+      "text": "Meridian Life Sciences",
+      "ratio": 13.9
+    },
+    {
+      "text": "Live simulationTelemetry connected",
+      "ratio": 5.46
+    },
+    {
+      "text": "Telemetry connected",
+      "ratio": 7.6
+    },
+    {
+      "text": "3D facility",
+      "ratio": 7.29
+    },
+    {
+      "text": "Floor plan",
+      "ratio": 7.65
+    },
+    {
+      "text": "36 × 26 m",
+      "ratio": 6.6
+    },
+    {
+      "text": "robot-3Standby",
+      "ratio": 13.72
+    },
+    {
+      "text": "Standby",
+      "ratio": 7.5
+    },
+    {
+      "text": "Humanoid navigator · 0.00 m/s",
+      "ratio": 7.5
+    },
+    {
+      "text": "CarrierPersonController target",
+      "ratio": 7.6
+    },
+    {
+      "text": "Select a robot to inspect",
+      "ratio": 7.6
+    },
+    {
+      "text": "Your fleet 3",
+      "ratio": 10.92
+    },
+    {
+      "text": "3",
+      "ratio": 11.66
+    },
+    {
+      "text": "Movement permissions are checked per robot",
+      "ratio": 5.97
+    },
+    {
+      "text": "robot-1Standby",
+      "ratio": 13.39
+    },
+    {
+      "text": "Standby",
+      "ratio": 6.7
+    },
+    {
+      "text": "Mobile carrier",
+      "ratio": 7.33
+    },
+    {
+      "text": "0.00 m/s · X 6.0 · Y 23.5",
+      "ratio": 7.33
+    },
+    {
+      "text": "·",
+      "ratio": 7.33
+    },
+    {
+      "text": "robot-2Standby",
+      "ratio": 13.39
+    },
+    {
+      "text": "Standby",
+      "ratio": 6.7
+    },
+    {
+      "text": "Mobile carrier",
+      "ratio": 7.33
+    },
+    {
+      "text": "0.00 m/s · X 30.0 · Y 2.5",
+      "ratio": 7.33
+    },
+    {
+      "text": "·",
+      "ratio": 7.33
+    },
+    {
+      "text": "robot-3Standby",
+      "ratio": 12.65
+    },
+    {
+      "text": "Standby",
+      "ratio": 6.7
+    },
+    {
+      "text": "Humanoid navigator",
+      "ratio": 6.92
+    },
+    {
+      "text": "0.00 m/s · X 18.0 · Y 9.0",
+      "ratio": 6.92
+    },
+    {
+      "text": "·",
+      "ratio": 6.92
+    },
+    {
+      "text": "Deterministic planner",
+      "ratio": 12.12
+    },
+    {
+      "text": "Deterministic planning is active. Model-backed capabilities are n",
+      "ratio": 6.63
+    },
+    {
+      "text": "Vision not configured",
+      "ratio": 7.33
+    },
+    {
+      "text": "MISSION DESK",
+      "ratio": 7.33
+    },
+    {
+      "text": "What happens next?",
+      "ratio": 13.39
+    },
+    {
+      "text": "DestinationChoose a destinationCold storage · C-01Quality lab · Q",
+      "ratio": 5.62
+    },
+    {
+      "text": "Choose an open floor point",
+      "ratio": 8.18
+    },
+    {
+      "text": "Assigned robotrobot-1 · Mobile carrierrobot-2 · Mobile carrierrob",
+      "ratio": 5.62
+    },
+    {
+      "text": "Mission instruction Optional",
+      "ratio": 5.62
+    },
+    {
+      "text": "Optional",
+      "ratio": 7.33
+    },
+    {
+      "text": "Every move is checked before the controller may act.",
+      "ratio": 7.33
+    },
+    {
+      "text": "Save draft",
+      "ratio": 8.18
+    },
+    {
+      "text": "Launch mission",
+      "ratio": 7.17
+    },
+    {
+      "text": "Trust in every step",
+      "ratio": 11.79
+    },
+    {
+      "text": "MISSION EVIDENCE",
+      "ratio": 7.12
+    },
+    {
+      "text": "Plan",
+      "ratio": 11.79
+    },
+    {
+      "text": "Waiting for a mission",
+      "ratio": 6.45
+    },
+    {
+      "text": "01",
+      "ratio": 6.45
+    },
+    {
+      "text": "Govern",
+      "ratio": 11.79
+    },
+    {
+      "text": "No decision yet",
+      "ratio": 6.45
+    },
+    {
+      "text": "02",
+      "ratio": 6.45
+    },
+    {
+      "text": "Permit",
+      "ratio": 11.79
+    },
+    {
+      "text": "No move admitted yet",
+      "ratio": 6.45
+    },
+    {
+      "text": "03",
+      "ratio": 6.45
+    },
+    {
+      "text": "Learn",
+      "ratio": 11.79
+    },
+    {
+      "text": "1 corroborated cells",
+      "ratio": 6.45
+    },
+    {
+      "text": "04",
+      "ratio": 6.45
+    },
+    {
+      "text": "Inspect security & permissions",
+      "ratio": 6.45
+    },
+    {
+      "text": "Behind every move",
+      "ratio": 13.39
+    },
+    {
+      "text": "Decisions appear here when a mission begins.",
+      "ratio": 7.33
+    },
+    {
+      "text": "Decision trail",
+      "ratio": 7.33
+    },
+    {
+      "text": "Shared learning",
+      "ratio": 7.33
+    },
+    {
+      "text": "Scenario lab",
+      "ratio": 7.33
+    },
+    {
+      "text": "Your next mission starts the story.",
+      "ratio": 7.33
+    },
+    {
+      "text": "Launch a transfer to follow the plan, gate checks and controller ",
+      "ratio": 7.33
+    },
+    {
+      "text": "Open detailed inspection",
+      "ratio": 8.18
+    },
+    {
+      "text": "Connected to the simulation",
+      "ratio": 5.97
+    },
+    {
+      "text": "Plans propose. Permits authorize. Evidence stays.",
+      "ratio": 5.97
+    }
+  ],
+  "runId": "run_5ad0bddd9296",
+  "arrival": {
+    "x": 18,
+    "y": 2.775
+  }
+}

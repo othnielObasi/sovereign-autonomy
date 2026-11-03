@@ -11,21 +11,18 @@ import { Bloom, EffectComposer, N8AO, SMAA, Vignette } from "@react-three/postpr
 import * as THREE from "three";
 import { RiskHeatmap, RobotSafety, Trail, CameraFootprint, MiniMap } from "./MapLayers";
 import { FrameBudget } from "./FrameBudget";
-import { Building } from "./Building";
-import { Racking } from "./Racking";
-import { Equipment } from "./Equipment";
-import { Features, Forklift, Obstacle, Robot, VERDICT_COLOURS, Worker, ZoneCones, ZoneMarking } from "./Actors";
+import { WarehouseToolbar } from "./WarehouseToolbar";
+import { FacilityEnvironment } from "./FacilityEnvironment";
+import { Forklift, Obstacle, FleetRobot, VERDICT_COLOURS, Worker, ZoneCones, ZoneMarking } from "./Actors";
 import type { WorldLayout } from "./textures";
 
-const StaticBuilding = memo(Building);
-const StaticRacking = memo(Racking);
-const StaticFeatures = memo(Features);
 
 export type CameraMode = "overview" | "follow" | "robot";
 type Pt = { x: number; y: number };
 export type Detection = { label: string; conf: number; dist: number; box: [number, number, number, number]; kind: string };
 
 export type TwinProps = {
+  roofMode?: "auto" | "show" | "hide";
   pathPoints?: Pt[] | null;
   showHeatmap?: boolean;
   showTrail?: boolean;
@@ -55,7 +52,7 @@ export type TwinProps = {
 
 /* ───────────────────────── camera rigs ───────────────────────── */
 
-function CameraRig({ mode, robot, center, reset, span, focus }: { span: number; focus: Pt | null; reset: number; mode: CameraMode; robot: React.MutableRefObject<{ x: number; y: number; theta: number }>; center: THREE.Vector3 }) {
+function CameraRig({ mode, robot, center, reset, span, focus, eyeHeight }: { eyeHeight: number; span: number; focus: Pt | null; reset: number; mode: CameraMode; robot: React.MutableRefObject<{ x: number; y: number; theta: number }>; center: THREE.Vector3 }) {
   const { camera } = useThree();
   const look = useRef(new THREE.Vector3().copy(center));
   const pos = useRef(new THREE.Vector3());
@@ -83,8 +80,8 @@ function CameraRig({ mode, robot, center, reset, span, focus }: { span: number; 
       pos.current.set(r.x - fx * 4.2, 3.1, -r.y - fz * 4.2);
       look.current.lerp(lookTarget.current.set(r.x + fx * 3, 0.5, -r.y + fz * 3), snap.current ? 1 : k);
     } else {
-      pos.current.set(r.x + fx * 0.37, 0.76, -r.y + fz * 0.37);
-      look.current.set(r.x + fx * 6, 0.45, -r.y + fz * 6);
+      pos.current.set(r.x + fx * 0.37, eyeHeight, -r.y + fz * 0.37);
+      look.current.set(r.x + fx * 6, eyeHeight-.05, -r.y + fz * 6);
     }
     camera.position.lerp(pos.current, mode === "robot" || snap.current ? 1 : k);
     snap.current = false;
@@ -269,15 +266,12 @@ function Scene(props: TwinProps & { focus: Pt | null; onCameraFootprint: (points
         <WarehouseEnvironment />
       </Suspense>
 
-      <StaticBuilding world={layout} />
+      <FacilityEnvironment world={layout} roofMode={props.roofMode} />
       {props.pickingGoal && mode === "overview" && <mesh position={[center.x, 0.045, center.z]} rotation={[-Math.PI / 2, 0, 0]} onClick={(e) => {
         if (e.delta > 5) return;
         e.stopPropagation();
         props.onGoalPick?.({ x: Math.round(e.point.x * 100) / 100, y: Math.round(-e.point.z * 100) / 100 });
       }}><planeGeometry args={[g.max_x - g.min_x, g.max_y - g.min_y]} /><meshBasicMaterial color="#38bdf8" transparent opacity={0.07} depthWrite={false} /></mesh>}
-      <StaticRacking racks={layout.racks.filter((r: any) => !r.kind || r.kind === "rack")} />
-      <Equipment items={layout.racks as any} />
-      <StaticFeatures features={layout.features ?? []} />
 
       {statics.map((o, i) => (
         <group key={`${o.type}-${i}`} onClick={(e) => { e.stopPropagation(); props.onSelect({ kind: "obstacle", index: obstacles.indexOf(o) }); }}><Obstacle o={o} /></group>
@@ -292,9 +286,9 @@ function Scene(props: TwinProps & { focus: Pt | null; onCameraFootprint: (points
         <group key={p.name ?? i} onClick={(e) => { e.stopPropagation(); props.onSelect({ kind: "person", index: i }); }}><Worker heading={p.heading} label={mode !== "robot" ? p.name ?? p.label ?? `Worker ${i + 1}` : undefined} id={p.name ?? String(i)} x={p.x} y={p.y} highlight={overlay && props.slow !== null && Math.hypot(p.x - rx, p.y - ry) < props.slow} /></group>
       ))}
       {idle.map((r: any, i: number) => (
-        <Robot key={`idle-${i}`} x={r.x} y={r.y} theta={r.theta ?? 0} verdict="IDLE" idle label={mode !== "robot" ? r.label ?? `Robot ${i + 2}` : undefined} />
+        <FleetRobot robot_kind={r.robot_kind} key={`idle-${i}`} x={r.x} y={r.y} theta={r.theta ?? 0} verdict={r.speed>.01?"APPROVED":"IDLE"} idle={!(r.speed>.01)} label={mode !== "robot" ? r.label ?? r.robot_id ?? `Robot ${i + 2}` : undefined} />
       ))}
-      <group onClick={(e) => { e.stopPropagation(); props.onSelect({ kind: "robot", index: 0 }); }}><Robot x={rx} y={ry} theta={rth} verdict={v} pose={props.robotPose} /></group>
+      <group onClick={(e) => { e.stopPropagation(); props.onSelect({ kind: "robot", index: 0 }); }}><FleetRobot robot_kind={telemetry?.robot_kind} x={rx} y={ry} theta={rth} verdict={v} pose={props.robotPose} /></group>
 
       {overlay && (
         <group>
@@ -337,7 +331,7 @@ function Scene(props: TwinProps & { focus: Pt | null; onCameraFootprint: (points
           ))}
           {ghostTarget && (
             <>
-              <Robot x={ghostTarget.x} y={ghostTarget.y} theta={Math.atan2(ghostTarget.y - ry, ghostTarget.x - rx)} verdict={v} ghost />
+              <FleetRobot robot_kind={telemetry?.robot_kind} x={ghostTarget.x} y={ghostTarget.y} theta={Math.atan2(ghostTarget.y - ry, ghostTarget.x - rx)} verdict={v} ghost />
               <Line points={[[rx, 0.05, -ry], [ghostTarget.x, 0.05, -ghostTarget.y]]} color={VERDICT_COLOURS[v]} lineWidth={2} dashed dashSize={0.2} gapSize={0.15} />
             </>
           )}
@@ -357,7 +351,7 @@ function Scene(props: TwinProps & { focus: Pt | null; onCameraFootprint: (points
         </group>
       )}
 
-      <CameraRig mode={mode} robot={props.robotPose} center={center} reset={props.reset} span={span} focus={props.focus} />
+      <CameraRig eyeHeight={telemetry?.robot_kind === "humanoid" ? 1.61 : .76} mode={mode} robot={props.robotPose} center={center} reset={props.reset} span={span} focus={props.focus} />
       <CameraFootprint onChange={props.onCameraFootprint} />
       <DetectionProbe active={mode === "robot"} items={detItems} onDetections={props.onDetections} racks={layout.racks} />
       {mode === "overview" && <OrbitControls key={props.reset} target={props.focus ? [props.focus.x, 0, -props.focus.y] : center} maxPolarAngle={Math.PI / 2.15} minDistance={4} maxDistance={span * 2} enableDamping />}
@@ -501,6 +495,7 @@ export default function Warehouse3D(props: TwinProps) {
   const [autoLow, setAutoLow] = useState(true);
   const [fps, setFps] = useState<number | null>(null);
   const [showRoutes, setShowRoutes] = useState(true);
+  const [roofMode,setRoofMode] = useState<"auto" | "show" | "hide">("auto");
   const quality = qualityChoice === "auto" ? (autoLow ? "low" : "high") : qualityChoice;
   const onFrameSample = useCallback((value: number) => { setFps(value); if (value < 35) setAutoLow(true); }, []);
   useEffect(() => { if (props.pickingGoal) setMode("overview"); }, [props.pickingGoal]);
@@ -510,7 +505,12 @@ export default function Warehouse3D(props: TwinProps) {
   const [lastUpdate, setLastUpdate] = useState<number | null>(null);
   const [now, setNow] = useState(Date.now());
   const [policy, setPolicy] = useState<{ stop: number; slow: number } | null>(null);
-  useEffect(() => { if (props.telemetry) setLastUpdate(Date.now()); }, [props.telemetry]);
+  useEffect(() => {
+    if (props.telemetry) {
+      const timestamp = Number(props.telemetry.timestamp)*1000;
+      setLastUpdate(Number.isFinite(timestamp)?Math.min(timestamp,Date.now()):Date.now());
+    }
+  }, [props.telemetry]);
   useEffect(() => { if (props.quality) setQualityChoice(props.quality); }, [props.quality]);
   useEffect(() => {
     const id = window.setInterval(() => setNow(Date.now()), 1000);
@@ -551,7 +551,17 @@ export default function Warehouse3D(props: TwinProps) {
   }
 
   return (
-    <div ref={containerRef} className={`relative overflow-hidden rounded-xl bg-slate-900 ${props.className ?? ""}`} style={{ minHeight: 240, ...(fullscreen ? { height: "100vh" } : {}) }}>
+    <div ref={containerRef} className={`warehouse-view ${props.className ?? ""}`} style={{ minHeight: 240, ...(fullscreen ? { height: "100vh" } : {}) }}>
+      <WarehouseToolbar mode={mode} setMode={setMode} age={age} fullscreen={fullscreen} toggleFullscreen={toggleFullscreen}
+        reset={()=>{setFocus(null);setReset(n=>n+1);}} inspect={()=>setSelection({kind:"robot",index:0})}
+        showMap={showMap} toggleMap={()=>setShowMap(!showMap)} heatmap={heatmap} trail={trail}
+        toggleHeatmap={props.showHeatmap===undefined?()=>setHeatmapLocal(!heatmap):undefined}
+        toggleTrail={props.showTrail===undefined?()=>setTrailLocal(!trail):undefined}
+        overlay={overlay} toggleOverlay={()=>setOverlay(!overlay)} waypoints={props.planWaypoints?.length||0}
+        showRoutes={showRoutes} toggleRoutes={()=>setShowRoutes(!showRoutes)} qualityChoice={qualityChoice}
+        setQuality={(q:"auto"|"high"|"low")=>{setQualityChoice(q);setAutoLow(true);}} quality={quality} fps={fps}
+        cleanroom={props.world.racks?.some((r:any)=>r.kind==='partition')} roofMode={roofMode} setRoofMode={setRoofMode}/>
+      <div className="warehouse-scene">
       <RenderBoundary><Canvas fallback={<div className="p-8 text-slate-200">WebGL is unavailable. Use the dashboard’s 2D map.</div>} shadows={quality === "high"} dpr={quality === "low" ? 1 : [1, 1.5]} gl={{ antialias: true, powerPreference: "high-performance" }} onCreated={({ gl }) => {
         gl.toneMapping = THREE.ACESFilmicToneMapping;
         gl.toneMappingExposure = 1.05;
@@ -561,43 +571,19 @@ export default function Warehouse3D(props: TwinProps) {
         <ContextMonitor onLost={setContextLost} />
         <ShadowBudget enabled={quality === "high"} />
         <FrameBudget onSample={onFrameSample} />
-        <Scene {...props} world={normalizedWorld} goal={resolvedGoal} goalLabel={props.destinationBayId ?? props.goalLabel} showHeatmap={heatmap} showTrail={trail} trailPoints={props.trailPoints ?? liveTrail.current} focus={focus} onCameraFootprint={setCameraFootprint} pathPoints={showRoutes ? props.pathPoints : null} planWaypoints={showRoutes ? props.planWaypoints : null} executedPath={showRoutes ? props.executedPath : undefined} quality={quality} reset={reset} stop={policy?.stop ?? null} slow={policy?.slow ?? null} onSelect={setSelection} mode={mode} overlay={overlay} onDetections={setDets} robotPose={robotPose} />
+        <Scene {...props} roofMode={roofMode} world={normalizedWorld} goal={resolvedGoal} goalLabel={props.destinationBayId ?? props.goalLabel} showHeatmap={heatmap} showTrail={trail} trailPoints={props.trailPoints ?? liveTrail.current} focus={focus} onCameraFootprint={setCameraFootprint} pathPoints={showRoutes ? props.pathPoints : null} planWaypoints={showRoutes ? props.planWaypoints : null} executedPath={showRoutes ? props.executedPath : undefined} quality={quality} reset={reset} stop={policy?.stop ?? null} slow={policy?.slow ?? null} onSelect={setSelection} mode={mode} overlay={overlay} onDetections={setDets} robotPose={robotPose} />
       </Canvas></RenderBoundary>
       {contextLost && <div role="alert" className="absolute inset-0 z-30 grid place-items-center bg-slate-950/95 text-white">Graphics connection lost. <button className="underline" onClick={() => window.location.reload()}>Reload 3D view</button></div>}
 
-      {/* controls */}
-      <button aria-label={fullscreen ? "Exit fullscreen" : "Fullscreen"} title={fullscreen ? "Exit fullscreen" : "Fullscreen"} aria-pressed={fullscreen} className="absolute top-2 right-2 z-20 rounded-md bg-slate-800/90 px-2 py-1 text-xs text-slate-100 hover:bg-slate-700" onClick={toggleFullscreen}>{fullscreen ? "⛶ Exit" : "⛶ Fullscreen"}</button>
-      <div className="absolute top-3 left-3 right-32 flex w-fit max-w-[calc(100%-9rem)] flex-wrap gap-1 bg-slate-950/70 backdrop-blur rounded-lg p-1 border border-white/10">
-        {MODES.map((m) => (
-          <button aria-pressed={mode === m.key} key={m.key} onClick={() => setMode(m.key)} className={`px-2.5 py-1 rounded-md text-xs font-semibold transition ${mode === m.key ? "bg-cyan-500 text-slate-950" : "text-slate-200 hover:bg-white/10"}`}>
-            {m.label}
-          </button>
-        ))}
-      </div>
-      <div className="absolute top-14 left-3 right-3 flex flex-wrap gap-2 text-xs text-slate-100">
-        <span role="status" className={`rounded px-2 py-1 ${age !== null && age < 3 ? "bg-emerald-950/90" : "bg-amber-950/90"}`}>{age === null ? "Waiting for telemetry" : age < 3 ? "Live · updated just now" : `Reconnecting · last update ${age}s ago`}</span>
-        <button className="rounded bg-slate-950/80 px-2 py-1" onClick={() => { setFocus(null); setReset((n) => n + 1); }}>Reset camera</button>
-        <label className="rounded bg-slate-950/80 px-2 py-1">Quality <select aria-label="Rendering quality" className="bg-slate-900" value={qualityChoice} onChange={(e) => { setQualityChoice(e.target.value as "auto" | "high" | "low"); setAutoLow(true); }}><option value="auto">Auto</option><option value="high">High</option><option value="low">Low</option></select></label>
-        <button aria-pressed={showMap} className="rounded bg-slate-950/80 px-2 py-1" onClick={() => setShowMap(!showMap)}>Minimap</button>
-        {props.showHeatmap === undefined && <button aria-pressed={heatmap} className="rounded bg-slate-950/80 px-2 py-1" onClick={() => setHeatmapLocal(!heatmap)}>Heatmap</button>}
-        {props.showTrail === undefined && <button aria-pressed={trail} className="rounded bg-slate-950/80 px-2 py-1" onClick={() => setTrailLocal(!trail)}>Trail</button>}
-        <span className="rounded bg-slate-950/80 px-2 py-1 text-slate-300">{fps === null ? "Measuring FPS" : `${fps} FPS`} · {quality}</span>
-        {props.planWaypoints?.length ? <button aria-pressed={showRoutes} className="rounded bg-slate-950/80 px-2 py-1" onClick={() => setShowRoutes(!showRoutes)}>{showRoutes ? "Hide route" : "Show route"} · {props.planWaypoints.length} waypoints</button> : null}
-        <button className="rounded bg-slate-950/80 px-2 py-1" onClick={() => setSelection({ kind: "robot", index: 0 })}>Inspect robot</button>
-      </div>
       {fullscreenError && <p role="alert" className="absolute bottom-36 left-3 rounded bg-red-950/90 p-2 text-xs text-red-200">{fullscreenError}</p>}
       {showMap && <MiniMap world={{ ...props.world, racks: props.world.racks ?? [] }} telemetry={props.telemetry} points={cameraFootprint} onNavigate={(point) => { setMode("overview"); setFocus(point); setReset(n => n + 1); }} />}
-      <output aria-label="Warehouse map status" className="sr-only">Execution {props.safetyState ?? "OK"}. Heatmap {heatmap ? "on" : "off"}. Trail {trail ? "on" : "off"}. Proposed path {props.pathPoints?.length ?? 0} points. Approved plan {props.planWaypoints?.length ?? 0} waypoints. Executed path {props.executedPath?.length ?? 0} points. Risk cells {props.riskCells?.length ?? 0}. Trail samples {(props.trailPoints ?? liveTrail.current).length}.</output>
-      {selection && <div className="absolute right-3 top-36 sm:top-28 z-20 max-w-[240px] rounded-lg border border-white/20 bg-slate-950/95 p-3 text-xs text-slate-200" aria-live="polite">
+      <output aria-label="Warehouse map status" className="sr-only">Execution {props.safetyState ?? "OK"}. Heatmap {heatmap ? "on" : "off"}. Trail {trail ? "on" : "off"}. Proposed path {props.pathPoints?.length ?? 0} points. Recorded plan {props.planWaypoints?.length ?? 0} waypoints. Executed path {props.executedPath?.length ?? 0} points. Risk cells {props.riskCells?.length ?? 0}. Trail samples {(props.trailPoints ?? liveTrail.current).length}.</output>
+      {selection && <div className="absolute right-3 top-3 z-20 max-w-[240px] rounded-lg border border-white/20 bg-slate-950/95 p-3 text-xs text-slate-200" aria-live="polite">
         <button aria-label="Close inspection" className="float-right ml-4" onClick={() => setSelection(null)}>×</button>
         <strong>{selection.kind === "robot" ? "Active robot" : selected?.name ?? selected?.type?.replaceAll("_", " ") ?? "Worker"}</strong>
         {selected ? <><p className="mt-2">Position: {Number(selected.x).toFixed(2)}, {Number(selected.y).toFixed(2)} m</p><p>Speed: {Number.isFinite(selected.speed) ? `${selected.speed.toFixed(2)} m/s` : "Unavailable"}</p>{selection.kind === "robot" ? <><p>Nearest person / obstacle edge: {Number.isFinite(nearestClearance) ? `${nearestClearance.toFixed(2)} m` : "None reported"}</p><p>Gate: {v}</p><p>{props.verdictText ?? props.proposal?.rationale ?? "No decision reported"}</p></> : <><p>Distance to robot: {distance?.toFixed(2) ?? "—"} m</p>{selected.activity && <p>Activity: {selected.activity.replaceAll("_", " ")}</p>}{selected.destination && <p>Destination: {selected.destination}</p>}</>}{age !== null && age >= 3 && <p className="text-amber-300">Stale telemetry</p>}</> : <p className="mt-2">Object no longer reported.</p>}
       </div>}
-      {mode !== "robot" && <div className="absolute bottom-3 left-3 right-3 rounded bg-slate-950/85 p-2 text-[11px] text-slate-200 pointer-events-none">{overlay ? <><span className="text-red-300">Stop {policy ? `${policy.stop} m` : "unavailable"}</span> · <span className="text-amber-300">Slow {policy ? `${policy.slow} m` : "unavailable"}</span> · <span className="text-blue-300">Proposed path</span> · <span className="text-purple-300">Approved plan</span> · <span className="text-green-300">Executed route / goal</span></> : "Governance layer hidden"}<span className="block text-slate-400">{props.world.geofence.max_x - props.world.geofence.min_x}×{props.world.geofence.max_y - props.world.geofence.min_y} m · {props.pickingGoal ? "Click open floor to choose a destination" : mode === "overview" ? "Drag to orbit · scroll to zoom · click actors or route points to inspect" : "Click an actor to inspect · Overview enables orbit controls"}</span></div>}
-      <button aria-pressed={overlay} onClick={() => setOverlay(!overlay)} className="absolute top-3 right-3 px-2.5 py-1 rounded-md text-xs font-semibold bg-slate-950/70 backdrop-blur border border-white/10 text-slate-200 hover:bg-slate-800">
-        {overlay ? "Governance: on" : "Governance: off"}
-      </button>
-
+      {mode !== "robot" && <div className="absolute bottom-3 left-3 right-3 rounded bg-slate-950/85 p-2 text-[11px] text-slate-200 pointer-events-none">{overlay ? <><span className="text-red-300">Stop {policy ? `${policy.stop} m` : "unavailable"}</span> · <span className="text-amber-300">Slow {policy ? `${policy.slow} m` : "unavailable"}</span> · <span className="text-blue-300">Proposed path</span> · <span className="text-purple-300">Recorded plan</span> · <span className="text-green-300">Executed route / goal</span></> : "Governance layer hidden"}<span className="block text-slate-400">{props.world.geofence.max_x - props.world.geofence.min_x}×{props.world.geofence.max_y - props.world.geofence.min_y} m · {props.pickingGoal ? "Click open floor to choose a destination" : mode === "overview" ? "Drag to orbit · scroll to zoom · click actors or route points to inspect" : "Click an actor to inspect · Overview enables orbit controls"}</span></div>}
       {/* robot-eye heads-up display */}
       {mode === "robot" && (
         <div className="pointer-events-none absolute inset-0">
@@ -619,6 +605,7 @@ export default function Warehouse3D(props: TwinProps) {
           </div>
         </div>
       )}
+      </div>
     </div>
   );
 }

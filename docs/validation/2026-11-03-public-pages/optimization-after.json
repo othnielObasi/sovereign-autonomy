@@ -1,0 +1,30 @@
+[
+  {
+    "width": 1440,
+    "route": "/",
+    "height": 6661,
+    "sections": 7,
+    "htmlBytes": 36442
+  },
+  {
+    "width": 1440,
+    "route": "/how-it-works",
+    "height": 8183,
+    "sections": 6,
+    "htmlBytes": 75340
+  },
+  {
+    "width": 390,
+    "route": "/",
+    "height": 9315,
+    "sections": 7,
+    "htmlBytes": 36442
+  },
+  {
+    "width": 390,
+    "route": "/how-it-works",
+    "height": 14733,
+    "sections": 6,
+    "htmlBytes": 75340
+  }
+]

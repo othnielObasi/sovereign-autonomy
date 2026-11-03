@@ -29,14 +29,22 @@ def main():
     for name in ("MODEL_API_KEY", "BASETEN_API_KEY", "NEBIUS_API_KEY", "GEMINI_API_KEY", "LANGSMITH_API_KEY",
                  "TAVILY_API_KEY", "OTEL_EXPORTER_OTLP_ENDPOINT"):
         env[name] = ""
+    live_integrations = os.environ.get("BROWSER_LIVE_INTEGRATIONS") == "1"
+    if live_integrations:
+        from dotenv import dotenv_values
+        configured = dotenv_values(ROOT / 'backend/.env')
+        # Explicit opt-in, bounded validation only. Do not enable external tracing.
+        for name in ("MODEL_API_KEY", "BASETEN_API_KEY", "TAVILY_API_KEY"):
+            env[name] = configured.get(name) or ""
+        env.update(LLM_ENABLED="true", VISION_ENABLED="false", REQUIRE_LLM_PLAN_AT_START="true")
     env.update(ENVIRONMENT="development", AUTH_REQUIRED="false", ALLOW_DEV_TOKENS="true", AUTH_ACCOUNTS="",
-               PUBLIC_DEMO="false", PYTHONIOENCODING="utf-8", RUN_MIGRATIONS_ON_START="false", SITE_LAYOUT="factory",
+               PUBLIC_DEMO="false", PYTHONIOENCODING="utf-8", RUN_MIGRATIONS_ON_START="false", SITE_LAYOUT=os.environ.get("BROWSER_SITE_LAYOUT", "factory"),
                DATABASE_URL="sqlite:///" + str(STATE / f"app-{session}.db").replace("\\", "/"),
                AUTHORITY_DB_PATH=str(STATE / f"authority-{session}.db"), SIM_STATE_DB=str(STATE / f"controller-{session}.db"),
                EXPERIENCE_ANCHOR_PATH=str(STATE / f'anchor-{session}.sqlite'), RECEIPT_SIGNING_KEY='',
                RECEIPT_SIGNING_KEY_FILE=str(STATE / f'receipt-{session}.key'),
                SIM_BASE_URL="http://127.0.0.1:18090", AUTHORITY_BASE_URL="http://127.0.0.1:18080",
-               BACKEND_URL="http://127.0.0.1:18080", NEXT_DIST_DIR=".next-validation",
+               BACKEND_URL="http://127.0.0.1:18080", NEXT_DIST_DIR=os.environ.get("BROWSER_NEXT_DIST_DIR", ".next-validation"),
                PERMIT_SECRET="browser-validation-only-secret-0123456789abcdef", SIM_TOKEN="",
                JWT_SECRET="browser-validation-only-jwt-0123456789abcdef", PYTHONPATH=str(ROOT / "backend"))
     commands = [
@@ -65,20 +73,23 @@ def main():
                     raise TimeoutError("validation stack not ready")
                 time.sleep(0.25)
         print("Validation stack ready at http://127.0.0.1:19300", flush=True)
-        # Signed fixture for exercising eligibility/rejection in the isolated UI;
-        # it is labelled explicitly and is not presented as a real mission outcome.
-        os.environ.update(env)
-        sys.path.insert(0, str(ROOT / "backend"))
-        from app.autonomy.experience import context_from_state
-        from app.services.route_learning import RouteMemory
-        telemetry = httpx.get("http://127.0.0.1:18090/telemetry", trust_env=False).json()
-        policy = httpx.get("http://127.0.0.1:18080/agent/lessons", trust_env=False).json()["policy_version"]
-        context = context_from_state(telemetry, policy)
-        fixture = RouteMemory(env["AUTHORITY_DB_PATH"], env["PERMIT_SECRET"].encode(), anchor_path=env['EXPERIENCE_ANCHOR_PATH'])
-        for source in ['robot-A (fixture)', 'robot-C (fixture)']:
-            fixture.record(f"browser-fixture-{source}-{time.time_ns()}", [((6, 7), 4.0, "STOP")],
-                           context=context, source_robot_id=source)
-        print("Signed browser fixture ready", flush=True)
+        if live_integrations:
+            print('Live validation: no synthetic experience seeded', flush=True)
+        else:
+            # Signed fixture for exercising eligibility/rejection in the isolated UI;
+            # it is labelled explicitly and is not presented as a real mission outcome.
+            os.environ.update(env)
+            sys.path.insert(0, str(ROOT / "backend"))
+            from app.autonomy.experience import context_from_state
+            from app.services.route_learning import RouteMemory
+            telemetry = httpx.get("http://127.0.0.1:18090/telemetry", trust_env=False).json()
+            policy = httpx.get("http://127.0.0.1:18080/agent/lessons", trust_env=False).json()["policy_version"]
+            context = context_from_state(telemetry, policy)
+            fixture = RouteMemory(env["AUTHORITY_DB_PATH"], env["PERMIT_SECRET"].encode(), anchor_path=env['EXPERIENCE_ANCHOR_PATH'])
+            for source in ['robot-A (fixture)', 'robot-C (fixture)']:
+                fixture.record(f"browser-fixture-{source}-{time.time_ns()}", [((6, 7), 4.0, "STOP")],
+                               context=context, source_robot_id=source)
+            print("Signed browser fixture ready", flush=True)
         while not stop.exists():
             if any(p.poll() is not None for p in processes):
                 raise RuntimeError("validation service exited")

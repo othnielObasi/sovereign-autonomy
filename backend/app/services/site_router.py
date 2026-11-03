@@ -101,9 +101,14 @@ def route_plan(world: Dict[str, Any], start: Dict[str, Any], goal: Dict[str, Any
         return None
     extra = [Circle(float(avoid["x"]), float(avoid["y"]), 0.8, "blocked")] if avoid else []
     extra += hazard_circles(hazards)
-    from app.autonomy.experience import context_from_world
+    from app.autonomy.experience import context_from_world, context_from_state
+    from app.autonomy.robot_profiles import observed_profile
     from app.policies.versioning import policy_version_hash
-    context = context_from_world(world, policy_version_hash())
+    context = (context_from_state(start, policy_version_hash()) if 'capability_profile_version' in start
+               else context_from_world(world, policy_version_hash()))
+    profile = observed_profile(start)
+    if profile and profile.max_speed_mps is not None:
+        max_speed = min(max_speed, profile.max_speed_mps)
     route = _route(layout, (float(start["x"]), float(start["y"])), (float(goal["x"]), float(goal["y"])), extra, context)
     if not route:
         return None
@@ -119,17 +124,21 @@ def repair_plan(world: Dict[str, Any], start: Dict[str, Any], waypoints: List[Wa
                 speed_limits: Dict[str, float]) -> Tuple[List[Waypoint], int]:
     """Re-route any leg that runs through racking; keeps every original waypoint as a via-point."""
     racks = _racks_from_world(world or {})
-    if not racks or not waypoints:
+    if not waypoints:
         return waypoints, 0
     out: List[Waypoint] = []
     repaired = 0
-    prev = {"x": float(start["x"]), "y": float(start["y"])}
+    prev = dict(start, x=float(start["x"]), y=float(start["y"]))
     for wp in waypoints:
         if path_blocked(prev["x"], prev["y"], float(wp["x"]), float(wp["y"]), racks):
-            leg = route_plan(world, prev, wp, speed_limits, max_speed=float(wp.get("max_speed", 0.5)))
+            leg = route_plan(world, dict(start, **prev), wp, speed_limits, max_speed=float(wp.get("max_speed", 0.5)))
             if leg:
                 out.extend(leg[:-1])
                 repaired += 1
+        from app.autonomy.robot_profiles import observed_profile
+        profile = observed_profile(start)
+        if profile and profile.max_speed_mps is not None:
+            wp = dict(wp, max_speed=min(float(wp.get('max_speed', .5)), profile.max_speed_mps))
         out.append(wp)
         prev = wp
     return out, repaired

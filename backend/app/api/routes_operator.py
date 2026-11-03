@@ -1,91 +1,108 @@
 from __future__ import annotations
 
-from fastapi import APIRouter, HTTPException, Depends
-from pydantic import BaseModel
+import asyncio
 from typing import Optional
+from fastapi import APIRouter, Depends, HTTPException
+from pydantic import BaseModel, Field
+from sqlalchemy.orm import Session
+from app.auth.roles import OPERATOR_ALWAYS
+from app.deps import get_db
+from app.db.models import Run
+from app.autonomy.core import Rejected
 from app.services import operator_approval as approval_svc
-from app.utils.hashing import sha256_canonical
-from app.auth.jwt import get_current_user
-from app.auth.roles import ADMIN, OPERATOR
+from app.services import operator_controls as controls
 
-router = APIRouter(prefix="/operator", tags=["operator"])
+router = APIRouter(prefix='/operator', tags=['operator'])
 
 
 class ApproveRequest(BaseModel):
     run_id: str
     proposal: dict
-    notes: Optional[str] = None
+    decision_event_id: str
+    notes: str = Field(min_length=5, max_length=1000)
 
 
 class OverrideRequest(BaseModel):
     run_id: str
-    action: str  # "resume"|"force_approve"|"replan"
-    reason: str
+    action: str
+    reason: str = Field(min_length=5, max_length=1000)
+    decision_event_id: Optional[str] = None
 
 
-def _require_operator(current_user: str):
-    if current_user != "operator":
-        raise HTTPException(status_code=403, detail="Insufficient role")
+def service():
+    from app.api.routes_runs import get_run_svc
+    return get_run_svc()
 
 
-@router.post("/approve")
-def approve(req: ApproveRequest, current_user: str | None = Depends(OPERATOR)):
-    actor = current_user or "operator"
-    try:
-        ph = sha256_canonical({"proposal": req.proposal})
-        approval_svc.approve(req.run_id, ph, approved_by=actor, notes=req.notes)
-        return {"ok": True, "run_id": req.run_id, "proposal_hash": ph}
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+def require_run(db, run_id):
+    run = db.get(Run, run_id)
+    if run is None:
+        raise HTTPException(status_code=404, detail='Run not found')
+    return run
 
 
-@router.post("/override")
-async def operator_override(req: OverrideRequest, current_user: str | None = Depends(OPERATOR)):
-    """Operator override — allows resuming paused runs, force-approving, or triggering replan.
-
-    All overrides are logged as INTERVENTION events in the audit trail.
-    """
-    actor = current_user or "operator"
-
-    if req.action not in ("resume", "force_approve", "replan"):
-        raise HTTPException(status_code=400, detail=f"Invalid override action: {req.action}")
-
-    if not req.reason or len(req.reason) < 5:
-        raise HTTPException(status_code=400, detail="Override reason must be at least 5 characters")
-
-    # Import run_svc from routes_runs (shared singleton)
-    import app.api.routes_runs as routes_runs_module
-    run_svc = routes_runs_module.run_svc
-    if not run_svc:
-        raise HTTPException(status_code=500, detail="RunService not initialized")
-
-    from app.db.session import SessionLocal
-    from app.db.models import Run
-    db = SessionLocal()
-    try:
-        run = db.query(Run).filter(Run.id == req.run_id).first()
-        if not run:
-            raise HTTPException(status_code=404, detail="Run not found")
-
-        # Record the override as an INTERVENTION event
-        run_svc._append_event(db, req.run_id, "INTERVENTION", {
-            "type": f"OPERATOR_OVERRIDE:{req.action.upper()}",
-            "actor": actor,
-            "reason": req.reason,
-            "action": req.action,
-        })
-        db.commit()
-
-        if req.action == "resume" and run.status == "paused":
-            await run_svc.resume_run(db, req.run_id)
-            return {"ok": True, "action": "resumed", "run_id": req.run_id}
-
-        return {"ok": True, "action": req.action, "run_id": req.run_id, "note": "Override recorded"}
-    finally:
-        db.close()
+@router.get('/review/{run_id}')
+def review(run_id: str, db: Session = Depends(get_db)):
+    """Latest recorded review; eligibility is rechecked with fresh sensors on approval."""
+    result = controls.latest_review(db, require_run(db, run_id))
+    result.pop('telemetry', None)
+    return result
 
 
-@router.get("/approvals/{run_id}")
-def list_approvals(run_id: str, current_user: str | None = Depends(get_current_user)):
-    return {"run_id": run_id, "approvals": approval_svc.list_for_run(run_id)}
+@router.post('/approve')
+async def approve(req: ApproveRequest, actor: str = Depends(OPERATOR_ALWAYS), db: Session = Depends(get_db)):
+    return await apply(db, req.run_id, 'approve', req.notes.strip(), actor,
+                       req.decision_event_id, req.proposal)
 
+
+@router.post('/override')
+async def operator_override(req: OverrideRequest, actor: str = Depends(OPERATOR_ALWAYS), db: Session = Depends(get_db)):
+    """Replace and hold a route, approve an eligible review and resume, or resume normally."""
+    if req.action not in ('resume','replan','force_approve'):
+        raise HTTPException(status_code=400, detail='Invalid override action')
+    return await apply(db, req.run_id, req.action, req.reason.strip(), actor, req.decision_event_id)
+
+
+async def apply(db, run_id, action, reason, actor, event_id=None, proposal=None):
+    if len(reason) < 5:
+        raise HTTPException(status_code=422, detail='Reason must contain at least five non-padding characters')
+    svc = service()
+    lock = svc._operator_locks.setdefault(run_id, asyncio.Lock())
+    if lock.locked():
+        raise HTTPException(status_code=409, detail='operator_action_in_progress')
+    async with lock:
+        svc._operator_busy.add(run_id)
+        try:
+            run = require_run(db, run_id)
+            if action == 'replan':
+                return await controls.replan(db, svc, run, actor, reason)
+            if action in ('approve','force_approve'):
+                result = await controls.approve_review(db,svc,run,actor,reason,event_id,proposal)
+                if action == 'approve':
+                    return result
+            if run.status != 'paused':
+                raise Rejected('run_not_paused')
+            resumed = await svc.resume_run(db,run_id,operator_control=True)
+            if resumed is None:
+                raise Rejected('run_not_paused')
+            svc._append_event(db,run_id,'INTERVENTION',{'type':'OPERATOR_OVERRIDE:'+action.upper(),
+                'actor':actor,'reason':reason,'decision_event_id':event_id})
+            db.commit()
+            return {'ok':True,'action':'review_approved_and_resumed' if action=='force_approve' else 'resumed',
+                    'run_id':run_id,'status':'running',**resumed,
+                    **({'approval_id':result['approval_id'],'expires_at':result['expires_at']} if action=='force_approve' else {})}
+        except Rejected as exc:
+            raise HTTPException(status_code=409, detail=str(exc)) from exc
+        except (ValueError, KeyError) as exc:
+            raise HTTPException(status_code=409, detail='operator_context_invalid') from exc
+        except HTTPException:
+            raise
+        except Exception as exc:
+            raise HTTPException(status_code=503, detail='Operator action could not be verified; inspect the run before resuming') from exc
+        finally:
+            svc._operator_busy.discard(run_id)
+
+
+@router.get('/approvals/{run_id}')
+def list_approvals(run_id: str):
+    return {'run_id':run_id, 'approvals':approval_svc.list_for_run(run_id)}

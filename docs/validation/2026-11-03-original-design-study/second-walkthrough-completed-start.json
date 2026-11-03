@@ -1,0 +1,238 @@
+{
+  "revision": "2d3a984",
+  "scope": "Original source, original dark palette, factory simulator, isolated state; no model calls",
+  "rendering": "Original 3D inspection and robot-eye screenshots captured separately; detailed workflow uses WebGL fallback because software rendering reached about 1 FPS",
+  "steps": [
+    {
+      "name": "Original 3D views inspected separately",
+      "screens": [
+        "01-original-twin-inspection.png",
+        "02-original-robot-eye.png"
+      ]
+    },
+    {
+      "name": "Draft checkpoint",
+      "observed": "×\nPlan a mission\n\nChoose a destination, save a draft, then start a governed run.\n\nDraft saved: Original design study: factory line-side delivery\n\nThe planner builds the route when the run starts. Every move is checked by the safety gate.\n\nStart governed run\nView saved missions\nPlan another mission"
+    },
+    {
+      "name": "Start navigates into detailed run",
+      "runId": "run_4b892e289717",
+      "eventTypes": [
+        "EXPERIENCE_RETRIEVAL",
+        "PLAN",
+        "MISSION_REVIEW",
+        "DECISION",
+        "AUTHORITY",
+        "EXECUTION",
+        "ALERT"
+      ],
+      "latestDecision": {
+        "context": {
+          "telemetry": {
+            "site_id": "factory",
+            "map_version": "b4b17d6d99e309fe9a7ba008d8cf9d69ad50caf3d6cb6072ce6663806125109c",
+            "capability_profile_version": "sim-amr-radius-0.4m-v1",
+            "robot_id": "robot-1",
+            "x": 3,
+            "y": 3.5,
+            "theta": 0,
+            "speed": 0,
+            "zone": "aisle",
+            "nearest_obstacle_m": 1.1,
+            "nearest_obstacle_xy": [
+              3,
+              2
+            ],
+            "human_detected": false,
+            "human_conf": 0,
+            "human_distance_m": 9.723,
+            "walking_humans": [
+              {
+                "x": 11.58,
+                "y": 8.07,
+                "name": "Worker A",
+                "type": "worker",
+                "role": "worker",
+                "conf": 0.9,
+                "speed": 0,
+                "heading": -0.592,
+                "activity": "waiting_for_person",
+                "destination": "P-02"
+              },
+              {
+                "x": 17.49,
+                "y": 17.25,
+                "name": "Worker B",
+                "type": "worker",
+                "role": "worker",
+                "conf": 0.9,
+                "speed": 0,
+                "heading": 3.142,
+                "activity": "waiting_for_person",
+                "destination": "CNC 2 operator"
+              },
+              {
+                "x": 16.75,
+                "y": 17.25,
+                "name": "Worker C",
+                "type": "worker",
+                "role": "worker",
+                "conf": 0.9,
+                "speed": 0,
+                "heading": 1.3,
+                "activity": "working",
+                "destination": "Press operator"
+              },
+              {
+                "x": 30.87,
+                "y": 18.25,
+                "name": "Runner 1",
+                "type": "worker",
+                "role": "worker",
+                "conf": 0.9,
+                "speed": 1.081,
+                "heading": 0,
+                "activity": "walking",
+                "destination": "Crossing destination"
+              },
+              {
+                "x": 28.75,
+                "y": 24.25,
+                "name": "Runner 2",
+                "type": "worker",
+                "role": "worker",
+                "conf": 0.9,
+                "speed": 0,
+                "heading": 1.571,
+                "activity": "waiting_at_crossing",
+                "destination": "Crossing destination"
+              },
+              {
+                "x": 12.25,
+                "y": 7.75,
+                "name": "Runner 3",
+                "type": "worker",
+                "role": "worker",
+                "conf": 0.9,
+                "speed": 0,
+                "heading": -1.571,
+                "activity": "waiting_for_person",
+                "destination": "Crossing destination"
+              }
+            ],
+            "t": 124.3,
+            "boot_id": "826e4709c04d4000bd41ae3748d0eec5",
+            "generation": 22,
+            "environment_changes": [],
+            "accepted_actions": [
+              "run_2d25a79f2f47:7:491981c5144b45b684e474bb9c269365",
+              "run_2d25a79f2f47:6:4eed7c9a1eca437987d6e7e7ca1ed83e",
+              "run_2d25a79f2f47:5:e2f6229c66d44b3f8b188ae6b51ae7e1"
+            ],
+            "events": [],
+            "human": {
+              "x": 11.58,
+              "y": 8.07,
+              "name": "Worker A",
+              "type": "human",
+              "role": "primary",
+              "conf": 0.9,
+              "speed": 0,
+              "heading": -0.592,
+              "activity": "waiting_for_person",
+              "destination": "P-02",
+              "id": "nearest"
+            },
+            "idle_robots": [],
+            "obstacles": [
+              {
+                "x": 35.5,
+                "y": 8.3,
+                "r": 0.3,
+                "type": "tote_stack"
+              },
+              {
+                "x": 1,
+                "y": 19,
+                "r": 0.4,
+                "type": "handcart"
+              },
+              {
+                "x": 37.5,
+                "y": 23.6,
+                "r": 0.5,
+                "type": "pallet"
+              },
+              {
+                "x": 20.73,
+                "y": 10.51,
+                "r": 1.9,
+                "type": "forklift",
+                "heading": 0.014
+              },
+              {
+                "x": 3,
+                "y": 21.5,
+                "r": 0.4,
+                "type": "robot"
+              }
+            ],
+            "bounds": {
+              "min_x": 0,
+              "max_x": 40,
+              "min_y": 0,
+              "max_y": 25
+            },
+            "target": null,
+            "estop": {
+              "engaged": false,
+              "reason": "",
+              "since": null,
+              "robot": null
+            },
+            "deadman_trips": 2,
+            "robot_contacts": 0,
+            "sim_time": 124.3,
+            "mode": "live",
+            "seed": 42,
+            "timestamp": 1793702409.7796764,
+            "site_constraints": []
+          },
+          "mission_goal": {
+            "x": 33,
+            "y": 18.2,
+            "zone": "staging"
+          }
+        },
+        "proposal": {
+          "intent": "MOVE_TO",
+          "params": {
+            "x": 4.75,
+            "y": 3.55,
+            "max_speed": 0.5
+          },
+          "rationale": "Following plan waypoint"
+        },
+        "governance": {
+          "decision": "APPROVED",
+          "policy_hits": [],
+          "reasons": [],
+          "required_action": null,
+          "risk_score": 0,
+          "policy_state": "SAFE",
+          "hard_fail": false,
+          "hard_fail_policies": []
+        }
+      }
+    }
+  ],
+  "pageErrors": [],
+  "screens": [
+    "03-original-mission-draft.png",
+    "04-original-active-run.png",
+    "failure.png"
+  ],
+  "completed": false,
+  "failure": "locator.waitFor: Timeout 45000ms exceeded.\nCall log:\n\u001b[2m  - waiting for getByRole('button', { name: /Override & Resume/ }) to be visible\u001b[22m\n\n    at C:\\othnielObasi\\sovereignAutonomy\\backend\\data\\original-ui-review\\review.cjs:42:81",
+  "failurePage": "Sovereign Autonomy\nRUNTIME GOVERNANCE\nOverview\nMissions\nRuns\nGovernance\nAuthority\nEvidence\nGate offline\nSign in\nLive warehouse\nRuns\n/\nrun_4b892e289717\nGoverned run\n—\nOffline\nStop robot\nMISSION\nIdle\nACTION VERDICT\nAwaiting\nENVIRONMENT\nClear\nPLANNER\nIdle\nEXECUTION\nWithin Bounds\nWAREHOUSE SIMULATION\nHeatmap\nTrail\n🚶\nHuman Near\n🛑\nToo Close\n🚧\nBlocked\n💧\nSpill\n🚜\nForklift\n✅\nClear\n3D warehouse\nFloor plan\nWaiting for the warehouse simulator…\nRobot\nObstacles\nHuman\nProposed Path\nApproved Plan\nExecuted Path\nGoal\nRisk Zone\nScroll to zoom · Drag to pan\nAI MISSION PLANNER\nAutonomous: ON\n🧠\n1. Reasoning\n🗺️\n2. Plan\n🛡️\n3. Governance\n🚀\n4. Execute\n📋\n5. Audit\nPlan →\nGOVERNANCE DECISION\n⏳ Awaiting first decision…\nLearning & task\nSite & vision\nChain & telemetry\nAlerts0\nAnalysis\nEXECUTION AUTHORITY\nStop robot\nStop everything\n🎙 Voice stop\nEXPERIENCE AND ENVIRONMENT\n\nPast experience is advisory. Current conditions decide whether it can be reused.\n\nShared routing requires two distinct robot identities. Repeated missions from one robot count as one source.\n\n0 eligible\n0 advisory\n0 excluded\nNo experience considered yet\nA mission records which signed experiences its route considered.\nEnvironment changes\n\nNo environment changes recorded.\n\nTASK FOCUS\n\nEach plan must end at the mission's destination without wandering, or the aisle route is used.\n\nNo plan checked yet.\nLESSONS THE PLANNER WAS GIVEN\n0\nNo lessons near this route yet. They come from earlier runs where the gate denied moves nearby.\nREPLANS AFTER A DENIAL\n0\nNo replans: the gate hasn't blocked the same waypoint three times.\nWHAT THIS RUN TAUGHT THE PLANNER\nLessons are distilled from the gate's decisions when the run ends.\nLessons only change what the planner proposes; the gate still judges every move. All lessons →\nAI INTELLIGENCE CONSOLE: SCENE ANALYSIS, TELEMETRY INSIGHTS, FAILURE DETECTION\n▾\nSovereign Autonomy · NOVTIA · MIT licensed\nPlanning by Muse Spark · perception by SAM 3.1 · Meta Global AI Developer Hackathon"
+}

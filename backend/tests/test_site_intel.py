@@ -82,6 +82,16 @@ def test_tavily_without_key_is_offline(monkeypatch):
     assert r.live is False and r.results == []
 
 
+def test_configured_status_does_not_claim_a_verified_lookup(monkeypatch):
+    monkeypatch.setattr(settings, 'tavily_api_key', 'test-only')
+    intel = SiteIntel()
+    assert intel.status()['lookup_state'] == 'not_checked'
+    intel.lookups.appendleft({'mode': 'live'})
+    assert intel.status()['lookup_state'] == 'live'
+    intel.lookups.appendleft({'mode': 'offline_sample_after_error'})
+    assert intel.status()['lookup_state'] == 'error'
+
+
 def test_tavily_request_shape_and_parsing(monkeypatch):
     monkeypatch.setattr(settings, "tavily_api_key", "tvly-test")
     seen = {}

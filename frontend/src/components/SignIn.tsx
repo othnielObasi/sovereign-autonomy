@@ -1,55 +1,48 @@
 "use client";
-
-/** Sign-in control: shows the signed-in user and role, or a small sign-in form. */
-import React, { useEffect, useState } from "react";
-import { signIn, signOut, storedSession } from "@/lib/api";
-import { Button, cx } from "@/components/ui";
+import { useEffect, useRef, useState } from 'react';
+import { signIn, signOut, storedSession } from '@/lib/api';
+import { Icon } from './control/Icon';
 
 export function SignIn() {
   const [session, setSession] = useState<{ user: string; role: string } | null>(null);
   const [open, setOpen] = useState(false);
-  const [user, setUser] = useState("");
-  const [pw, setPw] = useState("");
-  const [err, setErr] = useState<string | null>(null);
+  const [username, setUsername] = useState('');
+  const [password, setPassword] = useState('');
+  const [error, setError] = useState('');
   const [busy, setBusy] = useState(false);
-
+  const dialog = useRef<HTMLDivElement>(null);
+  const trigger = useRef<HTMLButtonElement>(null);
   useEffect(() => { setSession(storedSession()); }, []);
-
-  const submit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setBusy(true); setErr(null);
-    try {
-      const s = await signIn(user, pw);
-      setSession(s); setOpen(false); setPw("");
-    } catch (ex: any) { setErr(ex.message); }
-    setBusy(false);
-  };
-
-  if (session) {
-    return (
-      <button onClick={() => { signOut(); setSession(null); }} title="Sign out"
-        className="hidden sm:flex items-center gap-2 rounded-full border border-mc-line2 bg-mc-raise px-3 py-1 text-xs text-mc-mute hover:text-mc-ink">
-        <span className="text-mc-ink">{session.user}</span>
-        <span className={cx("font-semibold uppercase", session.role === "admin" ? "text-mc-warn" : "text-mc-accent")}>{session.role}</span>
-      </button>
-    );
+  useEffect(() => {
+    if (!open) return;
+    const previous = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+    dialog.current?.querySelector<HTMLInputElement>('input')?.focus();
+    function key(e: KeyboardEvent) {
+      if (e.key === 'Escape') setOpen(false);
+      if (e.key !== 'Tab') return;
+      const nodes = Array.from(dialog.current?.querySelectorAll<HTMLElement>('button:not(:disabled),input:not(:disabled),a[href]') || []);
+      const first = nodes[0], last = nodes[nodes.length - 1];
+      if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last?.focus(); }
+      if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first?.focus(); }
+    }
+    document.addEventListener('keydown', key);
+    return () => { document.body.style.overflow = previous; document.removeEventListener('keydown', key); trigger.current?.focus(); };
+  }, [open]);
+  async function submit(e: React.FormEvent) {
+    e.preventDefault(); setBusy(true); setError('');
+    try { setSession(await signIn(username, password)); setPassword(''); setOpen(false); }
+    catch (err: any) { setError(err.message || 'Sign-in failed. Check your credentials.'); }
+    finally { setBusy(false); }
   }
-  return (
-    <div className="relative hidden sm:block">
-      <button onClick={() => setOpen(!open)} className="rounded-full border border-mc-line2 px-3 py-1 text-xs text-mc-mute hover:text-mc-ink">
-        Sign in
-      </button>
-      {open && (
-        <form onSubmit={submit} className="absolute right-0 top-full mt-2 w-64 rounded-xl border border-mc-line bg-mc-panel p-3 shadow-xl z-50 space-y-2">
-          <input value={user} onChange={(e) => setUser(e.target.value)} placeholder="Username" autoComplete="username"
-            className="w-full rounded-lg border border-mc-line2 bg-mc-raise px-2.5 py-1.5 text-sm text-mc-ink outline-none focus:border-mc-accent" />
-          <input value={pw} onChange={(e) => setPw(e.target.value)} placeholder="Password" type="password" autoComplete="current-password"
-            className="w-full rounded-lg border border-mc-line2 bg-mc-raise px-2.5 py-1.5 text-sm text-mc-ink outline-none focus:border-mc-accent" />
-          {err && <div className="text-xs text-mc-stop">{err}</div>}
-          <Button variant="primary" className="w-full" disabled={busy || !user || !pw}>{busy ? "Signing in…" : "Sign in"}</Button>
-          <p className="text-[11px] text-mc-dim leading-snug">Stopping the robot never needs a sign-in. Mission control needs an operator; rule changes need an admin.</p>
-        </form>
-      )}
-    </div>
-  );
+  return <>
+    {session ? <button className="sa-account" aria-label={`Sign out ${session.user}`} title={`Signed in as ${session.role}. Select to sign out.`} onClick={() => { signOut(); setSession(null); }}><span className="sa-avatar">{session.user.slice(0, 1).toUpperCase()}</span><span>{session.user}<small>{session.role} · Sign out</small></span></button> : <button ref={trigger} aria-label="Operator access" onClick={() => { setError(''); setOpen(true); }} className="sa-account"><Icon name="user" size={17}/><span>Operator access</span></button>}
+    {open && <div className="sa-modal-backdrop" onMouseDown={e => { if (e.target === e.currentTarget && !busy) setOpen(false); }}>
+      <div className="sa-modal" role="dialog" aria-modal="true" aria-labelledby="operator-title" aria-describedby="operator-description" ref={dialog}>
+        <button className="sa-icon-button sa-modal-close" aria-label="Close sign-in" disabled={busy} onClick={() => setOpen(false)}><Icon name="cross"/></button>
+        <span className="sa-modal-symbol"><Icon name="shield" size={28}/></span><p className="sa-eyebrow">SOVEREIGN AUTONOMY</p><h2 id="operator-title">Your workspace.<br/>Your authority.</h2><p id="operator-description">Sign in to manage missions and operator approvals. Viewing the workspace and stopping robots never require an account.</p>
+        <form onSubmit={submit} className="sa-form"><label>Username<input value={username} onChange={e => setUsername(e.target.value)} autoComplete="username" required disabled={busy}/></label><label>Password<input value={password} onChange={e => setPassword(e.target.value)} type="password" autoComplete="current-password" required disabled={busy}/></label>{error && <p className="sa-error" role="alert">{error}</p>}<button className="sa-button sa-button-primary" disabled={busy || !username || !password}>{busy ? 'Signing in…' : 'Enter workspace'}<Icon name="arrow" size={17}/></button></form><p className="sa-modal-note">Use your Sovereign Autonomy operator account. Access is separate from other projects.</p>
+      </div>
+    </div>}
+  </>;
 }

@@ -1,0 +1,1524 @@
+{
+  "checked": "2026-11-03",
+  "scope": "Source inventory and read-only local preview checks; endpoint existence alone does not prove a feature works",
+  "source_routes": [
+    {
+      "method": "POST",
+      "path": "/authority/redeem",
+      "source": "backend/app/api/routes_authority.py",
+      "line": 40,
+      "handler": "redeem",
+      "description": "Controller-only signed request; no operator token can redeem a permit."
+    },
+    {
+      "method": "GET",
+      "path": "/authority/status",
+      "source": "backend/app/api/routes_authority.py",
+      "line": 56,
+      "handler": "status",
+      "description": "Whether permits are enforced, active kill switches, and journal integrity."
+    },
+    {
+      "method": "POST",
+      "path": "/authority/kill",
+      "source": "backend/app/api/routes_authority.py",
+      "line": 62,
+      "handler": "kill",
+      "description": "Revoke authority at once, stop the robot at the controller, and report measured times."
+    },
+    {
+      "method": "POST",
+      "path": "/authority/reset",
+      "source": "backend/app/api/routes_authority.py",
+      "line": 70,
+      "handler": "reset",
+      "description": "Lift one kill switch. Requires a signed-in operator or admin, in every environment."
+    },
+    {
+      "method": "POST",
+      "path": "/authority/voice",
+      "source": "backend/app/api/routes_authority.py",
+      "line": 93,
+      "handler": "voice_stop",
+      "description": "Spoken stop (Muse Voice Transcribe). A stop phrase fires a kill switch; nothing"
+    },
+    {
+      "method": "POST",
+      "path": "/authority/drills",
+      "source": "backend/app/api/routes_authority.py",
+      "line": 122,
+      "handler": "drills",
+      "description": "Run the security drills against the live simulator (only while no mission runs)."
+    },
+    {
+      "method": "GET",
+      "path": "/authority/learning",
+      "source": "backend/app/api/routes_authority.py",
+      "line": 144,
+      "handler": "learning_status",
+      "description": "Learned-routing memory: verified cells and quarantined records."
+    },
+    {
+      "method": "GET",
+      "path": "/authority/evidence",
+      "source": "backend/app/api/routes_authority.py",
+      "line": 161,
+      "handler": "evidence",
+      "description": "Recent dispatch and kill-switch events (most recent last)."
+    },
+    {
+      "method": "GET",
+      "path": "/compliance/report/{run_id}",
+      "source": "backend/app/api/routes_compliance.py",
+      "line": 62,
+      "handler": "get_compliance_report",
+      "description": "Generate a compliance report for a specific run (JSON)."
+    },
+    {
+      "method": "GET",
+      "path": "/compliance/report/{run_id}.txt",
+      "source": "backend/app/api/routes_compliance.py",
+      "line": 86,
+      "handler": "get_compliance_report_text",
+      "description": "Generate a compliance report for a specific run (plain text summary)."
+    },
+    {
+      "method": "GET",
+      "path": "/compliance/report/{run_id}/export",
+      "source": "backend/app/api/routes_compliance.py",
+      "line": 107,
+      "handler": "export_compliance_report",
+      "description": "Export compliance report as downloadable JSON."
+    },
+    {
+      "method": "GET",
+      "path": "/compliance/frameworks",
+      "source": "backend/app/api/routes_compliance.py",
+      "line": 133,
+      "handler": "list_frameworks",
+      "description": ""
+    },
+    {
+      "method": "GET",
+      "path": "/compliance/verify/{run_id}",
+      "source": "backend/app/api/routes_compliance.py",
+      "line": 156,
+      "handler": "verify_audit_chain",
+      "description": ""
+    },
+    {
+      "method": "GET",
+      "path": "/evidence/learning",
+      "source": "backend/app/api/routes_evidence.py",
+      "line": 22,
+      "handler": "learning_summary",
+      "description": "Live counts for adaptive learning and task-drift control on this deployment."
+    },
+    {
+      "method": "GET",
+      "path": "/evidence/benchmarks",
+      "source": "backend/app/api/routes_evidence.py",
+      "line": 97,
+      "handler": "benchmarks",
+      "description": ""
+    },
+    {
+      "method": "GET",
+      "path": "/policies",
+      "source": "backend/app/api/routes_governance.py",
+      "line": 24,
+      "handler": "list_policies",
+      "description": ""
+    },
+    {
+      "method": "POST",
+      "path": "/policies/test",
+      "source": "backend/app/api/routes_governance.py",
+      "line": 45,
+      "handler": "test_policy",
+      "description": "Test an action proposal against policies without running a full mission."
+    },
+    {
+      "method": "POST",
+      "path": "/governance/evaluate",
+      "source": "backend/app/api/routes_governance.py",
+      "line": 54,
+      "handler": "governance_evaluate",
+      "description": "Evaluate an AI-generated action against the governance policy layer."
+    },
+    {
+      "method": "GET",
+      "path": "/governance/decisions/{run_id}",
+      "source": "backend/app/api/routes_governance.py",
+      "line": 66,
+      "handler": "get_governance_decisions",
+      "description": "Query governance decision history for a run."
+    },
+    {
+      "method": "GET",
+      "path": "/governance/decisions/{run_id}/stats",
+      "source": "backend/app/api/routes_governance.py",
+      "line": 93,
+      "handler": "get_governance_stats",
+      "description": "Get aggregate governance statistics for a run."
+    },
+    {
+      "method": "GET",
+      "path": "/governance/receipts/{run_id}",
+      "source": "backend/app/api/routes_governance.py",
+      "line": 107,
+      "handler": "get_governance_receipts",
+      "description": "Get governance receipts for a run."
+    },
+    {
+      "method": "GET",
+      "path": "/governance/receipts/{run_id}/{decision_id}",
+      "source": "backend/app/api/routes_governance.py",
+      "line": 125,
+      "handler": "get_governance_receipt",
+      "description": "Get a single governance receipt by decision ID."
+    },
+    {
+      "method": "GET",
+      "path": "/governance/receipts/{run_id}/{decision_id}/verify",
+      "source": "backend/app/api/routes_governance.py",
+      "line": 138,
+      "handler": "verify_governance_receipt",
+      "description": "Verify a receipt's Ed25519 signature against the stored decision content."
+    },
+    {
+      "method": "GET",
+      "path": "/governance/signing-key",
+      "source": "backend/app/api/routes_governance.py",
+      "line": 147,
+      "handler": "get_signing_key",
+      "description": "Public key that signs governance receipts on this deployment, for independent verification."
+    },
+    {
+      "method": "GET",
+      "path": "/policies/version",
+      "source": "backend/app/api/routes_governance.py",
+      "line": 155,
+      "handler": "get_policy_version",
+      "description": "Return the current policy version hash and all active parameters."
+    },
+    {
+      "method": "GET",
+      "path": "/optimizer/envelope",
+      "source": "backend/app/api/routes_governance.py",
+      "line": 169,
+      "handler": "get_optimization_envelope",
+      "description": "Return the governance envelope \u2014 hard safety bounds the optimizer respects."
+    },
+    {
+      "method": "GET",
+      "path": "/optimizer/analyze/{run_id}",
+      "source": "backend/app/api/routes_governance.py",
+      "line": 177,
+      "handler": "analyze_run_optimization",
+      "description": "Analyse a run and produce governance-bounded optimization recommendations."
+    },
+    {
+      "method": "GET",
+      "path": "/tuning/recommendations",
+      "source": "backend/app/api/routes_governance.py",
+      "line": 191,
+      "handler": "get_tuning_recommendations",
+      "description": "Analyse historical runs and produce safe parameter tuning recommendations."
+    },
+    {
+      "method": "GET",
+      "path": "/integrity/run/{run_id}",
+      "source": "backend/app/api/routes_governance.py",
+      "line": 205,
+      "handler": "check_run_integrity",
+      "description": "Check a run's scorecard for reward-hacking indicators."
+    },
+    {
+      "method": "GET",
+      "path": "/integrity/cross-run",
+      "source": "backend/app/api/routes_governance.py",
+      "line": 217,
+      "handler": "check_cross_run_integrity",
+      "description": "Analyse trends across multiple runs for systemic gaming patterns."
+    },
+    {
+      "method": "GET",
+      "path": "/agent/memory",
+      "source": "backend/app/api/routes_governance.py",
+      "line": 231,
+      "handler": "get_agent_memory",
+      "description": "Retrieve persistent agent memory entries."
+    },
+    {
+      "method": "GET",
+      "path": "/agent/memory/stats",
+      "source": "backend/app/api/routes_governance.py",
+      "line": 247,
+      "handler": "get_agent_memory_stats",
+      "description": "Get agent memory statistics."
+    },
+    {
+      "method": "POST",
+      "path": "/agent/memory/learn/{run_id}",
+      "source": "backend/app/api/routes_governance.py",
+      "line": 260,
+      "handler": "extract_lessons",
+      "description": "Extract internalized lessons from a completed run (#18)."
+    },
+    {
+      "method": "GET",
+      "path": "/policies/classification",
+      "source": "backend/app/api/routes_governance.py",
+      "line": 277,
+      "handler": "get_policy_classification",
+      "description": "Return the hard-fail vs soft-fail classification of all policies."
+    },
+    {
+      "method": "GET",
+      "path": "/policies/versions",
+      "source": "backend/app/api/routes_governance.py",
+      "line": 294,
+      "handler": "list_policy_versions",
+      "description": "Return policy version history \u2014 every distinct config ever active."
+    },
+    {
+      "method": "GET",
+      "path": "/runs/{run_id}/safety-report",
+      "source": "backend/app/api/routes_governance.py",
+      "line": 323,
+      "handler": "get_safety_report",
+      "description": "Get safety validation report for a completed run."
+    },
+    {
+      "method": "GET",
+      "path": "/adversarial/validate",
+      "source": "backend/app/api/routes_governance.py",
+      "line": 343,
+      "handler": "adversarial_validate",
+      "description": "Run the full adversarial + holdout validation suite."
+    },
+    {
+      "method": "GET",
+      "path": "/adversarial/adversarial",
+      "source": "backend/app/api/routes_governance.py",
+      "line": 351,
+      "handler": "adversarial_suite",
+      "description": "Run only the adversarial scenario suite."
+    },
+    {
+      "method": "GET",
+      "path": "/adversarial/holdout",
+      "source": "backend/app/api/routes_governance.py",
+      "line": 359,
+      "handler": "holdout_suite",
+      "description": "Run only the holdout scenario suite."
+    },
+    {
+      "method": "GET",
+      "path": "/agent/memory/search",
+      "source": "backend/app/api/routes_governance.py",
+      "line": 369,
+      "handler": "search_agent_memory",
+      "description": "Semantic similarity search across agent memory entries."
+    },
+    {
+      "method": "GET",
+      "path": "/agent/cross-run-learning",
+      "source": "backend/app/api/routes_governance.py",
+      "line": 385,
+      "handler": "get_cross_run_learning",
+      "description": "Get cross-run learning aggregation: trends, patterns, baselines."
+    },
+    {
+      "method": "GET",
+      "path": "/agent/lessons",
+      "source": "backend/app/api/routes_governance.py",
+      "line": 398,
+      "handler": "get_planner_lessons",
+      "description": "Lessons the planner has learned from the gate's past decisions."
+    },
+    {
+      "method": "GET",
+      "path": "/agent/lessons/route",
+      "source": "backend/app/api/routes_governance.py",
+      "line": 414,
+      "handler": "get_lessons_for_route",
+      "description": "Preview the lessons the planner would receive for a route."
+    },
+    {
+      "method": "GET",
+      "path": "/analytics/score-trends",
+      "source": "backend/app/api/routes_governance.py",
+      "line": 441,
+      "handler": "get_score_trends",
+      "description": "Get score trends across recent runs for dashboard charts."
+    },
+    {
+      "method": "POST",
+      "path": "/runs/{run_id}/divergence-explanation",
+      "source": "backend/app/api/routes_governance.py",
+      "line": 480,
+      "handler": "generate_divergence_explanation",
+      "description": "Generate LLM-powered natural language explanation of plan vs execution divergence."
+    },
+    {
+      "method": "GET",
+      "path": "/runs/{run_id}/executed-path",
+      "source": "backend/app/api/routes_governance.py",
+      "line": 604,
+      "handler": "get_executed_path",
+      "description": "Get the actual executed positions for a completed/running run."
+    },
+    {
+      "method": "GET",
+      "path": "/health",
+      "source": "backend/app/api/routes_health.py",
+      "line": 18,
+      "handler": "health",
+      "description": "Health check endpoint with dependency status."
+    },
+    {
+      "method": "GET",
+      "path": "/metrics",
+      "source": "backend/app/api/routes_health.py",
+      "line": 67,
+      "handler": "prometheus_metrics",
+      "description": "Prometheus text format: gate decisions, permits, dispatch, kill switches, models."
+    },
+    {
+      "method": "GET",
+      "path": "/llm/usage",
+      "source": "backend/app/api/routes_llm.py",
+      "line": 139,
+      "handler": "llm_usage",
+      "description": "Per-model latency and token usage for model calls (process-local)."
+    },
+    {
+      "method": "GET",
+      "path": "/llm/models",
+      "source": "backend/app/api/routes_llm.py",
+      "line": 154,
+      "handler": "list_models",
+      "description": "List the active planner provider, its model tiers and cascade order."
+    },
+    {
+      "method": "POST",
+      "path": "/llm/plan",
+      "source": "backend/app/api/routes_llm.py",
+      "line": 177,
+      "handler": "generate_plan",
+      "description": "Generate a multi-waypoint plan via Gemini and validate every waypoint"
+    },
+    {
+      "method": "POST",
+      "path": "/llm/execute",
+      "source": "backend/app/api/routes_llm.py",
+      "line": 247,
+      "handler": "execute_plan",
+      "description": "Execute an LLM-generated plan: send each waypoint to the simulator"
+    },
+    {
+      "method": "POST",
+      "path": "/llm/analyze",
+      "source": "backend/app/api/routes_llm.py",
+      "line": 365,
+      "handler": "analyze_telemetry",
+      "description": "Analyze mission event logs for anomalies, denials, safety near-misses, and compliance risks."
+    },
+    {
+      "method": "POST",
+      "path": "/llm/scene",
+      "source": "backend/app/api/routes_llm.py",
+      "line": 380,
+      "handler": "analyze_scene",
+      "description": "Analyze a scene description for hazards, obstacles, humans, and recommend robot action."
+    },
+    {
+      "method": "POST",
+      "path": "/llm/failure-analysis",
+      "source": "backend/app/api/routes_llm.py",
+      "line": 409,
+      "handler": "failure_analysis",
+      "description": "Detect failure patterns: stuck robots, oscillation, repeated policy conflicts."
+    },
+    {
+      "method": "POST",
+      "path": "/llm/agentic/propose",
+      "source": "backend/app/api/routes_llm.py",
+      "line": 460,
+      "handler": "agentic_propose",
+      "description": "Run the agentic ReAct planner: reason \u2192 use tools \u2192 propose \u2192 govern."
+    },
+    {
+      "method": "POST",
+      "path": "/missions",
+      "source": "backend/app/api/routes_missions.py",
+      "line": 52,
+      "handler": "create_mission",
+      "description": ""
+    },
+    {
+      "method": "GET",
+      "path": "/missions",
+      "source": "backend/app/api/routes_missions.py",
+      "line": 66,
+      "handler": "list_missions",
+      "description": ""
+    },
+    {
+      "method": "GET",
+      "path": "/missions/{mission_id}",
+      "source": "backend/app/api/routes_missions.py",
+      "line": 76,
+      "handler": "get_mission",
+      "description": ""
+    },
+    {
+      "method": "PATCH",
+      "path": "/missions/{mission_id}",
+      "source": "backend/app/api/routes_missions.py",
+      "line": 84,
+      "handler": "update_mission",
+      "description": ""
+    },
+    {
+      "method": "POST",
+      "path": "/missions/{mission_id}/pause",
+      "source": "backend/app/api/routes_missions.py",
+      "line": 101,
+      "handler": "pause_mission",
+      "description": ""
+    },
+    {
+      "method": "POST",
+      "path": "/missions/{mission_id}/resume",
+      "source": "backend/app/api/routes_missions.py",
+      "line": 116,
+      "handler": "resume_mission",
+      "description": ""
+    },
+    {
+      "method": "POST",
+      "path": "/missions/{mission_id}/replay",
+      "source": "backend/app/api/routes_missions.py",
+      "line": 131,
+      "handler": "replay_mission",
+      "description": "Reset a completed mission back to draft so it can be re-executed."
+    },
+    {
+      "method": "DELETE",
+      "path": "/missions/{mission_id}",
+      "source": "backend/app/api/routes_missions.py",
+      "line": 144,
+      "handler": "delete_mission",
+      "description": ""
+    },
+    {
+      "method": "GET",
+      "path": "/missions/{mission_id}/audit",
+      "source": "backend/app/api/routes_missions.py",
+      "line": 159,
+      "handler": "get_mission_audit",
+      "description": "Get the full audit trail for a specific mission."
+    },
+    {
+      "method": "GET",
+      "path": "/audit/missions",
+      "source": "backend/app/api/routes_missions.py",
+      "line": 174,
+      "handler": "get_all_audit",
+      "description": "Get the global mission audit trail across all missions."
+    },
+    {
+      "method": "GET",
+      "path": "/operator/review/{run_id}",
+      "source": "backend/app/api/routes_operator.py",
+      "line": 45,
+      "handler": "review",
+      "description": "Latest recorded review; eligibility is rechecked with fresh sensors on approval."
+    },
+    {
+      "method": "POST",
+      "path": "/operator/approve",
+      "source": "backend/app/api/routes_operator.py",
+      "line": 53,
+      "handler": "approve",
+      "description": ""
+    },
+    {
+      "method": "POST",
+      "path": "/operator/override",
+      "source": "backend/app/api/routes_operator.py",
+      "line": 59,
+      "handler": "operator_override",
+      "description": "Replace and hold a route, approve an eligible review and resume, or resume normally."
+    },
+    {
+      "method": "GET",
+      "path": "/operator/approvals/{run_id}",
+      "source": "backend/app/api/routes_operator.py",
+      "line": 107,
+      "handler": "list_approvals",
+      "description": ""
+    },
+    {
+      "method": "GET",
+      "path": "/policies/active",
+      "source": "backend/app/api/routes_policy_proposals.py",
+      "line": 68,
+      "handler": "get_active",
+      "description": "The rules the gate enforces now, the latest activation, and what may be changed."
+    },
+    {
+      "method": "GET",
+      "path": "/policies/activations",
+      "source": "backend/app/api/routes_policy_proposals.py",
+      "line": 83,
+      "handler": "list_activations",
+      "description": ""
+    },
+    {
+      "method": "GET",
+      "path": "/policies/proposals",
+      "source": "backend/app/api/routes_policy_proposals.py",
+      "line": 89,
+      "handler": "list_proposals",
+      "description": ""
+    },
+    {
+      "method": "POST",
+      "path": "/policies/proposals",
+      "source": "backend/app/api/routes_policy_proposals.py",
+      "line": 97,
+      "handler": "create_proposal",
+      "description": ""
+    },
+    {
+      "method": "POST",
+      "path": "/policies/proposals/from-tuning",
+      "source": "backend/app/api/routes_policy_proposals.py",
+      "line": 102,
+      "handler": "create_from_tuning",
+      "description": ""
+    },
+    {
+      "method": "GET",
+      "path": "/policies/proposals/{proposal_id}",
+      "source": "backend/app/api/routes_policy_proposals.py",
+      "line": 107,
+      "handler": "get_proposal",
+      "description": ""
+    },
+    {
+      "method": "POST",
+      "path": "/policies/proposals/{proposal_id}/evaluate",
+      "source": "backend/app/api/routes_policy_proposals.py",
+      "line": 112,
+      "handler": "evaluate_proposal",
+      "description": ""
+    },
+    {
+      "method": "POST",
+      "path": "/policies/proposals/{proposal_id}/benchmark",
+      "source": "backend/app/api/routes_policy_proposals.py",
+      "line": 121,
+      "handler": "benchmark_proposal",
+      "description": "Drive seeded scenarios under the active and candidate rules (takes ~1 s per scenario)."
+    },
+    {
+      "method": "POST",
+      "path": "/policies/proposals/{proposal_id}/approve",
+      "source": "backend/app/api/routes_policy_proposals.py",
+      "line": 127,
+      "handler": "approve_proposal",
+      "description": ""
+    },
+    {
+      "method": "POST",
+      "path": "/policies/proposals/{proposal_id}/reject",
+      "source": "backend/app/api/routes_policy_proposals.py",
+      "line": 133,
+      "handler": "reject_proposal",
+      "description": ""
+    },
+    {
+      "method": "POST",
+      "path": "/policies/proposals/{proposal_id}/activate",
+      "source": "backend/app/api/routes_policy_proposals.py",
+      "line": 139,
+      "handler": "activate_proposal",
+      "description": ""
+    },
+    {
+      "method": "POST",
+      "path": "/policies/rollback",
+      "source": "backend/app/api/routes_policy_proposals.py",
+      "line": 145,
+      "handler": "rollback",
+      "description": ""
+    },
+    {
+      "method": "POST",
+      "path": "/runs",
+      "source": "backend/app/api/routes_runs.py",
+      "line": 97,
+      "handler": "start_run_legacy",
+      "description": "Backward-compatible: accepts POST /runs {mission_id} and proxies to the"
+    },
+    {
+      "method": "POST",
+      "path": "/missions/{mission_id}/start",
+      "source": "backend/app/api/routes_runs.py",
+      "line": 329,
+      "handler": "start_run",
+      "description": ""
+    },
+    {
+      "method": "GET",
+      "path": "/runs",
+      "source": "backend/app/api/routes_runs.py",
+      "line": 434,
+      "handler": "list_runs",
+      "description": ""
+    },
+    {
+      "method": "GET",
+      "path": "/runs/{run_id}",
+      "source": "backend/app/api/routes_runs.py",
+      "line": 454,
+      "handler": "get_run",
+      "description": ""
+    },
+    {
+      "method": "POST",
+      "path": "/runs/{run_id}/stop",
+      "source": "backend/app/api/routes_runs.py",
+      "line": 470,
+      "handler": "stop_run",
+      "description": ""
+    },
+    {
+      "method": "POST",
+      "path": "/runs/{run_id}/pause",
+      "source": "backend/app/api/routes_runs.py",
+      "line": 481,
+      "handler": "pause_run",
+      "description": "Pause a running run \u2014 robot stops executing but run can be resumed."
+    },
+    {
+      "method": "POST",
+      "path": "/runs/{run_id}/resume",
+      "source": "backend/app/api/routes_runs.py",
+      "line": 498,
+      "handler": "resume_run",
+      "description": "Resume a paused run."
+    },
+    {
+      "method": "GET",
+      "path": "/runs/{run_id}/events",
+      "source": "backend/app/api/routes_runs.py",
+      "line": 519,
+      "handler": "list_events",
+      "description": ""
+    },
+    {
+      "method": "GET",
+      "path": "/runs/{run_id}/telemetry",
+      "source": "backend/app/api/routes_runs.py",
+      "line": 551,
+      "handler": "list_telemetry",
+      "description": ""
+    },
+    {
+      "method": "GET",
+      "path": "/runs/{run_id}/replay",
+      "source": "backend/app/api/routes_runs.py",
+      "line": 572,
+      "handler": "replay_run",
+      "description": "Return the full timeline of a run for audit replay, including chain integrity verification."
+    },
+    {
+      "method": "GET",
+      "path": "/runs/{run_id}/audit-bundle",
+      "source": "backend/app/api/routes_runs.py",
+      "line": 587,
+      "handler": "audit_bundle",
+      "description": "Export a self-contained audit bundle for regulatory submission."
+    },
+    {
+      "method": "GET",
+      "path": "/runs/{run_id}/scores",
+      "source": "backend/app/api/routes_runs.py",
+      "line": 601,
+      "handler": "get_run_scores",
+      "description": "Compute and return multi-objective scorecard for a run."
+    },
+    {
+      "method": "GET",
+      "path": "/runs/{run_id}/risk-heatmap",
+      "source": "backend/app/api/routes_runs.py",
+      "line": 615,
+      "handler": "get_risk_heatmap",
+      "description": "Compute spatial risk heatmap from governance decisions (#21)."
+    },
+    {
+      "method": "GET",
+      "path": "/runs/{run_id}/introspection",
+      "source": "backend/app/api/routes_runs.py",
+      "line": 692,
+      "handler": "get_run_introspection",
+      "description": "Agent introspection: thought chains, denial history, memory recalls (#20)."
+    },
+    {
+      "method": "GET",
+      "path": "/sim/fleet",
+      "source": "backend/app/api/routes_sim.py",
+      "line": 28,
+      "handler": "get_fleet",
+      "description": "Every robot in the warehouse: pose, target, e-stop."
+    },
+    {
+      "method": "GET",
+      "path": "/sim/telemetry",
+      "source": "backend/app/api/routes_sim.py",
+      "line": 37,
+      "handler": "get_telemetry",
+      "description": "Proxy the simulator's current telemetry (robot position, sensors)."
+    },
+    {
+      "method": "POST",
+      "path": "/plans/check",
+      "source": "backend/app/api/routes_sim.py",
+      "line": 56,
+      "handler": "check_plan_for_drift",
+      "description": "Run the task-drift guard on any plan, with no side effects (nothing moves, nothing is recorded)."
+    },
+    {
+      "method": "GET",
+      "path": "/perception/status",
+      "source": "backend/app/api/routes_sim.py",
+      "line": 73,
+      "handler": "perception_status",
+      "description": "Vision model, settings, active caution zones and the latest checks."
+    },
+    {
+      "method": "POST",
+      "path": "/perception/check",
+      "source": "backend/app/api/routes_sim.py",
+      "line": 80,
+      "handler": "perception_check",
+      "description": "Read the robot camera now with the vision model and compare it with the sensors."
+    },
+    {
+      "method": "GET",
+      "path": "/sim/world",
+      "source": "backend/app/api/routes_sim.py",
+      "line": 93,
+      "handler": "get_world",
+      "description": "Proxy the simulator's world definition (geofence, obstacles, human)."
+    },
+    {
+      "method": "GET",
+      "path": "/sim/frame",
+      "source": "backend/app/api/routes_sim.py",
+      "line": 102,
+      "handler": "get_frame",
+      "description": "The robot's camera view (PNG): heading-up, top-down, around the robot."
+    },
+    {
+      "method": "POST",
+      "path": "/sim/seed",
+      "source": "backend/app/api/routes_sim.py",
+      "line": 118,
+      "handler": "load_seed",
+      "description": "Replay a benchmark scenario exactly (mode=benchmark) or load another live site (mode=live)."
+    },
+    {
+      "method": "GET",
+      "path": "/bays",
+      "source": "backend/app/api/routes_sim.py",
+      "line": 127,
+      "handler": "list_bays",
+      "description": "Return the list of bays (docks/shelves/receiving) from the simulator world."
+    },
+    {
+      "method": "POST",
+      "path": "/sim/scenario",
+      "source": "backend/app/api/routes_sim.py",
+      "line": 137,
+      "handler": "trigger_scenario",
+      "description": "Inject a deterministic scenario into the simulator for demo purposes."
+    },
+    {
+      "method": "GET",
+      "path": "/runs/{run_id}/path_preview",
+      "source": "backend/app/api/routes_sim.py",
+      "line": 150,
+      "handler": "path_preview",
+      "description": "Return a path polyline from latest pose to mission goal."
+    },
+    {
+      "method": "GET",
+      "path": "/site-intel/status",
+      "source": "backend/app/api/routes_site_intel.py",
+      "line": 35,
+      "handler": "status",
+      "description": "Live or offline mode, trusted publishers, reviewed rules, active zones."
+    },
+    {
+      "method": "GET",
+      "path": "/site-intel/constraints",
+      "source": "backend/app/api/routes_site_intel.py",
+      "line": 41,
+      "handler": "constraints",
+      "description": ""
+    },
+    {
+      "method": "GET",
+      "path": "/site-intel/lookups",
+      "source": "backend/app/api/routes_site_intel.py",
+      "line": 46,
+      "handler": "lookups",
+      "description": ""
+    },
+    {
+      "method": "POST",
+      "path": "/site-intel/lookup",
+      "source": "backend/app/api/routes_site_intel.py",
+      "line": 51,
+      "handler": "lookup",
+      "description": "Look up handling guidance for a substance (tightens the zone for `hazard_id` if active)."
+    },
+    {
+      "method": "GET",
+      "path": "/site-intel/bulletins",
+      "source": "backend/app/api/routes_site_intel.py",
+      "line": 57,
+      "handler": "bulletins",
+      "description": ""
+    },
+    {
+      "method": "POST",
+      "path": "/site-intel/bulletin",
+      "source": "backend/app/api/routes_site_intel.py",
+      "line": 62,
+      "handler": "bulletin",
+      "description": "Post a noticeboard bulletin. It is screened; it can never change a rule."
+    },
+    {
+      "method": "POST",
+      "path": "/site-intel/screen",
+      "source": "backend/app/api/routes_site_intel.py",
+      "line": 68,
+      "handler": "screen",
+      "description": "Run the firewall on any text (for testing): verdict, flags, fingerprint."
+    },
+    {
+      "method": "WEBSOCKET",
+      "path": "/ws/runs/{run_id}",
+      "source": "backend/app/api/routes_ws.py",
+      "line": 71,
+      "handler": "ws_run",
+      "description": ""
+    }
+  ],
+  "preview_health": {
+    "status": "ok",
+    "environment": "development",
+    "gemini_enabled": false,
+    "site": "pharma",
+    "muse_enabled": false,
+    "muse_open_enabled": false,
+    "vision_provider": null,
+    "voice_enabled": false,
+    "planner_provider": "fallback",
+    "version": "0.1.0",
+    "checks": {
+      "database": "ok",
+      "simulator": "ok"
+    }
+  },
+  "runtime_operations": [
+    {
+      "method": "GET",
+      "path": "/",
+      "operation_id": "root__get"
+    },
+    {
+      "method": "GET",
+      "path": "/health",
+      "operation_id": "health_health_get"
+    },
+    {
+      "method": "POST",
+      "path": "/auth/login",
+      "operation_id": "login_auth_login_post"
+    },
+    {
+      "method": "POST",
+      "path": "/auth/dev-token",
+      "operation_id": "dev_token_auth_dev_token_post"
+    },
+    {
+      "method": "GET",
+      "path": "/auth/me",
+      "operation_id": "me_auth_me_get"
+    },
+    {
+      "method": "POST",
+      "path": "/missions",
+      "operation_id": "create_mission_missions_post"
+    },
+    {
+      "method": "GET",
+      "path": "/missions",
+      "operation_id": "list_missions_missions_get"
+    },
+    {
+      "method": "GET",
+      "path": "/missions/{mission_id}",
+      "operation_id": "get_mission_missions__mission_id__get"
+    },
+    {
+      "method": "PATCH",
+      "path": "/missions/{mission_id}",
+      "operation_id": "update_mission_missions__mission_id__patch"
+    },
+    {
+      "method": "DELETE",
+      "path": "/missions/{mission_id}",
+      "operation_id": "delete_mission_missions__mission_id__delete"
+    },
+    {
+      "method": "POST",
+      "path": "/missions/{mission_id}/pause",
+      "operation_id": "pause_mission_missions__mission_id__pause_post"
+    },
+    {
+      "method": "POST",
+      "path": "/missions/{mission_id}/resume",
+      "operation_id": "resume_mission_missions__mission_id__resume_post"
+    },
+    {
+      "method": "POST",
+      "path": "/missions/{mission_id}/replay",
+      "operation_id": "replay_mission_missions__mission_id__replay_post"
+    },
+    {
+      "method": "GET",
+      "path": "/missions/{mission_id}/audit",
+      "operation_id": "get_mission_audit_missions__mission_id__audit_get"
+    },
+    {
+      "method": "GET",
+      "path": "/audit/missions",
+      "operation_id": "get_all_audit_audit_missions_get"
+    },
+    {
+      "method": "POST",
+      "path": "/runs",
+      "operation_id": "start_run_legacy_runs_post"
+    },
+    {
+      "method": "GET",
+      "path": "/runs",
+      "operation_id": "list_runs_runs_get"
+    },
+    {
+      "method": "POST",
+      "path": "/missions/{mission_id}/start",
+      "operation_id": "start_run_missions__mission_id__start_post"
+    },
+    {
+      "method": "GET",
+      "path": "/runs/{run_id}",
+      "operation_id": "get_run_runs__run_id__get"
+    },
+    {
+      "method": "POST",
+      "path": "/runs/{run_id}/stop",
+      "operation_id": "stop_run_runs__run_id__stop_post"
+    },
+    {
+      "method": "POST",
+      "path": "/runs/{run_id}/pause",
+      "operation_id": "pause_run_runs__run_id__pause_post"
+    },
+    {
+      "method": "POST",
+      "path": "/runs/{run_id}/resume",
+      "operation_id": "resume_run_runs__run_id__resume_post"
+    },
+    {
+      "method": "GET",
+      "path": "/runs/{run_id}/events",
+      "operation_id": "list_events_runs__run_id__events_get"
+    },
+    {
+      "method": "GET",
+      "path": "/runs/{run_id}/telemetry",
+      "operation_id": "list_telemetry_runs__run_id__telemetry_get"
+    },
+    {
+      "method": "GET",
+      "path": "/runs/{run_id}/replay",
+      "operation_id": "replay_run_runs__run_id__replay_get"
+    },
+    {
+      "method": "GET",
+      "path": "/runs/{run_id}/audit-bundle",
+      "operation_id": "audit_bundle_runs__run_id__audit_bundle_get"
+    },
+    {
+      "method": "GET",
+      "path": "/runs/{run_id}/scores",
+      "operation_id": "get_run_scores_runs__run_id__scores_get"
+    },
+    {
+      "method": "GET",
+      "path": "/runs/{run_id}/risk-heatmap",
+      "operation_id": "get_risk_heatmap_runs__run_id__risk_heatmap_get"
+    },
+    {
+      "method": "GET",
+      "path": "/runs/{run_id}/introspection",
+      "operation_id": "get_run_introspection_runs__run_id__introspection_get"
+    },
+    {
+      "method": "GET",
+      "path": "/policies",
+      "operation_id": "list_policies_policies_get"
+    },
+    {
+      "method": "POST",
+      "path": "/policies/test",
+      "operation_id": "test_policy_policies_test_post"
+    },
+    {
+      "method": "POST",
+      "path": "/governance/evaluate",
+      "operation_id": "governance_evaluate_governance_evaluate_post"
+    },
+    {
+      "method": "GET",
+      "path": "/governance/decisions/{run_id}",
+      "operation_id": "get_governance_decisions_governance_decisions__run_id__get"
+    },
+    {
+      "method": "GET",
+      "path": "/governance/decisions/{run_id}/stats",
+      "operation_id": "get_governance_stats_governance_decisions__run_id__stats_get"
+    },
+    {
+      "method": "GET",
+      "path": "/governance/receipts/{run_id}",
+      "operation_id": "get_governance_receipts_governance_receipts__run_id__get"
+    },
+    {
+      "method": "GET",
+      "path": "/governance/receipts/{run_id}/{decision_id}",
+      "operation_id": "get_governance_receipt_governance_receipts__run_id___decision_id__get"
+    },
+    {
+      "method": "GET",
+      "path": "/governance/receipts/{run_id}/{decision_id}/verify",
+      "operation_id": "verify_governance_receipt_governance_receipts__run_id___decision_id__verify_get"
+    },
+    {
+      "method": "GET",
+      "path": "/governance/signing-key",
+      "operation_id": "get_signing_key_governance_signing_key_get"
+    },
+    {
+      "method": "GET",
+      "path": "/policies/version",
+      "operation_id": "get_policy_version_policies_version_get"
+    },
+    {
+      "method": "GET",
+      "path": "/optimizer/envelope",
+      "operation_id": "get_optimization_envelope_optimizer_envelope_get"
+    },
+    {
+      "method": "GET",
+      "path": "/optimizer/analyze/{run_id}",
+      "operation_id": "analyze_run_optimization_optimizer_analyze__run_id__get"
+    },
+    {
+      "method": "GET",
+      "path": "/tuning/recommendations",
+      "operation_id": "get_tuning_recommendations_tuning_recommendations_get"
+    },
+    {
+      "method": "GET",
+      "path": "/integrity/run/{run_id}",
+      "operation_id": "check_run_integrity_integrity_run__run_id__get"
+    },
+    {
+      "method": "GET",
+      "path": "/integrity/cross-run",
+      "operation_id": "check_cross_run_integrity_integrity_cross_run_get"
+    },
+    {
+      "method": "GET",
+      "path": "/agent/memory",
+      "operation_id": "get_agent_memory_agent_memory_get"
+    },
+    {
+      "method": "GET",
+      "path": "/agent/memory/stats",
+      "operation_id": "get_agent_memory_stats_agent_memory_stats_get"
+    },
+    {
+      "method": "POST",
+      "path": "/agent/memory/learn/{run_id}",
+      "operation_id": "extract_lessons_agent_memory_learn__run_id__post"
+    },
+    {
+      "method": "GET",
+      "path": "/policies/classification",
+      "operation_id": "get_policy_classification_policies_classification_get"
+    },
+    {
+      "method": "GET",
+      "path": "/policies/versions",
+      "operation_id": "list_policy_versions_policies_versions_get"
+    },
+    {
+      "method": "GET",
+      "path": "/runs/{run_id}/safety-report",
+      "operation_id": "get_safety_report_runs__run_id__safety_report_get"
+    },
+    {
+      "method": "GET",
+      "path": "/adversarial/validate",
+      "operation_id": "adversarial_validate_adversarial_validate_get"
+    },
+    {
+      "method": "GET",
+      "path": "/adversarial/adversarial",
+      "operation_id": "adversarial_suite_adversarial_adversarial_get"
+    },
+    {
+      "method": "GET",
+      "path": "/adversarial/holdout",
+      "operation_id": "holdout_suite_adversarial_holdout_get"
+    },
+    {
+      "method": "GET",
+      "path": "/agent/memory/search",
+      "operation_id": "search_agent_memory_agent_memory_search_get"
+    },
+    {
+      "method": "GET",
+      "path": "/agent/cross-run-learning",
+      "operation_id": "get_cross_run_learning_agent_cross_run_learning_get"
+    },
+    {
+      "method": "GET",
+      "path": "/agent/lessons",
+      "operation_id": "get_planner_lessons_agent_lessons_get"
+    },
+    {
+      "method": "GET",
+      "path": "/agent/lessons/route",
+      "operation_id": "get_lessons_for_route_agent_lessons_route_get"
+    },
+    {
+      "method": "GET",
+      "path": "/analytics/score-trends",
+      "operation_id": "get_score_trends_analytics_score_trends_get"
+    },
+    {
+      "method": "POST",
+      "path": "/runs/{run_id}/divergence-explanation",
+      "operation_id": "generate_divergence_explanation_runs__run_id__divergence_explanation_post"
+    },
+    {
+      "method": "GET",
+      "path": "/runs/{run_id}/executed-path",
+      "operation_id": "get_executed_path_runs__run_id__executed_path_get"
+    },
+    {
+      "method": "GET",
+      "path": "/sim/fleet",
+      "operation_id": "get_fleet_sim_fleet_get"
+    },
+    {
+      "method": "GET",
+      "path": "/sim/telemetry",
+      "operation_id": "get_telemetry_sim_telemetry_get"
+    },
+    {
+      "method": "POST",
+      "path": "/plans/check",
+      "operation_id": "check_plan_for_drift_plans_check_post"
+    },
+    {
+      "method": "GET",
+      "path": "/perception/status",
+      "operation_id": "perception_status_perception_status_get"
+    },
+    {
+      "method": "POST",
+      "path": "/perception/check",
+      "operation_id": "perception_check_perception_check_post"
+    },
+    {
+      "method": "GET",
+      "path": "/sim/world",
+      "operation_id": "get_world_sim_world_get"
+    },
+    {
+      "method": "GET",
+      "path": "/sim/frame",
+      "operation_id": "get_frame_sim_frame_get"
+    },
+    {
+      "method": "POST",
+      "path": "/sim/seed",
+      "operation_id": "load_seed_sim_seed_post"
+    },
+    {
+      "method": "GET",
+      "path": "/bays",
+      "operation_id": "list_bays_bays_get"
+    },
+    {
+      "method": "POST",
+      "path": "/sim/scenario",
+      "operation_id": "trigger_scenario_sim_scenario_post"
+    },
+    {
+      "method": "GET",
+      "path": "/runs/{run_id}/path_preview",
+      "operation_id": "path_preview_runs__run_id__path_preview_get"
+    },
+    {
+      "method": "GET",
+      "path": "/compliance/report/{run_id}",
+      "operation_id": "get_compliance_report_compliance_report__run_id__get"
+    },
+    {
+      "method": "GET",
+      "path": "/compliance/report/{run_id}.txt",
+      "operation_id": "get_compliance_report_text_compliance_report__run_id__txt_get"
+    },
+    {
+      "method": "GET",
+      "path": "/compliance/report/{run_id}/export",
+      "operation_id": "export_compliance_report_compliance_report__run_id__export_get"
+    },
+    {
+      "method": "GET",
+      "path": "/compliance/frameworks",
+      "operation_id": "list_frameworks_compliance_frameworks_get"
+    },
+    {
+      "method": "GET",
+      "path": "/compliance/verify/{run_id}",
+      "operation_id": "verify_audit_chain_compliance_verify__run_id__get"
+    },
+    {
+      "method": "GET",
+      "path": "/llm/usage",
+      "operation_id": "llm_usage_llm_usage_get"
+    },
+    {
+      "method": "GET",
+      "path": "/llm/models",
+      "operation_id": "list_models_llm_models_get"
+    },
+    {
+      "method": "POST",
+      "path": "/llm/plan",
+      "operation_id": "generate_plan_llm_plan_post"
+    },
+    {
+      "method": "POST",
+      "path": "/llm/execute",
+      "operation_id": "execute_plan_llm_execute_post"
+    },
+    {
+      "method": "POST",
+      "path": "/llm/analyze",
+      "operation_id": "analyze_telemetry_llm_analyze_post"
+    },
+    {
+      "method": "POST",
+      "path": "/llm/scene",
+      "operation_id": "analyze_scene_llm_scene_post"
+    },
+    {
+      "method": "POST",
+      "path": "/llm/failure-analysis",
+      "operation_id": "failure_analysis_llm_failure_analysis_post"
+    },
+    {
+      "method": "POST",
+      "path": "/llm/agentic/propose",
+      "operation_id": "agentic_propose_llm_agentic_propose_post"
+    },
+    {
+      "method": "GET",
+      "path": "/operator/review/{run_id}",
+      "operation_id": "review_operator_review__run_id__get"
+    },
+    {
+      "method": "POST",
+      "path": "/operator/approve",
+      "operation_id": "approve_operator_approve_post"
+    },
+    {
+      "method": "POST",
+      "path": "/operator/override",
+      "operation_id": "operator_override_operator_override_post"
+    },
+    {
+      "method": "GET",
+      "path": "/operator/approvals/{run_id}",
+      "operation_id": "list_approvals_operator_approvals__run_id__get"
+    },
+    {
+      "method": "GET",
+      "path": "/policies/active",
+      "operation_id": "get_active_policies_active_get"
+    },
+    {
+      "method": "GET",
+      "path": "/policies/activations",
+      "operation_id": "list_activations_policies_activations_get"
+    },
+    {
+      "method": "GET",
+      "path": "/policies/proposals",
+      "operation_id": "list_proposals_policies_proposals_get"
+    },
+    {
+      "method": "POST",
+      "path": "/policies/proposals",
+      "operation_id": "create_proposal_policies_proposals_post"
+    },
+    {
+      "method": "POST",
+      "path": "/policies/proposals/from-tuning",
+      "operation_id": "create_from_tuning_policies_proposals_from_tuning_post"
+    },
+    {
+      "method": "GET",
+      "path": "/policies/proposals/{proposal_id}",
+      "operation_id": "get_proposal_policies_proposals__proposal_id__get"
+    },
+    {
+      "method": "POST",
+      "path": "/policies/proposals/{proposal_id}/evaluate",
+      "operation_id": "evaluate_proposal_policies_proposals__proposal_id__evaluate_post"
+    },
+    {
+      "method": "POST",
+      "path": "/policies/proposals/{proposal_id}/benchmark",
+      "operation_id": "benchmark_proposal_policies_proposals__proposal_id__benchmark_post"
+    },
+    {
+      "method": "POST",
+      "path": "/policies/proposals/{proposal_id}/approve",
+      "operation_id": "approve_proposal_policies_proposals__proposal_id__approve_post"
+    },
+    {
+      "method": "POST",
+      "path": "/policies/proposals/{proposal_id}/reject",
+      "operation_id": "reject_proposal_policies_proposals__proposal_id__reject_post"
+    },
+    {
+      "method": "POST",
+      "path": "/policies/proposals/{proposal_id}/activate",
+      "operation_id": "activate_proposal_policies_proposals__proposal_id__activate_post"
+    },
+    {
+      "method": "POST",
+      "path": "/policies/rollback",
+      "operation_id": "rollback_policies_rollback_post"
+    },
+    {
+      "method": "GET",
+      "path": "/site-intel/status",
+      "operation_id": "status_site_intel_status_get"
+    },
+    {
+      "method": "GET",
+      "path": "/site-intel/constraints",
+      "operation_id": "constraints_site_intel_constraints_get"
+    },
+    {
+      "method": "GET",
+      "path": "/site-intel/lookups",
+      "operation_id": "lookups_site_intel_lookups_get"
+    },
+    {
+      "method": "POST",
+      "path": "/site-intel/lookup",
+      "operation_id": "lookup_site_intel_lookup_post"
+    },
+    {
+      "method": "GET",
+      "path": "/site-intel/bulletins",
+      "operation_id": "bulletins_site_intel_bulletins_get"
+    },
+    {
+      "method": "POST",
+      "path": "/site-intel/bulletin",
+      "operation_id": "bulletin_site_intel_bulletin_post"
+    },
+    {
+      "method": "POST",
+      "path": "/site-intel/screen",
+      "operation_id": "screen_site_intel_screen_post"
+    },
+    {
+      "method": "GET",
+      "path": "/evidence/learning",
+      "operation_id": "learning_summary_evidence_learning_get"
+    },
+    {
+      "method": "GET",
+      "path": "/evidence/benchmarks",
+      "operation_id": "benchmarks_evidence_benchmarks_get"
+    },
+    {
+      "method": "GET",
+      "path": "/authority/status",
+      "operation_id": "status_authority_status_get"
+    },
+    {
+      "method": "POST",
+      "path": "/authority/kill",
+      "operation_id": "kill_authority_kill_post"
+    },
+    {
+      "method": "POST",
+      "path": "/authority/reset",
+      "operation_id": "reset_authority_reset_post"
+    },
+    {
+      "method": "POST",
+      "path": "/authority/voice",
+      "operation_id": "voice_stop_authority_voice_post"
+    },
+    {
+      "method": "POST",
+      "path": "/authority/drills",
+      "operation_id": "drills_authority_drills_post"
+    },
+    {
+      "method": "GET",
+      "path": "/authority/learning",
+      "operation_id": "learning_status_authority_learning_get"
+    },
+    {
+      "method": "GET",
+      "path": "/authority/evidence",
+      "operation_id": "evidence_authority_evidence_get"
+    }
+  ]
+}

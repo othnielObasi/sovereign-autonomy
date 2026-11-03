@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useEffect, useMemo, useRef, useState } from "react";
+import { OperatorActions } from "@/components/control/OperatorActions";
 import { getRun, listEvents, stopRun, operatorOverride, getWorld, getTelemetry, getPathPreview, triggerScenario, generateLLMPlan, executeLLMPlan, analyzeScene, analyzeTelemetry, detectFailures, agenticPropose, getMission, getRiskHeatmap, getExecutedPath, getRunSafetyReport, getDivergenceExplanation, analyzeRunOptimization } from "@/lib/api";
 import { WarehouseView } from "@/components/WarehouseView";
 import { ScoreCard } from "@/components/ScoreCard";
@@ -73,9 +74,9 @@ function StatusBadge({ status }: { status: string }) {
 
 function SafetyBadge({ state, detail }: { state: string; detail: string }) {
   const map: Record<string, string> = {
-    OK: "bg-green-500/20 text-green-400 border-green-500/30",
+    OK: "bg-green-500/20 text-emerald-700 border-green-500/30",
     STOP: "bg-red-500/20 text-red-400 border-red-500/30",
-    SLOW: "bg-yellow-500/20 text-yellow-400 border-yellow-500/30",
+    SLOW: "bg-yellow-500/20 text-amber-800 border-yellow-500/30",
     REPLAN: "bg-blue-500/20 text-blue-400 border-blue-500/30",
   };
   const cls = map[state] || map.OK;
@@ -103,7 +104,10 @@ export default function RunPage({ params }: { params: { runId: string } }) {
   const [riskCells, setRiskCells] = useState<Array<{x:number;y:number;risk:number}>>([]);
   const [alerts, setAlerts] = useState<any[]>([]);
   const [events, setEvents] = useState<any[]>([]);
+  const [operatorMessage,setOperatorMessage]=useState('');
   const [status, setStatus] = useState<string>("");
+  const missionRobot = useRef("robot-1");
+  const [pollConnected, setPollConnected] = useState(false);
   const [wsConnected, setWsConnected] = useState(false);
   const wsRef = useRef<WebSocket | null>(null);
   const reconnectTimer = useRef<any>(null);
@@ -236,7 +240,7 @@ export default function RunPage({ params }: { params: { runId: string } }) {
         }
       } catch (_) {}
       try { setWorld(await getWorld()); } catch (_) {}
-      try { setTelemetry(await getTelemetry()); } catch (_) {}
+      // Telemetry is loaded for the mission robot by the polling effect below.
       // Phase E: fetch safety report (optimization deferred to panel expand)
       try { setSafetyReport(await getRunSafetyReport(runId)); } catch (_) {}
       await refreshEvents();
@@ -258,8 +262,9 @@ export default function RunPage({ params }: { params: { runId: string } }) {
       };
 
       ws.onmessage = (ev) => {
-        const msg: WsMessage = JSON.parse(ev.data);
-        if (msg.kind === "telemetry") setTelemetry(msg.data);
+        let msg: WsMessage;
+        try { msg = JSON.parse(ev.data); } catch { return; }
+        if (msg.kind === "telemetry" && msg.data?.robot_id === missionRobot.current) setTelemetry(msg.data);
         if (msg.kind === "alert") setAlerts((a) => [{ ts: Date.now(), ...msg.data }, ...a].slice(0, 20));
         if (msg.kind === "planning_progress") {
           // Live planning substep from backend — append to visible progress log
@@ -341,6 +346,37 @@ export default function RunPage({ params }: { params: { runId: string } }) {
     t = setInterval(tick, 1500);
     return () => { if (t) clearInterval(t); };
   }, [runId]);
+
+  // HTTP is a real telemetry transport, including when a deployment cannot proxy WS.
+  // Never display robot-1's sensors while inspecting a robot-2 mission.
+  useEffect(() => {
+    if (!mission) return;
+    const robotId = mission.goal?.robot_id || "robot-1";
+    missionRobot.current = robotId;
+    let live = true, timer: ReturnType<typeof setTimeout>;
+    let version = "";
+    async function poll() {
+      try {
+        if (document.hidden) return;
+        const [sample, record] = await Promise.allSettled([getTelemetry(robotId), getRun(runId)]);
+        if (!live) return;
+        if (sample.status === "fulfilled" && sample.value.robot_id === robotId) {
+          setTelemetry(sample.value); setPollConnected(true);
+          if (!version || version !== sample.value.map_version) {
+            const layout = await getWorld();
+            if (live) setWorld(layout);
+            version = sample.value.map_version || "loaded";
+          }
+        } else setPollConnected(false);
+        if (record.status === "fulfilled" && live) {
+          setRun(record.value); setStatus(record.value.status);
+        }
+      } catch { if (live) setPollConnected(false); }
+      finally { if (live) timer = setTimeout(poll, 1000); }
+    }
+    void poll();
+    return () => { live = false; clearTimeout(timer); };
+  }, [runId, mission?.id, mission?.goal?.robot_id]);
 
   async function onStop() {
     await stopRun(runId);
@@ -561,15 +597,15 @@ export default function RunPage({ params }: { params: { runId: string } }) {
     && !agenticResult && !llmExecResult;
 
   const safetyBannerCls: Record<string, string> = {
-    OK: "bg-green-500/15 border-green-500/30 text-green-400",
+    OK: "bg-green-500/15 border-green-500/30 text-emerald-700",
     STOP: "bg-red-500/20 border-red-500/40 text-red-400",
-    SLOW: "bg-yellow-500/15 border-yellow-500/30 text-yellow-400",
+    SLOW: "bg-yellow-500/15 border-yellow-500/30 text-amber-800",
     REPLAN: "bg-blue-500/15 border-blue-500/30 text-blue-400",
   };
   const safetyIcon: Record<string, string> = { OK: "✅", STOP: "🔴", SLOW: "🟡", REPLAN: "🔵" };
 
   return (
-    <div className="max-w-[1400px] mx-auto px-4 py-4 space-y-3">
+    <div className="warehouse-run max-w-[1400px] mx-auto px-4 py-4 space-y-3">
       {/* Scenario toast notification (floating) */}
       {scenarioToast && (
         <div className="fixed top-20 right-4 z-50 bg-mc-panel/95 border border-cyan-500/40 rounded-xl px-4 py-3 shadow-lg shadow-black/30 backdrop-blur animate-slide-in max-w-xs">
@@ -591,10 +627,10 @@ export default function RunPage({ params }: { params: { runId: string } }) {
             </h1>
             <StatusBadge status={currentStatus} />
             <div className={`flex items-center gap-1.5 text-[11px] font-semibold px-2 py-0.5 rounded-full border ${
-              wsConnected ? "bg-mc-ok/10 text-mc-ok border-mc-ok/30" : "bg-mc-stop/10 text-mc-stop border-mc-stop/30"
+              (wsConnected || pollConnected) ? "bg-mc-ok/10 text-mc-ok border-mc-ok/30" : "bg-mc-stop/10 text-mc-stop border-mc-stop/30"
             }`}>
               <div className={`w-1.5 h-1.5 rounded-full bg-current ${wsConnected ? "animate-live-dot" : ""}`} />
-              {wsConnected ? "Live" : "Offline"}
+              {wsConnected ? "Live stream" : pollConnected ? "Live polling" : "Disconnected"}
             </div>
             {mission?.goal && <span className="text-xs text-mc-dim">goal ({mission.goal.x}, {mission.goal.y})</span>}
           </div>
@@ -605,31 +641,24 @@ export default function RunPage({ params }: { params: { runId: string } }) {
               Stop robot
             </button>
           )}
-          {currentStatus === "paused" && (
-            <button onClick={async () => {
-              try {
-                await operatorOverride(runId, "resume", "Operator approved after governance review");
-                setStatus("running");
-              } catch (e: any) { console.error("Override failed:", e); }
-            }} className="bg-amber-500/80 hover:bg-amber-600 text-white text-xs font-semibold px-3 py-1.5 rounded-lg transition animate-pulse">
-              ▶ Override &amp; Resume
-            </button>
-          )}
+          {currentStatus === "paused" && <button onClick={async()=>{try{await operatorOverride(runId,'resume','Operator resumed the paused mission');setStatus('running');}catch(e:any){setOperatorMessage(e.message||'Resume failed');}}} className="sa-button">Resume mission</button>}
           {/* Live diagnostics */}
           <div className="text-xs text-mc-mute ml-3 flex items-center gap-3">
             {executionReason && <span className="px-2 py-0.5 rounded bg-mc-raise">{executionReason}</span>}
             {distanceToGoalLive !== null && <span>Goal: {distanceToGoalLive.toFixed(2)}m</span>}
-            {stagnantCyclesLive > 0 && <span className="text-yellow-300">Stag: {stagnantCyclesLive}</span>}
+            {stagnantCyclesLive > 0 && <span className="text-amber-800">Stag: {stagnantCyclesLive}</span>}
           </div>
         </div>
       </div>
 
       {/* ── Multi-Scope Status Strip ── */}
+      <OperatorActions key={runId} runId={runId} status={currentStatus} onChange={async()=>{const r=await getRun(runId);setStatus(r.status);}}/>
+      {operatorMessage&&<p role="alert" className="text-mc-stop">{operatorMessage}</p>}
       <div className={`sticky top-0 z-20 backdrop-blur-md grid grid-cols-5 gap-1.5 px-3 py-2 rounded-lg border ${safetyBannerCls[safety.state] || safetyBannerCls.OK}`}>
         {/* Mission Status */}
         <div className="flex flex-col items-center text-center">
           <span className="text-[9px] uppercase tracking-wider text-mc-dim font-semibold">Mission</span>
-          <span className={`text-xs font-bold ${currentStatus === "stopped" ? "text-red-400" : currentStatus === "paused" ? "text-yellow-400" : currentStatus === "planning" ? "text-purple-400" : "text-green-400"}`}>
+          <span className={`text-xs font-bold ${currentStatus === "stopped" ? "text-red-400" : currentStatus === "paused" ? "text-amber-800" : currentStatus === "planning" ? "text-purple-400" : "text-emerald-700"}`}>
             {currentStatus === "running" ? "Active" : currentStatus === "stopped" ? "Halted" : currentStatus === "paused" ? "Paused" : currentStatus === "completed" ? "Complete" : currentStatus === "planning" ? "Planning…" : "Idle"}
           </span>
         </div>
@@ -637,9 +666,9 @@ export default function RunPage({ params }: { params: { runId: string } }) {
         <div className="flex flex-col items-center text-center">
           <span className="text-[9px] uppercase tracking-wider text-mc-dim font-semibold">Action Verdict</span>
           <span className={`text-xs font-bold ${
-            lastDecision?.governance?.decision === "APPROVED" ? "text-green-400" :
+            lastDecision?.governance?.decision === "APPROVED" ? "text-emerald-700" :
             lastDecision?.governance?.decision === "DENIED" ? "text-red-400" :
-            lastDecision?.governance?.decision === "NEEDS_REVIEW" ? "text-yellow-400" : "text-mc-mute"
+            lastDecision?.governance?.decision === "NEEDS_REVIEW" ? "text-amber-800" : "text-mc-mute"
           }`}>
             {lastDecision?.governance?.decision === "APPROVED"
               ? (lastDecision?.proposal?.intent === "STOP" ? "Approved Stop" : "Approved")
@@ -651,7 +680,7 @@ export default function RunPage({ params }: { params: { runId: string } }) {
           <span className="text-[9px] uppercase tracking-wider text-mc-dim font-semibold">Environment</span>
           <span className={`text-xs font-bold ${
             telemetry?.human_distance_m != null && telemetry.human_distance_m < 2 ? "text-red-400" :
-            telemetry?.human_distance_m != null && telemetry.human_distance_m < 4 ? "text-yellow-400" : "text-green-400"
+            telemetry?.human_distance_m != null && telemetry.human_distance_m < 4 ? "text-amber-800" : "text-emerald-700"
           }`}>
             {telemetry?.human_distance_m != null && telemetry.human_distance_m < 2 ? "Human Near"
               : telemetry?.human_distance_m != null && telemetry.human_distance_m < 4 ? "Elevated"
@@ -662,9 +691,9 @@ export default function RunPage({ params }: { params: { runId: string } }) {
         <div className="flex flex-col items-center text-center">
           <span className="text-[9px] uppercase tracking-wider text-mc-dim font-semibold">Planner</span>
           <span className={`text-xs font-bold ${
-            llmPlan?.all_approved === true ? "text-green-400" :
-            llmPlan?.all_approved === false ? "text-yellow-400" :
-            llmPlan && missionReview?.verdict === "APPROVED" ? "text-green-400" :
+            llmPlan?.all_approved === true ? "text-emerald-700" :
+            llmPlan?.all_approved === false ? "text-amber-800" :
+            llmPlan && missionReview?.verdict === "APPROVED" ? "text-emerald-700" :
             pipelineStage === "reasoning" || pipelineStage === "planning" ? "text-purple-400" : "text-mc-mute"
           }`}>
             {llmPlan?.all_approved === true ? "All Approved" :
@@ -678,9 +707,9 @@ export default function RunPage({ params }: { params: { runId: string } }) {
         <div className="flex flex-col items-center text-center">
           <span className="text-[9px] uppercase tracking-wider text-mc-dim font-semibold">Execution</span>
           <span className={`text-xs font-bold ${
-            safety.state === "OK" ? "text-green-400" :
+            safety.state === "OK" ? "text-emerald-700" :
             safety.state === "STOP" ? "text-red-400" :
-            safety.state === "SLOW" ? "text-yellow-400" : "text-blue-400"
+            safety.state === "SLOW" ? "text-amber-800" : "text-blue-400"
           }`}>
             {safety.state === "OK" ? "Within Bounds" :
              safety.state === "STOP" ? "Stopped" :
@@ -690,12 +719,13 @@ export default function RunPage({ params }: { params: { runId: string } }) {
       </div>
 
       {/* ── MAIN LAYOUT: Hero Map (left 60%) + Sidebar (right 40%) ── */}
+      {status === 'completed' && telemetry?.capability_profile_version?.startsWith('sim-') && <p role="status" className="rounded-lg border border-emerald-700/30 bg-emerald-50 px-4 py-3 text-sm text-emerald-900">Delivery completed. This simulator returns the robot to parking after arrival; the live position now shows its parking location. The run record retains the route and arrival decisions.</p>}
       <div ref={fullscreenGridRef} className={`grid grid-cols-1 lg:grid-cols-5 gap-3 [&:fullscreen]:bg-mc-bg [&:fullscreen]:p-4 [&:fullscreen]:overflow-y-auto`}>
 
         {/* ── LEFT: Hero Map ── */}
-        <div className="lg:col-span-3 space-y-3">
+        <div className="min-w-0 lg:col-span-3 space-y-3">
           <Card title="Warehouse Simulation">
-            <div className="flex items-center justify-between mb-2">
+            <div className="flex flex-wrap items-center justify-between gap-2 mb-2">
               <div className="flex items-center gap-3">
                 <label className="text-[10px] text-mc-mute flex items-center gap-1 cursor-pointer">
                   <input type="checkbox" checked={showHeatmap} onChange={(e) => setShowHeatmap(e.target.checked)} className="accent-cyan-500 w-3 h-3" />
@@ -707,14 +737,14 @@ export default function RunPage({ params }: { params: { runId: string } }) {
                 </label>
               </div>
               {/* Scenario triggers */}
-              <div className="flex items-center gap-1.5">
+              <div className="flex flex-wrap items-center gap-1.5">
                 {([
-                  { key: "human_approach", icon: "🚶", label: "Human Near", cls: "border-yellow-500/40 text-yellow-400 hover:bg-yellow-500/20" },
+                  { key: "human_approach", icon: "🚶", label: "Human Near", cls: "border-yellow-500/40 text-amber-800 hover:bg-yellow-500/20" },
                   { key: "human_too_close", icon: "🛑", label: "Too Close", cls: "border-red-500/40 text-red-400 hover:bg-red-500/20" },
                   { key: "path_blocked", icon: "🚧", label: "Blocked", cls: "border-blue-500/40 text-blue-400 hover:bg-blue-500/20" },
                   { key: "spill", icon: "💧", label: "Spill", cls: "border-sky-500/40 text-sky-400 hover:bg-sky-500/20" },
                   { key: "forklift_crossing", icon: "🚜", label: "Forklift", cls: "border-amber-500/40 text-amber-400 hover:bg-amber-500/20" },
-                  { key: "clear", icon: "✅", label: "Clear", cls: "border-green-500/40 text-green-400 hover:bg-green-500/20" },
+                  { key: "clear", icon: "✅", label: "Clear", cls: "border-green-500/40 text-emerald-700 hover:bg-green-500/20" },
                 ] as const).map((s) => (
                   <button
                     key={s.key}
@@ -759,8 +789,8 @@ export default function RunPage({ params }: { params: { runId: string } }) {
               {llmPlan && executedPathData.length > 0 && (
                 <span className={`ml-auto flex items-center gap-1 text-[10px] font-semibold px-2 py-0.5 rounded-full border ${
                   divergenceExplanation?.divergence_detected
-                    ? "bg-yellow-500/15 text-yellow-400 border-yellow-500/30"
-                    : "bg-green-500/15 text-green-400 border-green-500/30"
+                    ? "bg-yellow-500/15 text-amber-800 border-yellow-500/30"
+                    : "bg-green-500/15 text-emerald-700 border-green-500/30"
                 }`}>
                   {divergenceExplanation?.divergence_detected ? "⚠ Plan Diverged" : "✓ Following Approved Plan"}
                 </span>
@@ -796,7 +826,7 @@ export default function RunPage({ params }: { params: { runId: string } }) {
             </div>
 
             {/* Pipeline step indicator — numbered intelligence pipeline */}
-            <div className="flex items-center gap-0 mb-3 text-[10px] font-semibold">
+            <div className="warehouse-pipeline flex items-center gap-0 mb-3 text-[10px] font-semibold">
               {([
                 { key: "reasoning", label: "1. Reasoning", icon: "🧠" },
                 { key: "planning", label: "2. Plan", icon: "🗺️" },
@@ -814,7 +844,7 @@ export default function RunPage({ params }: { params: { runId: string } }) {
                     {i > 0 && <div className={`flex-1 h-0.5 mx-1 rounded ${isDone ? "bg-green-500" : isActive ? "bg-purple-500 animate-pulse" : "bg-mc-raise"}`} />}
                     <div className={`flex items-center gap-1 px-2 py-1 rounded-md border transition-all ${
                       isActive ? "border-purple-500/50 bg-purple-500/15 text-purple-300" :
-                      isDone ? "border-green-500/30 bg-green-500/10 text-green-400" :
+                      isDone ? "border-green-500/30 bg-green-500/10 text-emerald-700" :
                       "border-mc-line text-mc-dim"
                     }`}>
                       <span>{isDone ? "✓" : stage.icon}</span>
@@ -828,7 +858,7 @@ export default function RunPage({ params }: { params: { runId: string } }) {
             {/* ── Auto-pilot banner: explain what's happening when backend drives the run ── */}
             {isBackendAutoPilot && (
               <div className="flex items-start gap-2 bg-cyan-500/10 border border-cyan-500/30 rounded-lg p-3 mb-3">
-                <span className="text-cyan-400 text-base mt-0.5">{currentStatus === "planning" ? "🗺️" : "🚀"}</span>
+                <span className="text-teal-700 text-base mt-0.5">{currentStatus === "planning" ? "🗺️" : "🚀"}</span>
                 <div>
                   <div className="text-sm font-semibold text-cyan-300">
                     {currentStatus === "planning" ? "AI is generating a plan…" : "Mission running autonomously"}
@@ -861,15 +891,15 @@ export default function RunPage({ params }: { params: { runId: string } }) {
 
             {/* Instruction input + Plan button (hidden during auto-pilot; shown when idle or done) */}
             {!isBackendAutoPilot && (
-            <div className="flex gap-2 mb-3">
+            <div className="flex flex-col sm:flex-row gap-2 mb-3">
               <input type="text" value={missionInstruction} onChange={(e) => setMissionInstruction(e.target.value)}
                 onKeyDown={(e) => e.key === "Enter" && pipelineStage === "idle" && onRunPipeline()}
                 placeholder={mission?.title || "Navigate to loading bay avoiding obstacles"}
-                className="flex-1 bg-mc-bg/60 border border-mc-line2 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-purple-500 placeholder:text-mc-dim" />
+                className="min-w-0 flex-1 bg-mc-bg/60 border border-mc-line2 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-purple-500 placeholder:text-mc-dim" />
               <button onClick={onRunPipeline}
                 disabled={pipelineStage !== "idle" || !missionInstruction.trim()}
                 className="bg-purple-500 hover:bg-purple-600 disabled:bg-mc-line2 text-white text-sm font-semibold px-4 py-2 rounded-lg transition whitespace-nowrap">
-                {pipelineStage === "reasoning" ? "🧠 Reasoning..." : pipelineStage === "planning" ? "🗺️ Planning..." : pipelineStage === "executing" ? "🚀 Executing..." : pipelineStage === "done" ? "✓ Done" : "Plan →"}
+                {currentStatus === "paused" ? "Paused" : pipelineStage === "reasoning" ? "🧠 Reasoning..." : pipelineStage === "planning" ? "🗺️ Planning..." : pipelineStage === "executing" ? "🚀 Executing..." : pipelineStage === "done" ? "✓ Done" : "Plan →"}
               </button>
             </div>
             )}
@@ -963,7 +993,7 @@ export default function RunPage({ params }: { params: { runId: string } }) {
                     </button>
                   </div>
                   <div className="flex items-start gap-2">
-                    <span className="text-cyan-400 font-bold min-w-[80px]">Constraints:</span>
+                    <span className="text-teal-700 font-bold min-w-[80px]">Constraints:</span>
                     <div className="text-mc-ink/85 space-y-0.5">
                       {world?.human && <div>- Human @{world.human.x},{world.human.y}</div>}
                       {(world?.obstacles || []).slice(0, 1).map((o: any, i: number) => (
@@ -982,14 +1012,14 @@ export default function RunPage({ params }: { params: { runId: string } }) {
                   </div>
                   {/* Planner Confidence vs Governance Risk — explicitly distinct */}
                   <div className="flex items-center gap-2">
-                    <span className="text-yellow-400 font-bold min-w-[120px]">Planner Confidence:</span>
+                    <span className="text-amber-800 font-bold min-w-[120px]">Planner Confidence:</span>
                     {
                       (() => {
                         const risk = agenticResult.governance?.risk_score ?? 0;
                         const raw = 1 - risk;
                         const adjusted = Math.max(0, Math.min(1, raw * 0.92 + 0.04));
                         const pct = (adjusted * 100).toFixed(1);
-                        const color = adjusted > 0.7 ? "text-green-400" : adjusted > 0.4 ? "text-yellow-400" : "text-red-400";
+                        const color = adjusted > 0.7 ? "text-emerald-700" : adjusted > 0.4 ? "text-amber-800" : "text-red-400";
                         return (
                           <>
                             <span className={`font-bold ${color}`}>{pct}%</span>
@@ -1007,7 +1037,7 @@ export default function RunPage({ params }: { params: { runId: string } }) {
                       (() => {
                         const risk = agenticResult.governance?.risk_score ?? 0;
                         const pct = (risk * 100).toFixed(1);
-                        const color = risk > 0.5 ? "text-red-400" : risk > 0.2 ? "text-yellow-400" : "text-green-400";
+                        const color = risk > 0.5 ? "text-red-400" : risk > 0.2 ? "text-amber-800" : "text-emerald-700";
                         return (
                           <>
                             <span className={`font-bold ${color}`}>{pct}%</span>
@@ -1037,7 +1067,7 @@ export default function RunPage({ params }: { params: { runId: string } }) {
                                 "bg-mc-raise text-mc-ink/85"
                               }`}>{s.action}</span>
                               <span className="text-mc-dim">→</span>
-                              <span className={isReplan ? "text-amber-400" : isOk ? "text-green-400" : "text-amber-400"}>{isReplan ? "⟳ replanning" : isOk ? "OK" : "⚠ violation"}</span>
+                              <span className={isReplan ? "text-amber-400" : isOk ? "text-emerald-700" : "text-amber-400"}>{isReplan ? "⟳ replanning" : isOk ? "OK" : "⚠ violation"}</span>
                               {s.thought && <span className={`truncate max-w-[300px] ${isReplan ? "text-amber-400/70" : "text-mc-dim"}`}>{s.thought}</span>}
                             </div>
                           );
@@ -1072,7 +1102,7 @@ export default function RunPage({ params }: { params: { runId: string } }) {
                   {agenticResult.proposal && (
                     <>
                       <span className="text-mc-dim">→</span>
-                      <span className="font-semibold text-cyan-400">{agenticResult.proposal.intent}</span>
+                      <span className="font-semibold text-teal-700">{agenticResult.proposal.intent}</span>
                       {agenticResult.proposal.params?.x != null && <span className="text-mc-mute">({agenticResult.proposal.params.x}, {agenticResult.proposal.params.y})</span>}
                     </>
                   )}
@@ -1091,13 +1121,13 @@ export default function RunPage({ params }: { params: { runId: string } }) {
                       <span className="text-mc-dim text-[10px]">Preliminary Validation</span>
                     </div>
                     <div className="flex items-center gap-3 text-[10px]">
-                      <span className="text-mc-dim">Planner Confidence: <span className={`font-bold ${(1 - (agenticResult.governance.risk_score ?? 0)) > 0.7 ? "text-green-400" : "text-yellow-400"}`}>{((1 - (agenticResult.governance.risk_score ?? 0)) * 100).toFixed(0)}%</span></span>
+                      <span className="text-mc-dim">Planner Confidence: <span className={`font-bold ${(1 - (agenticResult.governance.risk_score ?? 0)) > 0.7 ? "text-emerald-700" : "text-amber-800"}`}>{((1 - (agenticResult.governance.risk_score ?? 0)) * 100).toFixed(0)}%</span></span>
                       <span className="text-mc-dim">|</span>
-                      <span className="text-mc-dim">Governance Risk: <span className={`font-bold ${(agenticResult.governance.risk_score ?? 0) > 0.5 ? "text-red-400" : (agenticResult.governance.risk_score ?? 0) > 0.2 ? "text-yellow-400" : "text-green-400"}`}>{((agenticResult.governance.risk_score ?? 0) * 100).toFixed(0)}%</span></span>
+                      <span className="text-mc-dim">Governance Risk: <span className={`font-bold ${(agenticResult.governance.risk_score ?? 0) > 0.5 ? "text-red-400" : (agenticResult.governance.risk_score ?? 0) > 0.2 ? "text-amber-800" : "text-emerald-700"}`}>{((agenticResult.governance.risk_score ?? 0) * 100).toFixed(0)}%</span></span>
                     </div>
                     {/* Why Approved / Why Denied — explainability */}
                     {agenticResult.governance.decision === "APPROVED" && telemetry && (
-                      <div className="text-[10px] text-green-400/70 space-y-0.5 pt-1 border-t border-green-500/10">
+                      <div className="text-[10px] text-emerald-700/70 space-y-0.5 pt-1 border-t border-green-500/10">
                         <div className="text-green-300 font-semibold mb-0.5">Checks satisfied:</div>
                         {telemetry.human_distance_m > 3 && <div>✓ Human distance: {telemetry.human_distance_m?.toFixed(1)}m {'>'} 3m safe threshold</div>}
                         {telemetry.human_distance_m <= 3 && telemetry.human_distance_m > 1 && <div>✓ Human distance: {telemetry.human_distance_m?.toFixed(1)}m — speed reduced to safe level</div>}
@@ -1179,9 +1209,9 @@ export default function RunPage({ params }: { params: { runId: string } }) {
                     return (
                       <span key={i} onMouseEnter={() => setHoveredWaypointIdx(i)} onMouseLeave={() => setHoveredWaypointIdx(null)} onClick={() => setActiveWaypointIdx(i)} className={`cursor-pointer text-[10px] px-1.5 py-0.5 rounded border transition-all duration-300 ${
                         isActive ? "border-cyan-400 bg-cyan-500/25 text-cyan-200 shadow-sm shadow-cyan-500/30 scale-105 font-bold" :
-                        isCompleted ? "border-green-500/40 bg-green-500/15 text-green-400 line-through opacity-70" :
+                        isCompleted ? "border-green-500/40 bg-green-500/15 text-emerald-700 line-through opacity-70" :
                         isNext ? "border-purple-400/40 bg-purple-500/10 text-purple-300 animate-pulse" :
-                        ok ? "border-green-500/30 text-green-400" : "border-yellow-500/30 text-yellow-400"
+                        ok ? "border-green-500/30 text-emerald-700" : "border-yellow-500/30 text-amber-800"
                       }`}>
                         {isCompleted ? "✓" : isActive ? "▶" : `${i + 1}:`} ({wp.x.toFixed(0)},{wp.y.toFixed(0)}) @{wp.max_speed}
                       </span>
@@ -1206,13 +1236,13 @@ export default function RunPage({ params }: { params: { runId: string } }) {
             {llmExecResult && (
               <div className="space-y-1 mb-2">
                 <div className="text-[10px] uppercase tracking-wide text-mc-dim font-semibold">Execution Result</div>
-                <span className={`text-xs font-semibold ${llmExecResult.status === "completed" ? "text-green-400" : "text-yellow-400"}`}>
+                <span className={`text-xs font-semibold ${llmExecResult.status === "completed" ? "text-emerald-700" : "text-amber-800"}`}>
                   {llmExecResult.status?.toUpperCase()}
                 </span>
                 {(llmExecResult.steps || []).map((step: any, i: number) => (
                   <div key={i} className={`flex items-center gap-1 px-2 py-1 rounded text-xs ${step.executed ? "bg-green-500/10" : "bg-red-500/10"}`}>
                     <span className="font-mono text-purple-400">WP{step.waypoint_index + 1}</span>
-                    <span className={step.executed ? "text-green-400" : "text-red-400"}>{step.executed ? "✓" : "✗"}</span>
+                    <span className={step.executed ? "text-emerald-700" : "text-red-400"}>{step.executed ? "✓" : "✗"}</span>
                     <span className="text-mc-dim">{step.policy_state}</span>
                   </div>
                 ))}
@@ -1232,7 +1262,7 @@ export default function RunPage({ params }: { params: { runId: string } }) {
         </div>
 
         {/* ── RIGHT SIDEBAR ── */}
-        <div className="lg:col-span-2 space-y-3 lg:sticky lg:top-14 lg:self-start lg:max-h-[calc(100vh-4.5rem)] lg:overflow-y-auto dash-scroll">
+        <div className="min-w-0 lg:col-span-2 space-y-3 lg:sticky lg:top-14 lg:self-start lg:max-h-[calc(100vh-4.5rem)] lg:overflow-y-auto dash-scroll">
 
           {/* Compact Governance Decision */}
           <Card title="Governance Decision">
@@ -1250,7 +1280,7 @@ export default function RunPage({ params }: { params: { runId: string } }) {
                       {lastDecision.governance?.decision === "APPROVED" ? "✅" : lastDecision.governance?.decision === "DENIED" ? "❌" : "⚠️"}
                     </span>
                     <span className={`font-bold ${isFullscreen ? "text-sm" : "text-lg"} ${
-                      lastDecision.governance?.decision === "APPROVED" ? "text-green-400" : lastDecision.governance?.decision === "DENIED" ? "text-red-400" : "text-yellow-400"
+                      lastDecision.governance?.decision === "APPROVED" ? "text-emerald-700" : lastDecision.governance?.decision === "DENIED" ? "text-red-400" : "text-amber-800"
                     }`}>
                       {lastDecision.governance?.decision === "APPROVED" && lastDecision.proposal?.intent === "STOP"
                         ? "APPROVED STOP"
@@ -1275,15 +1305,15 @@ export default function RunPage({ params }: { params: { runId: string } }) {
                     <span className="text-mc-dim min-w-[65px]">Policies:</span>
                     <span className="text-mc-ink/85 font-mono">{(lastDecision.governance?.policy_hits || []).length > 0
                       ? (lastDecision.governance.policy_hits).join(", ")
-                      : <span className="text-green-400">✓ 0 violations (11 active)</span>}</span>
+                      : <span className="text-emerald-700">✓ 0 violations (11 active)</span>}</span>
                   </div>
                 </div>
                 )}
                 {lastDecision.governance?.decision === "APPROVED" && !isFullscreen && (
                   <div className="bg-green-500/5 border border-green-500/20 rounded p-2 space-y-1">
                     <div className="flex items-center justify-between mb-1">
-                      <span className="text-green-400 font-semibold text-[10px] uppercase tracking-wider">All 11 Policies Passed</span>
-                      <span className="text-[10px] text-green-400/60 font-mono">0 denied · 0 constrained</span>
+                      <span className="text-emerald-700 font-semibold text-[10px] uppercase tracking-wider">All 11 Policies Passed</span>
+                      <span className="text-[10px] text-emerald-700/60 font-mono">0 denied · 0 constrained</span>
                     </div>
                     {[
                       { label: "GEOFENCE_01", check: telemetry ? `pos (${telemetry.x?.toFixed(1)},${telemetry.y?.toFixed(1)}) inside boundary` : "position inside boundary" },
@@ -1300,7 +1330,7 @@ export default function RunPage({ params }: { params: { runId: string } }) {
                     ].map((item, i) => (
                       <div key={i} className="flex items-center gap-1.5">
                         <span className="text-green-500 text-[10px]">✓</span>
-                        <span className="text-cyan-400 font-mono text-[10px] min-w-[140px]">{item.label}</span>
+                        <span className="text-teal-700 font-mono text-[10px] min-w-[140px]">{item.label}</span>
                         <span className="text-green-300/80 text-[10px]">{item.check}</span>
                       </div>
                     ))}
@@ -1313,7 +1343,7 @@ export default function RunPage({ params }: { params: { runId: string } }) {
                   </div>
                 )}
                 {lastDecision.governance?.required_action && (
-                  <div className="bg-yellow-500/10 border border-yellow-500/30 rounded px-2 py-1 text-yellow-300">
+                  <div className="bg-yellow-500/10 border border-yellow-500/30 rounded px-2 py-1 text-amber-800">
                     {lastDecision.governance.required_action}
                   </div>
                 )}
@@ -1361,7 +1391,7 @@ export default function RunPage({ params }: { params: { runId: string } }) {
                   </div>
                   <details>
                     <summary className="text-[10px] text-mc-dim cursor-pointer hover:text-mc-mute">Show Raw JSON</summary>
-                    <pre className="text-[10px] text-green-400/70 bg-mc-bg/60 p-2 rounded mt-1 overflow-x-auto max-h-40 overflow-y-auto font-mono">
+                    <pre className="text-[10px] text-emerald-700/70 bg-mc-bg/60 p-2 rounded mt-1 overflow-x-auto max-h-40 overflow-y-auto font-mono">
   {JSON.stringify(telemetry, null, 2)}
                     </pre>
                   </details>
@@ -1403,22 +1433,22 @@ export default function RunPage({ params }: { params: { runId: string } }) {
               {alerts.length === 0 ? (
                 <div className="text-xs text-mc-dim space-y-1">
                   <div className="flex items-center gap-2 bg-green-500/5 border border-green-500/10 rounded px-2 py-1">
-                    <span className="text-green-400 text-[10px]">●</span>
+                    <span className="text-emerald-700 text-[10px]">●</span>
                     <span className="text-[10px] text-mc-dim font-mono mr-1">PWR</span>
                     <span className="text-mc-mute">Battery at 96% — normal operating range</span>
                   </div>
                   <div className="flex items-center gap-2 bg-green-500/5 border border-green-500/10 rounded px-2 py-1">
-                    <span className="text-green-400 text-[10px]">●</span>
+                    <span className="text-emerald-700 text-[10px]">●</span>
                     <span className="text-[10px] text-mc-dim font-mono mr-1">NAV</span>
                     <span className="text-mc-mute">Path deviation 0.12m — within ±0.5m tolerance</span>
                   </div>
                   <div className="flex items-center gap-2 bg-green-500/5 border border-green-500/10 rounded px-2 py-1">
-                    <span className="text-green-400 text-[10px]">●</span>
+                    <span className="text-emerald-700 text-[10px]">●</span>
                     <span className="text-[10px] text-mc-dim font-mono mr-1">SEN</span>
                     <span className="text-mc-mute">Motor temp 42°C — below 65°C threshold</span>
                   </div>
                   <div className="flex items-center gap-2 bg-green-500/5 border border-green-500/10 rounded px-2 py-1">
-                    <span className="text-green-400 text-[10px]">●</span>
+                    <span className="text-emerald-700 text-[10px]">●</span>
                     <span className="text-[10px] text-mc-dim font-mono mr-1">COM</span>
                     <span className="text-mc-mute">Position update latency 12ms — below 100ms threshold</span>
                   </div>
@@ -1459,7 +1489,7 @@ export default function RunPage({ params }: { params: { runId: string } }) {
             {/* Agent Introspection (#20) */}
             {!isFullscreen && (
             <CollapsibleCard title="🔍 Agent Introspection" defaultOpen={true}
-              hint={replanCount > 0 ? <span className="text-amber-400">{replanCount} replans · {lastDenialPolicy || "policy hit"}</span> : <span className="text-green-400">No denials</span>}>
+              hint={replanCount > 0 ? <span className="text-amber-400">{replanCount} replans · {lastDenialPolicy || "policy hit"}</span> : <span className="text-emerald-700">No denials</span>}>
               <IntrospectionPanel runId={runId} />
             </CollapsibleCard>
             )}
@@ -1467,16 +1497,16 @@ export default function RunPage({ params }: { params: { runId: string } }) {
             {/* Safety Report (#14) */}
             {!isFullscreen && (
             <CollapsibleCard title="🛡️ Safety Report" defaultOpen={false}
-              hint={safetyReport ? <span className={safetyReport.verdict === "PASS" ? "text-green-400" : "text-red-400"}>{safetyReport.verdict === "PASS" ? "✓ PASS" : safetyReport.verdict === "FAIL" ? "✗ FAIL" : "⚠ " + safetyReport.verdict} · {safetyReport.checks_run || 0} checks</span> : <span className="text-mc-dim">Awaiting data</span>}>
+              hint={safetyReport ? <span className={safetyReport.verdict === "PASS" ? "text-emerald-700" : "text-red-400"}>{safetyReport.verdict === "PASS" ? "✓ PASS" : safetyReport.verdict === "FAIL" ? "✗ FAIL" : "⚠ " + safetyReport.verdict} · {safetyReport.checks_run || 0} checks</span> : <span className="text-mc-dim">Awaiting data</span>}>
               {!safetyReport ? (
                 <div className="text-xs text-mc-dim text-center py-2">No safety report yet</div>
               ) : (
                 <div className="space-y-2">
                   <div className="flex items-center justify-between">
                     <span className={`text-xs font-bold px-2 py-1 rounded-full border ${
-                      safetyReport.verdict === "PASS" ? "bg-green-500/15 text-green-400 border-green-500/30" :
+                      safetyReport.verdict === "PASS" ? "bg-green-500/15 text-emerald-700 border-green-500/30" :
                       safetyReport.verdict === "FAIL" ? "bg-red-500/15 text-red-400 border-red-500/30" :
-                      "bg-yellow-500/15 text-yellow-400 border-yellow-500/30"
+                      "bg-yellow-500/15 text-amber-800 border-yellow-500/30"
                     }`}>
                       {safetyReport.verdict === "PASS" ? "✓ PASS" : safetyReport.verdict === "FAIL" ? "✗ FAIL" : "⚠ " + (safetyReport.verdict || "N/A")}
                     </span>
@@ -1510,11 +1540,11 @@ export default function RunPage({ params }: { params: { runId: string } }) {
             {/* Optimization Analysis (#7) */}
             {!isFullscreen && (
             <CollapsibleCard title="⚡ Optimization Analysis" defaultOpen={false}
-              hint={optimizationAnalysis ? <span className="text-cyan-400">Eff: {((optimizationAnalysis.scorecard?.scores?.efficiency ?? 0) * 100).toFixed(0)}% · Safety: {((optimizationAnalysis.scorecard?.scores?.safety ?? 0) * 100).toFixed(0)}%</span> : <span className="text-mc-dim">Click to load</span>}>
+              hint={optimizationAnalysis ? <span className="text-teal-700">Eff: {((optimizationAnalysis.scorecard?.scores?.efficiency ?? 0) * 100).toFixed(0)}% · Safety: {((optimizationAnalysis.scorecard?.scores?.safety ?? 0) * 100).toFixed(0)}%</span> : <span className="text-mc-dim">Click to load</span>}>
               {!optimizationAnalysis ? (
                 <div className="text-center py-2">
                   <button onClick={async () => { try { setOptimizationAnalysis(await analyzeRunOptimization(runId)); } catch (_) {} }}
-                    className="text-xs bg-cyan-600/20 hover:bg-cyan-600/40 text-cyan-400 px-3 py-1.5 rounded border border-cyan-500/30 transition-colors">
+                    className="text-xs bg-cyan-600/20 hover:bg-cyan-600/40 text-teal-700 px-3 py-1.5 rounded border border-cyan-500/30 transition-colors">
                     Load Analysis
                   </button>
                 </div>
@@ -1560,7 +1590,7 @@ export default function RunPage({ params }: { params: { runId: string } }) {
                     </div>
                   )}
                   {optimizationAnalysis.recommendations?.length === 0 && (
-                    <div className="text-[10px] text-green-400/70">All parameters within optimal bounds</div>
+                    <div className="text-[10px] text-emerald-700/70">All parameters within optimal bounds</div>
                   )}
                 </div>
               )}
@@ -1570,13 +1600,13 @@ export default function RunPage({ params }: { params: { runId: string } }) {
             {/* Divergence Explanation (#20) */}
             {!isFullscreen && (
             <CollapsibleCard title="🔀 Divergence Explanation" defaultOpen={true}
-              hint={divergenceExplanation ? (divergenceExplanation.divergence_detected ? <span className="text-yellow-400">⚠ Diverged · {divergenceExplanation.max_deviation?.toFixed?.(1) || "?"}m</span> : <span className="text-green-400">✓ On Track</span>) : <span className="text-mc-dim">Click to analyze</span>}>
+              hint={divergenceExplanation ? (divergenceExplanation.divergence_detected ? <span className="text-amber-800">⚠ Diverged · {divergenceExplanation.max_deviation?.toFixed?.(1) || "?"}m</span> : <span className="text-emerald-700">✓ On Track</span>) : <span className="text-mc-dim">Click to analyze</span>}>
               <div className="space-y-2">
                 {divergenceExplanation ? (
                   <>
                     {divergenceExplanation.divergence_detected != null && (
                       <span className={`text-[10px] font-bold px-2 py-1 rounded-full border ${
-                        divergenceExplanation.divergence_detected ? "bg-yellow-500/15 text-yellow-400 border-yellow-500/30" : "bg-green-500/15 text-green-400 border-green-500/30"
+                        divergenceExplanation.divergence_detected ? "bg-yellow-500/15 text-amber-800 border-yellow-500/30" : "bg-green-500/15 text-emerald-700 border-green-500/30"
                       }`}>
                         {divergenceExplanation.divergence_detected ? "⚠ Divergence Detected" : "✓ On Track"}
                       </span>
@@ -1650,12 +1680,12 @@ export default function RunPage({ params }: { params: { runId: string } }) {
                     </div>
                   </div>
                   <div className="flex items-center gap-1">
-                    <span className="text-yellow-400 font-bold min-w-[70px]">Confidence:</span>
-                    {(() => { const r = agenticResult.governance?.risk_score ?? 0; const c = Math.max(0, Math.min(1, (1-r)*0.92+0.04)); return <><span className={`font-bold ${c>0.7?"text-green-400":"text-yellow-400"}`}>{(c*100).toFixed(0)}%</span><div className="flex-1 h-1 bg-mc-raise rounded-full ml-1"><div className={`h-full rounded-full ${c>0.7?"bg-green-500":"bg-yellow-500"}`} style={{width:`${c*100}%`}}/></div></>; })()}
+                    <span className="text-amber-800 font-bold min-w-[70px]">Confidence:</span>
+                    {(() => { const r = agenticResult.governance?.risk_score ?? 0; const c = Math.max(0, Math.min(1, (1-r)*0.92+0.04)); return <><span className={`font-bold ${c>0.7?"text-emerald-700":"text-amber-800"}`}>{(c*100).toFixed(0)}%</span><div className="flex-1 h-1 bg-mc-raise rounded-full ml-1"><div className={`h-full rounded-full ${c>0.7?"bg-green-500":"bg-yellow-500"}`} style={{width:`${c*100}%`}}/></div></>; })()}
                   </div>
                   <div className="flex items-center gap-1">
                     <span className="text-red-400 font-bold min-w-[70px]">Gov Risk:</span>
-                    {(() => { const r = agenticResult.governance?.risk_score ?? 0; return <><span className={`font-bold ${r>0.5?"text-red-400":"text-green-400"}`}>{(r*100).toFixed(0)}%</span><div className="flex-1 h-1 bg-mc-raise rounded-full ml-1"><div className={`h-full rounded-full ${r>0.5?"bg-red-500":"bg-green-500"}`} style={{width:`${r*100}%`}}/></div></>; })()}
+                    {(() => { const r = agenticResult.governance?.risk_score ?? 0; return <><span className={`font-bold ${r>0.5?"text-red-400":"text-emerald-700"}`}>{(r*100).toFixed(0)}%</span><div className="flex-1 h-1 bg-mc-raise rounded-full ml-1"><div className={`h-full rounded-full ${r>0.5?"bg-red-500":"bg-green-500"}`} style={{width:`${r*100}%`}}/></div></>; })()}
                   </div>
                 </div>
                 {agenticResult.model_used && <div className="text-[9px] text-mc-dim font-mono">Model: {agenticResult.model_used}</div>}
@@ -1676,8 +1706,8 @@ export default function RunPage({ params }: { params: { runId: string } }) {
                     <span className="text-mc-ink/85 truncate">{llmPlan.rationale || "Direct path with obstacle avoidance"}</span>
                   </div>
                   <div className="flex items-center gap-1">
-                    <span className="text-yellow-400 font-bold min-w-[70px]">Confidence:</span>
-                    {(() => { const r = lastDecision?.governance?.risk_score ?? 0.15; const c = Math.max(0, Math.min(1, (1-r)*0.92+0.04)); return <><span className={`font-bold ${c>0.7?"text-green-400":"text-yellow-400"}`}>{(c*100).toFixed(0)}%</span><div className="flex-1 h-1 bg-mc-raise rounded-full ml-1"><div className={`h-full rounded-full ${c>0.7?"bg-green-500":"bg-yellow-500"}`} style={{width:`${c*100}%`}}/></div></>; })()}
+                    <span className="text-amber-800 font-bold min-w-[70px]">Confidence:</span>
+                    {(() => { const r = lastDecision?.governance?.risk_score ?? 0.15; const c = Math.max(0, Math.min(1, (1-r)*0.92+0.04)); return <><span className={`font-bold ${c>0.7?"text-emerald-700":"text-amber-800"}`}>{(c*100).toFixed(0)}%</span><div className="flex-1 h-1 bg-mc-raise rounded-full ml-1"><div className={`h-full rounded-full ${c>0.7?"bg-green-500":"bg-yellow-500"}`} style={{width:`${c*100}%`}}/></div></>; })()}
                   </div>
                 </div>
                 {llmPlan.model && <div className="text-[9px] text-mc-dim font-mono">Model: {llmPlan.model}</div>}
@@ -1688,7 +1718,7 @@ export default function RunPage({ params }: { params: { runId: string } }) {
             {llmPlan && (
               <div className="space-y-1.5 mb-2">
                 <div className="flex items-center gap-2 flex-wrap">
-                  <span className={`text-[9px] font-semibold px-1.5 py-0.5 rounded-full border ${llmPlan.all_approved === false ? "bg-yellow-500/20 text-yellow-400 border-yellow-500/30" : "bg-green-500/20 text-green-400 border-green-500/30"}`}>
+                  <span className={`text-[9px] font-semibold px-1.5 py-0.5 rounded-full border ${llmPlan.all_approved === false ? "bg-yellow-500/20 text-amber-800 border-yellow-500/30" : "bg-green-500/20 text-emerald-700 border-green-500/30"}`}>
                     {llmPlan.all_approved === true ? "All Approved" : llmPlan.all_approved === false ? "Flagged" : missionReview?.verdict === "APPROVED" ? "Sovereign Autonomy Approved" : "Under Review"}
                   </span>
                   <span className="text-[9px] text-mc-dim">{llmPlan.waypoints?.length || 0} waypoints</span>
@@ -1700,7 +1730,7 @@ export default function RunPage({ params }: { params: { runId: string } }) {
                     const isCompleted = activeWaypointIdx > i;
                     return (
                       <span key={i} onMouseEnter={() => setHoveredWaypointIdx(i)} onMouseLeave={() => setHoveredWaypointIdx(null)}
-                        className={`text-[9px] px-1 py-0.5 rounded border ${isActive ? "border-cyan-400 bg-cyan-500/25 text-cyan-200 font-bold" : isCompleted ? "border-green-500/40 bg-green-500/15 text-green-400 line-through opacity-70" : ok ? "border-green-500/30 text-green-400" : "border-yellow-500/30 text-yellow-400"}`}>
+                        className={`text-[9px] px-1 py-0.5 rounded border ${isActive ? "border-cyan-400 bg-cyan-500/25 text-cyan-200 font-bold" : isCompleted ? "border-green-500/40 bg-green-500/15 text-emerald-700 line-through opacity-70" : ok ? "border-green-500/30 text-emerald-700" : "border-yellow-500/30 text-amber-800"}`}>
                         {isCompleted ? "✓" : isActive ? "▶" : `${i+1}:`} ({wp.x.toFixed(0)},{wp.y.toFixed(0)})
                       </span>
                     );
@@ -1754,7 +1784,7 @@ export default function RunPage({ params }: { params: { runId: string } }) {
               <div className="space-y-2 text-xs">
                 {sceneResult.hazards?.length > 0 && sceneResult.hazards.map((h: any, i: number) => (
                   <div key={i} className="flex items-center gap-2 bg-red-500/10 border border-red-500/20 rounded p-2">
-                    <span className={`font-bold ${h.severity === "high" ? "text-red-400" : "text-yellow-400"}`}>{(h.severity || "?").toUpperCase()}</span>
+                    <span className={`font-bold ${h.severity === "high" ? "text-red-400" : "text-amber-800"}`}>{(h.severity || "?").toUpperCase()}</span>
                     <span className="text-mc-ink/85">{h.type || h.description}</span>
                   </div>
                 ))}
@@ -1809,7 +1839,7 @@ export default function RunPage({ params }: { params: { runId: string } }) {
             {failureError && <div className="text-xs text-red-400 bg-red-500/10 rounded p-2 mb-2">{failureError}</div>}
             {failureResult && (
               <div className="space-y-2 text-xs">
-                <span className={`font-semibold px-2 py-0.5 rounded-full border text-[10px] ${failureResult.failures_detected ? "bg-red-500/20 text-red-400 border-red-500/30" : "bg-green-500/20 text-green-400 border-green-500/30"}`}>
+                <span className={`font-semibold px-2 py-0.5 rounded-full border text-[10px] ${failureResult.failures_detected ? "bg-red-500/20 text-red-400 border-red-500/30" : "bg-green-500/20 text-emerald-700 border-green-500/30"}`}>
                   {failureResult.failures_detected ? "Failures Detected" : "No Failures"}
                 </span>
                 {failureResult.failures?.map((f: any, i: number) => (

@@ -31,7 +31,7 @@ _LAYOUT_PATH = _HERE.parent / "bench" / "layout.json"
 
 import os as _os
 
-_SITE = _os.getenv("SITE_LAYOUT", "factory").strip() or "factory"
+_SITE = _os.getenv("SITE_LAYOUT", "pharma").strip() or "pharma"
 if _SITE != "warehouse":
     _site_path = _HERE.parent / "bench" / "sites" / f"{_SITE}.json"
     if _site_path.exists():

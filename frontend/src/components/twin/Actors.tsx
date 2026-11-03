@@ -98,7 +98,7 @@ export function Robot({ x, y, theta, verdict, ghost = false, idle = false, pose,
 
   return (
     <group ref={ref}>
-      {label && <Html position={[0, 1.2, 0]} center distanceFactor={16}><div className="whitespace-nowrap rounded bg-slate-950/80 px-2 py-1 text-[10px] text-slate-300">{label} · IDLE</div></Html>}
+      {label && <Html position={[0, 1.2, 0]} center distanceFactor={16}><div className="whitespace-nowrap rounded bg-slate-950/80 px-2 py-1 text-[10px] text-slate-300">{label} · {idle ? "IDLE" : "MOVING"}</div></Html>}
       {/* Four recessed rubber wheels roll with measured rendered travel. */}
       {[[-0.28, -0.31], [-0.28, 0.31], [0.28, -0.31], [0.28, 0.31]].map(([wx, wz], i) => <group key={i} ref={(wheel) => { if (wheel) wheels.current[i] = wheel; }} position={[wx, 0.095, wz]}>
         <mesh rotation={[Math.PI / 2, 0, 0]} castShadow><cylinderGeometry args={[0.095, 0.095, 0.065, 16]} /><meshStandardMaterial color="#161b22" roughness={0.94} /></mesh>
@@ -151,6 +151,45 @@ export function Robot({ x, y, theta, verdict, ghost = false, idle = false, pose,
 }
 
 /* ───────────────────────────── forklift ───────────────────────────── */
+
+/** Shared fleet identity. Articulation follows received movement only. */
+export function FleetRobot(props: React.ComponentProps<typeof Robot> & { robot_kind?: string }) {
+  return props.robot_kind === "humanoid" ? <Humanoid {...props}/> : <Robot {...props}/>;
+}
+function Humanoid({ x,y,theta,verdict,ghost=false,pose,label }: React.ComponentProps<typeof Robot>) {
+  const root=useRef<THREE.Group>(null!), limbs=useRef<THREE.Group[]>([]), phase=useRef(0);
+  const speed=useGlide(root,x,y,theta,ghost?30:7,pose);
+  useFrame((_,dt)=>{
+    phase.current+=speed.current*Math.min(dt,.1)*10;
+    const swing=Math.sin(phase.current)*Math.min(.22,speed.current*.6);
+    limbs.current.forEach((g,i)=>{if(g)g.rotation.z=(i%2?-1:1)*swing*(i<2?1:.7);});
+  });
+  const shell={color:'#dbe8f2',metalness:.45,roughness:.32,transparent:ghost,opacity:ghost?.28:1};
+  const joint={...shell,color:'#263f53'};
+  return <group ref={root} name="humanoid-navigator" userData={{robotKind:'humanoid'}}>
+    {label&&<Html position={[0,2,0]} center><div className="rounded bg-slate-950 px-2 py-1 text-xs text-white whitespace-nowrap">{label} / Humanoid</div></Html>}
+    <RoundedBox args={[.28,.43,.36]} radius={.055} position={[0,1.16,0]} castShadow><meshStandardMaterial {...shell}/></RoundedBox>
+    <mesh position={[.145,1.22,0]}><boxGeometry args={[.012,.045,.25]}/><meshStandardMaterial color={VERDICT_COLOURS[verdict]||'#38bdf8'}/></mesh>
+    <mesh position={[0,.88,0]}><boxGeometry args={[.24,.14,.31]}/><meshStandardMaterial {...joint}/></mesh>
+    <mesh position={[0,1.43,0]}><cylinderGeometry args={[.055,.055,.12,12]}/><meshStandardMaterial {...joint}/></mesh>
+    <RoundedBox args={[.24,.24,.28]} radius={.045} position={[0,1.59,0]} castShadow><meshStandardMaterial {...shell}/></RoundedBox>
+    <mesh position={[.124,1.61,0]}><boxGeometry args={[.012,.075,.19]}/><meshStandardMaterial {...joint}/></mesh>
+    {[-1,1].map((side,i)=><group key={'leg'+side} position={[0,.84,side*.105]} ref={g=>{if(g)limbs.current[i]=g;}}>
+      <mesh><sphereGeometry args={[.075,12,10]}/><meshStandardMaterial {...joint}/></mesh>
+      <RoundedBox args={[.13,.32,.13]} radius={.025} position={[0,-.19,0]} castShadow><meshStandardMaterial {...shell}/></RoundedBox>
+      <mesh position={[0,-.39,0]}><sphereGeometry args={[.07,12,10]}/><meshStandardMaterial {...joint}/></mesh>
+      <RoundedBox args={[.11,.3,.12]} radius={.02} position={[0,-.57,0]} castShadow><meshStandardMaterial {...shell}/></RoundedBox>
+      <mesh position={[.035,-.79,0]} castShadow><boxGeometry args={[.28,.1,.15]}/><meshStandardMaterial {...joint}/></mesh>
+    </group>)}
+    {[-1,1].map((side,i)=><group key={'arm'+side} position={[0,1.31,side*.24]} ref={g=>{if(g)limbs.current[i+2]=g;}}>
+      <mesh><sphereGeometry args={[.07,12,10]}/><meshStandardMaterial {...joint}/></mesh>
+      <RoundedBox args={[.105,.27,.11]} radius={.025} position={[0,-.16,0]} castShadow><meshStandardMaterial {...shell}/></RoundedBox>
+      <mesh position={[0,-.33,0]}><sphereGeometry args={[.055,12,10]}/><meshStandardMaterial {...joint}/></mesh>
+      <RoundedBox args={[.09,.24,.1]} radius={.02} position={[.025,-.48,0]} castShadow><meshStandardMaterial {...shell}/></RoundedBox>
+      <mesh position={[.03,-.65,0]}><boxGeometry args={[.09,.1,.09]}/><meshStandardMaterial {...joint}/></mesh>
+    </group>)}
+  </group>;
+}
 
 export function Forklift({ x, y, heading }: { x: number; y: number; heading: number }) {
   const ref = useRef<THREE.Group>(null!);

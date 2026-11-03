@@ -1,0 +1,22 @@
+{
+  "checks": [
+    "Mission Control replaces a real humanoid route, records capped waypoints, verifies stop and holds without resuming; ordinary paused decisions cannot be force-approved",
+    "Explicit resume restores governed movement after operator route replacement",
+    "The full run page exposes the same operational route replacement and eligible-review controls",
+    "Oversight controls, reason entry and status messages fit mobile and desktop",
+    "Both named interventions are recorded and the full event hash chain verifies; no browser errors"
+  ],
+  "errors": [],
+  "runId": "run_48f916a5cb7a",
+  "layout": [
+    {
+      "width": 390,
+      "scrollWidth": 390
+    },
+    {
+      "width": 1440,
+      "scrollWidth": 1440
+    }
+  ],
+  "passed": true
+}

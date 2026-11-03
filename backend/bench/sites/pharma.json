@@ -1,0 +1,543 @@
+{
+  "name": "pharma",
+  "site_id": "sovereign-cleanroom",
+  "title": "Meridian Life Sciences",
+  "units": "metres",
+  "coordinate_frame": "facility-floor-v1",
+  "geofence": {
+    "min_x": 0,
+    "max_x": 36,
+    "min_y": 0,
+    "max_y": 26
+  },
+  "zone_speed_limits": {
+    "aisle": 0.5,
+    "corridor": 0.6,
+    "staging": 0.3,
+    "loading_bay": 0.3
+  },
+  "zones": [
+    {
+      "name": "corridor",
+      "label": "Shared transfer corridor",
+      "rect": {
+        "min_x": 0,
+        "max_x": 36,
+        "min_y": 10.8,
+        "max_y": 15.2
+      }
+    },
+    {
+      "name": "aisle",
+      "label": "Cold storage",
+      "rect": {
+        "min_x": 1.0,
+        "max_x": 11.0,
+        "min_y": 1.5,
+        "max_y": 10.5
+      }
+    },
+    {
+      "name": "staging",
+      "label": "Quality lab",
+      "rect": {
+        "min_x": 12.5,
+        "max_x": 23.5,
+        "min_y": 1.5,
+        "max_y": 10.5
+      }
+    },
+    {
+      "name": "staging",
+      "label": "Formulation",
+      "rect": {
+        "min_x": 25.0,
+        "max_x": 35.0,
+        "min_y": 1.5,
+        "max_y": 10.5
+      }
+    },
+    {
+      "name": "staging",
+      "label": "Gowning",
+      "rect": {
+        "min_x": 1.0,
+        "max_x": 11.0,
+        "min_y": 15.5,
+        "max_y": 24.5
+      }
+    },
+    {
+      "name": "staging",
+      "label": "Research lab",
+      "rect": {
+        "min_x": 13.0,
+        "max_x": 23.0,
+        "min_y": 15.5,
+        "max_y": 24.5
+      }
+    },
+    {
+      "name": "staging",
+      "label": "Packaging",
+      "rect": {
+        "min_x": 25.0,
+        "max_x": 35.0,
+        "min_y": 15.5,
+        "max_y": 24.5
+      }
+    }
+  ],
+  "racks": [
+    {
+      "id": "north-partition-0",
+      "kind": "partition",
+      "label": "Glass partition",
+      "x1": 1,
+      "x2": 4.5,
+      "y": 10.5,
+      "depth": 0.18,
+      "levels": 1
+    },
+    {
+      "id": "north-partition-1",
+      "kind": "partition",
+      "label": "Glass partition",
+      "x1": 8.5,
+      "x2": 11.5,
+      "y": 10.5,
+      "depth": 0.18,
+      "levels": 1
+    },
+    {
+      "id": "north-partition-2",
+      "kind": "partition",
+      "label": "Glass partition",
+      "x1": 12.3,
+      "x2": 16,
+      "y": 10.5,
+      "depth": 0.18,
+      "levels": 1
+    },
+    {
+      "id": "north-partition-3",
+      "kind": "partition",
+      "label": "Glass partition",
+      "x1": 20,
+      "x2": 23.5,
+      "y": 10.5,
+      "depth": 0.18,
+      "levels": 1
+    },
+    {
+      "id": "north-partition-4",
+      "kind": "partition",
+      "label": "Glass partition",
+      "x1": 24.3,
+      "x2": 28,
+      "y": 10.5,
+      "depth": 0.18,
+      "levels": 1
+    },
+    {
+      "id": "north-partition-5",
+      "kind": "partition",
+      "label": "Glass partition",
+      "x1": 32,
+      "x2": 35,
+      "y": 10.5,
+      "depth": 0.18,
+      "levels": 1
+    },
+    {
+      "id": "south-partition-0",
+      "kind": "partition",
+      "label": "Glass partition",
+      "x1": 1,
+      "x2": 4.5,
+      "y": 15.3,
+      "depth": 0.18,
+      "levels": 1
+    },
+    {
+      "id": "south-partition-1",
+      "kind": "partition",
+      "label": "Glass partition",
+      "x1": 8.5,
+      "x2": 11.5,
+      "y": 15.3,
+      "depth": 0.18,
+      "levels": 1
+    },
+    {
+      "id": "south-partition-2",
+      "kind": "partition",
+      "label": "Glass partition",
+      "x1": 12.3,
+      "x2": 16,
+      "y": 15.3,
+      "depth": 0.18,
+      "levels": 1
+    },
+    {
+      "id": "south-partition-3",
+      "kind": "partition",
+      "label": "Glass partition",
+      "x1": 20,
+      "x2": 23.5,
+      "y": 15.3,
+      "depth": 0.18,
+      "levels": 1
+    },
+    {
+      "id": "south-partition-4",
+      "kind": "partition",
+      "label": "Glass partition",
+      "x1": 24.3,
+      "x2": 28,
+      "y": 15.3,
+      "depth": 0.18,
+      "levels": 1
+    },
+    {
+      "id": "south-partition-5",
+      "kind": "partition",
+      "label": "Glass partition",
+      "x1": 32,
+      "x2": 35,
+      "y": 15.3,
+      "depth": 0.18,
+      "levels": 1
+    },
+    {
+      "id": "north-divider-12",
+      "kind": "partition",
+      "label": "Glass partition",
+      "x1": 12,
+      "x2": 12.18,
+      "y": 1,
+      "depth": 9,
+      "levels": 1
+    },
+    {
+      "id": "south-divider-12",
+      "kind": "partition",
+      "label": "Glass partition",
+      "x1": 12,
+      "x2": 12.18,
+      "y": 16,
+      "depth": 9,
+      "levels": 1
+    },
+    {
+      "id": "north-divider-24",
+      "kind": "partition",
+      "label": "Glass partition",
+      "x1": 24,
+      "x2": 24.18,
+      "y": 1,
+      "depth": 9,
+      "levels": 1
+    },
+    {
+      "id": "south-divider-24",
+      "kind": "partition",
+      "label": "Glass partition",
+      "x1": 24,
+      "x2": 24.18,
+      "y": 16,
+      "depth": 9,
+      "levels": 1
+    },
+    {
+      "id": "cold-west-bench",
+      "kind": "bench",
+      "x1": 2,
+      "x2": 4,
+      "y": 3.5,
+      "depth": 4
+    },
+    {
+      "id": "cold-east-bench",
+      "kind": "bench",
+      "x1": 8,
+      "x2": 10,
+      "y": 3.5,
+      "depth": 4
+    },
+    {
+      "id": "quality-west-bench",
+      "kind": "bench",
+      "x1": 14,
+      "x2": 16,
+      "y": 3.5,
+      "depth": 4
+    },
+    {
+      "id": "quality-east-bench",
+      "kind": "bench",
+      "x1": 20,
+      "x2": 22,
+      "y": 3.5,
+      "depth": 4
+    },
+    {
+      "id": "formulation-west-bench",
+      "kind": "bench",
+      "x1": 26,
+      "x2": 28,
+      "y": 3.5,
+      "depth": 4
+    },
+    {
+      "id": "formulation-east-bench",
+      "kind": "bench",
+      "x1": 32,
+      "x2": 34,
+      "y": 3.5,
+      "depth": 4
+    },
+    {
+      "id": "gowning-west-bench",
+      "kind": "bench",
+      "x1": 2,
+      "x2": 4,
+      "y": 17.5,
+      "depth": 4
+    },
+    {
+      "id": "gowning-east-bench",
+      "kind": "bench",
+      "x1": 8,
+      "x2": 10,
+      "y": 17.5,
+      "depth": 4
+    },
+    {
+      "id": "research-west-bench",
+      "kind": "bench",
+      "x1": 14,
+      "x2": 16,
+      "y": 17.5,
+      "depth": 4
+    },
+    {
+      "id": "research-east-bench",
+      "kind": "bench",
+      "x1": 20,
+      "x2": 22,
+      "y": 17.5,
+      "depth": 4
+    },
+    {
+      "id": "packaging-west-bench",
+      "kind": "bench",
+      "x1": 26,
+      "x2": 28,
+      "y": 17.5,
+      "depth": 4
+    },
+    {
+      "id": "packaging-east-bench",
+      "kind": "bench",
+      "x1": 32,
+      "x2": 34,
+      "y": 17.5,
+      "depth": 4
+    }
+  ],
+  "features": [
+    {
+      "type": "room",
+      "id": "cold",
+      "label": "Cold storage",
+      "x": 6,
+      "y": 6,
+      "width": 10,
+      "depth": 9,
+      "tone": "#e5eeef"
+    },
+    {
+      "type": "room",
+      "id": "qc",
+      "label": "Quality lab",
+      "x": 18,
+      "y": 6,
+      "width": 11,
+      "depth": 9,
+      "tone": "#e9eddf"
+    },
+    {
+      "type": "room",
+      "id": "formulation",
+      "label": "Formulation",
+      "x": 30,
+      "y": 6,
+      "width": 10,
+      "depth": 9,
+      "tone": "#ede8df"
+    },
+    {
+      "type": "room",
+      "id": "gowning",
+      "label": "Gowning",
+      "x": 6,
+      "y": 20,
+      "width": 10,
+      "depth": 9,
+      "tone": "#e5eade"
+    },
+    {
+      "type": "room",
+      "id": "research",
+      "label": "Research lab",
+      "x": 18,
+      "y": 20,
+      "width": 10,
+      "depth": 9,
+      "tone": "#e4ebed"
+    },
+    {
+      "type": "room",
+      "id": "packaging",
+      "label": "Packaging",
+      "x": 30,
+      "y": 20,
+      "width": 10,
+      "depth": 9,
+      "tone": "#e9e6dc"
+    }
+  ],
+  "bays": [
+    {
+      "id": "C-01",
+      "x": 6,
+      "y": 2.5,
+      "side": "floor",
+      "type": "pick",
+      "label": "Cold storage"
+    },
+    {
+      "id": "Q-01",
+      "x": 18,
+      "y": 2.5,
+      "side": "floor",
+      "type": "qc",
+      "label": "Quality lab"
+    },
+    {
+      "id": "F-01",
+      "x": 30,
+      "y": 2.5,
+      "side": "floor",
+      "type": "line",
+      "label": "Formulation"
+    },
+    {
+      "id": "G-01",
+      "x": 6,
+      "y": 23.5,
+      "side": "floor",
+      "type": "dock",
+      "label": "Gowning"
+    },
+    {
+      "id": "R-01",
+      "x": 18,
+      "y": 23.5,
+      "side": "floor",
+      "type": "qc",
+      "label": "Research lab"
+    },
+    {
+      "id": "P-01",
+      "x": 30,
+      "y": 23.5,
+      "side": "floor",
+      "type": "line",
+      "label": "Packaging"
+    }
+  ],
+  "obstacles": [],
+  "parking": {
+    "robot-1": [
+      6,
+      23.5
+    ],
+    "robot-2": [
+      30,
+      2.5
+    ],
+    "robot-3": [
+      18,
+      9
+    ]
+  },
+  "hotspots": [
+    [
+      6.5,
+      11.8
+    ],
+    [
+      18,
+      12.5
+    ],
+    [
+      29.5,
+      14
+    ],
+    [
+      10,
+      13
+    ],
+    [
+      22,
+      13
+    ],
+    [
+      18,
+      16.7
+    ]
+  ],
+  "vehicle_lane": [
+    [
+      2,
+      13
+    ],
+    [
+      34,
+      13
+    ]
+  ],
+  "presets": [
+    {
+      "title": "Transfer a sample to cold storage",
+      "bay": "C-01"
+    },
+    {
+      "title": "Transfer a sample to quality lab",
+      "bay": "Q-01"
+    },
+    {
+      "title": "Transfer a sample to formulation",
+      "bay": "F-01"
+    },
+    {
+      "title": "Transfer a sample to gowning",
+      "bay": "G-01"
+    },
+    {
+      "title": "Transfer a sample to research lab",
+      "bay": "R-01"
+    },
+    {
+      "title": "Transfer a sample to packaging",
+      "bay": "P-01"
+    }
+  ],
+  "robot_profiles": {
+    "robot-1": "sim-amr-radius-0.4m-v1",
+    "robot-2": "sim-amr-radius-0.4m-v1",
+    "robot-3": "sim-humanoid-radius-0.35m-speed-0.3mps-v1"
+  }
+}

@@ -26,6 +26,8 @@ import math
 import json
 import logging
 import time
+import threading
+from datetime import timedelta, timezone
 from typing import Any, Dict, List, Optional
 
 from sqlalchemy.orm import Session
@@ -97,6 +99,10 @@ class RunService:
         self._plans: Dict[str, List[Dict[str, Any]]] = {}  # ordered waypoint queue
         self._plan_contexts: Dict[str, Any] = {}
         self._environment_holds: set[str] = set()
+        self._review_proposals: Dict[str, ActionProposal] = {}
+        self._operator_locks: Dict[str, asyncio.Lock] = {}
+        self._operator_busy: set[str] = set()
+        self._tick_idle: Dict[str, asyncio.Event] = {}
         self._plans_lock = asyncio.Lock()  # protects concurrent reads/writes to _plans
 
         # --- Stagnation detection ---
@@ -125,6 +131,7 @@ class RunService:
                                              # commanded and actual position after exec
 
         self.sim = SimAdapter()
+        self._event_locks: Dict[str, Any] = {}
         self._run_robot: Dict[str, str] = {}   # run id -> robot it drives
         self.agent = AgentRouter()
         self.gov = GovernanceEngine()
@@ -143,6 +150,13 @@ class RunService:
 
         Returns the newly created Event ORM row (already committed).
         """
+        # The runtime is a single writer process. Serialize its sync handlers as
+        # well as loop callbacks; the system clock can repeat a timestamp.
+        lock = self._event_locks.setdefault(run_id, threading.RLock())
+        with lock:
+            return self._append_event_locked(db, run_id, etype, payload)
+
+    def _append_event_locked(self, db: Session, run_id: str, etype: str, payload: Dict[str, Any]) -> Event:
         # Get previous event hash for chain linking
         prev = (
             db.query(Event)
@@ -153,6 +167,10 @@ class RunService:
         prev_hash = prev.hash if prev else "0" * 64
 
         ts = utc_now()  # single timestamp for both hash and storage
+        if prev is not None:
+            previous_ts = prev.ts if prev.ts.tzinfo else prev.ts.replace(tzinfo=timezone.utc)
+            if ts <= previous_ts:
+                ts = previous_ts + timedelta(microseconds=1)
         evt = {
             "run_id": run_id,
             "ts": ts.isoformat(),
@@ -274,6 +292,9 @@ class RunService:
         """Spawn the asyncio run-loop task for a given run."""
         if run_id in self._tasks and not self._tasks[run_id].done():
             return  # already running
+        idle = asyncio.Event()
+        idle.set()
+        self._tick_idle[run_id] = idle
         stop_event = asyncio.Event()
         self._stop_flags[run_id] = stop_event
         self._tasks[run_id] = asyncio.create_task(self._run_loop(run_id))
@@ -419,7 +440,7 @@ class RunService:
             self._plans[run_id] = waypoints
         return len(waypoints)
 
-    async def resume_run(self, db: Session, run_id: str) -> Optional[Dict[str, Any]]:
+    async def resume_run(self, db: Session, run_id: str, *, operator_control=False) -> Optional[Dict[str, Any]]:
         """Resume a paused run, after the same checks a restart needs.
 
         Raises Rejected if a kill switch covers this robot or mission. Moves whose
@@ -427,10 +448,19 @@ class RunService:
         run = db.query(Run).filter(Run.id == run_id).first()
         if not run or run.status != "paused":
             return None
+        if run_id in self._operator_busy and not operator_control:
+            raise Rejected('operator_action_in_progress')
+        task = self._tasks.get(run_id)
+        idle = self._tick_idle.get(run_id)
+        if (task and not task.done() and idle is not None and not idle.is_set()
+                and self._pause_flags.get(run_id) and self._pause_flags[run_id].is_set()):
+            raise Rejected('operator_tick_not_settled')
         authority = get_authority()
+        from app.config import settings as _resume_settings
         locks = [(s, i) for s, i in authority.kills.active()
-                 if s == "global" or (s == "robot" and i == authority.robot_id)
-                 or (s == "mission" and i == run.mission_id)]
+                 if s == "global" or (s == "robot" and i == self.robot_for(run_id))
+                 or (s == "mission" and i == run.mission_id)
+                 or (s == "agent" and i == f"planner:{_resume_settings.planner_provider}")]
         if locks:
             raise Rejected("kill_switch_active")
         settled: List[Dict[str, Any]] = []
@@ -518,7 +548,7 @@ class RunService:
     MAX_CONSECUTIVE_TICK_ERRORS = 5
     AGENT_PROPOSAL_TIMEOUT = 15  # seconds
 
-    async def _refresh_environment_plan(self, db, run_id, telemetry, goal):
+    async def _refresh_environment_plan(self, db, run_id, telemetry, goal, *, force=False):
         """Stop and replace an obsolete plan before evaluating any new move."""
         from app.autonomy.experience import context_from_state, context_from_world
         from app.policies.versioning import policy_version_hash
@@ -530,12 +560,19 @@ class RunService:
         changes = get_lifecycle().observe(telemetry, policy_version_hash())
         signature = {"context": context, "constraints": constraints_key(telemetry)}
         previous = self._plan_contexts.get(run_id)
-        if previous == signature and run_id not in self._environment_holds:
+        if not force and previous == signature and run_id not in self._environment_holds:
             return False
         await self.sim_for(run_id).send_command({"intent": "STOP", "params": {}})
         world = await self.sim_for(run_id).get_world()
-        if context_from_world(world, policy_version_hash()) != context:
+        world_context = context_from_world(world, policy_version_hash())
+        # /world describes shared geometry; capability identity belongs to the selected robot.
+        if not world_context or any(world_context[k] != context[k] for k in ('site_id', 'map_version')):
             raise Rejected("environment_changed_during_replan")
+        if force:
+            controlled = db.get(Run, run_id)
+            db.refresh(controlled)
+            if controlled.status != 'paused':
+                raise Rejected('operator_run_changed')
         waypoints = route_plan(world, telemetry, goal, ZONE_SPEED_LIMITS, hazards=telemetry.get("site_constraints"))
         was_holding = run_id in self._environment_holds
         self._plans[run_id] = waypoints or []
@@ -544,13 +581,19 @@ class RunService:
             self._environment_holds.discard(run_id)
         else:
             self._environment_holds.add(run_id)
-        if previous != signature or (was_holding and waypoints):
+        if force or previous != signature or (was_holding and waypoints):
             self._append_event(db, run_id, "ENVIRONMENT_CHANGE", {
                 "previous": previous, "current": signature,
                 "action": "replanned" if waypoints else "holding_no_route", "waypoints": len(waypoints or []),
                 "changes": [c["id"] for c in changes], "reason": "Environment assumptions changed; old plan discarded",
             })
             self._append_event(db, run_id, "EXPERIENCE_RETRIEVAL", dict(last_route_info))
+            if force:
+                self._append_event(db, run_id, 'PLAN', {
+                    'plan': {'waypoints': waypoints or [], 'model_used': 'site_router'},
+                    'source': 'operator_replan', 'map_version': context['map_version'],
+                    'context': context, 'holding': not bool(waypoints),
+                })
         return True
 
     async def _execute_permitted(self, db: Session, run_id: str, mission_id: str,
@@ -565,6 +608,8 @@ class RunService:
         robot_id = self.robot_for(run_id)
         if intent != "MOVE_TO":
             return await sim.send_command({"intent": intent, "params": params})
+        if self._pause_flags.get(run_id) and self._pause_flags[run_id].is_set():
+            return {'ok':False,'rejected':True,'reason':'run_paused'}
         authority = get_authority()
         from app.config import settings as _cfg
         from app.policies.params import active_params, params_hash
@@ -643,6 +688,8 @@ class RunService:
                     await asyncio.sleep(0.5)
                     continue
 
+                idle = self._tick_idle.setdefault(run_id, asyncio.Event())
+                idle.clear()
                 db = SessionLocal()
                 try:
                     run = db.query(Run).filter(Run.id == run_id).first()
@@ -923,6 +970,8 @@ class RunService:
                         p["max_speed"] = clamped
                         proposal.params = p
 
+                    if reviewed := self._review_proposals.pop(run_id, None):
+                        proposal = reviewed
                     proposal_payload = proposal.model_dump()
 
                     # The gate must judge fresh positions: if planning took a while, re-read
@@ -1387,6 +1436,7 @@ class RunService:
                         break
                 finally:
                     db.close()
+                    idle.set()
 
                 await asyncio.sleep(1.0)
 

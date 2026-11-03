@@ -15,7 +15,7 @@ const API_BASE = process.env.NEXT_PUBLIC_API_BASE || "/api";
  * Writes carry the signed-in user's token (roles: viewer < operator < admin).
  * Without a sign-in, development servers hand out a dev token; production does not.
  */
-const TOKEN_KEY = "sa_token";
+const TOKEN_KEY = "sovereign-autonomy.session.v1";
 let devToken: string | null | undefined;
 
 export function storedSession(): { token: string; user: string; role: string } | null {
@@ -164,11 +164,23 @@ export async function stopRun(runId: string) {
   return r.json();
 }
 
-export async function operatorOverride(runId: string, action: string, reason: string) {
+export async function pauseRun(runId: string) {
+  const r = await fetchWithRetry(`${API_BASE}/runs/${runId}/pause`, { method: 'POST' });
+  if (!r.ok) throw new Error(await parseErrorResponse(r, 'Could not pause mission'));
+  return r.json();
+}
+
+export async function resumeRun(runId: string) {
+  const r = await fetchWithRetry(`${API_BASE}/runs/${runId}/resume`, { method: 'POST' });
+  if (!r.ok) throw new Error(await parseErrorResponse(r, 'Could not resume mission'));
+  return r.json();
+}
+
+export async function operatorOverride(runId: string, action: string, reason: string, decisionEventId?: string) {
   const r = await fetchWithRetry(`${API_BASE}/operator/override`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ run_id: runId, action, reason }),
+    body: JSON.stringify({ run_id: runId, action, reason, decision_event_id: decisionEventId }),
   });
   if (!r.ok) throw new Error(await parseErrorResponse(r, "Failed to send operator override"));
   return r.json();
@@ -191,8 +203,8 @@ export async function testPolicy(payload: any) {
 }
 
 
-export async function getTelemetry() {
-  const r = await fetchWithRetry(`${API_BASE}/sim/telemetry`, { cache: "no-store" });
+export async function getTelemetry(robotId?: string) {
+  const r = await fetchWithRetry(`${API_BASE}/sim/telemetry${robotId ? `?robot_id=${encodeURIComponent(robotId)}` : ""}`, { cache: "no-store" });
   if (!r.ok) throw new Error(await parseErrorResponse(r, "Failed to get telemetry"));
   return r.json();
 }
@@ -615,3 +627,5 @@ export async function voiceStop(wav: Blob) {
   if (!r.ok) throw new Error(await parseErrorResponse(r, "Voice stop failed"));
   return r.json();
 }
+
+export const getOperatorReview = (runId: string) => getJson(`/operator/review/${runId}`, "operator review");

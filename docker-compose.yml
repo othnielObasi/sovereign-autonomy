@@ -18,7 +18,7 @@ services:
     environment:
       DATABASE_URL: "postgresql://sovereign:sovereign@postgres:5432/sovereign"
       SIM_BASE_URL: "http://warehouse-sim:8090"
-      SITE_LAYOUT: "${SITE_LAYOUT:-factory}"
+      SITE_LAYOUT: "${SITE_LAYOUT:-pharma}"
       # Shared with the simulator; every move's permit is signed with it
       PERMIT_SECRET: "${PERMIT_SECRET:?Set PERMIT_SECRET (32+ characters) in .env}"
       CORS_ORIGINS: "http://localhost:3000"
@@ -48,7 +48,7 @@ services:
       SIM_SEED: "42"
       AUTHORITY_BASE_URL: "http://backend:8080"
       SIM_STATE_DB: "/app/data/controller.db"
-      SITE_LAYOUT: "${SITE_LAYOUT:-factory}"
+      SITE_LAYOUT: "${SITE_LAYOUT:-pharma}"
       PERMIT_SECRET: "${PERMIT_SECRET:?Set PERMIT_SECRET (32+ characters) in .env}"
 
     volumes:

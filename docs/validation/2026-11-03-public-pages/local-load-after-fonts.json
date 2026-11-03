@@ -1,0 +1,21 @@
+{
+  "scope": "Single local headless-browser sample after self-hosting fonts; unthrottled localhost and fresh contexts. Not a production/mobile-network benchmark.",
+  "results": [
+    {
+      "route": "/",
+      "cls": 0,
+      "lcpMs": 304,
+      "domContentLoadedMs": 33.10000002384186,
+      "loadMs": 95.10000002384186,
+      "resourceBytes": 333363
+    },
+    {
+      "route": "/how-it-works",
+      "cls": 0,
+      "lcpMs": 224,
+      "domContentLoadedMs": 30.899999976158142,
+      "loadMs": 97.80000007152557,
+      "resourceBytes": 62064
+    }
+  ]
+}

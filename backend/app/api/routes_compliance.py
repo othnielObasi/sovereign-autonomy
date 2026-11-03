@@ -75,6 +75,8 @@ async def get_compliance_report(
         events=events,
         framework=framework,
     )
+    from app.services.replay_service import get_run_timeline
+    report.chain_valid = get_run_timeline(db, run_id)['chain_valid']
     return report
 
 
@@ -99,6 +101,8 @@ async def get_compliance_report_text(
         events=events,
         framework=framework,
     )
+    from app.services.replay_service import get_run_timeline
+    report.chain_valid = get_run_timeline(db, run_id)['chain_valid']
     summary = compliance_service.export_summary(report)
     return PlainTextResponse(content=summary)
 
@@ -120,6 +124,8 @@ async def export_compliance_report(
         events=events,
         framework=framework,
     )
+    from app.services.replay_service import get_run_timeline
+    report.chain_valid = get_run_timeline(db, run_id)['chain_valid']
 
     return JSONResponse(
         content=report.model_dump(),
@@ -154,17 +160,17 @@ async def list_frameworks():
 
 @router.get("/verify/{run_id}")
 async def verify_audit_chain(run_id: str, db: Session = Depends(get_db)):
-    events = _load_events_from_db(db, run_id)
-    report = compliance_service.generate_report(
-        run_id=run_id,
-        events=events,
-    )
+    _load_events_from_db(db, run_id)  # Keep the existing missing-run validation.
+    from app.services.replay_service import get_run_timeline
+    timeline = get_run_timeline(db, run_id)
+    events = timeline['events']
 
     return {
         "run_id": run_id,
-        "chain_valid": report.chain_valid,
-        "total_entries": len(report.audit_entries),
-        "first_hash": report.audit_entries[0].hash[:16] + "..." if report.audit_entries else None,
-        "last_hash": report.audit_entries[-1].hash[:16] + "..." if report.audit_entries else None,
-        "verified_at": utc_now().isoformat() + "Z",
+        "chain_valid": timeline['chain_valid'],
+        "total_entries": len(events),
+        "first_hash": events[0]['hash'][:16] + "..." if events else None,
+        "last_hash": events[-1]['hash'][:16] + "..." if events else None,
+        "verified_at": utc_now().isoformat(),
+        "scope": "original stored event contents and previous-hash links",
     }

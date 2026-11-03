@@ -56,6 +56,7 @@ async def search(query: str, include_domains: List[str], max_results: int = 6,
         "chunks_per_source": 3,
         "max_results": max_results,
         "include_domains": include_domains,
+        "include_domains_mode": "restrict",
         "include_answer": False,       # we never use a model-written answer, only sources
         "include_raw_content": False,
         "include_usage": True,

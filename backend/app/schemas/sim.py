@@ -40,6 +40,7 @@ class Human(BaseModel):
 
 
 class SimWorld(BaseModel):
+    site: Optional[Dict[str, str]] = None
     site_id: Optional[str] = None
     map_version: Optional[str] = None
     capability_profile_version: Optional[str] = None

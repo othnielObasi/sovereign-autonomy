@@ -168,6 +168,10 @@ class ExecutionAuthority:
             conn.close()
         if intent == "MOVE_TO":
             state = self.world.require(rid, version)
+            from app.autonomy.robot_profiles import observed_profile, move_violation
+            violation = move_violation(observed_profile(state), params or {})
+            if violation:
+                raise Rejected(violation)
             self._check_path(state, params or {})
             self._reserve_path(rid, state, params or {})
         with self._lock:

@@ -1,0 +1,24 @@
+{
+  "date": "2026-11-03",
+  "scope": "Operational human oversight in the single-site simulator; local working tree",
+  "backend": {
+    "command": ".venv/Scripts/python.exe -m pytest backend/tests -q",
+    "passed": 489,
+    "duration_s": 244.19,
+    "oversight_cases_included": 33
+  },
+  "frontend": {
+    "command": "NEXT_DIST_DIR=.next-validation BACKEND_URL=http://127.0.0.1:18080 npm --prefix frontend run build",
+    "passed": true
+  },
+  "browser": {
+    "oversight_checks": 5,
+    "mission_control_checks": 10,
+    "errors": []
+  },
+  "limitations": [
+    "No paid live-model integration validation",
+    "No physical hardware verification",
+    "No commit or push performed"
+  ]
+}

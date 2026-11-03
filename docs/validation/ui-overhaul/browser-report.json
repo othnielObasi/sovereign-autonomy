@@ -1,0 +1,16 @@
+{
+  "scope": "Real isolated simulator/backend; no model calls",
+  "checks": [
+    "Landing enters Mission Control; real pharma world, fleet and new 3D renderer load",
+    "Keyboard robot selection and accessible operator dialog work",
+    "Scenario lab changes real world geometry and records environment revalidation",
+    "Mission creation, controller admission evidence and pause update real backend state",
+    "New mission opens composer; busy robot blocked and second robot selectable",
+    "Persistent stop confirms controller stop; release does not resume paused mission",
+    "Mobile has no horizontal overflow; navigation, operator access and stop remain available",
+    "Lost connection marks positions stale and disables launching",
+    "Unavailable WebGL falls back to real floor plan while keeping controls"
+  ],
+  "errors": [],
+  "passed": true
+}
