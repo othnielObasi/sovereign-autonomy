@@ -44,6 +44,7 @@ the supporting foundation, including the pre-existing Tavily integration.
 | Kill switches (global, robot, mission, agent), controller e-stop, verified stop, dead-man stop | Working |
 | Restart recovery: interrupted runs pause; resume settles uncertain moves and continues from the last confirmed waypoint | Working |
 | Learned routing on NetworkX from signed experience; forged records quarantined | Working |
+| Memgraph operational knowledge graph: connected mission evidence, context-scoped retrieval and planner context | Implemented; enable optional database. [Setup and limits](docs/MEMGRAPH.md) |
 | Canary tripwire: a plan that obeys an instruction hidden in untrusted data is discarded | Working |
 | Security drills: eight real attacks against the live simulator, pass/fail (`/authority`) | Working |
 | Prometheus `/metrics` and Grafana dashboard for the safety path | Working |

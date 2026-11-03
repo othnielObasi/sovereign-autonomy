@@ -1,0 +1,11 @@
+{
+  "passed": 5,
+  "checks": [
+    "Real Memgraph evidence renders with source event IDs and signed receipt references",
+    "Operator sync is idempotent against the real 25-decision mission projection",
+    "Graph workspace fits phone, tablet and desktop widths",
+    "Mocked outage/disabled responses display accurate states without fabricated evidence",
+    "Graph inspection and sync send no simulator commands and cause no browser errors"
+  ],
+  "errors": []
+}

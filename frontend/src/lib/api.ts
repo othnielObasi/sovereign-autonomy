@@ -11,6 +11,17 @@
 
 const API_BASE = process.env.NEXT_PUBLIC_API_BASE || "/api";
 
+async function knowledgeRequest(path: string, method = 'GET') {
+  const token = await authToken();
+  const headers: Record<string, string> = token ? { Authorization: `Bearer ${token}` } : {};
+  const r = await fetchWithRetry(`${API_BASE}/knowledge${path}`, { method, headers, cache: 'no-store' });
+  if (!r.ok) throw new Error(await parseErrorResponse(r, 'Operational graph unavailable'));
+  return r.json();
+}
+export const getKnowledgeStatus = () => knowledgeRequest('/status');
+export const getKnowledgeRun = (runId: string) => knowledgeRequest(`/runs/${encodeURIComponent(runId)}`);
+export const syncKnowledge = (runId?: string) => knowledgeRequest(runId ? `/runs/${encodeURIComponent(runId)}/sync` : '/sync', 'POST');
+
 /* ── Sign-in token ─────────────────────────────────────────────────────────
  * Writes carry the signed-in user's token (roles: viewer < operator < admin).
  * Without a sign-in, development servers hand out a dev token; production does not.

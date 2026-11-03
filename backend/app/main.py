@@ -27,6 +27,7 @@ from app.api.routes_policy_proposals import router as policy_proposals_router
 from app.api.routes_site_intel import router as site_intel_router
 from app.api.routes_evidence import router as evidence_router
 from app.api.routes_authority import router as authority_router  # noqa: E402
+from app.api.routes_knowledge import router as knowledge_router
 from app.services.run_service import RunService
 
 configure_logging()
@@ -154,7 +155,16 @@ async def lifespan(app: FastAPI):
     finally:
         _db.close()
     
+    graph_task = None
+    if settings.memgraph_enabled:
+        from app.services.operational_graph import graph_worker
+        graph_task = asyncio.create_task(graph_worker())
     yield
+    if graph_task is not None:
+        graph_task.cancel()
+        await asyncio.gather(graph_task, return_exceptions=True)
+        from app.services.operational_graph import graph
+        await asyncio.to_thread(graph.close)
     
     # Shutdown
     logger.info("Shutting down...")
@@ -223,6 +233,7 @@ app.include_router(policy_proposals_router)
 app.include_router(site_intel_router)
 app.include_router(evidence_router)
 app.include_router(authority_router)
+app.include_router(knowledge_router)
 
 # Initialize RunService and bind broadcaster
 run_service = RunService()

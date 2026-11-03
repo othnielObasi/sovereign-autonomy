@@ -16,6 +16,7 @@ for _secret in ("MODEL_API_KEY", "BASETEN_API_KEY", "LANGSMITH_API_KEY", "GEMINI
 # Tests never talk to a real simulator running on this machine (another project may own
 # the default port 8090): a closed port fails fast, and tests that need one start their own.
 os.environ["SIM_BASE_URL"] = "http://127.0.0.1:9"
+os.environ['MEMGRAPH_ENABLED'] = 'false'  # real graph tests opt in explicitly
 # Most tests check the benchmark warehouse's exact geometry; the factory has its own tests.
 os.environ.setdefault("SITE_LAYOUT", "warehouse")
 # Lifespan/real-server tests bypass get_db overrides. Keep those databases away

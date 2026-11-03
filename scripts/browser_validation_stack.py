@@ -24,7 +24,9 @@ def main():
     STATE.mkdir(parents=True, exist_ok=True)
     stop = STATE / "stop"
     stop.unlink(missing_ok=True)
-    session = str(time.time_ns())
+    session = os.environ.get('BROWSER_VALIDATION_SESSION') or str(time.time_ns())
+    if not session.isdigit() or len(session) > 24:
+        raise ValueError('BROWSER_VALIDATION_SESSION must be the numeric ID of an isolated validation session')
     env = dict(os.environ)
     for name in ("MODEL_API_KEY", "BASETEN_API_KEY", "NEBIUS_API_KEY", "GEMINI_API_KEY", "LANGSMITH_API_KEY",
                  "TAVILY_API_KEY", "OTEL_EXPORTER_OTLP_ENDPOINT"):
@@ -47,6 +49,10 @@ def main():
                BACKEND_URL="http://127.0.0.1:18080", NEXT_DIST_DIR=os.environ.get("BROWSER_NEXT_DIST_DIR", ".next-validation"),
                PERMIT_SECRET="browser-validation-only-secret-0123456789abcdef", SIM_TOKEN="",
                JWT_SECRET="browser-validation-only-jwt-0123456789abcdef", PYTHONPATH=str(ROOT / "backend"))
+    env['MEMGRAPH_ENABLED'] = 'true' if os.environ.get('BROWSER_MEMGRAPH_URI') else 'false'
+    if os.environ.get('BROWSER_MEMGRAPH_URI'):
+        env['MEMGRAPH_URI'] = os.environ['BROWSER_MEMGRAPH_URI']
+        env['MEMGRAPH_NAMESPACE'] = 'browser-validation-' + session
     commands = [
         ("sim", ROOT, [sys.executable, "-m", "uvicorn", "server:app", "--app-dir", "sim/warehouse_sim", "--host", "127.0.0.1", "--port", "18090"]),
         ("backend", ROOT / "backend", [sys.executable, "-m", "uvicorn", "app.main:app", "--host", "127.0.0.1", "--port", "18080"]),

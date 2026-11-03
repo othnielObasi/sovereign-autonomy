@@ -68,6 +68,14 @@ class Settings(BaseSettings):
     experience_decay_s: float = Field(86400.0, gt=0)  # advisory congestion influence e-folding time
     experience_ttl_s: float = Field(604800.0, gt=0)  # reuse horizon; simulation defaults, not safety thresholds
     experience_anchor_path: Optional[str] = None  # independently protected SQLite checkpoint; default <authority DB>.anchor.sqlite
+    # Optional advisory knowledge graph. Never used to authorize movement.
+    memgraph_enabled: bool = False
+    memgraph_uri: str = "bolt://127.0.0.1:7687"
+    memgraph_username: str = ""
+    memgraph_password: str = ""
+    memgraph_namespace: str = Field("sovereign-autonomy", min_length=1, max_length=100)
+    memgraph_timeout_s: float = Field(2.0, ge=0.2, le=10)
+    memgraph_sync_interval_s: float = Field(30.0, ge=5, le=3600)
     dispatch_watchdog_s: float = 30.0  # no loop heartbeat for this long blocks dispatch
 
     # Gazebo

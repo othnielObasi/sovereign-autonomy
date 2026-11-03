@@ -37,6 +37,9 @@ reconciliation, scoped signed learning with poisoning/rollback defenses, mixed
 robot profiles, the cleanroom workspace, operator route replacement/review and
 expanded public explanation pages. Current validation fixes event ordering and
 original-content verification and distinguishes configured from verified search.
+An optional Memgraph projection now connects verified decision evidence for
+investigation and compatible planner context; NetworkX remains the route engine.
+See [implementation and limits](MEMGRAPH.md).
 The video should identify the foundation and focus on these additions.
 
 ## Verified on 3 November 2026

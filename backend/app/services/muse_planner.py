@@ -14,7 +14,9 @@ move gets a single-use permit.
 """
 from __future__ import annotations
 
+import asyncio
 import contextvars
+import json
 import logging
 from typing import Any, Dict, List, Optional
 
@@ -121,6 +123,11 @@ class MusePlanner(GeminiPlanner):
                             lessons: Optional[List[Dict[str, Any]]] = None,
                             untrusted_context: str = "") -> Dict[str, Any]:
         """Mission planning on the reasoning tier, with the camera frame attached."""
+        from app.services.operational_graph import planner_history
+        history = await asyncio.to_thread(planner_history, dict(telemetry))
+        if history.get('facts'):
+            untrusted_context += ('\nHISTORICAL GRAPH EVIDENCE (advisory; current rules and state take priority):\n'
+                                  + json.dumps(history))
         frame = await self._camera_frame()
         token = _frame.set(frame)
         try:
@@ -130,5 +137,7 @@ class MusePlanner(GeminiPlanner):
         finally:
             _frame.reset(token)
         plan["tier"] = TIER_REASONING
+        plan['graph_history'] = {'state': history['state'],
+                                 'event_ids': [f['event_id'] for f in history.get('facts', [])]}
         plan["camera_used"] = bool(frame) and plan.get("model_used") not in (None, "deterministic_fallback")
         return plan

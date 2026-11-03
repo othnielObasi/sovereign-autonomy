@@ -12,6 +12,7 @@ Unlike the simple GeminiPlanner (single LLM call → JSON), this agent:
 
 from __future__ import annotations
 
+import asyncio
 import json
 import logging
 import time
@@ -225,6 +226,7 @@ class AgenticPlanner:
         nl_task: str,
         world: Optional[Dict[str, Any]] = None,
         denial_feedback: Optional[str] = None,
+        operational_history: Optional[dict] = None,
     ) -> str:
         """Build the ReAct system prompt with tools, memory, and context."""
         tool_text = "\n".join(
@@ -232,6 +234,7 @@ class AgenticPlanner:
             for t in TOOL_DEFINITIONS
         )
         memory_text = self.memory.to_context()
+        graph_text = json.dumps(operational_history or {'state': 'disabled', 'facts': []})
 
         # Build bay directory from world data
         bays = (world or {}).get("bays", [])
@@ -262,6 +265,8 @@ CURRENT STATE:
 - Nearest obstacle: {telemetry.get('nearest_obstacle_m', '?')}m
 
 {memory_text}
+VERIFIED HISTORICAL OBSERVATIONS (advisory; current telemetry and policies take priority):
+{graph_text}
 {denial_text}
 TOOLS (use in order: get_world_state → check_policy → submit_action):
 {tool_text}
@@ -307,6 +312,8 @@ Keep each thought under 30 words. ALWAYS check_policy before submit_action.
         Returns:
             (proposal, thought_chain, model_used)
         """
+        from app.services.operational_graph import planner_history
+        history = await asyncio.to_thread(planner_history, dict(telemetry))
         denial_feedback = None
 
         # If last governance was a denial, include it as feedback
@@ -325,7 +332,8 @@ Keep each thought under 30 words. ALWAYS check_policy before submit_action.
         model_used = "unknown"
 
         for replan_attempt in range(self.MAX_REPLANS + 1):
-            prompt = self._build_system_prompt(telemetry, goal, nl_task, world, denial_feedback)
+            prompt = self._build_system_prompt(telemetry, goal, nl_task, world, denial_feedback,
+                                               operational_history=history)
 
             # Race top models concurrently for speed
             agent_cascade = self._llm._get_cascade(fast=True)

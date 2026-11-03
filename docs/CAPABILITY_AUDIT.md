@@ -6,6 +6,12 @@ stop commands, paid model calls or configuration changes were made.
 
 ## Platform-wide inventory
 
+Subsequent addition: optional [Memgraph operational graph](MEMGRAPH.md), with
+source-reverified mission/decision relationships, exact-context nearby retrieval,
+planner context and a workspace evidence panel. This adds graph retrieval; the
+original memory and NetworkX routing mechanisms remain responsible for learning
+eligibility and route costs.
+
 The initial audit focused on robot navigation and missed much of the platform.
 The operator-control findings were subsequently implemented; see the follow-up
 at the end of this document.
