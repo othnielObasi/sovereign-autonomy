@@ -1,0 +1,17 @@
+[
+  {
+    "route": "/",
+    "width": 390,
+    "overflow": false
+  },
+  {
+    "route": "/mission-control",
+    "width": 390,
+    "overflow": false
+  },
+  {
+    "route": "/authority",
+    "width": 390,
+    "overflow": true
+  }
+]

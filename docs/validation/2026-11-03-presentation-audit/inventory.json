@@ -1,0 +1,2416 @@
+{
+  "scope": "Read-only UI navigation; no missions or scenarios executed",
+  "pages": [
+    {
+      "route": "/",
+      "final_url": "/",
+      "title": "Sovereign Autonomy — Intelligence that acts. Autonomy you can trust.",
+      "headings": [
+        {
+          "level": "H1",
+          "text": "Intelligence that acts.Autonomy you can trust."
+        },
+        {
+          "level": "H2",
+          "text": "One mission.A real reason to stop."
+        },
+        {
+          "level": "H3",
+          "text": "A route to the Quality lab"
+        },
+        {
+          "level": "H2",
+          "text": "Plan, check, move.Learn from what happened."
+        },
+        {
+          "level": "H3",
+          "text": "Mission intelligence"
+        },
+        {
+          "level": "H3",
+          "text": "Perception & movement"
+        },
+        {
+          "level": "H3",
+          "text": "Governance & control"
+        },
+        {
+          "level": "H3",
+          "text": "Learning & improvement"
+        },
+        {
+          "level": "H3",
+          "text": "Operations & resilience"
+        },
+        {
+          "level": "H2",
+          "text": "A plan proposes.A permit authorises movement."
+        },
+        {
+          "level": "H3",
+          "text": "Perceive & plan"
+        },
+        {
+          "level": "H3",
+          "text": "Verify every move"
+        },
+        {
+          "level": "H3",
+          "text": "Accept or refuse the move"
+        },
+        {
+          "level": "H3",
+          "text": "The AI proposes.The controller checks."
+        },
+        {
+          "level": "H2",
+          "text": "One intelligence.Many environments."
+        },
+        {
+          "level": "H3",
+          "text": "Manufacturing"
+        },
+        {
+          "level": "H2",
+          "text": "Built to be challenged."
+        },
+        {
+          "level": "H3",
+          "text": "What is proven — and what is not."
+        },
+        {
+          "level": "H2",
+          "text": "More capable machines.More accountable autonomy."
+        }
+      ],
+      "visible_text": "PHYSICAL AI · INTELLIGENCE & TRUST\nIntelligence that acts.\nAutonomy you can trust.\n\nPlan robot missions, check every proposed move, coordinate a fleet and learn from recorded outcomes. Explore the working simulator and the controls behind each decision.\n\nOpen Mission Control\n↗\nHow it works\n↗\n↗\nLearn from verified outcomes\n◎\nReuse checked experience\n◇\nCheck moves before execution\n↺\nRecover from disruption\nWATCH THE DECISIONS BEHIND THE MOVEMENT\nOne mission.\nA real reason to stop.\n\nFollow a recorded simulator delivery through its route, a refused move, replanning and arrival. Each moment links back to the saved events.\n\nActual simulator facility / reference view, not a frame of the selected moment.\nRecorded simulator highlights / 3 November 2026 / fallback planner\n01\nPlan\n02\nMove\n03\nStop\n04\nReplan\n05\nArrive\nMeridian Life Sciences\nrobot-2 / Formulation to Quality lab\nCold storage\nQuality lab\nFormulation\nGowning\nResearch lab\nPackaging\nShared transfer corridor\nDestination\nrobot-2\nProposed route\nRecorded positions\nWorkers at stop\n\nFacility floor plan with recorded robot positions. Dashed line: proposed route; solid line: recorded positions up to this moment. Intermediate moments are omitted.\n\nRoute proposed\nA route to the Quality lab\n\nRobot-2 receives a route from Formulation to the Quality lab through the shared corridor. The site router proposes 16 waypoints. Each move still needs its own safety check and permit.\n\nPlanned route\n16 waypoints\nPrevious\n01 / 05\nNext: Move\nInspect this recorded moment\n\nFive selected moments from one completed run, not an idealised animation. The recording includes unsafe proposals and review decisions. Its historical audit has ordering gaps; see the recording limits below.\n\nOpen Mission Control ↗\nExplore the capabilities ↗\nRecording scope and evidence limits\nSee the recorded interface after completion\nTHE COMPLETE PLATFORM / 22 CAPABILITY AREAS\nPlan, check, move.\nLearn from what happened.\n\nExplore five connected areas covering all 22 capabilities. Each links to a plain-language explanation, an example and the relevant workspace.\n\n01 / EXPLORE CAPABILITIES ↗\nMission intelligence\n\nCreate a mission, assign a robot and propose a route that stays aligned with its destination.\n\n02 / EXPLORE CAPABILITIES ↗\nPerception & movement\n\nRead observations, find routes, check shared space and respond when a corridor or hazard changes.\n\n03 / EXPLORE CAPABILITIES ↗\nGovernance & control\n\nCheck safety rules, authorise individual moves, review eligible uncertainty and stop movement.\n\n04 / EXPLORE CAPABILITIES ↗\nLearning & improvement\n\nCheck and reuse experience, evaluate rule changes, suggest improvements and test difficult situations.\n\n05 / EXPLORE CAPABILITIES ↗\nOperations & resilience\n\nInspect the facility, screen site guidance, investigate results and check progress after interruptions.\n\nExplore learning, recovery and model integrations in the full guide. Live model services require setup.\n\nExplore all 22 capabilities ↗\nHOW MOVEMENT IS AUTHORISED\nA plan proposes.\nA permit authorises movement.\n\nThe planner suggests a move. Separate safety checks decide whether it may proceed. The robot controller then checks a signed permit: a permission for that specific move. STOP can always be requested without a movement permit.\n\n01 / INTELLIGENCE\nPerceive & plan\n\nUse the map and current observations to propose a route. AI integrations require setup; a built-in planner provides a fallback.\n\nA proposed move still needs permission\n↓\n02 / INDEPENDENT AUTHORITY\nVerify every move\n\nCheck current conditions, hazards along the route, active safety rules, the mission and any stop controls.\n\nSIGNED PERMISSION / ONE USE / SHORT LIFETIME / ONE EXACT MOVE\n↓\n03 / ROBOT CONTROLLER\nAccept or refuse the move\n\nThe simulator controller independently validates the permit, then records the outcome. STOP never requires a permit.\n\nRecorded robot updates support the audit history and checked learning\nPERMISSION IS CHECKED TWICE\nThe AI proposes.\nThe controller checks.\n\nA separate service issues a signed permit for one approved move. The controller checks that it is current, unchanged and unused before accepting it.\n\nAn expired or reused permit is refused. After an interruption, the system checks actual progress before continuing. STOP does not need a movement permit.\n\nSee safety, permits and operator review ↗\nAPPLICATIONS / ONE PLATFORM · MULTIPLE PHYSICAL WORLDS\nOne intelligence.\nMany environments.\n\nFrom precision manufacturing to healthcare, logistics and agriculture—explore how governed autonomy can support different machines, missions and environments.\n\n01 / 04\nAPPLICATION LANDSCAPE / 01\nManufacturing\n\nLive today in the simulated factory: keep production moving as robots coordinate material handling, adapt to changing routes and operate within defined safety boundaries.\n\nManufacturing\nHealthcare\nLogistics\nAgriculture\n‹\n›\nRECORDED SOFTWARE VALIDATION\nBuilt to be challenged.\n\nRecorded validation covers forbidden commands, replay attempts, poisoned memories, injected instructions and operational interruptions. Inspect the safety decision, movement permit and recorded outcome together.\n\n489\nbackend tests passed in the recorded 3 November 2026 validation\n15\nMission Control and oversight browser checks passed in that validation\n3 robots\ntwo mobile carriers and one humanoid navigation profile in the simulator\nSigned\ndecision records and linked audit events that can be checked for alteration\n\nSoftware validation recorded 3 November 2026. Read the recorded validation report\n\nWhat is proven — and what is not.\n\nThese are repository-documented software and simulator results. They are not independent hardware safety certification. Real deployments require hardware stops, calibrated perception, swept-footprint and braking-distance validation, and robot-specific safety assessment.\n\nInspect evidence ↗\nRead current scope ↗\nTHE NEXT GENERATION OF PHYSICAL AI\nMore capable machines.\nMore accountable autonomy.\nOpen Mission Control ↗\nSee the evidence ↗",
+      "all_text": "Physical AI · Intelligence & trustIntelligence that acts.Autonomy you can trust.Plan robot missions, check every proposed move, coordinate a fleet and learn from recorded outcomes. Explore the working simulator and the controls behind each decision.Open Mission Control ↗How it works ↗↗Learn from verified outcomes◎Reuse checked experience◇Check moves before execution↺Recover from disruptionWATCH THE DECISIONS BEHIND THE MOVEMENTOne mission.A real reason to stop.Follow a recorded simulator delivery through its route, a refused move, replanning and arrival. Each moment links back to the saved events.Actual simulator facility / reference view, not a frame of the selected moment.Recorded simulator highlights / 3 November 2026 / fallback planner01Plan02Move03Stop04Replan05ArriveMeridian Life Sciencesrobot-2 / Formulation to Quality labScroll the floor plan sideways to inspect all rooms.Meridian Life Sciences recorded missionSimplified floor plan from the facility layout. Route and robot positions come from the saved run. This is not live telemetry.Cold storageQuality labFormulationGowningResearch labPackagingShared transfer corridorDestinationrobot-2Proposed routeRecorded positionsWorkers at stopFacility floor plan with recorded robot positions. Dashed line: proposed route; solid line: recorded positions up to this moment. Intermediate moments are omitted.Route proposedA route to the Quality labRobot-2 receives a route from Formulation to the Quality lab through the shared corridor. The site router proposes 16 waypoints. Each move still needs its own safety check and permit.Planned route16 waypointsPrevious01 / 05Next: MoveInspect this recorded momentRecorded time12:02:08 UTCSource event IDsevt_472b2909e066 · evt_12fb15ecc1a6Download the saved event record (JSON, 1.4 MB)Five selected moments from one completed run, not an idealised animation. The recording includes unsafe proposals and review decisions. Its historical audit has ordering gaps; see the recording limits below.Open Mission Control ↗Explore the capabilities ↗Recording scope and evidence limitsRecorded local simulator validation on 3 November 2026; no physical robots or paid model calls.Selected moments omit intermediate events and operator pauses. This is not real-time playback.Fallback planning was used. This recording does not demonstrate live AI model execution or shared learning.The record contains unsafe proposals, review decisions and integrity alerts. Completion does not mean every proposal was safe.After arrival the simulator resets to parking; this is not a driven return journey.All 413 individual event hashes verify. The historical chronological audit has 37 linkage discontinuities; it is not a fully continuous audit chain.Download all 413 recorded eventsSee the recorded interface after completionActual interface captured after this run completed. The displayed robot position has reset to parking. This screenshot does not represent the selected timeline moment. Open the full screenshot<p>JavaScript enables the five recorded moments. The mission summary and downloadable event record remain available.</p>{\"schema\":\"sovereign-mission-highlights-v1\",\"run_id\":\"run_f8bdbc5984ab\",\"recorded_date\":\"3 November 2026\",\"robot_id\":\"robot-2\",\"event_count\":413,\"permit_uses\":81,\"hard_fail_decisions\":8,\"notes\":[\"Recorded local simulator validation on 3 November 2026; no physical robots or paid model calls.\",\"Selected moments omit intermediate events and operator pauses. This is not real-time playback.\",\"Fallback planning was used. This recording does not demonstrate live AI model execution or shared learning.\",\"The record contains unsafe proposals, review decisions and integrity alerts. Completion does not mean every proposal was safe.\",\"After arrival the simulator resets to parking; this is not a driven return journey.\",\"All 413 individual event hashes verify. The historical chronological audit has 37 linkage discontinuities; it is not a fully continuous audit chain.\"],\"steps\":[{\"label\":\"Plan\",\"title\":\"A route to the Quality lab\",\"text\":\"Robot-2 receives a route from Formulation to the Quality lab through the shared corridor. The site router proposes 16 waypoints. Each move still needs its own safety check and permit.\",\"status\":\"Route proposed\",\"time\":\"2026-11-03T12:02:08.353729+00:00\",\"event_ids\":[\"evt_472b2909e066\",\"evt_12fb15ecc1a6\"],\"pose\":{\"x\":30.0,\"y\":2.5,\"speed\":0.0,\"human_distance_m\":18.145},\"route\":[[30,2.5],[29.85,4.35],[29.7,6.2],[29.55,8.05],[29.4,9.9],[29.25,11.75],[27.5,11.75],[25.75,11.75],[24.0,11.75],[22.25,11.75],[20.5,11.75],[18.75,11.75],[18.6,9.9],[18.45,8.05],[18.3,6.2],[18.15,4.35],[18.0,2.5]],\"fact_label\":\"Planned route\",\"fact\":\"16 waypoints\",\"time_range\":\"12:02:08 UTC\",\"trail\":[[30.0,2.5]]},{\"label\":\"Move\",\"title\":\"A permit allows the next move\",\"text\":\"The controller records a used movement permit. Subsequent robot updates show the carrier leaving its start position. A route alone did not authorise this move.\",\"status\":\"Permit used\",\"time\":\"2026-11-03T12:02:36.714329+00:00\",\"event_ids\":[\"evt_65cc2733f8b0\",\"evt_0030f23ebaa0\"],\"pose\":{\"x\":30.0,\"y\":2.607,\"speed\":0.3,\"human_distance_m\":16.107},\"fact_label\":\"Recorded robot speed\",\"fact\":\"0.3 m/s\",\"time_range\":\"12:02:36 - 12:02:37 UTC\",\"trail\":[[30.0,2.5],[30.0,2.5],[30.0,2.607]]},{\"label\":\"Stop\",\"title\":\"A person comes too close\",\"text\":\"The recorded human distance falls to 0.378 metres. The proximity rule refuses the proposed move and a verified STOP follows. The robot is stationary while the next route is assessed.\",\"status\":\"Move refused / STOP verified\",\"time\":\"2026-11-03T12:04:23.039357+00:00\",\"event_ids\":[\"evt_0b5a92dc17f7\",\"evt_b6ef905be414\"],\"pose\":{\"x\":19.041,\"y\":11.73,\"speed\":0.0,\"human_distance_m\":0.378},\"people\":[{\"x\":5.75,\"y\":1.75,\"name\":\"Worker A\",\"type\":\"worker\",\"role\":\"worker\",\"conf\":0.9,\"speed\":0.0,\"heading\":1.381,\"activity\":\"working\",\"destination\":\"Cold storage\"},{\"x\":20.75,\"y\":16.75,\"name\":\"Runner 1\",\"type\":\"worker\",\"role\":\"worker\",\"conf\":0.9,\"speed\":0.0,\"heading\":0.0,\"activity\":\"waiting_at_crossing\",\"destination\":\"Crossing destination\"},{\"x\":7.79,\"y\":11.75,\"name\":\"Runner 2\",\"type\":\"worker\",\"role\":\"worker\",\"conf\":0.9,\"speed\":1.081,\"heading\":0.0,\"activity\":\"walking\",\"destination\":\"Crossing destination\"},{\"x\":19.25,\"y\":12.05,\"name\":\"Runner 3\",\"type\":\"worker\",\"role\":\"worker\",\"conf\":0.9,\"speed\":1.148,\"heading\":1.571,\"activity\":\"walking\",\"destination\":\"Crossing destination\"}],\"fact_label\":\"Recorded human distance\",\"fact\":\"0.378 m\",\"time_range\":\"12:04:23 UTC\",\"trail\":[[30.0,2.5],[30.0,2.5],[30.0,2.607],[29.977,2.876],[29.969,2.96],[29.947,3.217],[29.922,3.516],[29.893,3.844],[29.866,4.173],[29.839,4.502],[29.81,4.861],[29.78,5.22],[29.753,5.549],[29.724,5.907],[29.697,6.236],[29.671,6.565],[29.646,6.864],[29.617,7.223],[29.59,7.552],[29.564,7.881],[29.537,8.21],[29.51,8.539],[29.486,8.838],[29.462,9.137],[29.438,9.436],[29.409,9.795],[29.382,10.124],[29.358,10.423],[29.331,10.752],[29.293,11.214],[28.931,11.454],[28.803,11.481],[28.803,11.481],[28.803,11.481],[28.803,11.481],[28.8,11.468],[28.35,11.563],[27.813,11.681],[27.265,11.714],[26.665,11.728],[26.116,11.741],[25.566,11.745],[25.066,11.747],[24.516,11.748],[24.016,11.749],[23.886,11.749],[23.886,11.749],[23.628,11.749],[23.298,11.749],[22.938,11.75],[22.638,11.75],[22.278,11.75],[21.858,11.75],[21.834,11.75],[21.636,11.75],[21.306,11.75],[20.946,11.75],[20.922,11.75],[20.922,11.75],[20.922,11.75],[20.922,11.75],[20.922,11.75],[20.922,11.75],[20.922,11.75],[20.922,11.75],[20.922,11.75],[20.922,11.75],[20.727,11.643],[20.693,11.623],[20.693,11.623],[20.693,11.623],[20.693,11.623],[20.693,11.623],[20.693,11.623],[20.436,11.635],[20.412,11.636],[20.155,11.654],[19.766,11.68],[19.406,11.705],[19.353,11.709],[19.353,11.709],[19.353,11.709],[19.353,11.709],[19.353,11.709],[19.095,11.726],[19.041,11.73],[19.041,11.73]]},{\"label\":\"Replan\",\"title\":\"New plan. Fresh permission.\",\"text\":\"After repeated proximity denials, the fallback planner proposes a replacement toward the same destination. A task check keeps it on goal. The controller later records a fresh permit use before continuation.\",\"status\":\"New plan / fresh permit used\",\"time\":\"2026-11-03T12:04:26.405331+00:00\",\"event_ids\":[\"evt_e18d4b6819ff\",\"evt_dc1fd051140c\",\"evt_c1781604bef2\"],\"pose\":{\"x\":19.012,\"y\":11.575,\"speed\":0.4,\"human_distance_m\":3.692},\"route\":[[19.041,11.73],[18.0,2.5]],\"fact_label\":\"Replacement plan\",\"fact\":\"Same destination\",\"time_range\":\"12:04:24 - 12:04:27 UTC\",\"trail\":[[30.0,2.5],[30.0,2.5],[30.0,2.607],[29.977,2.876],[29.969,2.96],[29.947,3.217],[29.922,3.516],[29.893,3.844],[29.866,4.173],[29.839,4.502],[29.81,4.861],[29.78,5.22],[29.753,5.549],[29.724,5.907],[29.697,6.236],[29.671,6.565],[29.646,6.864],[29.617,7.223],[29.59,7.552],[29.564,7.881],[29.537,8.21],[29.51,8.539],[29.486,8.838],[29.462,9.137],[29.438,9.436],[29.409,9.795],[29.382,10.124],[29.358,10.423],[29.331,10.752],[29.293,11.214],[28.931,11.454],[28.803,11.481],[28.803,11.481],[28.803,11.481],[28.803,11.481],[28.8,11.468],[28.35,11.563],[27.813,11.681],[27.265,11.714],[26.665,11.728],[26.116,11.741],[25.566,11.745],[25.066,11.747],[24.516,11.748],[24.016,11.749],[23.886,11.749],[23.886,11.749],[23.628,11.749],[23.298,11.749],[22.938,11.75],[22.638,11.75],[22.278,11.75],[21.858,11.75],[21.834,11.75],[21.636,11.75],[21.306,11.75],[20.946,11.75],[20.922,11.75],[20.922,11.75],[20.922,11.75],[20.922,11.75],[20.922,11.75],[20.922,11.75],[20.922,11.75],[20.922,11.75],[20.922,11.75],[20.922,11.75],[20.727,11.643],[20.693,11.623],[20.693,11.623],[20.693,11.623],[20.693,11.623],[20.693,11.623],[20.693,11.623],[20.436,11.635],[20.412,11.636],[20.155,11.654],[19.766,11.68],[19.406,11.705],[19.353,11.709],[19.353,11.709],[19.353,11.709],[19.353,11.709],[19.353,11.709],[19.095,11.726],[19.041,11.73],[19.041,11.73],[19.041,11.73],[19.012,11.575]]},{\"label\":\"Arrive\",\"title\":\"Arrival is recorded\",\"text\":\"The final decision records robot-2 at the Quality lab with zero speed, followed by a verified STOP. The run completes. Its later parking reset is not a driven return journey.\",\"status\":\"Completed / STOP verified\",\"time\":\"2026-11-03T12:05:05.185121+00:00\",\"event_ids\":[\"evt_7ff07c387322\",\"evt_4d882f6a901d\"],\"pose\":{\"x\":18.004,\"y\":2.533,\"speed\":0.0,\"human_distance_m\":11.532},\"fact_label\":\"Recorded arrival\",\"fact\":\"18.004, 2.533 m\",\"time_range\":\"12:05:05 UTC\",\"trail\":[[30.0,2.5],[30.0,2.5],[30.0,2.607],[29.977,2.876],[29.969,2.96],[29.947,3.217],[29.922,3.516],[29.893,3.844],[29.866,4.173],[29.839,4.502],[29.81,4.861],[29.78,5.22],[29.753,5.549],[29.724,5.907],[29.697,6.236],[29.671,6.565],[29.646,6.864],[29.617,7.223],[29.59,7.552],[29.564,7.881],[29.537,8.21],[29.51,8.539],[29.486,8.838],[29.462,9.137],[29.438,9.436],[29.409,9.795],[29.382,10.124],[29.358,10.423],[29.331,10.752],[29.293,11.214],[28.931,11.454],[28.803,11.481],[28.803,11.481],[28.803,11.481],[28.803,11.481],[28.8,11.468],[28.35,11.563],[27.813,11.681],[27.265,11.714],[26.665,11.728],[26.116,11.741],[25.566,11.745],[25.066,11.747],[24.516,11.748],[24.016,11.749],[23.886,11.749],[23.886,11.749],[23.628,11.749],[23.298,11.749],[22.938,11.75],[22.638,11.75],[22.278,11.75],[21.858,11.75],[21.834,11.75],[21.636,11.75],[21.306,11.75],[20.946,11.75],[20.922,11.75],[20.922,11.75],[20.922,11.75],[20.922,11.75],[20.922,11.75],[20.922,11.75],[20.922,11.75],[20.922,11.75],[20.922,11.75],[20.922,11.75],[20.727,11.643],[20.693,11.623],[20.693,11.623],[20.693,11.623],[20.693,11.623],[20.693,11.623],[20.693,11.623],[20.436,11.635],[20.412,11.636],[20.155,11.654],[19.766,11.68],[19.406,11.705],[19.353,11.709],[19.353,11.709],[19.353,11.709],[19.353,11.709],[19.353,11.709],[19.095,11.726],[19.041,11.73],[19.041,11.73],[19.041,11.73],[19.012,11.575],[18.963,11.137],[18.953,11.05],[18.953,11.05],[18.953,11.05],[18.918,10.732],[18.869,10.294],[18.818,9.837],[18.778,9.479],[18.738,9.122],[18.705,8.824],[18.672,8.525],[18.632,8.168],[18.592,7.81],[18.555,7.482],[18.519,7.154],[18.486,6.856],[18.449,6.528],[18.412,6.2],[18.373,5.842],[18.333,5.484],[18.293,5.126],[18.263,4.858],[18.226,4.53],[18.19,4.202],[18.153,3.874],[18.113,3.516],[18.08,3.218],[18.05,2.95],[18.004,2.533]]}]}THE COMPLETE PLATFORM / 22 CAPABILITY AREASPlan, check, move.Learn from what happened.Explore five connected areas covering all 22 capabilities. Each links to a plain-language explanation, an example and the relevant workspace.01 / EXPLORE CAPABILITIES ↗Mission intelligenceCreate a mission, assign a robot and propose a route that stays aligned with its destination.02 / EXPLORE CAPABILITIES ↗Perception & movementRead observations, find routes, check shared space and respond when a corridor or hazard changes.03 / EXPLORE CAPABILITIES ↗Governance & controlCheck safety rules, authorise individual moves, review eligible uncertainty and stop movement.04 / EXPLORE CAPABILITIES ↗Learning & improvementCheck and reuse experience, evaluate rule changes, suggest improvements and test difficult situations.05 / EXPLORE CAPABILITIES ↗Operations & resilienceInspect the facility, screen site guidance, investigate results and check progress after interruptions.Explore learning, recovery and model integrations in the full guide. Live model services require setup.Explore all 22 capabilities ↗ HOW MOVEMENT IS AUTHORISED A plan proposes.A permit authorises movement.The planner suggests a move. Separate safety checks decide whether it may proceed. The robot controller then checks a signed permit: a permission for that specific move. STOP can always be requested without a movement permit. 01 / INTELLIGENCEPerceive & planUse the map and current observations to propose a route. AI integrations require setup; a built-in planner provides a fallback.A proposed move still needs permission ↓ 02 / INDEPENDENT AUTHORITYVerify every moveCheck current conditions, hazards along the route, active safety rules, the mission and any stop controls.SIGNED PERMISSION / ONE USE / SHORT LIFETIME / ONE EXACT MOVE ↓ 03 / ROBOT CONTROLLERAccept or refuse the moveThe simulator controller independently validates the permit, then records the outcome. STOP never requires a permit.Recorded robot updates support the audit history and checked learning PERMISSION IS CHECKED TWICEThe AI proposes.The controller checks.A separate service issues a signed permit for one approved move. The controller checks that it is current, unchanged and unused before accepting it.An expired or reused permit is refused. After an interruption, the system checks actual progress before continuing. STOP does not need a movement permit.See safety, permits and operator review ↗APPLICATIONS / ONE PLATFORM · MULTIPLE PHYSICAL WORLDSOne intelligence.Many environments.From precision manufacturing to healthcare, logistics and agriculture—explore how governed autonomy can support different machines, missions and environments.01 / 04 CINEMATIC SCENE▶ Play motionAPPLICATION LANDSCAPE / 01ManufacturingLive today in the simulated factory: keep production moving as robots coordinate material handling, adapt to changing routes and operate within defined safety boundaries.ManufacturingHealthcareLogisticsAgriculture‹›RECORDED SOFTWARE VALIDATIONBuilt to be challenged.Recorded validation covers forbidden commands, replay attempts, poisoned memories, injected instructions and operational interruptions. Inspect the safety decision, movement permit and recorded outcome together. 489backend tests passed in the recorded 3 November 2026 validation15Mission Control and oversight browser checks passed in that validation3 robotstwo mobile carriers and one humanoid navigation profile in the simulatorSigneddecision records and linked audit events that can be checked for alterationSoftware validation recorded 3 November 2026. Read the recorded validation reportWhat is proven — and what is not.These are repository-documented software and simulator results. They are not independent hardware safety certification. Real deployments require hardware stops, calibrated perception, swept-footprint and braking-distance validation, and robot-specific safety assessment.Inspect evidence ↗Read current scope ↗THE NEXT GENERATION OF PHYSICAL AIMore capable machines.More accountable autonomy.Open Mission Control ↗See the evidence ↗",
+      "links": [
+        {
+          "label": "Skip to content",
+          "href": "#main"
+        },
+        {
+          "label": "SSOVEREIGNAUTONOMY",
+          "href": "#top"
+        },
+        {
+          "label": "Platform",
+          "href": "#capability-overview"
+        },
+        {
+          "label": "How it works",
+          "href": "/how-it-works"
+        },
+        {
+          "label": "Environments",
+          "href": "#environments"
+        },
+        {
+          "label": "Evidence",
+          "href": "#evidence"
+        },
+        {
+          "label": "Open Mission Control ↗",
+          "href": "/mission-control"
+        },
+        {
+          "label": "Open Mission Control ↗",
+          "href": "/mission-control"
+        },
+        {
+          "label": "How it works ↗",
+          "href": "/how-it-works"
+        },
+        {
+          "label": "Download the saved event record (JSON, 1.4 MB)",
+          "href": "/landing/mission-story/audit.json"
+        },
+        {
+          "label": "Open Mission Control ↗",
+          "href": "/mission-control"
+        },
+        {
+          "label": "Explore the capabilities ↗",
+          "href": "/how-it-works"
+        },
+        {
+          "label": "Download all 413 recorded events",
+          "href": "/landing/mission-story/audit.json"
+        },
+        {
+          "label": "Open the full screenshot",
+          "href": "/landing/mission-story/completed-interface.png"
+        },
+        {
+          "label": "01 / EXPLORE CAPABILITIES ↗Mission intelligenceCreate a mission, assign a robot and propose a route that stays aligned with its destination.",
+          "href": "/how-it-works#mission"
+        },
+        {
+          "label": "02 / EXPLORE CAPABILITIES ↗Perception & movementRead observations, find routes, check shared space and respond when a corridor or hazard changes.",
+          "href": "/how-it-works#movement"
+        },
+        {
+          "label": "03 / EXPLORE CAPABILITIES ↗Governance & controlCheck safety rules, authorise individual moves, review eligible uncertainty and stop movement.",
+          "href": "/how-it-works#control"
+        },
+        {
+          "label": "04 / EXPLORE CAPABILITIES ↗Learning & improvementCheck and reuse experience, evaluate rule changes, suggest improvements and test difficult situations.",
+          "href": "/how-it-works#learning"
+        },
+        {
+          "label": "05 / EXPLORE CAPABILITIES ↗Operations & resilienceInspect the facility, screen site guidance, investigate results and check progress after interruptions.",
+          "href": "/how-it-works#operations"
+        },
+        {
+          "label": "Explore all 22 capabilities ↗",
+          "href": "/how-it-works"
+        },
+        {
+          "label": "See safety, permits and operator review ↗",
+          "href": "/how-it-works#control"
+        },
+        {
+          "label": "Read the recorded validation report",
+          "href": "/landing/validation.json"
+        },
+        {
+          "label": "Inspect evidence ↗",
+          "href": "/evidence"
+        },
+        {
+          "label": "Read current scope ↗",
+          "href": "/how-it-works#boundaries"
+        },
+        {
+          "label": "Open Mission Control ↗",
+          "href": "/mission-control"
+        },
+        {
+          "label": "See the evidence ↗",
+          "href": "/evidence"
+        }
+      ],
+      "controls": [
+        {
+          "tag": "BUTTON",
+          "role": null,
+          "label": "01Plan",
+          "disabled": false
+        },
+        {
+          "tag": "BUTTON",
+          "role": null,
+          "label": "02Move",
+          "disabled": false
+        },
+        {
+          "tag": "BUTTON",
+          "role": null,
+          "label": "03Stop",
+          "disabled": false
+        },
+        {
+          "tag": "BUTTON",
+          "role": null,
+          "label": "04Replan",
+          "disabled": false
+        },
+        {
+          "tag": "BUTTON",
+          "role": null,
+          "label": "05Arrive",
+          "disabled": false
+        },
+        {
+          "tag": "BUTTON",
+          "role": null,
+          "label": "Previous",
+          "disabled": true
+        },
+        {
+          "tag": "BUTTON",
+          "role": null,
+          "label": "Next: Move",
+          "disabled": false
+        },
+        {
+          "tag": "SUMMARY",
+          "role": null,
+          "label": "Inspect this recorded moment",
+          "disabled": false
+        },
+        {
+          "tag": "SUMMARY",
+          "role": null,
+          "label": "Recording scope and evidence limits",
+          "disabled": false
+        },
+        {
+          "tag": "SUMMARY",
+          "role": null,
+          "label": "See the recorded interface after completion",
+          "disabled": false
+        },
+        {
+          "tag": "BUTTON",
+          "role": null,
+          "label": "Manufacturing",
+          "disabled": false
+        },
+        {
+          "tag": "BUTTON",
+          "role": null,
+          "label": "Healthcare",
+          "disabled": false
+        },
+        {
+          "tag": "BUTTON",
+          "role": null,
+          "label": "Logistics",
+          "disabled": false
+        },
+        {
+          "tag": "BUTTON",
+          "role": null,
+          "label": "Agriculture",
+          "disabled": false
+        },
+        {
+          "tag": "BUTTON",
+          "role": null,
+          "label": "Previous environment",
+          "disabled": false
+        },
+        {
+          "tag": "BUTTON",
+          "role": null,
+          "label": "Next environment",
+          "disabled": false
+        }
+      ],
+      "details": [
+        {
+          "open": false,
+          "label": "Inspect this recorded moment"
+        },
+        {
+          "open": false,
+          "label": "Recording scope and evidence limits"
+        },
+        {
+          "open": false,
+          "label": "See the recorded interface after completion"
+        }
+      ],
+      "sections": [
+        {
+          "id": "top",
+          "heading": ""
+        },
+        {
+          "id": "experience",
+          "heading": "One mission.A real reason to stop."
+        },
+        {
+          "id": "capability-overview",
+          "heading": "Plan, check, move.Learn from what happened."
+        },
+        {
+          "id": "authority",
+          "heading": "A plan proposes.A permit authorises movement."
+        },
+        {
+          "id": "environments",
+          "heading": "One intelligence.Many environments."
+        },
+        {
+          "id": "evidence",
+          "heading": "Built to be challenged."
+        }
+      ],
+      "overflow": false
+    },
+    {
+      "route": "/how-it-works",
+      "final_url": "/how-it-works",
+      "title": "How It Works — Sovereign Autonomy",
+      "headings": [
+        {
+          "level": "H1",
+          "text": "From mission intent to verified action."
+        },
+        {
+          "level": "H2",
+          "text": "One mission.Many cooperating capabilities."
+        },
+        {
+          "level": "H3",
+          "text": "Mission intent"
+        },
+        {
+          "level": "H2",
+          "text": "What happens when the world changes?"
+        },
+        {
+          "level": "H3",
+          "text": "The parts delivery"
+        },
+        {
+          "level": "H2",
+          "text": "Explore what the platform can do."
+        },
+        {
+          "level": "H3",
+          "text": "01 / Mission & decision"
+        },
+        {
+          "level": "H3",
+          "text": "02 / Perception & movement"
+        },
+        {
+          "level": "H3",
+          "text": "03 / Governance & authority"
+        },
+        {
+          "level": "H3",
+          "text": "04 / Learning & assurance"
+        },
+        {
+          "level": "H3",
+          "text": "05 / Operations & resilience"
+        },
+        {
+          "level": "H2",
+          "text": "Designed for real autonomy.Validated in simulation."
+        },
+        {
+          "level": "H3",
+          "text": "Available in the simulator"
+        },
+        {
+          "level": "H3",
+          "text": "Configuration or validation needed"
+        },
+        {
+          "level": "H3",
+          "text": "Not yet delivered"
+        },
+        {
+          "level": "H2",
+          "text": "AI can propose. Only authorised movement can proceed."
+        }
+      ],
+      "visible_text": "INSIDE SOVEREIGN AUTONOMY / A VISUAL GUIDE\nFrom mission intent to verified action.\n\nSee how autonomous systems perceive, plan, coordinate, act, learn and recover — with independent checks at every critical movement. Follow a mission step by step, or explore all 22 capability areas below.\n\nFollow the journey ↗\nOpen Mission Control ↗\nExplore 22 capabilities ↗\nILLUSTRATIVE FACTORY MISSION\nGUIDED EXPLAINER\nMACHINE FLOOR\nWELDING CELL\nSTORES\nASSEMBLY\n!\nROBOT 1\nFrom parts storage to assembly — a route is only a proposal until the controller accepts authorised movement.\n01 / THE BIG PICTURE\nOne mission.\nMany cooperating capabilities.\n\nSelect any stage to see what happens. The planner suggests a route. Safety checks and the robot controller determine which moves can execute.\n\n01\nMission intent\n02\nPerceive & understand\n03\nPlan & route\n04\nCheck & review\n05\nAuthorise\n06\nExecute\n07\nObserve & verify\n08\nLearn & improve\n09\nRecover & continue\nMission intent\n\nAn operator sets a destination, objective and robot.\n\n01 / 09\nExplore mission capabilities ↗\n02 / SEE IT IN ACTION\nWhat happens when the world changes?\n\nSwitch between operational situations and see how the platform responds. These are illustrative flows, not a connection to the live simulator.\n\nNormal mission\nNew obstacle\nUnsafe proposal\nInterrupted run\nLearning\nMACHINE FLOOR\nWELDING CELL\nSTORES\nASSEMBLY\n!\nROBOT 1\nThe route, machines and obstacle are illustrative, not live robot telemetry.\nSCENARIO 01 / 05\nThe parts delivery\nOperator assigns Robot 1 a destination\nThe planner proposes a plan\nroute is generated\nmovement is checked\neach approved move receives a signed permit\nthe controller checks the permit before movement\n\nOutcome: progress and action evidence are captured throughout the mission.\n\n03 / CAPABILITY FLOWS\nExplore what the platform can do.\n\nScan each feature and its status. Expand a card for an example, its steps and limits, or open its related workspace. Search also looks inside the details.\n\nAll 22 capabilities\nMission & decision\nPerception & movement\nGovernance & authority\nLearning & assurance\nOperations & resilience\nAll statuses\nImplemented in simulator\nRequires setup / live checks\n\n22 of 22 capability areas\n\nReset filters\n01 / Mission & decision\n\nFrom intent to a mission that stays on course.\n\n4 capabilities\nMission management\nImplemented in simulator\n\nCreate a mission, choose its robot and follow its progress.\n\nExample, steps and limits\nOpen related workspace ↗\nAI planning\nRequires setup / live checks\n\nTurn a written mission into a proposed sequence of moves.\n\nExample, steps and limits\nOpen related workspace ↗\nAgentic planning\nRequires setup / live checks\n\nLet the AI planner ask questions about the site before proposing actions.\n\nExample, steps and limits\nOpen related workspace ↗\nTask fidelity\nImplemented in simulator\n\nCheck that the proposed route still serves the assigned destination.\n\nExample, steps and limits\nOpen related workspace ↗\n02 / Perception & movement\n\nUnderstanding the environment and coordinating paths.\n\n4 capabilities\nRouting\nImplemented in simulator\n\nFind a path through available aisles while avoiding excluded areas.\n\nExample, steps and limits\nOpen related workspace ↗\nPerception\nRequires setup / live checks\n\nUse camera and sensor observations to add information about nearby hazards.\n\nExample, steps and limits\nOpen related workspace ↗\nEnvironment adaptation\nImplemented in simulator\n\nHold movement and reconsider a route when the site changes.\n\nExample, steps and limits\nOpen related workspace ↗\nFleet coordination\nImplemented in simulator\n\nKeep each robot’s mission and movement permissions separate while checking shared space.\n\nExample, steps and limits\nOpen related workspace ↗\n03 / Governance & authority\n\nIndependent checks before anything moves.\n\n4 capabilities\nSafety governance\nImplemented in simulator\n\nCheck proposed moves against safety rules before they can proceed.\n\nExample, steps and limits\nOpen related workspace ↗\nExecution authority\nImplemented in simulator\n\nIssue a signed movement permit and check it again at the robot controller.\n\nExample, steps and limits\nOpen related workspace ↗\nHuman oversight\nImplemented in simulator\n\nLet an authorised operator review eligible uncertainty or request a new route.\n\nExample, steps and limits\nOpen related workspace ↗\nEmergency control\nImplemented in simulator\n\nStop movement through controls that operate independently of the AI planner.\n\nExample, steps and limits\nOpen related workspace ↗\n04 / Learning & assurance\n\nImproving performance without silently changing trust.\n\n5 capabilities\nPersistent learning\nImplemented in simulator\n\nStore useful route and planning experience for later compatible missions.\n\nExample, steps and limits\nOpen related workspace ↗\nLearning security\nImplemented in simulator\n\nCheck stored experience before allowing it to influence future decisions.\n\nExample, steps and limits\nOpen related workspace ↗\nRule management\nImplemented in simulator\n\nEvaluate and approve changes to operating rules before activating them.\n\nExample, steps and limits\nOpen related workspace ↗\nOptimization\nImplemented in simulator\n\nUse mission scores to suggest improvements within existing safety limits.\n\nExample, steps and limits\nOpen related workspace ↗\nRobustness testing\nImplemented in simulator\n\nChallenge the system with difficult scenarios and inspect how it responds.\n\nExample, steps and limits\nOpen related workspace ↗\n05 / Operations & resilience\n\nObserve, investigate, verify and recover.\n\n5 capabilities\nSite intelligence\nImplemented in simulator\n\nScreen site guidance before using it to inform a mission.\n\nExample, steps and limits\nOpen related workspace ↗\nEvidence\nImplemented in simulator\n\nKeep a verifiable history of proposed moves, decisions and outcomes.\n\nExample, steps and limits\nOpen related workspace ↗\nAnalysis\nImplemented in simulator\n\nFind patterns in recorded missions and investigate where plans and outcomes differ.\n\nExample, steps and limits\nOpen related workspace ↗\nRecovery\nImplemented in simulator\n\nCheck what actually happened after an interruption before allowing continuation.\n\nExample, steps and limits\nOpen related workspace ↗\nOperations and twin\nImplemented in simulator\n\nShow the simulated facility, robot status and mission controls in one workspace.\n\nExample, steps and limits\nOpen related workspace ↗\n\nStatus reviewed 3 November 2026 against the repository capability audit. Maturity labels describe the current documented implementation, not certification or physical-hardware readiness. “Needs validation/config” includes model-dependent capabilities disabled in the preview; “Partial” reflects known functional or interface gaps.\n\n04 / HONEST BOUNDARIES\nDesigned for real autonomy.\nValidated in simulation.\n\nUnderstanding the current scope is part of trusting the platform. The current fleet has two mobile carriers and one humanoid navigator. All three support simulated navigation, stopping and waiting; physical manipulation and balancing are outside this scope.\n\nAvailable in the simulator\n\nMission workflows, movement permits, stops, environment revalidation, learned routing, evidence, recovery and mixed-fleet navigation have documented test coverage.\n\nConfiguration or validation needed\n\nModel planning, vision, voice, external lookup and tracing paths depend on suitable credentials, services and live validation. Operator review and replan-and-hold are available; approvals cannot override hard safety limits.\n\nNot yet delivered\n\nPhysical humanoid manipulation and balancing, cross-platform skill transfer, enforced role-specific task eligibility and multi-site failover are outside current implementation.\n\nTHE IDEA IN ONE LINE\nAI can propose. Only authorised movement can proceed.\n\nExplore the main experience or inspect the public evidence behind the simulator implementation.\n\nReturn to the experience ↗\nPublic project & evidence ↗",
+      "all_text": "Inside Sovereign Autonomy / A visual guideFrom mission intent to verified action.See how autonomous systems perceive, plan, coordinate, act, learn and recover — with independent checks at every critical movement. Follow a mission step by step, or explore all 22 capability areas below.Follow the journey ↗Open Mission Control ↗Explore 22 capabilities ↗ILLUSTRATIVE FACTORY MISSIONGUIDED EXPLAINERMACHINE FLOORWELDING CELLSTORESASSEMBLY!ROBOT 1From parts storage to assembly — a route is only a proposal until the controller accepts authorised movement.01 / THE BIG PICTUREOne mission.Many cooperating capabilities.Select any stage to see what happens. The planner suggests a route. Safety checks and the robot controller determine which moves can execute.01Mission intent02Perceive & understand03Plan & route04Check & review05Authorise06Execute07Observe & verify08Learn & improve09Recover & continueMission intentAn operator sets a destination, objective and robot.01 / 09Explore mission capabilities ↗02 / SEE IT IN ACTIONWhat happens when the world changes?Switch between operational situations and see how the platform responds. These are illustrative flows, not a connection to the live simulator.Normal missionNew obstacleUnsafe proposalInterrupted runLearningMACHINE FLOORWELDING CELLSTORESASSEMBLY!ROBOT 1The route, machines and obstacle are illustrative, not live robot telemetry.Scenario 01 / 05The parts deliveryOperator assigns Robot 1 a destinationThe planner proposes a planroute is generatedmovement is checkedeach approved move receives a signed permitthe controller checks the permit before movementOutcome: progress and action evidence are captured throughout the mission.03 / CAPABILITY FLOWSExplore what the platform can do.Scan each feature and its status. Expand a card for an example, its steps and limits, or open its related workspace. Search also looks inside the details.All 22 capabilitiesMission & decisionPerception & movementGovernance & authorityLearning & assuranceOperations & resilienceAll statusesImplemented in simulatorRequires setup / live checks22 of 22 capability areasReset filters01 / Mission & decisionFrom intent to a mission that stays on course.4 capabilitiesMission managementImplemented in simulatorCreate a mission, choose its robot and follow its progress.Example, steps and limitsExample: Send a mobile carrier to a selected cleanroom bay.Choose a destination and robot→Start and monitor the mission→Pause, resume or review its historyOutcome: A traceable mission from request to completion.Open related workspace ↗AI planningRequires setup / live checksTurn a written mission into a proposed sequence of moves.Example, steps and limitsExample: Describe a destination in words and review the proposed route.Provide the goal and map context→Use a configured AI model or the fallback planner→Check the proposed moves before executionOutcome: A proposed plan, not permission to move.Open related workspace ↗Agentic planningRequires setup / live checksLet the AI planner ask questions about the site before proposing actions.Example, steps and limitsExample: The planner checks current obstacles and receives feedback on an unsafe proposal.Planner queries the current site→Tools return observations and safety feedback→Planner revises its proposalOutcome: A plan that responds to real operational constraints.Open related workspace ↗Task fidelityImplemented in simulatorCheck that the proposed route still serves the assigned destination.Example, steps and limitsExample: Challenge a route that takes the robot away from its mission goal.Keep the original destination→Compare the proposed route with the goal→Replace or reject a route that driftsOutcome: Actions remain aligned with the intended mission.Checks navigation goals; this is not a general physical-task planner.Open related workspace ↗02 / Perception & movementUnderstanding the environment and coordinating paths.4 capabilitiesRoutingImplemented in simulatorFind a path through available aisles while avoiding excluded areas.Example, steps and limitsExample: Plan a route around a blocked corridor.Read the destination and obstacles→Find a route through available space→Create waypoints and repair blocked sectionsOutcome: A navigable route that respects excluded spaces.Open related workspace ↗PerceptionRequires setup / live checksUse camera and sensor observations to add information about nearby hazards.Example, steps and limitsExample: A possible spill adds a caution area for further checks.Receive simulated camera and sensor data→Check configured visual detections against sensors→Add caution information to planning and checksOutcome: An updated picture of what may be nearby.Open related workspace ↗Environment adaptationImplemented in simulatorHold movement and reconsider a route when the site changes.Example, steps and limitsExample: A new hazard makes an earlier route unsuitable.Detect a relevant site change→Stop using the outdated route→Assess a replacement before movement resumesOutcome: No movement on an outdated plan.Open related workspace ↗Fleet coordinationImplemented in simulatorKeep each robot’s mission and movement permissions separate while checking shared space.Example, steps and limitsExample: Two mobile carriers request the same corridor.Assign independent robot missions→Check reserved space and nearby robots→Delay, refuse or replan conflicting movesOutcome: Coordinated missions within the current supported fleet scope.Simulated navigation with AMR and humanoid profiles; no general fleet scheduler or manipulation.Open related workspace ↗03 / Governance & authorityIndependent checks before anything moves.4 capabilitiesSafety governanceImplemented in simulatorCheck proposed moves against safety rules before they can proceed.Example, steps and limitsExample: Refuse a move that crosses a restricted area or exceeds a speed limit.Receive a proposed move→Check boundaries, hazards, clearance and speed→Allow, refuse or request eligible human reviewOutcome: A policy decision before action; hard limits remain enforced.Open related workspace ↗Execution authorityImplemented in simulatorIssue a signed movement permit and check it again at the robot controller.Example, steps and limitsExample: Reject an expired permit or a permit reused for a second move.Match an approved move to current conditions→Issue one short-lived permit for that exact move→Controller checks the permit before movingOutcome: Movement requires valid, specific authorisation; STOP does not require a permit.Open related workspace ↗Human oversightImplemented in simulatorLet an authorised operator review eligible uncertainty or request a new route.Example, steps and limitsExample: Replan a paused mission and hold it for inspection before resuming.Inspect the paused mission and reason→Review eligible uncertainty or request replanning→Apply fresh checks before resumingOutcome: Human control with visible decisions and boundaries.Approvals cover eligible uncertainty only; hard safety limits cannot be approved away.Open related workspace ↗Emergency controlImplemented in simulatorStop movement through controls that operate independently of the AI planner.Example, steps and limitsExample: Stop one robot or the whole fleet, then verify it has stopped.Receive a stop request or safety trigger→Revoke movement permission and command STOP→Verify the stop; require checks before restartOutcome: A way to halt activity independently of the AI plan.Open related workspace ↗04 / Learning & assuranceImproving performance without silently changing trust.5 capabilitiesPersistent learningImplemented in simulatorStore useful route and planning experience for later compatible missions.Example, steps and limitsExample: A recorded corridor delay influences a later route choice.Record mission outcomes and delays→Store lessons with their origin and context→Use relevant lessons in compatible missionsOutcome: Better-informed later missions from validated history.Compatible route and planner experience; no cross-platform skill transfer.Open related workspace ↗Learning securityImplemented in simulatorCheck stored experience before allowing it to influence future decisions.Example, steps and limitsExample: Reject an old lesson from a different map or isolate a suspicious record.Check origin, integrity, age and compatibility→Seek supporting records where required→Accept, isolate or reject the experienceOutcome: Untrusted experience does not silently become trusted guidance.Open related workspace ↗Rule managementImplemented in simulatorEvaluate and approve changes to operating rules before activating them.Example, steps and limitsExample: Compare a proposed rule change with recorded missions before approval.Propose a rule change→Evaluate it against replay and benchmark results→Approve and activate it, or restore a previous versionOutcome: Controlled evolution of operating rules.Open related workspace ↗OptimizationImplemented in simulatorUse mission scores to suggest improvements within existing safety limits.Example, steps and limitsExample: Compare route efficiency and smoothness without relaxing a restricted zone.Review mission scores and outcomes→Generate bounded recommendations→Review changes through the approval processOutcome: Efficiency improvements without weakening hard limits.Bounded recommendations; active safety rules require governed approval.Open related workspace ↗Robustness testingImplemented in simulatorChallenge the system with difficult scenarios and inspect how it responds.Example, steps and limitsExample: Test an unsafe shortcut, suspicious instruction or interrupted mission.Run difficult or previously unseen scenarios→Measure decisions, outcomes and failures→Report findings for investigation and retestingOutcome: Evidence of how the system behaves under challenge.Open related workspace ↗05 / Operations & resilienceObserve, investigate, verify and recover.5 capabilitiesSite intelligenceImplemented in simulatorScreen site guidance before using it to inform a mission.Example, steps and limitsExample: Check a spill bulletin while rejecting instructions that try to bypass safety rules.Receive site guidance or incident information→Screen for hazards and suspicious instructions→Use accepted information within existing controlsOutcome: Useful external context with trust boundaries.Offline screening is implemented; external lookup requires configuration.Open related workspace ↗EvidenceImplemented in simulatorKeep a verifiable history of proposed moves, decisions and outcomes.Example, steps and limitsExample: Inspect why a move was refused and export its recorded history.Record a decision, permit or outcome→Sign decision records and link audit events→Inspect, verify or export the historyOutcome: A reviewable record of what was proposed and allowed.Open related workspace ↗AnalysisImplemented in simulatorFind patterns in recorded missions and investigate where plans and outcomes differ.Example, steps and limitsExample: Inspect repeated stops, risk heatmaps or a route that diverged from its plan.Collect mission and safety events→Compute trends, risks and differences→Investigate recurring problemsOutcome: Operational insight from actual runs.Recorded and computed views work locally; model-written explanations require configuration.Open related workspace ↗RecoveryImplemented in simulatorCheck what actually happened after an interruption before allowing continuation.Example, steps and limitsExample: After a restart, inspect an uncertain command instead of sending it again.Pause an interrupted run→Compare saved progress with controller records→Hold or continue from confirmed progressOutcome: Continuity without blindly repeating an action.Single-site restart and backup workflows; multi-site failover is outside scope.Open related workspace ↗Operations and twinImplemented in simulatorShow the simulated facility, robot status and mission controls in one workspace.Example, steps and limitsExample: Switch between 2D and 3D views and inspect a selected robot.Receive simulator status and robot updates→Inspect maps, cameras and mission records→Use authorised controls and review outcomesOutcome: A common operational view of missions and behaviour.Local simulation and telemetry; external tracing requires configuration.Open related workspace ↗<p>Enable JavaScript to explore capability filters and scenarios. Mission Control and the current scope below remain accessible.</p>Status reviewed 3 November 2026 against the repository capability audit. Maturity labels describe the current documented implementation, not certification or physical-hardware readiness. “Needs validation/config” includes model-dependent capabilities disabled in the preview; “Partial” reflects known functional or interface gaps.04 / HONEST BOUNDARIESDesigned for real autonomy.Validated in simulation.Understanding the current scope is part of trusting the platform. The current fleet has two mobile carriers and one humanoid navigator. All three support simulated navigation, stopping and waiting; physical manipulation and balancing are outside this scope.Available in the simulatorMission workflows, movement permits, stops, environment revalidation, learned routing, evidence, recovery and mixed-fleet navigation have documented test coverage.Configuration or validation neededModel planning, vision, voice, external lookup and tracing paths depend on suitable credentials, services and live validation. Operator review and replan-and-hold are available; approvals cannot override hard safety limits.Not yet deliveredPhysical humanoid manipulation and balancing, cross-platform skill transfer, enforced role-specific task eligibility and multi-site failover are outside current implementation.THE IDEA IN ONE LINEAI can propose. Only authorised movement can proceed.Explore the main experience or inspect the public evidence behind the simulator implementation.Return to the experience ↗Public project & evidence ↗",
+      "links": [
+        {
+          "label": "Skip to content",
+          "href": "#main"
+        },
+        {
+          "label": "SSOVEREIGNAUTONOMY",
+          "href": "/"
+        },
+        {
+          "label": "Lifecycle",
+          "href": "#lifecycle"
+        },
+        {
+          "label": "See it in action",
+          "href": "#scenario"
+        },
+        {
+          "label": "22 capabilities",
+          "href": "#capabilities"
+        },
+        {
+          "label": "Current scope",
+          "href": "#boundaries"
+        },
+        {
+          "label": "Mission Control ↗",
+          "href": "/mission-control"
+        },
+        {
+          "label": "← Main site",
+          "href": "/"
+        },
+        {
+          "label": "Follow the journey ↗",
+          "href": "#lifecycle"
+        },
+        {
+          "label": "Open Mission Control ↗",
+          "href": "/mission-control"
+        },
+        {
+          "label": "Explore 22 capabilities ↗",
+          "href": "#capabilities"
+        },
+        {
+          "label": "Explore mission capabilities ↗",
+          "href": "#capabilities"
+        },
+        {
+          "label": "Open related workspace ↗",
+          "href": "/missions"
+        },
+        {
+          "label": "Open related workspace ↗",
+          "href": "/mission-control"
+        },
+        {
+          "label": "Open related workspace ↗",
+          "href": "/mission-control"
+        },
+        {
+          "label": "Open related workspace ↗",
+          "href": "/runs"
+        },
+        {
+          "label": "Open related workspace ↗",
+          "href": "/mission-control"
+        },
+        {
+          "label": "Open related workspace ↗",
+          "href": "/mission-control"
+        },
+        {
+          "label": "Open related workspace ↗",
+          "href": "/mission-control"
+        },
+        {
+          "label": "Open related workspace ↗",
+          "href": "/mission-control"
+        },
+        {
+          "label": "Open related workspace ↗",
+          "href": "/policies"
+        },
+        {
+          "label": "Open related workspace ↗",
+          "href": "/authority"
+        },
+        {
+          "label": "Open related workspace ↗",
+          "href": "/mission-control"
+        },
+        {
+          "label": "Open related workspace ↗",
+          "href": "/authority"
+        },
+        {
+          "label": "Open related workspace ↗",
+          "href": "/evidence"
+        },
+        {
+          "label": "Open related workspace ↗",
+          "href": "/authority"
+        },
+        {
+          "label": "Open related workspace ↗",
+          "href": "/policies"
+        },
+        {
+          "label": "Open related workspace ↗",
+          "href": "/runs"
+        },
+        {
+          "label": "Open related workspace ↗",
+          "href": "/authority"
+        },
+        {
+          "label": "Open related workspace ↗",
+          "href": "/authority"
+        },
+        {
+          "label": "Open related workspace ↗",
+          "href": "/evidence"
+        },
+        {
+          "label": "Open related workspace ↗",
+          "href": "/runs"
+        },
+        {
+          "label": "Open related workspace ↗",
+          "href": "/runs"
+        },
+        {
+          "label": "Open related workspace ↗",
+          "href": "/twin"
+        },
+        {
+          "label": "Return to the experience ↗",
+          "href": "/"
+        },
+        {
+          "label": "Public project & evidence ↗",
+          "href": "https://github.com/othnielObasi/sovereign-autonomy"
+        }
+      ],
+      "controls": [
+        {
+          "tag": "BUTTON",
+          "role": null,
+          "label": "01Mission intent",
+          "disabled": false
+        },
+        {
+          "tag": "BUTTON",
+          "role": null,
+          "label": "02Perceive & understand",
+          "disabled": false
+        },
+        {
+          "tag": "BUTTON",
+          "role": null,
+          "label": "03Plan & route",
+          "disabled": false
+        },
+        {
+          "tag": "BUTTON",
+          "role": null,
+          "label": "04Check & review",
+          "disabled": false
+        },
+        {
+          "tag": "BUTTON",
+          "role": null,
+          "label": "05Authorise",
+          "disabled": false
+        },
+        {
+          "tag": "BUTTON",
+          "role": null,
+          "label": "06Execute",
+          "disabled": false
+        },
+        {
+          "tag": "BUTTON",
+          "role": null,
+          "label": "07Observe & verify",
+          "disabled": false
+        },
+        {
+          "tag": "BUTTON",
+          "role": null,
+          "label": "08Learn & improve",
+          "disabled": false
+        },
+        {
+          "tag": "BUTTON",
+          "role": null,
+          "label": "09Recover & continue",
+          "disabled": false
+        },
+        {
+          "tag": "BUTTON",
+          "role": null,
+          "label": "Normal mission",
+          "disabled": false
+        },
+        {
+          "tag": "BUTTON",
+          "role": null,
+          "label": "New obstacle",
+          "disabled": false
+        },
+        {
+          "tag": "BUTTON",
+          "role": null,
+          "label": "Unsafe proposal",
+          "disabled": false
+        },
+        {
+          "tag": "BUTTON",
+          "role": null,
+          "label": "Interrupted run",
+          "disabled": false
+        },
+        {
+          "tag": "BUTTON",
+          "role": null,
+          "label": "Learning",
+          "disabled": false
+        },
+        {
+          "tag": "BUTTON",
+          "role": null,
+          "label": "All 22 capabilities",
+          "disabled": false
+        },
+        {
+          "tag": "BUTTON",
+          "role": null,
+          "label": "Mission & decision",
+          "disabled": false
+        },
+        {
+          "tag": "BUTTON",
+          "role": null,
+          "label": "Perception & movement",
+          "disabled": false
+        },
+        {
+          "tag": "BUTTON",
+          "role": null,
+          "label": "Governance & authority",
+          "disabled": false
+        },
+        {
+          "tag": "BUTTON",
+          "role": null,
+          "label": "Learning & assurance",
+          "disabled": false
+        },
+        {
+          "tag": "BUTTON",
+          "role": null,
+          "label": "Operations & resilience",
+          "disabled": false
+        },
+        {
+          "tag": "INPUT",
+          "role": null,
+          "label": "Search capabilities",
+          "disabled": false
+        },
+        {
+          "tag": "BUTTON",
+          "role": null,
+          "label": "All statuses",
+          "disabled": false
+        },
+        {
+          "tag": "BUTTON",
+          "role": null,
+          "label": "Implemented in simulator",
+          "disabled": false
+        },
+        {
+          "tag": "BUTTON",
+          "role": null,
+          "label": "Requires setup / live checks",
+          "disabled": false
+        },
+        {
+          "tag": "BUTTON",
+          "role": null,
+          "label": "Reset filters",
+          "disabled": true
+        },
+        {
+          "tag": "SUMMARY",
+          "role": null,
+          "label": "Example, steps and limits",
+          "disabled": false
+        },
+        {
+          "tag": "SUMMARY",
+          "role": null,
+          "label": "Example, steps and limits",
+          "disabled": false
+        },
+        {
+          "tag": "SUMMARY",
+          "role": null,
+          "label": "Example, steps and limits",
+          "disabled": false
+        },
+        {
+          "tag": "SUMMARY",
+          "role": null,
+          "label": "Example, steps and limits",
+          "disabled": false
+        },
+        {
+          "tag": "SUMMARY",
+          "role": null,
+          "label": "Example, steps and limits",
+          "disabled": false
+        },
+        {
+          "tag": "SUMMARY",
+          "role": null,
+          "label": "Example, steps and limits",
+          "disabled": false
+        },
+        {
+          "tag": "SUMMARY",
+          "role": null,
+          "label": "Example, steps and limits",
+          "disabled": false
+        },
+        {
+          "tag": "SUMMARY",
+          "role": null,
+          "label": "Example, steps and limits",
+          "disabled": false
+        },
+        {
+          "tag": "SUMMARY",
+          "role": null,
+          "label": "Example, steps and limits",
+          "disabled": false
+        },
+        {
+          "tag": "SUMMARY",
+          "role": null,
+          "label": "Example, steps and limits",
+          "disabled": false
+        },
+        {
+          "tag": "SUMMARY",
+          "role": null,
+          "label": "Example, steps and limits",
+          "disabled": false
+        },
+        {
+          "tag": "SUMMARY",
+          "role": null,
+          "label": "Example, steps and limits",
+          "disabled": false
+        },
+        {
+          "tag": "SUMMARY",
+          "role": null,
+          "label": "Example, steps and limits",
+          "disabled": false
+        },
+        {
+          "tag": "SUMMARY",
+          "role": null,
+          "label": "Example, steps and limits",
+          "disabled": false
+        },
+        {
+          "tag": "SUMMARY",
+          "role": null,
+          "label": "Example, steps and limits",
+          "disabled": false
+        },
+        {
+          "tag": "SUMMARY",
+          "role": null,
+          "label": "Example, steps and limits",
+          "disabled": false
+        },
+        {
+          "tag": "SUMMARY",
+          "role": null,
+          "label": "Example, steps and limits",
+          "disabled": false
+        },
+        {
+          "tag": "SUMMARY",
+          "role": null,
+          "label": "Example, steps and limits",
+          "disabled": false
+        },
+        {
+          "tag": "SUMMARY",
+          "role": null,
+          "label": "Example, steps and limits",
+          "disabled": false
+        },
+        {
+          "tag": "SUMMARY",
+          "role": null,
+          "label": "Example, steps and limits",
+          "disabled": false
+        },
+        {
+          "tag": "SUMMARY",
+          "role": null,
+          "label": "Example, steps and limits",
+          "disabled": false
+        },
+        {
+          "tag": "SUMMARY",
+          "role": null,
+          "label": "Example, steps and limits",
+          "disabled": false
+        }
+      ],
+      "details": [
+        {
+          "open": false,
+          "label": "Example, steps and limits"
+        },
+        {
+          "open": false,
+          "label": "Example, steps and limits"
+        },
+        {
+          "open": false,
+          "label": "Example, steps and limits"
+        },
+        {
+          "open": false,
+          "label": "Example, steps and limits"
+        },
+        {
+          "open": false,
+          "label": "Example, steps and limits"
+        },
+        {
+          "open": false,
+          "label": "Example, steps and limits"
+        },
+        {
+          "open": false,
+          "label": "Example, steps and limits"
+        },
+        {
+          "open": false,
+          "label": "Example, steps and limits"
+        },
+        {
+          "open": false,
+          "label": "Example, steps and limits"
+        },
+        {
+          "open": false,
+          "label": "Example, steps and limits"
+        },
+        {
+          "open": false,
+          "label": "Example, steps and limits"
+        },
+        {
+          "open": false,
+          "label": "Example, steps and limits"
+        },
+        {
+          "open": false,
+          "label": "Example, steps and limits"
+        },
+        {
+          "open": false,
+          "label": "Example, steps and limits"
+        },
+        {
+          "open": false,
+          "label": "Example, steps and limits"
+        },
+        {
+          "open": false,
+          "label": "Example, steps and limits"
+        },
+        {
+          "open": false,
+          "label": "Example, steps and limits"
+        },
+        {
+          "open": false,
+          "label": "Example, steps and limits"
+        },
+        {
+          "open": false,
+          "label": "Example, steps and limits"
+        },
+        {
+          "open": false,
+          "label": "Example, steps and limits"
+        },
+        {
+          "open": false,
+          "label": "Example, steps and limits"
+        },
+        {
+          "open": false,
+          "label": "Example, steps and limits"
+        }
+      ],
+      "sections": [
+        {
+          "id": "lifecycle",
+          "heading": "One mission.Many cooperating capabilities."
+        },
+        {
+          "id": "scenario",
+          "heading": "What happens when the world changes?"
+        },
+        {
+          "id": "capabilities",
+          "heading": "Explore what the platform can do."
+        },
+        {
+          "id": "boundaries",
+          "heading": "Designed for real autonomy.Validated in simulation."
+        }
+      ],
+      "overflow": false
+    },
+    {
+      "route": "/mission-control",
+      "final_url": "/mission-control",
+      "title": "Sovereign Autonomy | Mission Control",
+      "headings": [
+        {
+          "level": "H1",
+          "text": "Mission control"
+        },
+        {
+          "level": "H2",
+          "text": "Meridian Life Sciences"
+        },
+        {
+          "level": "H2",
+          "text": "Your fleet 3"
+        },
+        {
+          "level": "H2",
+          "text": "Mission in progress"
+        },
+        {
+          "level": "H3",
+          "text": "Move to Q-01"
+        },
+        {
+          "level": "H2",
+          "text": "Trust in every step"
+        },
+        {
+          "level": "H2",
+          "text": "Behind every move"
+        }
+      ],
+      "visible_text": "AUTONOMOUS OPERATIONS, UNDER YOUR AUTHORITY\nMission control\n\nYour fleet, its decisions, and the proof behind every move.\n\nGuided showcase\nNew mission\nFleet connected\n03\nrobots\nExecution authority\nPermits enforced\nCurrent mission\nIn progress\nLIVE\nShared experience\n1\ncorroborated cells\nFACILITY TWIN\nMeridian Life Sciences\nLive simulation\nTelemetry connected\n3D facility\nFloor plan\n36 × 26 m\nC-01\nQ-01\nG-01\nR-01\nP-01\nCold storage\nQuality lab\nFormulation\nGowning\nResearch lab\nPackaging\nrobot-1\nrobot-2\nrobot-3\nrobot-1\nStandby\nMobile carrier · 0.00 m/s\nCarrier\nPerson\nController target\nSelect a robot to inspect\nYour fleet\n3\nMovement permissions are checked per robot\nrobot-1\nStandby\n\nMobile carrier\n\n0.00 m/s\n·\nX 17.4 · Y 11.3\nrobot-2\nStandby\n\nMobile carrier\n\n0.00 m/s\n·\nX 30.0 · Y 2.5\nrobot-3\nStandby\n\nHumanoid navigator\n\n0.00 m/s\n·\nX 18.0 · Y 9.0\nDeterministic planner\n\nDeterministic planning is active. Model-backed capabilities are not configured.\n\nVision not configured\nMISSION DESK\nMission in progress\nRUNNING\nMove to Q-01\n\nOnly individually admitted moves may execute. Follow the live decision trail below.\n\nRoute execution in progress\nPause\nEnd mission\nOperator oversight\nReason for intervention\nReplan and hold\nOpen full mission record\nTrust in every step\nMISSION EVIDENCE\nPlan\nWaiting For A Mission\n01\nGovern\nApproved\n02\nPermit\nNo Move Admitted Yet\n03\nLearn\n1 Corroborated Cells\n04\nInspect security & permissions\nBehind every move\n\nThe current mission’s recorded decisions.\n\nDecision trail\nShared learning\nScenario lab\npermit refused\n\ntrajectory_obstacle_clearance\n\n18:48:15\nMove approved by the gate\n\nThe current move was checked against the active policies.\n\n18:48:15\npermit refused\n\ntrajectory_obstacle_clearance\n\n18:48:13\nMove approved by the gate\n\nThe current move was checked against the active policies.\n\n18:48:13\npermit refused\n\ntrajectory_obstacle_clearance\n\n18:48:12\nMove approved by the gate\n\nThe current move was checked against the active policies.\n\n18:48:12\nOperator review requested\n\nHuman detected but confidence too low: 0.46 < 0.65.\n\n18:48:10\nOperator review requested\n\nHuman detected but confidence too low: 0.46 < 0.65.\n\n18:48:10\nOpen detailed inspection\nConnected to the simulation\nVoice stop not configured\nPlans propose. Permits authorize. Evidence stays.",
+      "all_text": "AUTONOMOUS OPERATIONS, UNDER YOUR AUTHORITYMission controlYour fleet, its decisions, and the proof behind every move.Guided showcaseNew missionFleet connected03robotsExecution authorityPermits enforcedCurrent missionIn progressLIVEShared experience1corroborated cellsFACILITY TWINMeridian Life SciencesLive simulationTelemetry connected3D facilityFloor plan36 × 26 mGlass partitionGlass partitionGlass partitionGlass partitionGlass partitionGlass partitionGlass partitionGlass partitionGlass partitionGlass partitionGlass partitionGlass partitionGlass partitionGlass partitionGlass partitionGlass partitioncold-west-benchcold-east-benchquality-west-benchquality-east-benchformulation-west-benchformulation-east-benchgowning-west-benchgowning-east-benchresearch-west-benchresearch-east-benchpackaging-west-benchpackaging-east-benchC-01: Cold storageC-01Q-01: Quality labQ-01F-01: FormulationG-01: GowningG-01R-01: Research labR-01P-01: PackagingP-01Cold storageCold storageQuality labQuality labFormulationFormulationGowningGowningResearch labResearch labPackagingPackagingMobile carrierrobot-1Mobile carrierrobot-2Humanoid navigatorrobot-3robot-1StandbyMobile carrier · 0.00 m/sCarrierPersonController targetSelect a robot to inspectYour fleet 3Movement permissions are checked per robotrobot-1StandbyMobile carrier0.00 m/s · X 17.4 · Y 11.3robot-2StandbyMobile carrier0.00 m/s · X 30.0 · Y 2.5robot-3StandbyHumanoid navigator0.00 m/s · X 18.0 · Y 9.0Deterministic plannerDeterministic planning is active. Model-backed capabilities are not configured.Vision not configuredMISSION DESKMission in progressrunningMove to Q-01Only individually admitted moves may execute. Follow the live decision trail below.Route execution in progressPauseEnd missionOperator oversightReason for interventionReplan and holdOpen full mission record Trust in every stepMISSION EVIDENCEPlanWaiting for a mission01Governapproved02PermitNo move admitted yet03Learn1 corroborated cells04Inspect security & permissions Behind every moveThe current mission’s recorded decisions.Decision trailShared learningScenario labpermit refusedtrajectory_obstacle_clearance18:48:15Move approved by the gateThe current move was checked against the active policies.18:48:15permit refusedtrajectory_obstacle_clearance18:48:13Move approved by the gateThe current move was checked against the active policies.18:48:13permit refusedtrajectory_obstacle_clearance18:48:12Move approved by the gateThe current move was checked against the active policies.18:48:12Operator review requestedHuman detected but confidence too low: 0.46 < 0.65.18:48:10Operator review requestedHuman detected but confidence too low: 0.46 < 0.65.18:48:10Open detailed inspectionConnected to the simulationVoice stop not configuredPlans propose. Permits authorize. Evidence stays.",
+      "links": [
+        {
+          "label": "Skip to content",
+          "href": "#main-content"
+        },
+        {
+          "label": "SovereignAUTONOMY",
+          "href": "/mission-control"
+        },
+        {
+          "label": "Mission control",
+          "href": "/mission-control"
+        },
+        {
+          "label": "Missions",
+          "href": "/missions"
+        },
+        {
+          "label": "Mission history",
+          "href": "/runs"
+        },
+        {
+          "label": "Trust & security",
+          "href": "/authority"
+        },
+        {
+          "label": "Governance",
+          "href": "/policies"
+        },
+        {
+          "label": "Evidence",
+          "href": "/evidence"
+        },
+        {
+          "label": "Explore the showcase",
+          "href": "/mission-control?showcase=1"
+        },
+        {
+          "label": "About the system",
+          "href": "/overview"
+        },
+        {
+          "label": "Open full mission record",
+          "href": "/runs/run_c1abee3b765b"
+        },
+        {
+          "label": "Inspect security & permissions",
+          "href": "/authority"
+        }
+      ],
+      "controls": [
+        {
+          "tag": "BUTTON",
+          "role": null,
+          "label": "Guided showcase",
+          "disabled": false
+        },
+        {
+          "tag": "BUTTON",
+          "role": null,
+          "label": "New mission",
+          "disabled": false
+        },
+        {
+          "tag": "BUTTON",
+          "role": null,
+          "label": "3D facility",
+          "disabled": false
+        },
+        {
+          "tag": "BUTTON",
+          "role": null,
+          "label": "Floor plan",
+          "disabled": false
+        },
+        {
+          "tag": "BUTTON",
+          "role": null,
+          "label": "robot-1StandbyMobile carrier0.00 m/s · X 17.4 · Y 11.3",
+          "disabled": false
+        },
+        {
+          "tag": "BUTTON",
+          "role": null,
+          "label": "robot-2StandbyMobile carrier0.00 m/s · X 30.0 · Y 2.5",
+          "disabled": false
+        },
+        {
+          "tag": "BUTTON",
+          "role": null,
+          "label": "robot-3StandbyHumanoid navigator0.00 m/s · X 18.0 · Y 9.0",
+          "disabled": false
+        },
+        {
+          "tag": "BUTTON",
+          "role": null,
+          "label": "Pause",
+          "disabled": false
+        },
+        {
+          "tag": "BUTTON",
+          "role": null,
+          "label": "End mission",
+          "disabled": false
+        },
+        {
+          "tag": "TEXTAREA",
+          "role": null,
+          "label": "Reason for intervention",
+          "disabled": false
+        },
+        {
+          "tag": "BUTTON",
+          "role": null,
+          "label": "Replan and hold",
+          "disabled": true
+        },
+        {
+          "tag": "BUTTON",
+          "role": "tab",
+          "label": "Decision trail",
+          "disabled": false
+        },
+        {
+          "tag": "BUTTON",
+          "role": "tab",
+          "label": "Shared learning",
+          "disabled": false
+        },
+        {
+          "tag": "BUTTON",
+          "role": "tab",
+          "label": "Scenario lab",
+          "disabled": false
+        },
+        {
+          "tag": "BUTTON",
+          "role": null,
+          "label": "Open detailed inspection",
+          "disabled": false
+        },
+        {
+          "tag": "BUTTON",
+          "role": null,
+          "label": "Voice stop not configured",
+          "disabled": true
+        }
+      ],
+      "details": [],
+      "sections": [],
+      "overflow": false
+    },
+    {
+      "route": "/missions",
+      "final_url": "/missions",
+      "title": "Sovereign Autonomy | Mission Control",
+      "headings": [
+        {
+          "level": "H1",
+          "text": "Missions"
+        },
+        {
+          "level": "H2",
+          "text": "New mission"
+        }
+      ],
+      "visible_text": "MISSIONS\nMissions\n\nA mission is a destination for the robot. Muse Spark plans the route; the gate approves every move, and each approved move needs its own permit.\n\nPick a bay on the warehouse →\nNEW MISSION\nDeliver pallet to dock B-03\nPick items from rack A-04\nRestock rack A-08\nMove goods to staging S-01\nHazmat container to dock B-05\nInstruction for the planner\nDestination bay\nC-01 · (6, 2.5)\nQ-01 · (18, 2.5)\nR-01 · (18, 23.5)\nF-01 · (30, 2.5)\nP-01 · (30, 23.5)\nG-01 · (6, 23.5)\nRobot\nrobot-1\nrobot-2\nrobot-3\nSave draft\nStart governed run\n\nEach robot runs one mission at a time. Two robots never get overlapping paths: each move reserves its stretch of floor before it gets a permit.\n\nAll2\nDraft1\nRunning1\nPaused0\nCompleted0\nRUNNING\nMove to Q-01\nmis_651a1311106a\ngoal (18, 2.5) · staging\n03/11/2026, 18:38:52\nPause\nDRAFT\nNavigate the mobile carrier through the gowning aisle to x=6, y=18.5. Navigation only.\nmis_b03d49c884fd\ngoal (6, 18.5) · staging · robot-1\n03/11/2026, 17:46:02\nEdit\nRun\nDelete\nLooking for results? Every run keeps its full decision record.",
+      "all_text": "MissionsMissionsA mission is a destination for the robot. Muse Spark plans the route; the gate approves every move, and each approved move needs its own permit.Pick a bay on the warehouse →New missionDeliver pallet to dock B-03Pick items from rack A-04Restock rack A-08Move goods to staging S-01Hazmat container to dock B-05Instruction for the plannerDestination bayC-01 · (6, 2.5)Q-01 · (18, 2.5)R-01 · (18, 23.5)F-01 · (30, 2.5)P-01 · (30, 23.5)G-01 · (6, 23.5)Robotrobot-1robot-2robot-3Save draftStart governed runEach robot runs one mission at a time. Two robots never get overlapping paths: each move reserves its stretch of floor before it gets a permit.All2Draft1Running1Paused0Completed0RUNNINGMove to Q-01mis_651a1311106agoal (18, 2.5) · staging03/11/2026, 18:38:52PauseDRAFTNavigate the mobile carrier through the gowning aisle to x=6, y=18.5. Navigation only.mis_b03d49c884fdgoal (6, 18.5) · staging · robot-103/11/2026, 17:46:02EditRunDeleteLooking for results? Every run keeps its full decision record.",
+      "links": [
+        {
+          "label": "Skip to content",
+          "href": "#main-content"
+        },
+        {
+          "label": "SovereignAUTONOMY",
+          "href": "/mission-control"
+        },
+        {
+          "label": "Mission control",
+          "href": "/mission-control"
+        },
+        {
+          "label": "Missions",
+          "href": "/missions"
+        },
+        {
+          "label": "Mission history",
+          "href": "/runs"
+        },
+        {
+          "label": "Trust & security",
+          "href": "/authority"
+        },
+        {
+          "label": "Governance",
+          "href": "/policies"
+        },
+        {
+          "label": "Evidence",
+          "href": "/evidence"
+        },
+        {
+          "label": "Explore the showcase",
+          "href": "/mission-control?showcase=1"
+        },
+        {
+          "label": "About the system",
+          "href": "/overview"
+        },
+        {
+          "label": "Pick a bay on the warehouse →",
+          "href": "/twin"
+        },
+        {
+          "label": "Every run",
+          "href": "/runs"
+        },
+        {
+          "label": "Return to mission control",
+          "href": "/mission-control"
+        }
+      ],
+      "controls": [
+        {
+          "tag": "BUTTON",
+          "role": null,
+          "label": "Deliver pallet to dock B-03",
+          "disabled": false
+        },
+        {
+          "tag": "BUTTON",
+          "role": null,
+          "label": "Pick items from rack A-04",
+          "disabled": false
+        },
+        {
+          "tag": "BUTTON",
+          "role": null,
+          "label": "Restock rack A-08",
+          "disabled": false
+        },
+        {
+          "tag": "BUTTON",
+          "role": null,
+          "label": "Move goods to staging S-01",
+          "disabled": false
+        },
+        {
+          "tag": "BUTTON",
+          "role": null,
+          "label": "Hazmat container to dock B-05",
+          "disabled": false
+        },
+        {
+          "tag": "INPUT",
+          "role": null,
+          "label": null,
+          "disabled": false
+        },
+        {
+          "tag": "SELECT",
+          "role": null,
+          "label": "C-01 · (6, 2.5)Q-01 · (18, 2.5)R-01 · (18, 23.5)F-01 · (30, 2.5)P-01 · (30, 23.5)G-01 · (6, 23.5)",
+          "disabled": false
+        },
+        {
+          "tag": "SELECT",
+          "role": null,
+          "label": "robot-1robot-2robot-3",
+          "disabled": false
+        },
+        {
+          "tag": "BUTTON",
+          "role": null,
+          "label": "Save draft",
+          "disabled": false
+        },
+        {
+          "tag": "BUTTON",
+          "role": null,
+          "label": "Start governed run",
+          "disabled": false
+        },
+        {
+          "tag": "BUTTON",
+          "role": "tab",
+          "label": "All2",
+          "disabled": false
+        },
+        {
+          "tag": "BUTTON",
+          "role": "tab",
+          "label": "Draft1",
+          "disabled": false
+        },
+        {
+          "tag": "BUTTON",
+          "role": "tab",
+          "label": "Running1",
+          "disabled": false
+        },
+        {
+          "tag": "BUTTON",
+          "role": "tab",
+          "label": "Paused0",
+          "disabled": false
+        },
+        {
+          "tag": "BUTTON",
+          "role": "tab",
+          "label": "Completed0",
+          "disabled": false
+        },
+        {
+          "tag": "BUTTON",
+          "role": null,
+          "label": "Pause",
+          "disabled": false
+        },
+        {
+          "tag": "BUTTON",
+          "role": null,
+          "label": "Edit",
+          "disabled": false
+        },
+        {
+          "tag": "BUTTON",
+          "role": null,
+          "label": "Run",
+          "disabled": false
+        },
+        {
+          "tag": "BUTTON",
+          "role": null,
+          "label": "Delete",
+          "disabled": false
+        }
+      ],
+      "details": [],
+      "sections": [],
+      "overflow": false
+    },
+    {
+      "route": "/runs",
+      "final_url": "/runs",
+      "title": "Sovereign Autonomy | Mission Control",
+      "headings": [
+        {
+          "level": "H1",
+          "text": "Runs"
+        }
+      ],
+      "visible_text": "RUNS\nRuns\n\nEvery run keeps its full record: the plan, every gate decision with a signed receipt, vision checks and the hash-chained audit trail.\n\nWatch the running mission\nAll2\nRunning1\nCompleted1\nStopped0\nFailed0\nSTATUS\tRUN\tMISSION\tSTARTED\tDURATION\t\n\nrunning\trun_c1abee3b765b\tMove to Q-01\t03/11/2026, 18:38:55\t9m 21s\tOpen →\n\ncompleted\trun_84fa654ec55a\tNavigate the mobile carrier through the gowning aisle to x=6, y=18.5. Navigation only.\t03/11/2026, 17:46:02\t1m 9s\tOpen →",
+      "all_text": "RunsRunsEvery run keeps its full record: the plan, every gate decision with a signed receipt, vision checks and the hash-chained audit trail.Watch the running missionAll2Running1Completed1Stopped0Failed0StatusRunMissionStartedDurationrunningrun_c1abee3b765bMove to Q-0103/11/2026, 18:38:559m 21sOpen →completedrun_84fa654ec55aNavigate the mobile carrier through the gowning aisle to x=6, y=18.5. Navigation only.03/11/2026, 17:46:021m 9sOpen →",
+      "links": [
+        {
+          "label": "Skip to content",
+          "href": "#main-content"
+        },
+        {
+          "label": "SovereignAUTONOMY",
+          "href": "/mission-control"
+        },
+        {
+          "label": "Mission control",
+          "href": "/mission-control"
+        },
+        {
+          "label": "Missions",
+          "href": "/missions"
+        },
+        {
+          "label": "Mission history",
+          "href": "/runs"
+        },
+        {
+          "label": "Trust & security",
+          "href": "/authority"
+        },
+        {
+          "label": "Governance",
+          "href": "/policies"
+        },
+        {
+          "label": "Evidence",
+          "href": "/evidence"
+        },
+        {
+          "label": "Explore the showcase",
+          "href": "/mission-control?showcase=1"
+        },
+        {
+          "label": "About the system",
+          "href": "/overview"
+        },
+        {
+          "label": "Watch the running mission",
+          "href": "/runs/run_c1abee3b765b"
+        },
+        {
+          "label": "run_c1abee3b765b",
+          "href": "/runs/run_c1abee3b765b"
+        },
+        {
+          "label": "Open →",
+          "href": "/runs/run_c1abee3b765b"
+        },
+        {
+          "label": "run_84fa654ec55a",
+          "href": "/runs/run_84fa654ec55a"
+        },
+        {
+          "label": "Open →",
+          "href": "/runs/run_84fa654ec55a"
+        },
+        {
+          "label": "Return to mission control",
+          "href": "/mission-control"
+        }
+      ],
+      "controls": [
+        {
+          "tag": "BUTTON",
+          "role": "tab",
+          "label": "All2",
+          "disabled": false
+        },
+        {
+          "tag": "BUTTON",
+          "role": "tab",
+          "label": "Running1",
+          "disabled": false
+        },
+        {
+          "tag": "BUTTON",
+          "role": "tab",
+          "label": "Completed1",
+          "disabled": false
+        },
+        {
+          "tag": "BUTTON",
+          "role": "tab",
+          "label": "Stopped0",
+          "disabled": false
+        },
+        {
+          "tag": "BUTTON",
+          "role": "tab",
+          "label": "Failed0",
+          "disabled": false
+        }
+      ],
+      "details": [],
+      "sections": [],
+      "overflow": false
+    },
+    {
+      "route": "/authority",
+      "final_url": "/authority",
+      "title": "Sovereign Autonomy | Mission Control",
+      "headings": [
+        {
+          "level": "H1",
+          "text": "Execution authority"
+        },
+        {
+          "level": "H2",
+          "text": "Execution authority"
+        },
+        {
+          "level": "H2",
+          "text": "Learned routing"
+        },
+        {
+          "level": "H2",
+          "text": "Operational knowledge graph"
+        },
+        {
+          "level": "H2",
+          "text": "Experience and environment"
+        },
+        {
+          "level": "H3",
+          "text": "Environment changes"
+        },
+        {
+          "level": "H2",
+          "text": "Security drills"
+        },
+        {
+          "level": "H2",
+          "text": "Dispatch and kill-switch events"
+        }
+      ],
+      "visible_text": "BUILT DURING THE HACKATHON\nExecution authority\n\nMeta's models plan and perceive; this layer decides what may actually move. Every move needs a signed, single-use permit for exactly that move, checked again by the robot controller.\n\nEXECUTION AUTHORITY\n\nNothing moves without a single-use permit. Stopping never needs a login.\n\nPermits enforced\nStop robot\nStop everything\n🎙 Voice stop\nStop robot-1\n0.00 m/s\nStop robot-2\n0.00 m/s\nStop robot-3\n0.00 m/s\nRobot\nrobot-1\nAuthority epoch\n8\nWorld version\n504\nAction journal\nintact\nLEARNED ROUTING\n\nNetworkX over the warehouse floor; only signed experience counts\n\nRouter\nnetworkx\nCells with learned delay\n1\nQuarantined records\n0\nExpected delay on last route\n0 s\nOPERATIONAL KNOWLEDGE GRAPH\n\nExplore how robot missions, decisions, locations and policies connect\n\nMemgraph connected\n\nNetworkX calculates routes. Memgraph connects historical evidence; every displayed decision is rechecked against the original signed record.\n\nRecorded mission run\nNavigate the mobile carrier through the gowning aisle to x=6, y=18.5. Navigation only. · completed\nSync evidence\n1 projected runs · 25 decision references · latest 30 matching observations shown\nMission overview\nInspect a decision\nShow decisions\nAll decisions\nBlocked & review\nApproved\n\nFollow the arrows from the mission to its recorded outcomes. Select any node to see what connects to it.\n\nattempt\nperformed\nrecorded\nat\nMission\nAssigned task\nOperator instruction\nRobot\nrobot-1\nPerformed this run\nMission run\nExecution\n25 observations\nDecision group\nApproved\n25 observations\nLocation group\n12 floor cells\nRecorded positions\n25 of 25 retrieved observations · Grouped for clarity · Historical evidence\n−\n100%\n+\nFit view\n\nNo policy hits were recorded in these displayed observations. Approved decisions still passed through the policy gate.\n\nExplore the mission. Select a node to highlight its connections and inspect the supporting records. Use Tab, then Enter or Space, to explore by keyboard.\n\nView 25 verified decision connections\nEXPERIENCE AND ENVIRONMENT\n\nPast experience is advisory. Current conditions decide whether it can be reused.\n\nShared routing requires two distinct robot identities. Repeated missions from one robot count as one source.\n\nSite\nsovereign-cleanroom\nMap version\nd48c88b6780c\n10 eligible\n0 advisory\n0 excluded\nExperience checks\nEligible\nrobot-A (fixture)\n2295 s old\nbrowser-fixture-robot-A (fixture)-1793729403988751400:6:7:STOP:f94405df8da6888769ac04300de8071effefeeb6f93291569e5bc5796910876f:robot-A (fixture)\nContext and freshness checks passed\nEligible\nrobot-C (fixture)\n2295 s old\nbrowser-fixture-robot-C (fixture)-1793729404005398900:6:7:STOP:f94405df8da6888769ac04300de8071effefeeb6f93291569e5bc5796910876f:robot-C (fixture)\nContext and freshness checks passed\nEligible\nrobot-A (fixture)\n2150 s old\nbrowser-fixture-robot-A (fixture)-1793729548300036100:6:7:STOP:f94405df8da6888769ac04300de8071effefeeb6f93291569e5bc5796910876f:robot-A (fixture)\nContext and freshness checks passed\nEligible\nrobot-C (fixture)\n2150 s old\nbrowser-fixture-robot-C (fixture)-1793729548324035400:6:7:STOP:f94405df8da6888769ac04300de8071effefeeb6f93291569e5bc5796910876f:robot-C (fixture)\nContext and freshness checks passed\nEligible\nrobot-A (fixture)\n1530 s old\nbrowser-fixture-robot-A (fixture)-1793730168552709300:6:7:STOP:f94405df8da6888769ac04300de8071effefeeb6f93291569e5bc5796910876f:robot-A (fixture)\nContext and freshness checks passed\nEligible\nrobot-C (fixture)\n1530 s old\nbrowser-fixture-robot-C (fixture)-1793730168566195100:6:7:STOP:f94405df8da6888769ac04300de8071effefeeb6f93291569e5bc5796910876f:robot-C (fixture)\nContext and freshness checks passed\nEligible\nrobot-A (fixture)\n1417 s old\nbrowser-fixture-robot-A (fixture)-1793730281815218500:6:7:STOP:f94405df8da6888769ac04300de8071effefeeb6f93291569e5bc5796910876f:robot-A (fixture)\nContext and freshness checks passed\nEligible\nrobot-C (fixture)\n1417 s old\nbrowser-fixture-robot-C (fixture)-1793730281828737400:6:7:STOP:f94405df8da6888769ac04300de8071effefeeb6f93291569e5bc5796910876f:robot-C (fixture)\nContext and freshness checks passed\nEligible\nrobot-A (fixture)\n1330 s old\nbrowser-fixture-robot-A (fixture)-1793730369013434500:6:7:STOP:f94405df8da6888769ac04300de8071effefeeb6f93291569e5bc5796910876f:robot-A (fixture)\nContext and freshness checks passed\nEligible\nrobot-C (fixture)\n1330 s old\nbrowser-fixture-robot-C (fixture)-1793730369026434700:6:7:STOP:f94405df8da6888769ac04300de8071effefeeb6f93291569e5bc5796910876f:robot-C (fixture)\nContext and freshness checks passed\nEnvironment changes\ncontext changed\n6ecdea0c64f1 → d48c88b6780c\nscenario:clear\n6ecdea0c64f1 → d48c88b6780c\nObserved after 267783 ms\ncontext changed\nf8ef5e3b7c5c → 6ecdea0c64f1\nscenario:clear\nf8ef5e3b7c5c → 6ecdea0c64f1\nObserved after 36 ms\ncontext changed\nb62e8ce4bd06 → f8ef5e3b7c5c\nscenario:spill\nb62e8ce4bd06 → f8ef5e3b7c5c\nObserved after 40 ms\nSECURITY DRILLS\n\nReal attacks against the live simulator, each with a pass/fail result\n\nRun all drills\nNo drills run yet\nRuns only while no mission is active. The probe move targets the robot's own position, and everything is cleaned up afterwards.\nDISPATCH AND KILL-SWITCH EVENTS\n\nMost recent first\n\ncontroller acknowledged\nrun_c1abee3b765b:68:f123bb7c2031497e9ff6e0b30f3fdf35\n18:40:36\npermit redeemed\nrun_c1abee3b765b:68:f123bb7c2031497e9ff6e0b30f3fdf35\n18:40:36\ncommand dispatched\nrun_c1abee3b765b:68:f123bb7c2031497e9ff6e0b30f3fdf35\n18:40:36\ncontroller acknowledged\nrun_c1abee3b765b:67:708c62f8b04e4503a866e7e9187b4fd1\n18:40:35\npermit redeemed\nrun_c1abee3b765b:67:708c62f8b04e4503a866e7e9187b4fd1\n18:40:35\ncommand dispatched\nrun_c1abee3b765b:67:708c62f8b04e4503a866e7e9187b4fd1\n18:40:35\ncontroller acknowledged\nrun_c1abee3b765b:66:81919cf92c98498296cd349ad80aa1f4\n18:40:34\npermit redeemed\nrun_c1abee3b765b:66:81919cf92c98498296cd349ad80aa1f4\n18:40:34\ncommand dispatched\nrun_c1abee3b765b:66:81919cf92c98498296cd349ad80aa1f4\n18:40:33\ncontroller acknowledged\nrun_c1abee3b765b:65:3155ba6350ae4feea0a447d2e8f81877\n18:40:32\ncommand dispatched\nrun_c1abee3b765b:65:3155ba6350ae4feea0a447d2e8f81877\n18:40:32\ncontroller acknowledged\nrun_c1abee3b765b:64:f95899baaaf2492a916098e891c48c0b\n18:40:31\ncommand dispatched\nrun_c1abee3b765b:64:f95899baaaf2492a916098e891c48c0b\n18:40:31\ncontroller acknowledged\nrun_c1abee3b765b:63:05542d026a4e4a55a0b02f068a496d77\n18:40:30\ncommand dispatched\nrun_c1abee3b765b:63:05542d026a4e4a55a0b02f068a496d77\n18:40:30\ncontroller acknowledged\nrun_c1abee3b765b:62:8537e786e1a649b98ec0fadfeec26329\n18:40:28\ncommand dispatched\nrun_c1abee3b765b:62:8537e786e1a649b98ec0fadfeec26329\n18:40:28\ncontroller acknowledged\nrun_c1abee3b765b:61:9b3d30a46294462aae11abf454499717\n18:40:27\ncommand dispatched\nrun_c1abee3b765b:61:9b3d30a46294462aae11abf454499717\n18:40:27\ncontroller acknowledged\nrun_c1abee3b765b:60:1b6ddd46ac2f45e2bab82abfdf111c57\n18:40:26\npermit redeemed\nrun_c1abee3b765b:60:1b6ddd46ac2f45e2bab82abfdf111c57\n18:40:26\ncommand dispatched\nrun_c1abee3b765b:60:1b6ddd46ac2f45e2bab82abfdf111c57\n18:40:26\ncontroller acknowledged\nrun_c1abee3b765b:59:d2d883a75ba740ffaef67b68f3a496fc\n18:40:25\npermit redeemed\nrun_c1abee3b765b:59:d2d883a75ba740ffaef67b68f3a496fc\n18:40:25\ncommand dispatched\nrun_c1abee3b765b:59:d2d883a75ba740ffaef67b68f3a496fc\n18:40:25\ncontroller acknowledged\nrun_c1abee3b765b:58:058a42dce65c4ac59874be88800cc76c\n18:40:24\npermit redeemed\nrun_c1abee3b765b:58:058a42dce65c4ac59874be88800cc76c\n18:40:23\ncommand dispatched\nrun_c1abee3b765b:58:058a42dce65c4ac59874be88800cc76c\n18:40:23\ncontroller acknowledged\nrun_c1abee3b765b:57:45ff33acdeea4070a394aedd4cdebd24\n18:40:22\npermit redeemed\nrun_c1abee3b765b:57:45ff33acdeea4070a394aedd4cdebd24\n18:40:22\ncommand dispatched\nrun_c1abee3b765b:57:45ff33acdeea4070a394aedd4cdebd24\n18:40:22\ncontroller acknowledged\nrun_c1abee3b765b:56:738bbabb7803455881af30babbda4134\n18:40:21\npermit redeemed\nrun_c1abee3b765b:56:738bbabb7803455881af30babbda4134\n18:40:21\ncommand dispatched\nrun_c1abee3b765b:56:738bbabb7803455881af30babbda4134\n18:40:21\ncontroller acknowledged\nrun_c1abee3b765b:55:00f5b88d492e455f9d2f3477dd8e7b8f\n18:40:19\npermit redeemed\nrun_c1abee3b765b:55:00f5b88d492e455f9d2f3477dd8e7b8f\n18:40:19\ncommand dispatched\nrun_c1abee3b765b:55:00f5b88d492e455f9d2f3477dd8e7b8f\n18:40:19\ncontroller acknowledged\nrun_c1abee3b765b:54:40ec45da5dea4394bab1a7ee284c9d99\n18:40:18\npermit redeemed\nrun_c1abee3b765b:54:40ec45da5dea4394bab1a7ee284c9d99\n18:40:18\ncommand dispatched\nrun_c1abee3b765b:54:40ec45da5dea4394bab1a7ee284c9d99\n18:40:18\ncontroller acknowledged\nrun_c1abee3b765b:53:015844d552c640d5b9621a645fdfadd6\n18:40:17\npermit redeemed\nrun_c1abee3b765b:53:015844d552c640d5b9621a645fdfadd6\n18:40:17\ncommand dispatched\nrun_c1abee3b765b:53:015844d552c640d5b9621a645fdfadd6\n18:40:16\ncontroller acknowledged\nrun_c1abee3b765b:52:0f5142e7fbca4434b0c10ea016b2ffc5\n18:40:15\npermit redeemed\nrun_c1abee3b765b:52:0f5142e7fbca4434b0c10ea016b2ffc5\n18:40:15\ncommand dispatched\nrun_c1abee3b765b:52:0f5142e7fbca4434b0c10ea016b2ffc5\n18:40:15\ncontroller acknowledged\nrun_c1abee3b765b:51:0d6f2b06cc4841afbba31a7006b7c0f8\n18:40:14\npermit redeemed\nrun_c1abee3b765b:51:0d6f2b06cc4841afbba31a7006b7c0f8\n18:40:14\ncommand dispatched\nrun_c1abee3b765b:51:0d6f2b06cc4841afbba31a7006b7c0f8\n18:40:13\ncontroller acknowledged\nrun_c1abee3b765b:50:50481650810147d6af9ebfb743667bff\n18:40:12\npermit redeemed\nrun_c1abee3b765b:50:50481650810147d6af9ebfb743667bff\n18:40:12\ncommand dispatched\nrun_c1abee3b765b:50:50481650810147d6af9ebfb743667bff\n18:40:12\ncontroller acknowledged\nrun_c1abee3b765b:49:60b9a3a093b14846be7ce7846c354fe6\n18:40:11\npermit redeemed\nrun_c1abee3b765b:49:60b9a3a093b14846be7ce7846c354fe6\n18:40:11\ncommand dispatched\nrun_c1abee3b765b:49:60b9a3a093b14846be7ce7846c354fe6\n18:40:10\ncontroller acknowledged\nrun_c1abee3b765b:48:bddfe70750b74eec807d63b77375f481\n18:40:09\ncommand dispatched\nrun_c1abee3b765b:48:bddfe70750b74eec807d63b77375f481\n18:40:09\ncontroller acknowledged\nrun_c1abee3b765b:47:8085586d1e9641b480383fed355e268b\n18:40:08\npermit redeemed\nrun_c1abee3b765b:47:8085586d1e9641b480383fed355e268b\n18:40:08\ncommand dispatched\nrun_c1abee3b765b:47:8085586d1e9641b480383fed355e268b\n18:40:08",
+      "all_text": "Built during the hackathonExecution authorityMeta's models plan and perceive; this layer decides what may actually move. Every move needs a signed, single-use permit for exactly that move, checked again by the robot controller.Execution authorityNothing moves without a single-use permit. Stopping never needs a login.Permits enforcedStop robotStop everything🎙 Voice stopStop robot-10.00 m/sStop robot-20.00 m/sStop robot-30.00 m/sRobotrobot-1Authority epoch8World version504Action journalintactLearned routingNetworkX over the warehouse floor; only signed experience countsRouternetworkxCells with learned delay1Quarantined records0Expected delay on last route0 sOperational knowledge graphExplore how robot missions, decisions, locations and policies connectMemgraph connectedNetworkX calculates routes. Memgraph connects historical evidence; every displayed decision is rechecked against the original signed record.Recorded mission runNavigate the mobile carrier through the gowning aisle to x=6, y=18.5. Navigation only. · completedSync evidence1 projected runs · 25 decision references · latest 30 matching observations shownMission overviewInspect a decisionShow decisionsAll decisionsBlocked & reviewApprovedFollow the arrows from the mission to its recorded outcomes. Select any node to see what connects to it.Verified mission relationshipsMission and robot connect to an execution run. The run connects to recorded decisions, which connect to observed locations and any triggered policies. Nodes can be selected with a pointer or keyboard.attemptperformedrecordedatMission: Assigned task — Operator instructionMissionAssigned taskOperator instructionRobot: robot-1 — Performed this runRobotrobot-1Performed this runMission run: Execution — 25 observationsMission runExecution25 observationsDecision group: Approved — 25 observationsDecision groupApproved25 observationsLocation group: 12 floor cells — Recorded positionsLocation group12 floor cellsRecorded positions25 of 25 retrieved observations · Grouped for clarity · Historical evidence−100%+Fit viewNo policy hits were recorded in these displayed observations. Approved decisions still passed through the policy gate.Explore the mission. Select a node to highlight its connections and inspect the supporting records. Use Tab, then Enter or Space, to explore by keyboard.View 25 verified decision connectionsHistorical sample for investigation and planning context. It grants no execution permission.Robot / locationDecision / policiesEvidencerobot-1sovereign-cleanroom · (6.0, 18.5)APPROVEDNo policy hitsevt_4f96d7558a7cSigned receipt 25robot-1sovereign-cleanroom · (6.0, 18.5)APPROVEDNo policy hitsevt_383a565896b1Signed receipt 24robot-1sovereign-cleanroom · (6.0, 18.5)APPROVEDNo policy hitsevt_4d368b60ca61Signed receipt 23robot-1sovereign-cleanroom · (6.0, 18.5)APPROVEDNo policy hitsevt_7f5c83bea1eeSigned receipt 22robot-1sovereign-cleanroom · (6.0, 18.5)APPROVEDNo policy hitsevt_b07732a4af08Signed receipt 21robot-1sovereign-cleanroom · (6.0, 18.5)APPROVEDNo policy hitsevt_637ec52578e4Signed receipt 20robot-1sovereign-cleanroom · (6.0, 18.5)APPROVEDNo policy hitsevt_c7803bad6134Signed receipt 19robot-1sovereign-cleanroom · (6.0, 18.5)APPROVEDNo policy hitsevt_ff4c9add1ab4Signed receipt 18robot-1sovereign-cleanroom · (6.0, 18.5)APPROVEDNo policy hitsevt_1fb1141d1dbeSigned receipt 17robot-1sovereign-cleanroom · (6.0, 19.0)APPROVEDNo policy hitsevt_e936cb5a1eceSigned receipt 16robot-1sovereign-cleanroom · (6.0, 19.4)APPROVEDNo policy hitsevt_c9b77a9ca604Signed receipt 15robot-1sovereign-cleanroom · (6.0, 19.7)APPROVEDNo policy hitsevt_6b0c38c5c825Signed receipt 14robot-1sovereign-cleanroom · (6.0, 20.0)APPROVEDNo policy hitsevt_eebeeefbccabSigned receipt 13robot-1sovereign-cleanroom · (6.0, 20.3)APPROVEDNo policy hitsevt_cf2457e49e12Signed receipt 12robot-1sovereign-cleanroom · (6.0, 20.6)APPROVEDNo policy hitsevt_17eb1157634bSigned receipt 11robot-1sovereign-cleanroom · (6.0, 20.9)APPROVEDNo policy hitsevt_d0163d6bbc32Signed receipt 10robot-1sovereign-cleanroom · (6.0, 21.3)APPROVEDNo policy hitsevt_84e321bc305eSigned receipt 9robot-1sovereign-cleanroom · (6.0, 21.6)APPROVEDNo policy hitsevt_4a46a47847f6Signed receipt 8robot-1sovereign-cleanroom · (6.0, 21.9)APPROVEDNo policy hitsevt_54e7a2045027Signed receipt 7robot-1sovereign-cleanroom · (6.0, 22.2)APPROVEDNo policy hitsevt_fd99b6ea8a26Signed receipt 6robot-1sovereign-cleanroom · (6.0, 22.5)APPROVEDNo policy hitsevt_e5fedfb72bd3Signed receipt 5robot-1sovereign-cleanroom · (6.0, 22.8)APPROVEDNo policy hitsevt_00125195a3c9Signed receipt 4robot-1sovereign-cleanroom · (6.0, 23.0)APPROVEDNo policy hitsevt_24a6e9eeeea0Signed receipt 3robot-1sovereign-cleanroom · (6.0, 23.4)APPROVEDNo policy hitsevt_73dc18394870Signed receipt 2robot-1sovereign-cleanroom · (6.0, 23.5)APPROVEDNo policy hitsevt_721fb1f311d6Signed receipt 1Experience and environmentPast experience is advisory. Current conditions decide whether it can be reused.Shared routing requires two distinct robot identities. Repeated missions from one robot count as one source.Sitesovereign-cleanroomMap versiond48c88b6780c10 eligible0 advisory0 excludedExperience checksEligiblerobot-A (fixture)2295 s oldbrowser-fixture-robot-A (fixture)-1793729403988751400:6:7:STOP:f94405df8da6888769ac04300de8071effefeeb6f93291569e5bc5796910876f:robot-A (fixture)Context and freshness checks passedEligiblerobot-C (fixture)2295 s oldbrowser-fixture-robot-C (fixture)-1793729404005398900:6:7:STOP:f94405df8da6888769ac04300de8071effefeeb6f93291569e5bc5796910876f:robot-C (fixture)Context and freshness checks passedEligiblerobot-A (fixture)2150 s oldbrowser-fixture-robot-A (fixture)-1793729548300036100:6:7:STOP:f94405df8da6888769ac04300de8071effefeeb6f93291569e5bc5796910876f:robot-A (fixture)Context and freshness checks passedEligiblerobot-C (fixture)2150 s oldbrowser-fixture-robot-C (fixture)-1793729548324035400:6:7:STOP:f94405df8da6888769ac04300de8071effefeeb6f93291569e5bc5796910876f:robot-C (fixture)Context and freshness checks passedEligiblerobot-A (fixture)1530 s oldbrowser-fixture-robot-A (fixture)-1793730168552709300:6:7:STOP:f94405df8da6888769ac04300de8071effefeeb6f93291569e5bc5796910876f:robot-A (fixture)Context and freshness checks passedEligiblerobot-C (fixture)1530 s oldbrowser-fixture-robot-C (fixture)-1793730168566195100:6:7:STOP:f94405df8da6888769ac04300de8071effefeeb6f93291569e5bc5796910876f:robot-C (fixture)Context and freshness checks passedEligiblerobot-A (fixture)1417 s oldbrowser-fixture-robot-A (fixture)-1793730281815218500:6:7:STOP:f94405df8da6888769ac04300de8071effefeeb6f93291569e5bc5796910876f:robot-A (fixture)Context and freshness checks passedEligiblerobot-C (fixture)1417 s oldbrowser-fixture-robot-C (fixture)-1793730281828737400:6:7:STOP:f94405df8da6888769ac04300de8071effefeeb6f93291569e5bc5796910876f:robot-C (fixture)Context and freshness checks passedEligiblerobot-A (fixture)1330 s oldbrowser-fixture-robot-A (fixture)-1793730369013434500:6:7:STOP:f94405df8da6888769ac04300de8071effefeeb6f93291569e5bc5796910876f:robot-A (fixture)Context and freshness checks passedEligiblerobot-C (fixture)1330 s oldbrowser-fixture-robot-C (fixture)-1793730369026434700:6:7:STOP:f94405df8da6888769ac04300de8071effefeeb6f93291569e5bc5796910876f:robot-C (fixture)Context and freshness checks passedEnvironment changescontext changed6ecdea0c64f1 → d48c88b6780cscenario:clear6ecdea0c64f1 → d48c88b6780cObserved after 267783 mscontext changedf8ef5e3b7c5c → 6ecdea0c64f1scenario:clearf8ef5e3b7c5c → 6ecdea0c64f1Observed after 36 mscontext changedb62e8ce4bd06 → f8ef5e3b7c5cscenario:spillb62e8ce4bd06 → f8ef5e3b7c5cObserved after 40 msSecurity drillsReal attacks against the live simulator, each with a pass/fail resultRun all drillsNo drills run yetRuns only while no mission is active. The probe move targets the robot's own position, and everything is cleaned up afterwards.Dispatch and kill-switch eventsMost recent firstcontroller acknowledgedrun_c1abee3b765b:68:f123bb7c2031497e9ff6e0b30f3fdf3518:40:36permit redeemedrun_c1abee3b765b:68:f123bb7c2031497e9ff6e0b30f3fdf3518:40:36command dispatchedrun_c1abee3b765b:68:f123bb7c2031497e9ff6e0b30f3fdf3518:40:36controller acknowledgedrun_c1abee3b765b:67:708c62f8b04e4503a866e7e9187b4fd118:40:35permit redeemedrun_c1abee3b765b:67:708c62f8b04e4503a866e7e9187b4fd118:40:35command dispatchedrun_c1abee3b765b:67:708c62f8b04e4503a866e7e9187b4fd118:40:35controller acknowledgedrun_c1abee3b765b:66:81919cf92c98498296cd349ad80aa1f418:40:34permit redeemedrun_c1abee3b765b:66:81919cf92c98498296cd349ad80aa1f418:40:34command dispatchedrun_c1abee3b765b:66:81919cf92c98498296cd349ad80aa1f418:40:33controller acknowledgedrun_c1abee3b765b:65:3155ba6350ae4feea0a447d2e8f8187718:40:32command dispatchedrun_c1abee3b765b:65:3155ba6350ae4feea0a447d2e8f8187718:40:32controller acknowledgedrun_c1abee3b765b:64:f95899baaaf2492a916098e891c48c0b18:40:31command dispatchedrun_c1abee3b765b:64:f95899baaaf2492a916098e891c48c0b18:40:31controller acknowledgedrun_c1abee3b765b:63:05542d026a4e4a55a0b02f068a496d7718:40:30command dispatchedrun_c1abee3b765b:63:05542d026a4e4a55a0b02f068a496d7718:40:30controller acknowledgedrun_c1abee3b765b:62:8537e786e1a649b98ec0fadfeec2632918:40:28command dispatchedrun_c1abee3b765b:62:8537e786e1a649b98ec0fadfeec2632918:40:28controller acknowledgedrun_c1abee3b765b:61:9b3d30a46294462aae11abf45449971718:40:27command dispatchedrun_c1abee3b765b:61:9b3d30a46294462aae11abf45449971718:40:27controller acknowledgedrun_c1abee3b765b:60:1b6ddd46ac2f45e2bab82abfdf111c5718:40:26permit redeemedrun_c1abee3b765b:60:1b6ddd46ac2f45e2bab82abfdf111c5718:40:26command dispatchedrun_c1abee3b765b:60:1b6ddd46ac2f45e2bab82abfdf111c5718:40:26controller acknowledgedrun_c1abee3b765b:59:d2d883a75ba740ffaef67b68f3a496fc18:40:25permit redeemedrun_c1abee3b765b:59:d2d883a75ba740ffaef67b68f3a496fc18:40:25command dispatchedrun_c1abee3b765b:59:d2d883a75ba740ffaef67b68f3a496fc18:40:25controller acknowledgedrun_c1abee3b765b:58:058a42dce65c4ac59874be88800cc76c18:40:24permit redeemedrun_c1abee3b765b:58:058a42dce65c4ac59874be88800cc76c18:40:23command dispatchedrun_c1abee3b765b:58:058a42dce65c4ac59874be88800cc76c18:40:23controller acknowledgedrun_c1abee3b765b:57:45ff33acdeea4070a394aedd4cdebd2418:40:22permit redeemedrun_c1abee3b765b:57:45ff33acdeea4070a394aedd4cdebd2418:40:22command dispatchedrun_c1abee3b765b:57:45ff33acdeea4070a394aedd4cdebd2418:40:22controller acknowledgedrun_c1abee3b765b:56:738bbabb7803455881af30babbda413418:40:21permit redeemedrun_c1abee3b765b:56:738bbabb7803455881af30babbda413418:40:21command dispatchedrun_c1abee3b765b:56:738bbabb7803455881af30babbda413418:40:21controller acknowledgedrun_c1abee3b765b:55:00f5b88d492e455f9d2f3477dd8e7b8f18:40:19permit redeemedrun_c1abee3b765b:55:00f5b88d492e455f9d2f3477dd8e7b8f18:40:19command dispatchedrun_c1abee3b765b:55:00f5b88d492e455f9d2f3477dd8e7b8f18:40:19controller acknowledgedrun_c1abee3b765b:54:40ec45da5dea4394bab1a7ee284c9d9918:40:18permit redeemedrun_c1abee3b765b:54:40ec45da5dea4394bab1a7ee284c9d9918:40:18command dispatchedrun_c1abee3b765b:54:40ec45da5dea4394bab1a7ee284c9d9918:40:18controller acknowledgedrun_c1abee3b765b:53:015844d552c640d5b9621a645fdfadd618:40:17permit redeemedrun_c1abee3b765b:53:015844d552c640d5b9621a645fdfadd618:40:17command dispatchedrun_c1abee3b765b:53:015844d552c640d5b9621a645fdfadd618:40:16controller acknowledgedrun_c1abee3b765b:52:0f5142e7fbca4434b0c10ea016b2ffc518:40:15permit redeemedrun_c1abee3b765b:52:0f5142e7fbca4434b0c10ea016b2ffc518:40:15command dispatchedrun_c1abee3b765b:52:0f5142e7fbca4434b0c10ea016b2ffc518:40:15controller acknowledgedrun_c1abee3b765b:51:0d6f2b06cc4841afbba31a7006b7c0f818:40:14permit redeemedrun_c1abee3b765b:51:0d6f2b06cc4841afbba31a7006b7c0f818:40:14command dispatchedrun_c1abee3b765b:51:0d6f2b06cc4841afbba31a7006b7c0f818:40:13controller acknowledgedrun_c1abee3b765b:50:50481650810147d6af9ebfb743667bff18:40:12permit redeemedrun_c1abee3b765b:50:50481650810147d6af9ebfb743667bff18:40:12command dispatchedrun_c1abee3b765b:50:50481650810147d6af9ebfb743667bff18:40:12controller acknowledgedrun_c1abee3b765b:49:60b9a3a093b14846be7ce7846c354fe618:40:11permit redeemedrun_c1abee3b765b:49:60b9a3a093b14846be7ce7846c354fe618:40:11command dispatchedrun_c1abee3b765b:49:60b9a3a093b14846be7ce7846c354fe618:40:10controller acknowledgedrun_c1abee3b765b:48:bddfe70750b74eec807d63b77375f48118:40:09command dispatchedrun_c1abee3b765b:48:bddfe70750b74eec807d63b77375f48118:40:09controller acknowledgedrun_c1abee3b765b:47:8085586d1e9641b480383fed355e268b18:40:08permit redeemedrun_c1abee3b765b:47:8085586d1e9641b480383fed355e268b18:40:08command dispatchedrun_c1abee3b765b:47:8085586d1e9641b480383fed355e268b18:40:08",
+      "links": [
+        {
+          "label": "Skip to content",
+          "href": "#main-content"
+        },
+        {
+          "label": "SovereignAUTONOMY",
+          "href": "/mission-control"
+        },
+        {
+          "label": "Mission control",
+          "href": "/mission-control"
+        },
+        {
+          "label": "Missions",
+          "href": "/missions"
+        },
+        {
+          "label": "Mission history",
+          "href": "/runs"
+        },
+        {
+          "label": "Trust & security",
+          "href": "/authority"
+        },
+        {
+          "label": "Governance",
+          "href": "/policies"
+        },
+        {
+          "label": "Evidence",
+          "href": "/evidence"
+        },
+        {
+          "label": "Explore the showcase",
+          "href": "/mission-control?showcase=1"
+        },
+        {
+          "label": "About the system",
+          "href": "/overview"
+        },
+        {
+          "label": "evt_4f96d7558a7c",
+          "href": "/runs/run_84fa654ec55a"
+        },
+        {
+          "label": "evt_383a565896b1",
+          "href": "/runs/run_84fa654ec55a"
+        },
+        {
+          "label": "evt_4d368b60ca61",
+          "href": "/runs/run_84fa654ec55a"
+        },
+        {
+          "label": "evt_7f5c83bea1ee",
+          "href": "/runs/run_84fa654ec55a"
+        },
+        {
+          "label": "evt_b07732a4af08",
+          "href": "/runs/run_84fa654ec55a"
+        },
+        {
+          "label": "evt_637ec52578e4",
+          "href": "/runs/run_84fa654ec55a"
+        },
+        {
+          "label": "evt_c7803bad6134",
+          "href": "/runs/run_84fa654ec55a"
+        },
+        {
+          "label": "evt_ff4c9add1ab4",
+          "href": "/runs/run_84fa654ec55a"
+        },
+        {
+          "label": "evt_1fb1141d1dbe",
+          "href": "/runs/run_84fa654ec55a"
+        },
+        {
+          "label": "evt_e936cb5a1ece",
+          "href": "/runs/run_84fa654ec55a"
+        },
+        {
+          "label": "evt_c9b77a9ca604",
+          "href": "/runs/run_84fa654ec55a"
+        },
+        {
+          "label": "evt_6b0c38c5c825",
+          "href": "/runs/run_84fa654ec55a"
+        },
+        {
+          "label": "evt_eebeeefbccab",
+          "href": "/runs/run_84fa654ec55a"
+        },
+        {
+          "label": "evt_cf2457e49e12",
+          "href": "/runs/run_84fa654ec55a"
+        },
+        {
+          "label": "evt_17eb1157634b",
+          "href": "/runs/run_84fa654ec55a"
+        },
+        {
+          "label": "evt_d0163d6bbc32",
+          "href": "/runs/run_84fa654ec55a"
+        },
+        {
+          "label": "evt_84e321bc305e",
+          "href": "/runs/run_84fa654ec55a"
+        },
+        {
+          "label": "evt_4a46a47847f6",
+          "href": "/runs/run_84fa654ec55a"
+        },
+        {
+          "label": "evt_54e7a2045027",
+          "href": "/runs/run_84fa654ec55a"
+        },
+        {
+          "label": "evt_fd99b6ea8a26",
+          "href": "/runs/run_84fa654ec55a"
+        },
+        {
+          "label": "evt_e5fedfb72bd3",
+          "href": "/runs/run_84fa654ec55a"
+        },
+        {
+          "label": "evt_00125195a3c9",
+          "href": "/runs/run_84fa654ec55a"
+        },
+        {
+          "label": "evt_24a6e9eeeea0",
+          "href": "/runs/run_84fa654ec55a"
+        },
+        {
+          "label": "evt_73dc18394870",
+          "href": "/runs/run_84fa654ec55a"
+        },
+        {
+          "label": "evt_721fb1f311d6",
+          "href": "/runs/run_84fa654ec55a"
+        },
+        {
+          "label": "Return to mission control",
+          "href": "/mission-control"
+        }
+      ],
+      "controls": [
+        {
+          "tag": "BUTTON",
+          "role": null,
+          "label": "Stop robot",
+          "disabled": false
+        },
+        {
+          "tag": "BUTTON",
+          "role": null,
+          "label": "Stop everything",
+          "disabled": false
+        },
+        {
+          "tag": "BUTTON",
+          "role": null,
+          "label": "🎙 Voice stop",
+          "disabled": false
+        },
+        {
+          "tag": "BUTTON",
+          "role": null,
+          "label": "Stop robot-10.00 m/s",
+          "disabled": false
+        },
+        {
+          "tag": "BUTTON",
+          "role": null,
+          "label": "Stop robot-20.00 m/s",
+          "disabled": false
+        },
+        {
+          "tag": "BUTTON",
+          "role": null,
+          "label": "Stop robot-30.00 m/s",
+          "disabled": false
+        },
+        {
+          "tag": "SELECT",
+          "role": null,
+          "label": "Knowledge graph run",
+          "disabled": false
+        },
+        {
+          "tag": "BUTTON",
+          "role": null,
+          "label": "Sync evidence",
+          "disabled": false
+        },
+        {
+          "tag": "BUTTON",
+          "role": null,
+          "label": "Mission overview",
+          "disabled": false
+        },
+        {
+          "tag": "BUTTON",
+          "role": null,
+          "label": "Inspect a decision",
+          "disabled": false
+        },
+        {
+          "tag": "SELECT",
+          "role": null,
+          "label": "Graph decision filter",
+          "disabled": false
+        },
+        {
+          "tag": "BUTTON",
+          "role": null,
+          "label": "Zoom out graph",
+          "disabled": true
+        },
+        {
+          "tag": "BUTTON",
+          "role": null,
+          "label": "Zoom in graph",
+          "disabled": false
+        },
+        {
+          "tag": "BUTTON",
+          "role": null,
+          "label": "Fit view",
+          "disabled": false
+        },
+        {
+          "tag": "SUMMARY",
+          "role": null,
+          "label": "View 25 verified decision connections",
+          "disabled": false
+        },
+        {
+          "tag": "SUMMARY",
+          "role": null,
+          "label": "Experience checks",
+          "disabled": false
+        },
+        {
+          "tag": "BUTTON",
+          "role": null,
+          "label": "Run all drills",
+          "disabled": false
+        }
+      ],
+      "details": [
+        {
+          "open": false,
+          "label": "View 25 verified decision connections"
+        },
+        {
+          "open": true,
+          "label": "Experience checks"
+        }
+      ],
+      "sections": [],
+      "overflow": false
+    },
+    {
+      "route": "/policies",
+      "final_url": "/policies",
+      "title": "Sovereign Autonomy | Mission Control",
+      "headings": [
+        {
+          "level": "H1",
+          "text": "The rules every move must pass"
+        },
+        {
+          "level": "H2",
+          "text": "Where the robot may go"
+        },
+        {
+          "level": "H2",
+          "text": "People and vehicles"
+        },
+        {
+          "level": "H2",
+          "text": "Speed and hazards"
+        },
+        {
+          "level": "H2",
+          "text": "Escalation"
+        }
+      ],
+      "visible_text": "GOVERNANCE\nThe rules every move must pass\n\nEleven deterministic policies judge every proposal before the robot moves. The rules change only through a governed workflow; the planner learns from the gate, the gate does not drift.\n\nPolicies\nRules in force\nLearning & task focus\nTest a move or plan\nWHERE THE ROBOT MAY GO\nGEOFENCE_01\nHIGH\nGeofence enforcement\n\nDeny actions if robot or destination is outside the allowed operating area.\n\nWhen Robot position or destination outside boundary\nThen STOP\nmin_x=0\nmax_x=40\nmin_y=0\nmax_y=25\nPATH_CLEARANCE_07\nHIGH\nPath clearance\n\nDeny a move whose straight path runs through permanent racking, so the robot replans along the aisles before it starts instead of being stopped when already close.\n\nWhen Straight path to the target passes within 0.2 m of racking (robot body)\nThen REPLAN\nrobot_radius_m=0.4\npath_margin_m=0.6\nOBSTACLE_CLEARANCE_03\nHIGH\nObstacle clearance\n\nDeny motion if nearest obstacle is below the minimum clearance distance.\n\nWhen Obstacle distance < 0.5m\nThen REPLAN\nmin_clearance_m=0.5\nPEOPLE AND VEHICLES\nHUMAN_PROXIMITY_02\nHIGH\nHuman proximity enforcement\n\nEnforce SLOW when a human or worker is within the slow radius, STOP within the stop radius.\n\nWhen Human/worker within proximity radius\nThen STOP if < 1m, SLOW if < 3m\nslow_radius_m=3\nstop_radius_m=1\nmax_speed_near_human_ms=0.4\nHUMAN_CLEARANCE_02\nHIGH\nHuman confidence speed check\n\nDeny unsafe speed when a human is detected with high confidence and speed exceeds safe limit.\n\nWhen Human detected (conf >= 0.65) and speed too high\nThen SLOW\nmin_confidence=0.65\nmax_speed_near_human_ms=0.4\nWORKER_PROXIMITY_06\nHIGH\nWalking worker proximity\n\nEnforce SLOW/STOP when walking warehouse workers (separate from primary human detection) are within proximity radius.\n\nWhen Walking worker within proximity radius\nThen STOP if < 1m, SLOW if < 3m\nslow_radius_m=3\nstop_radius_m=1\nUNCERTAINTY_04\nMEDIUM\nPerception uncertainty gate\n\nFlag risky actions when human detection confidence is below the threshold.\n\nWhen Human detected but confidence < 65%\nThen SLOW + operator review\nmin_human_confidence=0.65\nmin_confidence_for_move=0.55\nSPEED AND HAZARDS\nSAFE_SPEED_01\nHIGH\nZone speed limit\n\nEnforce maximum speed per zone type. Aisle, corridor, and loading bay each have distinct limits.\n\nWhen Proposed speed exceeds zone limit\nThen SLOW\naisle_limit_ms=0.5\ncorridor_limit_ms=0.7\nloading_bay_limit_ms=0.4\nHAZARD_EXCLUSION_08\nHIGH\nHazard exclusion zone\n\nDeny a move that would enter or cross a temporary exclusion zone round a hazard such as a spill. Every spill gets a baseline zone at once; corroborated guidance from authoritative sources (via Tavily, screened as untrusted) can only enlarge it. A robot already inside may only back out, slowly.\n\nWhen Path to the target passes within the zone radius, or the robot is inside and not leaving\nThen REPLAN\nbaseline_radius_m=1.2\nmax_radius_m=6\ncorroborating_sources=2\nHAZARD_SLOW_09\nMEDIUM\nHazard slow zone\n\nCap speed near a hazard zone. Limits come from reviewed per-hazard rules (0.2 to 0.3 m/s), never from outside text.\n\nWhen Robot or path within the slow radius above the zone's speed cap\nThen SLOW\nmax_speed_range=0.1 to 0.3\nESCALATION\nHITL_05\nHIGH\nHuman-in-the-loop trigger\n\nEscalate to operator review when aggregate risk score exceeds the threshold.\n\nWhen Risk score >= 0.75\nThen NEEDS_REVIEW (operator escalation)\nrisk_threshold=0.75",
+      "all_text": "GovernanceThe rules every move must passEleven deterministic policies judge every proposal before the robot moves. The rules change only through a governed workflow; the planner learns from the gate, the gate does not drift.PoliciesRules in forceLearning & task focusTest a move or planWhere the robot may goGEOFENCE_01HIGHGeofence enforcementDeny actions if robot or destination is outside the allowed operating area.When Robot position or destination outside boundaryThen STOPmin_x=0max_x=40min_y=0max_y=25PATH_CLEARANCE_07HIGHPath clearanceDeny a move whose straight path runs through permanent racking, so the robot replans along the aisles before it starts instead of being stopped when already close.When Straight path to the target passes within 0.2 m of racking (robot body)Then REPLANrobot_radius_m=0.4path_margin_m=0.6OBSTACLE_CLEARANCE_03HIGHObstacle clearanceDeny motion if nearest obstacle is below the minimum clearance distance.When Obstacle distance < 0.5mThen REPLANmin_clearance_m=0.5People and vehiclesHUMAN_PROXIMITY_02HIGHHuman proximity enforcementEnforce SLOW when a human or worker is within the slow radius, STOP within the stop radius.When Human/worker within proximity radiusThen STOP if < 1m, SLOW if < 3mslow_radius_m=3stop_radius_m=1max_speed_near_human_ms=0.4HUMAN_CLEARANCE_02HIGHHuman confidence speed checkDeny unsafe speed when a human is detected with high confidence and speed exceeds safe limit.When Human detected (conf >= 0.65) and speed too highThen SLOWmin_confidence=0.65max_speed_near_human_ms=0.4WORKER_PROXIMITY_06HIGHWalking worker proximityEnforce SLOW/STOP when walking warehouse workers (separate from primary human detection) are within proximity radius.When Walking worker within proximity radiusThen STOP if < 1m, SLOW if < 3mslow_radius_m=3stop_radius_m=1UNCERTAINTY_04MEDIUMPerception uncertainty gateFlag risky actions when human detection confidence is below the threshold.When Human detected but confidence < 65%Then SLOW + operator reviewmin_human_confidence=0.65min_confidence_for_move=0.55Speed and hazardsSAFE_SPEED_01HIGHZone speed limitEnforce maximum speed per zone type. Aisle, corridor, and loading bay each have distinct limits.When Proposed speed exceeds zone limitThen SLOWaisle_limit_ms=0.5corridor_limit_ms=0.7loading_bay_limit_ms=0.4HAZARD_EXCLUSION_08HIGHHazard exclusion zoneDeny a move that would enter or cross a temporary exclusion zone round a hazard such as a spill. Every spill gets a baseline zone at once; corroborated guidance from authoritative sources (via Tavily, screened as untrusted) can only enlarge it. A robot already inside may only back out, slowly.When Path to the target passes within the zone radius, or the robot is inside and not leavingThen REPLANbaseline_radius_m=1.2max_radius_m=6corroborating_sources=2HAZARD_SLOW_09MEDIUMHazard slow zoneCap speed near a hazard zone. Limits come from reviewed per-hazard rules (0.2 to 0.3 m/s), never from outside text.When Robot or path within the slow radius above the zone's speed capThen SLOWmax_speed_range=0.1 to 0.3EscalationHITL_05HIGHHuman-in-the-loop triggerEscalate to operator review when aggregate risk score exceeds the threshold.When Risk score >= 0.75Then NEEDS_REVIEW (operator escalation)risk_threshold=0.75",
+      "links": [
+        {
+          "label": "Skip to content",
+          "href": "#main-content"
+        },
+        {
+          "label": "SovereignAUTONOMY",
+          "href": "/mission-control"
+        },
+        {
+          "label": "Mission control",
+          "href": "/mission-control"
+        },
+        {
+          "label": "Missions",
+          "href": "/missions"
+        },
+        {
+          "label": "Mission history",
+          "href": "/runs"
+        },
+        {
+          "label": "Trust & security",
+          "href": "/authority"
+        },
+        {
+          "label": "Governance",
+          "href": "/policies"
+        },
+        {
+          "label": "Evidence",
+          "href": "/evidence"
+        },
+        {
+          "label": "Explore the showcase",
+          "href": "/mission-control?showcase=1"
+        },
+        {
+          "label": "About the system",
+          "href": "/overview"
+        },
+        {
+          "label": "Return to mission control",
+          "href": "/mission-control"
+        }
+      ],
+      "controls": [
+        {
+          "tag": "BUTTON",
+          "role": "tab",
+          "label": "Policies",
+          "disabled": false
+        },
+        {
+          "tag": "BUTTON",
+          "role": "tab",
+          "label": "Rules in force",
+          "disabled": false
+        },
+        {
+          "tag": "BUTTON",
+          "role": "tab",
+          "label": "Learning & task focus",
+          "disabled": false
+        },
+        {
+          "tag": "BUTTON",
+          "role": "tab",
+          "label": "Test a move or plan",
+          "disabled": false
+        }
+      ],
+      "details": [],
+      "sections": [],
+      "overflow": false
+    },
+    {
+      "route": "/evidence",
+      "final_url": "/evidence",
+      "title": "Sovereign Autonomy | Mission Control",
+      "headings": [
+        {
+          "level": "H1",
+          "text": "What the gate prevented, and how to check it"
+        },
+        {
+          "level": "H2",
+          "text": "Rule-based planner"
+        },
+        {
+          "level": "H2",
+          "text": "Stress test: reckless planner"
+        }
+      ],
+      "visible_text": "EVIDENCE\nWhat the gate prevented, and how to check it\n\nBenchmark results committed with the code, signed decision receipts you can verify, and the hash-chained audit trail.\n\nBenchmarks & receipts\nCompliance reports\nAudit trail\nSafety benchmarks\nReceipts & chain\nRun quality\nA move is labelled unsafe by fixed safety floors in code, not by the rules under test. Person contacts are physical (bodies within 0.7 m while the robot moves); “while braking” means the gate had already told the robot to stop.\nRULE-BASED PLANNER\n\n150 seeded missions per arm, 5 rounds of fresh scenarios · 2026-10-22 14:57 UTC\n\nUNSAFE MOVES EXECUTED\nNo gate\n1,262\nGate\n0\nGate + learning\n0\nMEASURE\tNO GATE\tGATE\tGATE + LEARNING\nMissions\t150\t150\t150\nUnsafe proposed (per 100 moves)\t1,262 (3.13)\t1,597 (3.04)\t1,118 (1.84)\nPerson contacts (while braking)\t117 (0)\t38 (38)\t9 (9)\nRack / obstacle contacts\t4\t0\t0\nMissions completed\t98%\t98%\t97%\nSafe moves wrongly blocked\t—\t16%\t3.9%\nMean time to goal\t54.5 s\t71.1 s\t87.7 s\nRound 5, with 200 lessons from earlier rounds: unsafe proposals per 100 moves 2.4 with the gate alone vs 1.8 with learning.\nSTRESS TEST: RECKLESS PLANNER\n\nDrives at 0.9 m/s everywhere · 2026-10-22 14:58 UTC\n\nUNSAFE MOVES EXECUTED\nNo gate\n527\nGate\n0\nGate + learning\n0\nMEASURE\tNO GATE\tGATE\tGATE + LEARNING\nMissions\t60\t60\t—\nUnsafe proposed (per 100 moves)\t527 (6.36)\t524 (2.44)\t— (—)\nPerson contacts (while braking)\t17 (0)\t9 (9)\t— (—)\nRack / obstacle contacts\t2\t0\t—\nMissions completed\t100%\t98%\t—\nSafe moves wrongly blocked\t—\t17%\t—\nMean time to goal\t27.6 s\t72.6 s\t—",
+      "all_text": "EvidenceWhat the gate prevented, and how to check itBenchmark results committed with the code, signed decision receipts you can verify, and the hash-chained audit trail.Benchmarks & receiptsCompliance reportsAudit trailSafety benchmarksReceipts & chainRun qualityA move is labelled unsafe by fixed safety floors in code, not by the rules under test. Person contacts are physical (bodies within 0.7 m while the robot moves); “while braking” means the gate had already told the robot to stop.Rule-based planner150 seeded missions per arm, 5 rounds of fresh scenarios · 2026-10-22 14:57 UTCUnsafe moves executedNo gate1,262Gate0Gate + learning0MeasureNo gateGateGate + learningMissions150150150Unsafe proposed (per 100 moves)1,262 (3.13)1,597 (3.04)1,118 (1.84)Person contacts (while braking)117 (0)38 (38)9 (9)Rack / obstacle contacts400Missions completed98%98%97%Safe moves wrongly blocked—16%3.9%Mean time to goal54.5 s71.1 s87.7 sRound 5, with 200 lessons from earlier rounds: unsafe proposals per 100 moves 2.4 with the gate alone vs 1.8 with learning.Stress test: reckless plannerDrives at 0.9 m/s everywhere · 2026-10-22 14:58 UTCUnsafe moves executedNo gate527Gate0Gate + learning0MeasureNo gateGateGate + learningMissions6060—Unsafe proposed (per 100 moves)527 (6.36)524 (2.44)— (—)Person contacts (while braking)17 (0)9 (9)— (—)Rack / obstacle contacts20—Missions completed100%98%—Safe moves wrongly blocked—17%—Mean time to goal27.6 s72.6 s—",
+      "links": [
+        {
+          "label": "Skip to content",
+          "href": "#main-content"
+        },
+        {
+          "label": "SovereignAUTONOMY",
+          "href": "/mission-control"
+        },
+        {
+          "label": "Mission control",
+          "href": "/mission-control"
+        },
+        {
+          "label": "Missions",
+          "href": "/missions"
+        },
+        {
+          "label": "Mission history",
+          "href": "/runs"
+        },
+        {
+          "label": "Trust & security",
+          "href": "/authority"
+        },
+        {
+          "label": "Governance",
+          "href": "/policies"
+        },
+        {
+          "label": "Evidence",
+          "href": "/evidence"
+        },
+        {
+          "label": "Explore the showcase",
+          "href": "/mission-control?showcase=1"
+        },
+        {
+          "label": "About the system",
+          "href": "/overview"
+        },
+        {
+          "label": "Benchmarks & receipts",
+          "href": "/evidence"
+        },
+        {
+          "label": "Compliance reports",
+          "href": "/compliance"
+        },
+        {
+          "label": "Audit trail",
+          "href": "/audit"
+        },
+        {
+          "label": "Return to mission control",
+          "href": "/mission-control"
+        }
+      ],
+      "controls": [
+        {
+          "tag": "BUTTON",
+          "role": "tab",
+          "label": "Safety benchmarks",
+          "disabled": false
+        },
+        {
+          "tag": "BUTTON",
+          "role": "tab",
+          "label": "Receipts & chain",
+          "disabled": false
+        },
+        {
+          "tag": "BUTTON",
+          "role": "tab",
+          "label": "Run quality",
+          "disabled": false
+        }
+      ],
+      "details": [],
+      "sections": [],
+      "overflow": false
+    },
+    {
+      "route": "/audit",
+      "final_url": "/audit",
+      "title": "Sovereign Autonomy | Mission Control",
+      "headings": [
+        {
+          "level": "H1",
+          "text": "Audit trail"
+        }
+      ],
+      "visible_text": "EVIDENCE\nAudit trail\n\n3 entries across 2 missions. Mission changes, recorded and append-only.\n\nBenchmarks & receipts\nCompliance reports\nAudit trail\nFilter\n➕\nCreated\nmis_651a1311106a\n\nMission created: Move to Q-01\n\n03/11/2026, 18:38:52\nby operator\n♻️\nReplayed\nmis_b03d49c884fd\n\nMission replayed from completed\n\n03/11/2026, 18:38:06\nby operator\n➕\nCreated\nmis_b03d49c884fd\n\nMission created: Navigate the mobile carrier through the gowning aisle to x=6, y=18.5. Navigation only.\n\n03/11/2026, 17:46:02\nby operator",
+      "all_text": "EvidenceAudit trail3 entries across 2 missions. Mission changes, recorded and append-only.Benchmarks & receiptsCompliance reportsAudit trailFilter➕Createdmis_651a1311106aMission created: Move to Q-0103/11/2026, 18:38:52by operator♻️Replayedmis_b03d49c884fdMission replayed from completed03/11/2026, 18:38:06by operator➕Createdmis_b03d49c884fdMission created: Navigate the mobile carrier through the gowning aisle to x=6, y=18.5. Navigation only.03/11/2026, 17:46:02by operator",
+      "links": [
+        {
+          "label": "Skip to content",
+          "href": "#main-content"
+        },
+        {
+          "label": "SovereignAUTONOMY",
+          "href": "/mission-control"
+        },
+        {
+          "label": "Mission control",
+          "href": "/mission-control"
+        },
+        {
+          "label": "Missions",
+          "href": "/missions"
+        },
+        {
+          "label": "Mission history",
+          "href": "/runs"
+        },
+        {
+          "label": "Trust & security",
+          "href": "/authority"
+        },
+        {
+          "label": "Governance",
+          "href": "/policies"
+        },
+        {
+          "label": "Evidence",
+          "href": "/evidence"
+        },
+        {
+          "label": "Explore the showcase",
+          "href": "/mission-control?showcase=1"
+        },
+        {
+          "label": "About the system",
+          "href": "/overview"
+        },
+        {
+          "label": "Benchmarks & receipts",
+          "href": "/evidence"
+        },
+        {
+          "label": "Compliance reports",
+          "href": "/compliance"
+        },
+        {
+          "label": "Audit trail",
+          "href": "/audit"
+        },
+        {
+          "label": "Return to mission control",
+          "href": "/mission-control"
+        }
+      ],
+      "controls": [
+        {
+          "tag": "INPUT",
+          "role": null,
+          "label": "Filter by mission ID (e.g. mis_abc123)... leave empty for all",
+          "disabled": false
+        },
+        {
+          "tag": "BUTTON",
+          "role": null,
+          "label": "Filter",
+          "disabled": false
+        }
+      ],
+      "details": [],
+      "sections": [],
+      "overflow": false
+    },
+    {
+      "route": "/compliance",
+      "final_url": "/compliance",
+      "title": "Sovereign Autonomy | Mission Control",
+      "headings": [
+        {
+          "level": "H1",
+          "text": "Compliance reports"
+        }
+      ],
+      "visible_text": "EVIDENCE\nCompliance reports\n\nA run's decisions mapped to ISO/IEC 42001, the EU AI Act and the NIST AI RMF, with hash-chain verification.\n\nBenchmarks & receipts\nCompliance reports\nAudit trail\nRUN\nrun_c1abee3b765b — running\nrun_84fa654ec55a — completed\nFRAMEWORK\nISO/IEC 42001:2023\nEU AI Act\nNIST AI RMF\n\nAI Management System Standard\n\nGenerate Report\n📋\n\nSelect a run and generate a compliance report\n\nReports include SHA-256 hash chain verification, policy violation analysis, and framework alignment (ISO 42001, EU AI Act, NIST AI RMF).",
+      "all_text": "EvidenceCompliance reportsA run's decisions mapped to ISO/IEC 42001, the EU AI Act and the NIST AI RMF, with hash-chain verification.Benchmarks & receiptsCompliance reportsAudit trailRunrun_c1abee3b765b — runningrun_84fa654ec55a — completedFrameworkISO/IEC 42001:2023EU AI ActNIST AI RMFAI Management System StandardGenerate Report📋Select a run and generate a compliance reportReports include SHA-256 hash chain verification, policy violation analysis, and framework alignment (ISO 42001, EU AI Act, NIST AI RMF).",
+      "links": [
+        {
+          "label": "Skip to content",
+          "href": "#main-content"
+        },
+        {
+          "label": "SovereignAUTONOMY",
+          "href": "/mission-control"
+        },
+        {
+          "label": "Mission control",
+          "href": "/mission-control"
+        },
+        {
+          "label": "Missions",
+          "href": "/missions"
+        },
+        {
+          "label": "Mission history",
+          "href": "/runs"
+        },
+        {
+          "label": "Trust & security",
+          "href": "/authority"
+        },
+        {
+          "label": "Governance",
+          "href": "/policies"
+        },
+        {
+          "label": "Evidence",
+          "href": "/evidence"
+        },
+        {
+          "label": "Explore the showcase",
+          "href": "/mission-control?showcase=1"
+        },
+        {
+          "label": "About the system",
+          "href": "/overview"
+        },
+        {
+          "label": "Benchmarks & receipts",
+          "href": "/evidence"
+        },
+        {
+          "label": "Compliance reports",
+          "href": "/compliance"
+        },
+        {
+          "label": "Audit trail",
+          "href": "/audit"
+        },
+        {
+          "label": "Return to mission control",
+          "href": "/mission-control"
+        }
+      ],
+      "controls": [
+        {
+          "tag": "SELECT",
+          "role": null,
+          "label": "run_c1abee3b765b — runningrun_84fa654ec55a — completed",
+          "disabled": false
+        },
+        {
+          "tag": "SELECT",
+          "role": null,
+          "label": "ISO/IEC 42001:2023EU AI ActNIST AI RMF",
+          "disabled": false
+        },
+        {
+          "tag": "BUTTON",
+          "role": null,
+          "label": "Generate Report",
+          "disabled": false
+        }
+      ],
+      "details": [],
+      "sections": [],
+      "overflow": false
+    },
+    {
+      "route": "/runs/run_c1abee3b765b",
+      "final_url": "/runs/run_c1abee3b765b",
+      "title": "Sovereign Autonomy | Mission Control",
+      "headings": [
+        {
+          "level": "H1",
+          "text": "Move to Q-01"
+        },
+        {
+          "level": "H2",
+          "text": "Execution authority"
+        },
+        {
+          "level": "H2",
+          "text": "Experience and environment"
+        },
+        {
+          "level": "H3",
+          "text": "Environment changes"
+        },
+        {
+          "level": "H3",
+          "text": "Task focus"
+        },
+        {
+          "level": "H3",
+          "text": "Lessons the planner was given"
+        },
+        {
+          "level": "H3",
+          "text": "Replans after a denial"
+        },
+        {
+          "level": "H3",
+          "text": "What this run taught the planner"
+        }
+      ],
+      "visible_text": "Runs\n/\nrun_c1abee3b765b\nMove to Q-01\nRUNNING\nLive polling\ngoal (18, 2.5)\nStop robot\nOperator oversight\nReason for intervention\nReplan and hold\nMISSION\nActive\nACTION VERDICT\nApproved\nENVIRONMENT\nHuman Near\nPLANNER\nSovereign Autonomy Approved\nEXECUTION\nWithin Bounds\nWAREHOUSE SIMULATION\nHeatmap\nTrail\n🚶\nHuman Near\n🛑\nToo Close\n🚧\nBlocked\n💧\nSpill\n🚜\nForklift\n✅\nClear\n3D warehouse\nFloor plan\n⛶ Fullscreen\nRobot\nObstacles\nHuman\nProposed Path\nApproved Plan\nExecuted Path\nGoal\nRisk Zone\nAI MISSION PLANNER\nAutonomous: ON\n✓\n1. Reasoning\n✓\n2. Plan\n✓\n3. Governance\n🚀\n4. Execute\n📋\n5. Audit\n🚀\nMission running autonomously\nThe robot is following the approved plan. Watch the map and chain-of-trust below for live progress.\nPLANNER'S REASONING\nPlan review passed · 4 checks\n\nRoute along the aisles to the destination.\n\nShow details\nWAYPOINT PLAN\n16 waypoints · hover one to find it on the map\n1: (6,22) @0.3\n2: (7,20) @0.3\n3: (7,18) @0.3\n4: (7,16) @0.3\n5: (7,14) @0.5\n6: (9,14) @0.5\n7: (11,13) @0.5\n8: (13,13) @0.5\n9: (14,12) @0.5\n10: (16,12) @0.5\n11: (18,11) @0.5\n12: (18,10) @0.3\n13: (18,8) @0.3\n14: (18,6) @0.3\n15: (18,4) @0.3\n16: (18,3) @0.3\nExecuting waypoints…\nGOVERNANCE DECISION\n✅\nAPPROVED\nExecution Risk: 0%\nScope:\nCurrent action only\nIntent:\nMOVE_TO\n→ (10.8, 13.3)\nPolicies:\n✓ 0 violations (11 active)\nALL 11 POLICIES PASSED\n0 denied · 0 constrained\n✓\nGEOFENCE_01\npos (17.4,11.3) inside boundary\n✓\nSAFE_SPEED_01\nspeed 0.00 m/s within corridor limit\n✓\nHUMAN_PROXIMITY_02\nhuman 1.9m away (>1m safe)\n✓\nHUMAN_CLEARANCE_02\nclearance 1.9m (>3m ideal)\n✓\nOBSTACLE_CLEARANCE_03\nobstacle 1.2m (>0.5m)\n✓\nUNCERTAINTY_04\nconfidence above threshold\n✓\nHITL_05\nno operator override required\n✓\nWORKER_PROXIMITY_06\nworker zone clear (1.9m)\n✓\nPATH_CLEARANCE_07\npath clear of racking\n✓\nHAZARD_EXCLUSION_08\nno hazard zones in force\n✓\nHAZARD_SLOW_09\nno hazard speed caps\nLearning & task\nSite & vision\nChain & telemetry\nAlerts0\nAnalysis\nEXECUTION AUTHORITY\nPermits enforced\nStop robot\nStop everything\n🎙 Voice stop\nStop robot-1\n0.00 m/s\nStop robot-2\n0.00 m/s\nStop robot-3\n0.00 m/s\nEXPERIENCE AND ENVIRONMENT\n\nPast experience is advisory. Current conditions decide whether it can be reused.\n\nShared routing requires two distinct robot identities. Repeated missions from one robot count as one source.\n\n10 eligible\n0 advisory\n0 excluded\nExperience checks\nEligible\nrobot-A (fixture)\n1732 s old\nbrowser-fixture-robot-A (fixture)-1793729403988751400:6:7:STOP:f94405df8da6888769ac04300de8071effefeeb6f93291569e5bc5796910876f:robot-A (fixture)\nContext and freshness checks passed\nEligible\nrobot-C (fixture)\n1732 s old\nbrowser-fixture-robot-C (fixture)-1793729404005398900:6:7:STOP:f94405df8da6888769ac04300de8071effefeeb6f93291569e5bc5796910876f:robot-C (fixture)\nContext and freshness checks passed\nEligible\nrobot-A (fixture)\n1588 s old\nbrowser-fixture-robot-A (fixture)-1793729548300036100:6:7:STOP:f94405df8da6888769ac04300de8071effefeeb6f93291569e5bc5796910876f:robot-A (fixture)\nContext and freshness checks passed\nEligible\nrobot-C (fixture)\n1588 s old\nbrowser-fixture-robot-C (fixture)-1793729548324035400:6:7:STOP:f94405df8da6888769ac04300de8071effefeeb6f93291569e5bc5796910876f:robot-C (fixture)\nContext and freshness checks passed\nEligible\nrobot-A (fixture)\n968 s old\nbrowser-fixture-robot-A (fixture)-1793730168552709300:6:7:STOP:f94405df8da6888769ac04300de8071effefeeb6f93291569e5bc5796910876f:robot-A (fixture)\nContext and freshness checks passed\nEligible\nrobot-C (fixture)\n968 s old\nbrowser-fixture-robot-C (fixture)-1793730168566195100:6:7:STOP:f94405df8da6888769ac04300de8071effefeeb6f93291569e5bc5796910876f:robot-C (fixture)\nContext and freshness checks passed\nEligible\nrobot-A (fixture)\n854 s old\nbrowser-fixture-robot-A (fixture)-1793730281815218500:6:7:STOP:f94405df8da6888769ac04300de8071effefeeb6f93291569e5bc5796910876f:robot-A (fixture)\nContext and freshness checks passed\nEligible\nrobot-C (fixture)\n854 s old\nbrowser-fixture-robot-C (fixture)-1793730281828737400:6:7:STOP:f94405df8da6888769ac04300de8071effefeeb6f93291569e5bc5796910876f:robot-C (fixture)\nContext and freshness checks passed\nEligible\nrobot-A (fixture)\n767 s old\nbrowser-fixture-robot-A (fixture)-1793730369013434500:6:7:STOP:f94405df8da6888769ac04300de8071effefeeb6f93291569e5bc5796910876f:robot-A (fixture)\nContext and freshness checks passed\nEligible\nrobot-C (fixture)\n767 s old\nbrowser-fixture-robot-C (fixture)-1793730369026434700:6:7:STOP:f94405df8da6888769ac04300de8071effefeeb6f93291569e5bc5796910876f:robot-C (fixture)\nContext and freshness checks passed\nEnvironment changes\n\nNo environment changes recorded.\n\nTASK FOCUS\n\nEach plan must end at the mission's destination without wandering, or the aisle route is used.\n\nNo plan checked yet.\nLESSONS THE PLANNER WAS GIVEN\n0\nNo lessons near this route yet. They come from earlier runs where the gate denied moves nearby.\nREPLANS AFTER A DENIAL\n0\nNo replans: the gate hasn't blocked the same waypoint three times.\nWHAT THIS RUN TAUGHT THE PLANNER\nLessons are distilled from the gate's decisions when the run ends.\nLessons only change what the planner proposes; the gate still judges every move. All lessons →\nAI INTELLIGENCE CONSOLE: SCENE ANALYSIS, TELEMETRY INSIGHTS, FAILURE DETECTION\n▾",
+      "all_text": "Runs/run_c1abee3b765bMove to Q-01runningLive pollinggoal (18, 2.5)Stop robotOperator oversightReason for interventionReplan and holdMissionActiveAction VerdictApprovedEnvironmentHuman NearPlannerSovereign Autonomy ApprovedExecutionWithin BoundsWarehouse SimulationHeatmapTrail🚶Human Near🛑Too Close🚧Blocked💧Spill🚜Forklift✅Clear3D warehouseFloor plan⛶ Fullscreen Robot Obstacles Human Proposed Path Approved Plan Executed Path Goal Risk ZoneAI Mission PlannerAutonomous: ON✓1. Reasoning✓2. Plan✓3. Governance🚀4. Execute📋5. Audit🚀Mission running autonomouslyThe robot is following the approved plan. Watch the map and chain-of-trust below for live progress.Planner's reasoningPlan review passed · 4 checksRoute along the aisles to the destination.Show detailsWaypoint plan16 waypoints · hover one to find it on the map1: (6,22) @0.32: (7,20) @0.33: (7,18) @0.34: (7,16) @0.35: (7,14) @0.56: (9,14) @0.57: (11,13) @0.58: (13,13) @0.59: (14,12) @0.510: (16,12) @0.511: (18,11) @0.512: (18,10) @0.313: (18,8) @0.314: (18,6) @0.315: (18,4) @0.316: (18,3) @0.3Executing waypoints…Governance Decision✅APPROVEDExecution Risk: 0%Scope:Current action onlyIntent:MOVE_TO→ (10.8, 13.3)Policies:✓ 0 violations (11 active)All 11 Policies Passed0 denied · 0 constrained✓GEOFENCE_01pos (17.4,11.3) inside boundary✓SAFE_SPEED_01speed 0.00 m/s within corridor limit✓HUMAN_PROXIMITY_02human 1.9m away (>1m safe)✓HUMAN_CLEARANCE_02clearance 1.9m (>3m ideal)✓OBSTACLE_CLEARANCE_03obstacle 1.2m (>0.5m)✓UNCERTAINTY_04confidence above threshold✓HITL_05no operator override required✓WORKER_PROXIMITY_06worker zone clear (1.9m)✓PATH_CLEARANCE_07path clear of racking✓HAZARD_EXCLUSION_08no hazard zones in force✓HAZARD_SLOW_09no hazard speed capsLearning & taskSite & visionChain & telemetryAlerts0AnalysisExecution authorityPermits enforcedStop robotStop everything🎙 Voice stopStop robot-10.00 m/sStop robot-20.00 m/sStop robot-30.00 m/sExperience and environmentPast experience is advisory. Current conditions decide whether it can be reused.Shared routing requires two distinct robot identities. Repeated missions from one robot count as one source.10 eligible0 advisory0 excludedExperience checksEligiblerobot-A (fixture)1732 s oldbrowser-fixture-robot-A (fixture)-1793729403988751400:6:7:STOP:f94405df8da6888769ac04300de8071effefeeb6f93291569e5bc5796910876f:robot-A (fixture)Context and freshness checks passedEligiblerobot-C (fixture)1732 s oldbrowser-fixture-robot-C (fixture)-1793729404005398900:6:7:STOP:f94405df8da6888769ac04300de8071effefeeb6f93291569e5bc5796910876f:robot-C (fixture)Context and freshness checks passedEligiblerobot-A (fixture)1588 s oldbrowser-fixture-robot-A (fixture)-1793729548300036100:6:7:STOP:f94405df8da6888769ac04300de8071effefeeb6f93291569e5bc5796910876f:robot-A (fixture)Context and freshness checks passedEligiblerobot-C (fixture)1588 s oldbrowser-fixture-robot-C (fixture)-1793729548324035400:6:7:STOP:f94405df8da6888769ac04300de8071effefeeb6f93291569e5bc5796910876f:robot-C (fixture)Context and freshness checks passedEligiblerobot-A (fixture)968 s oldbrowser-fixture-robot-A (fixture)-1793730168552709300:6:7:STOP:f94405df8da6888769ac04300de8071effefeeb6f93291569e5bc5796910876f:robot-A (fixture)Context and freshness checks passedEligiblerobot-C (fixture)968 s oldbrowser-fixture-robot-C (fixture)-1793730168566195100:6:7:STOP:f94405df8da6888769ac04300de8071effefeeb6f93291569e5bc5796910876f:robot-C (fixture)Context and freshness checks passedEligiblerobot-A (fixture)854 s oldbrowser-fixture-robot-A (fixture)-1793730281815218500:6:7:STOP:f94405df8da6888769ac04300de8071effefeeb6f93291569e5bc5796910876f:robot-A (fixture)Context and freshness checks passedEligiblerobot-C (fixture)854 s oldbrowser-fixture-robot-C (fixture)-1793730281828737400:6:7:STOP:f94405df8da6888769ac04300de8071effefeeb6f93291569e5bc5796910876f:robot-C (fixture)Context and freshness checks passedEligiblerobot-A (fixture)767 s oldbrowser-fixture-robot-A (fixture)-1793730369013434500:6:7:STOP:f94405df8da6888769ac04300de8071effefeeb6f93291569e5bc5796910876f:robot-A (fixture)Context and freshness checks passedEligiblerobot-C (fixture)767 s oldbrowser-fixture-robot-C (fixture)-1793730369026434700:6:7:STOP:f94405df8da6888769ac04300de8071effefeeb6f93291569e5bc5796910876f:robot-C (fixture)Context and freshness checks passedEnvironment changesNo environment changes recorded.Task focusEach plan must end at the mission's destination without wandering, or the aisle route is used.No plan checked yet.Lessons the planner was given0No lessons near this route yet. They come from earlier runs where the gate denied moves nearby.Replans after a denial0No replans: the gate hasn't blocked the same waypoint three times.What this run taught the plannerLessons are distilled from the gate's decisions when the run ends.Lessons only change what the planner proposes; the gate still judges every move. All lessons →AI Intelligence Console: scene analysis, telemetry insights, failure detection▾",
+      "links": [
+        {
+          "label": "Skip to content",
+          "href": "#main-content"
+        },
+        {
+          "label": "SovereignAUTONOMY",
+          "href": "/mission-control"
+        },
+        {
+          "label": "Mission control",
+          "href": "/mission-control"
+        },
+        {
+          "label": "Missions",
+          "href": "/missions"
+        },
+        {
+          "label": "Mission history",
+          "href": "/runs"
+        },
+        {
+          "label": "Trust & security",
+          "href": "/authority"
+        },
+        {
+          "label": "Governance",
+          "href": "/policies"
+        },
+        {
+          "label": "Evidence",
+          "href": "/evidence"
+        },
+        {
+          "label": "Explore the showcase",
+          "href": "/mission-control?showcase=1"
+        },
+        {
+          "label": "About the system",
+          "href": "/overview"
+        },
+        {
+          "label": "Runs",
+          "href": "/runs"
+        },
+        {
+          "label": "All lessons →",
+          "href": "/policies"
+        },
+        {
+          "label": "Return to mission control",
+          "href": "/mission-control"
+        }
+      ],
+      "controls": [
+        {
+          "tag": "BUTTON",
+          "role": null,
+          "label": "Stop robot",
+          "disabled": false
+        },
+        {
+          "tag": "TEXTAREA",
+          "role": null,
+          "label": "Reason for intervention",
+          "disabled": false
+        },
+        {
+          "tag": "BUTTON",
+          "role": null,
+          "label": "Replan and hold",
+          "disabled": true
+        },
+        {
+          "tag": "INPUT",
+          "role": null,
+          "label": null,
+          "disabled": false
+        },
+        {
+          "tag": "INPUT",
+          "role": null,
+          "label": null,
+          "disabled": false
+        },
+        {
+          "tag": "BUTTON",
+          "role": null,
+          "label": "🚶Human Near",
+          "disabled": false
+        },
+        {
+          "tag": "BUTTON",
+          "role": null,
+          "label": "🛑Too Close",
+          "disabled": false
+        },
+        {
+          "tag": "BUTTON",
+          "role": null,
+          "label": "🚧Blocked",
+          "disabled": false
+        },
+        {
+          "tag": "BUTTON",
+          "role": null,
+          "label": "💧Spill",
+          "disabled": false
+        },
+        {
+          "tag": "BUTTON",
+          "role": null,
+          "label": "🚜Forklift",
+          "disabled": false
+        },
+        {
+          "tag": "BUTTON",
+          "role": null,
+          "label": "✅Clear",
+          "disabled": false
+        },
+        {
+          "tag": "BUTTON",
+          "role": null,
+          "label": "3D warehouse",
+          "disabled": false
+        },
+        {
+          "tag": "BUTTON",
+          "role": null,
+          "label": "Floor plan",
+          "disabled": false
+        },
+        {
+          "tag": "BUTTON",
+          "role": null,
+          "label": "⛶ Fullscreen",
+          "disabled": false
+        },
+        {
+          "tag": "BUTTON",
+          "role": null,
+          "label": "Autonomous: ON",
+          "disabled": false
+        },
+        {
+          "tag": "BUTTON",
+          "role": null,
+          "label": "Show details",
+          "disabled": false
+        },
+        {
+          "tag": "BUTTON",
+          "role": "tab",
+          "label": "Learning & task",
+          "disabled": false
+        },
+        {
+          "tag": "BUTTON",
+          "role": "tab",
+          "label": "Site & vision",
+          "disabled": false
+        },
+        {
+          "tag": "BUTTON",
+          "role": "tab",
+          "label": "Chain & telemetry",
+          "disabled": false
+        },
+        {
+          "tag": "BUTTON",
+          "role": "tab",
+          "label": "Alerts0",
+          "disabled": false
+        },
+        {
+          "tag": "BUTTON",
+          "role": "tab",
+          "label": "Analysis",
+          "disabled": false
+        },
+        {
+          "tag": "BUTTON",
+          "role": null,
+          "label": "Stop robot",
+          "disabled": false
+        },
+        {
+          "tag": "BUTTON",
+          "role": null,
+          "label": "Stop everything",
+          "disabled": false
+        },
+        {
+          "tag": "BUTTON",
+          "role": null,
+          "label": "🎙 Voice stop",
+          "disabled": false
+        },
+        {
+          "tag": "BUTTON",
+          "role": null,
+          "label": "Stop robot-10.00 m/s",
+          "disabled": false
+        },
+        {
+          "tag": "BUTTON",
+          "role": null,
+          "label": "Stop robot-20.00 m/s",
+          "disabled": false
+        },
+        {
+          "tag": "BUTTON",
+          "role": null,
+          "label": "Stop robot-30.00 m/s",
+          "disabled": false
+        },
+        {
+          "tag": "SUMMARY",
+          "role": null,
+          "label": "Experience checks",
+          "disabled": false
+        },
+        {
+          "tag": "BUTTON",
+          "role": null,
+          "label": "AI Intelligence Console: scene analysis, telemetry insights, failure detection▾",
+          "disabled": false
+        }
+      ],
+      "details": [
+        {
+          "open": true,
+          "label": "Experience checks"
+        }
+      ],
+      "sections": [],
+      "overflow": false
+    }
+  ],
+  "errors": [],
+  "non_get_requests": [
+    {
+      "method": "POST",
+      "url": "/api/auth/dev-token?role=admin"
+    }
+  ]
+}

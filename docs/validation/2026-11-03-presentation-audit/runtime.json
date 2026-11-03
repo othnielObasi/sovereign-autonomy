@@ -1,0 +1,850 @@
+{
+  "health": {
+    "status": "ok",
+    "environment": "development",
+    "gemini_enabled": false,
+    "site": "pharma",
+    "muse_enabled": false,
+    "muse_open_enabled": false,
+    "vision_provider": null,
+    "voice_enabled": false,
+    "planner_provider": "fallback",
+    "version": "0.1.0",
+    "checks": {
+      "database": "ok",
+      "simulator": "ok"
+    }
+  },
+  "world": {
+    "site": {
+      "name": "pharma",
+      "title": "Meridian Life Sciences"
+    },
+    "site_id": "sovereign-cleanroom",
+    "map_version": "d48c88b6780cad9ac9561775c2ba096449d6bdd8cd57a7f49f3205274b419832",
+    "capability_profile_version": "sim-amr-radius-0.4m-v1",
+    "geofence": {
+      "min_x": 0.0,
+      "max_x": 36.0,
+      "min_y": 0.0,
+      "max_y": 26.0
+    },
+    "zones": [
+      {
+        "name": "corridor",
+        "rect": {
+          "min_x": 0.0,
+          "max_x": 36.0,
+          "min_y": 10.8,
+          "max_y": 15.2
+        }
+      },
+      {
+        "name": "aisle",
+        "rect": {
+          "min_x": 1.0,
+          "max_x": 11.0,
+          "min_y": 1.5,
+          "max_y": 10.5
+        }
+      },
+      {
+        "name": "staging",
+        "rect": {
+          "min_x": 12.5,
+          "max_x": 23.5,
+          "min_y": 1.5,
+          "max_y": 10.5
+        }
+      },
+      {
+        "name": "staging",
+        "rect": {
+          "min_x": 25.0,
+          "max_x": 35.0,
+          "min_y": 1.5,
+          "max_y": 10.5
+        }
+      },
+      {
+        "name": "staging",
+        "rect": {
+          "min_x": 1.0,
+          "max_x": 11.0,
+          "min_y": 15.5,
+          "max_y": 24.5
+        }
+      },
+      {
+        "name": "staging",
+        "rect": {
+          "min_x": 13.0,
+          "max_x": 23.0,
+          "min_y": 15.5,
+          "max_y": 24.5
+        }
+      },
+      {
+        "name": "staging",
+        "rect": {
+          "min_x": 25.0,
+          "max_x": 35.0,
+          "min_y": 15.5,
+          "max_y": 24.5
+        }
+      }
+    ],
+    "obstacles": [
+      {
+        "x": 30.67,
+        "y": 12.75,
+        "r": 1.9,
+        "type": "forklift",
+        "heading": 3.142
+      }
+    ],
+    "human": {
+      "x": 5.75,
+      "y": 2.25
+    },
+    "walking_humans": [
+      {
+        "x": 5.75,
+        "y": 2.25,
+        "name": "Worker A",
+        "type": "worker",
+        "role": "worker",
+        "conf": 0.9,
+        "speed": 0.0,
+        "heading": 1.268,
+        "activity": "working",
+        "destination": "C-01"
+      },
+      {
+        "x": 20.75,
+        "y": 16.75,
+        "name": "Runner 1",
+        "type": "worker",
+        "role": "worker",
+        "conf": 0.9,
+        "speed": 0.0,
+        "heading": 0.0,
+        "activity": "waiting_at_crossing",
+        "destination": "Crossing destination"
+      },
+      {
+        "x": 3.64,
+        "y": 11.95,
+        "name": "Runner 2",
+        "type": "worker",
+        "role": "worker",
+        "conf": 0.9,
+        "speed": 1.081,
+        "heading": -2.678,
+        "activity": "walking",
+        "destination": "Crossing destination"
+      },
+      {
+        "x": 19.62,
+        "y": 15.77,
+        "name": "Runner 3",
+        "type": "worker",
+        "role": "worker",
+        "conf": 0.9,
+        "speed": 0.0,
+        "heading": 0.054,
+        "activity": "blocked_by_obstacle",
+        "destination": "Crossing destination"
+      }
+    ],
+    "idle_robots": [],
+    "bays": [
+      {
+        "id": "C-01",
+        "x": 6,
+        "y": 2.5,
+        "side": "floor",
+        "type": "pick",
+        "label": "Cold storage"
+      },
+      {
+        "id": "Q-01",
+        "x": 18,
+        "y": 2.5,
+        "side": "floor",
+        "type": "qc",
+        "label": "Quality lab"
+      },
+      {
+        "id": "F-01",
+        "x": 30,
+        "y": 2.5,
+        "side": "floor",
+        "type": "line",
+        "label": "Formulation"
+      },
+      {
+        "id": "G-01",
+        "x": 6,
+        "y": 23.5,
+        "side": "floor",
+        "type": "dock",
+        "label": "Gowning"
+      },
+      {
+        "id": "R-01",
+        "x": 18,
+        "y": 23.5,
+        "side": "floor",
+        "type": "qc",
+        "label": "Research lab"
+      },
+      {
+        "id": "P-01",
+        "x": 30,
+        "y": 23.5,
+        "side": "floor",
+        "type": "line",
+        "label": "Packaging"
+      }
+    ],
+    "racks": [
+      {
+        "id": "north-partition-0",
+        "kind": "partition",
+        "label": "Glass partition",
+        "x1": 1,
+        "x2": 4.5,
+        "y": 10.5,
+        "depth": 0.18,
+        "levels": 1
+      },
+      {
+        "id": "north-partition-1",
+        "kind": "partition",
+        "label": "Glass partition",
+        "x1": 8.5,
+        "x2": 11.5,
+        "y": 10.5,
+        "depth": 0.18,
+        "levels": 1
+      },
+      {
+        "id": "north-partition-2",
+        "kind": "partition",
+        "label": "Glass partition",
+        "x1": 12.3,
+        "x2": 16,
+        "y": 10.5,
+        "depth": 0.18,
+        "levels": 1
+      },
+      {
+        "id": "north-partition-3",
+        "kind": "partition",
+        "label": "Glass partition",
+        "x1": 20,
+        "x2": 23.5,
+        "y": 10.5,
+        "depth": 0.18,
+        "levels": 1
+      },
+      {
+        "id": "north-partition-4",
+        "kind": "partition",
+        "label": "Glass partition",
+        "x1": 24.3,
+        "x2": 28,
+        "y": 10.5,
+        "depth": 0.18,
+        "levels": 1
+      },
+      {
+        "id": "north-partition-5",
+        "kind": "partition",
+        "label": "Glass partition",
+        "x1": 32,
+        "x2": 35,
+        "y": 10.5,
+        "depth": 0.18,
+        "levels": 1
+      },
+      {
+        "id": "south-partition-0",
+        "kind": "partition",
+        "label": "Glass partition",
+        "x1": 1,
+        "x2": 4.5,
+        "y": 15.3,
+        "depth": 0.18,
+        "levels": 1
+      },
+      {
+        "id": "south-partition-1",
+        "kind": "partition",
+        "label": "Glass partition",
+        "x1": 8.5,
+        "x2": 11.5,
+        "y": 15.3,
+        "depth": 0.18,
+        "levels": 1
+      },
+      {
+        "id": "south-partition-2",
+        "kind": "partition",
+        "label": "Glass partition",
+        "x1": 12.3,
+        "x2": 16,
+        "y": 15.3,
+        "depth": 0.18,
+        "levels": 1
+      },
+      {
+        "id": "south-partition-3",
+        "kind": "partition",
+        "label": "Glass partition",
+        "x1": 20,
+        "x2": 23.5,
+        "y": 15.3,
+        "depth": 0.18,
+        "levels": 1
+      },
+      {
+        "id": "south-partition-4",
+        "kind": "partition",
+        "label": "Glass partition",
+        "x1": 24.3,
+        "x2": 28,
+        "y": 15.3,
+        "depth": 0.18,
+        "levels": 1
+      },
+      {
+        "id": "south-partition-5",
+        "kind": "partition",
+        "label": "Glass partition",
+        "x1": 32,
+        "x2": 35,
+        "y": 15.3,
+        "depth": 0.18,
+        "levels": 1
+      },
+      {
+        "id": "north-divider-12",
+        "kind": "partition",
+        "label": "Glass partition",
+        "x1": 12,
+        "x2": 12.18,
+        "y": 1,
+        "depth": 9,
+        "levels": 1
+      },
+      {
+        "id": "south-divider-12",
+        "kind": "partition",
+        "label": "Glass partition",
+        "x1": 12,
+        "x2": 12.18,
+        "y": 16,
+        "depth": 9,
+        "levels": 1
+      },
+      {
+        "id": "north-divider-24",
+        "kind": "partition",
+        "label": "Glass partition",
+        "x1": 24,
+        "x2": 24.18,
+        "y": 1,
+        "depth": 9,
+        "levels": 1
+      },
+      {
+        "id": "south-divider-24",
+        "kind": "partition",
+        "label": "Glass partition",
+        "x1": 24,
+        "x2": 24.18,
+        "y": 16,
+        "depth": 9,
+        "levels": 1
+      },
+      {
+        "id": "cold-west-bench",
+        "kind": "bench",
+        "x1": 2,
+        "x2": 4,
+        "y": 3.5,
+        "depth": 4
+      },
+      {
+        "id": "cold-east-bench",
+        "kind": "bench",
+        "x1": 8,
+        "x2": 10,
+        "y": 3.5,
+        "depth": 4
+      },
+      {
+        "id": "quality-west-bench",
+        "kind": "bench",
+        "x1": 14,
+        "x2": 16,
+        "y": 3.5,
+        "depth": 4
+      },
+      {
+        "id": "quality-east-bench",
+        "kind": "bench",
+        "x1": 20,
+        "x2": 22,
+        "y": 3.5,
+        "depth": 4
+      },
+      {
+        "id": "formulation-west-bench",
+        "kind": "bench",
+        "x1": 26,
+        "x2": 28,
+        "y": 3.5,
+        "depth": 4
+      },
+      {
+        "id": "formulation-east-bench",
+        "kind": "bench",
+        "x1": 32,
+        "x2": 34,
+        "y": 3.5,
+        "depth": 4
+      },
+      {
+        "id": "gowning-west-bench",
+        "kind": "bench",
+        "x1": 2,
+        "x2": 4,
+        "y": 17.5,
+        "depth": 4
+      },
+      {
+        "id": "gowning-east-bench",
+        "kind": "bench",
+        "x1": 8,
+        "x2": 10,
+        "y": 17.5,
+        "depth": 4
+      },
+      {
+        "id": "research-west-bench",
+        "kind": "bench",
+        "x1": 14,
+        "x2": 16,
+        "y": 17.5,
+        "depth": 4
+      },
+      {
+        "id": "research-east-bench",
+        "kind": "bench",
+        "x1": 20,
+        "x2": 22,
+        "y": 17.5,
+        "depth": 4
+      },
+      {
+        "id": "packaging-west-bench",
+        "kind": "bench",
+        "x1": 26,
+        "x2": 28,
+        "y": 17.5,
+        "depth": 4
+      },
+      {
+        "id": "packaging-east-bench",
+        "kind": "bench",
+        "x1": 32,
+        "x2": 34,
+        "y": 17.5,
+        "depth": 4
+      }
+    ],
+    "features": [
+      {
+        "type": "room",
+        "id": "cold",
+        "label": "Cold storage",
+        "x": 6,
+        "y": 6,
+        "width": 10,
+        "depth": 9,
+        "tone": "#e5eeef"
+      },
+      {
+        "type": "room",
+        "id": "qc",
+        "label": "Quality lab",
+        "x": 18,
+        "y": 6,
+        "width": 11,
+        "depth": 9,
+        "tone": "#e9eddf"
+      },
+      {
+        "type": "room",
+        "id": "formulation",
+        "label": "Formulation",
+        "x": 30,
+        "y": 6,
+        "width": 10,
+        "depth": 9,
+        "tone": "#ede8df"
+      },
+      {
+        "type": "room",
+        "id": "gowning",
+        "label": "Gowning",
+        "x": 6,
+        "y": 20,
+        "width": 10,
+        "depth": 9,
+        "tone": "#e5eade"
+      },
+      {
+        "type": "room",
+        "id": "research",
+        "label": "Research lab",
+        "x": 18,
+        "y": 20,
+        "width": 10,
+        "depth": 9,
+        "tone": "#e4ebed"
+      },
+      {
+        "type": "room",
+        "id": "packaging",
+        "label": "Packaging",
+        "x": 30,
+        "y": 20,
+        "width": 10,
+        "depth": 9,
+        "tone": "#e9e6dc"
+      }
+    ],
+    "hotspots": [
+      {
+        "x": 6.5,
+        "y": 11.8
+      },
+      {
+        "x": 18,
+        "y": 12.5
+      },
+      {
+        "x": 29.5,
+        "y": 14
+      },
+      {
+        "x": 10,
+        "y": 13
+      },
+      {
+        "x": 22,
+        "y": 13
+      },
+      {
+        "x": 18,
+        "y": 16.7
+      }
+    ],
+    "mode": "live",
+    "seed": 42
+  },
+  "policies": [
+    {
+      "policy_id": "GEOFENCE_01",
+      "name": "Geofence enforcement",
+      "description": "Deny actions if robot or destination is outside the allowed operating area.",
+      "severity": "HIGH",
+      "parameters": {
+        "min_x": 0.0,
+        "max_x": 40.0,
+        "min_y": 0.0,
+        "max_y": 25.0
+      },
+      "trigger": "Robot position or destination outside boundary",
+      "action": "STOP"
+    },
+    {
+      "policy_id": "SAFE_SPEED_01",
+      "name": "Zone speed limit",
+      "description": "Enforce maximum speed per zone type. Aisle, corridor, and loading bay each have distinct limits.",
+      "severity": "HIGH",
+      "parameters": {
+        "aisle_limit_ms": 0.5,
+        "corridor_limit_ms": 0.7,
+        "loading_bay_limit_ms": 0.4
+      },
+      "trigger": "Proposed speed exceeds zone limit",
+      "action": "SLOW"
+    },
+    {
+      "policy_id": "HUMAN_PROXIMITY_02",
+      "name": "Human proximity enforcement",
+      "description": "Enforce SLOW when a human or worker is within the slow radius, STOP within the stop radius.",
+      "severity": "HIGH",
+      "parameters": {
+        "slow_radius_m": 3.0,
+        "stop_radius_m": 1.0,
+        "max_speed_near_human_ms": 0.4
+      },
+      "trigger": "Human/worker within proximity radius",
+      "action": "STOP if < 1m, SLOW if < 3m"
+    },
+    {
+      "policy_id": "HUMAN_CLEARANCE_02",
+      "name": "Human confidence speed check",
+      "description": "Deny unsafe speed when a human is detected with high confidence and speed exceeds safe limit.",
+      "severity": "HIGH",
+      "parameters": {
+        "min_confidence": 0.65,
+        "max_speed_near_human_ms": 0.4
+      },
+      "trigger": "Human detected (conf >= 0.65) and speed too high",
+      "action": "SLOW"
+    },
+    {
+      "policy_id": "OBSTACLE_CLEARANCE_03",
+      "name": "Obstacle clearance",
+      "description": "Deny motion if nearest obstacle is below the minimum clearance distance.",
+      "severity": "HIGH",
+      "parameters": {
+        "min_clearance_m": 0.5
+      },
+      "trigger": "Obstacle distance < 0.5m",
+      "action": "REPLAN"
+    },
+    {
+      "policy_id": "UNCERTAINTY_04",
+      "name": "Perception uncertainty gate",
+      "description": "Flag risky actions when human detection confidence is below the threshold.",
+      "severity": "MEDIUM",
+      "parameters": {
+        "min_human_confidence": 0.65,
+        "min_confidence_for_move": 0.55
+      },
+      "trigger": "Human detected but confidence < 65%",
+      "action": "SLOW + operator review"
+    },
+    {
+      "policy_id": "HITL_05",
+      "name": "Human-in-the-loop trigger",
+      "description": "Escalate to operator review when aggregate risk score exceeds the threshold.",
+      "severity": "HIGH",
+      "parameters": {
+        "risk_threshold": 0.75
+      },
+      "trigger": "Risk score >= 0.75",
+      "action": "NEEDS_REVIEW (operator escalation)"
+    },
+    {
+      "policy_id": "WORKER_PROXIMITY_06",
+      "name": "Walking worker proximity",
+      "description": "Enforce SLOW/STOP when walking warehouse workers (separate from primary human detection) are within proximity radius.",
+      "severity": "HIGH",
+      "parameters": {
+        "slow_radius_m": 3.0,
+        "stop_radius_m": 1.0
+      },
+      "trigger": "Walking worker within proximity radius",
+      "action": "STOP if < 1m, SLOW if < 3m"
+    },
+    {
+      "policy_id": "PATH_CLEARANCE_07",
+      "name": "Path clearance",
+      "description": "Deny a move whose straight path runs through permanent racking, so the robot replans along the aisles before it starts instead of being stopped when already close.",
+      "severity": "HIGH",
+      "parameters": {
+        "robot_radius_m": 0.4,
+        "path_margin_m": 0.6
+      },
+      "trigger": "Straight path to the target passes within 0.2 m of racking (robot body)",
+      "action": "REPLAN"
+    },
+    {
+      "policy_id": "HAZARD_EXCLUSION_08",
+      "name": "Hazard exclusion zone",
+      "description": "Deny a move that would enter or cross a temporary exclusion zone round a hazard such as a spill. Every spill gets a baseline zone at once; corroborated guidance from authoritative sources (via Tavily, screened as untrusted) can only enlarge it. A robot already inside may only back out, slowly.",
+      "severity": "HIGH",
+      "parameters": {
+        "baseline_radius_m": 1.2,
+        "max_radius_m": 6.0,
+        "corroborating_sources": 2
+      },
+      "trigger": "Path to the target passes within the zone radius, or the robot is inside and not leaving",
+      "action": "REPLAN"
+    },
+    {
+      "policy_id": "HAZARD_SLOW_09",
+      "name": "Hazard slow zone",
+      "description": "Cap speed near a hazard zone. Limits come from reviewed per-hazard rules (0.2 to 0.3 m/s), never from outside text.",
+      "severity": "MEDIUM",
+      "parameters": {
+        "max_speed_range": "0.1 to 0.3"
+      },
+      "trigger": "Robot or path within the slow radius above the zone's speed cap",
+      "action": "SLOW"
+    }
+  ],
+  "run_status": {
+    "id": "run_c1abee3b765b",
+    "mission_id": "mis_651a1311106a",
+    "status": "running",
+    "started_at": "2026-11-03T18:38:55.897809",
+    "ended_at": null
+  },
+  "recent_event_summary": [
+    {
+      "id": "evt_6d4f9c4d6131",
+      "ts": "2026-11-03T18:50:01.068480",
+      "type": "EXECUTION",
+      "event": null,
+      "reason": null,
+      "governance": null,
+      "result": {
+        "ok": false,
+        "rejected": true,
+        "reason": "trajectory_obstacle_clearance"
+      }
+    },
+    {
+      "id": "evt_718d9cab8374",
+      "ts": "2026-11-03T18:50:01.085370",
+      "type": "ALERT",
+      "event": "execution_unverified",
+      "reason": null,
+      "governance": null,
+      "result": null
+    },
+    {
+      "id": "evt_85ce1ec7b3ed",
+      "ts": "2026-11-03T18:50:02.120156",
+      "type": "STAGNATION",
+      "event": null,
+      "reason": "Robot movement below threshold",
+      "governance": null,
+      "result": null
+    },
+    {
+      "id": "evt_a7cb9d2b01cc",
+      "ts": "2026-11-03T18:50:02.136142",
+      "type": "DECISION",
+      "event": null,
+      "reason": null,
+      "governance": {
+        "decision": "APPROVED",
+        "policy_hits": [],
+        "reasons": [],
+        "required_action": null,
+        "risk_score": 0.0,
+        "policy_state": "SAFE",
+        "hard_fail": false,
+        "hard_fail_policies": []
+      },
+      "result": null
+    },
+    {
+      "id": "evt_0b36bf6af654",
+      "ts": "2026-11-03T18:50:02.164535",
+      "type": "ALERT",
+      "event": "runtime_integrity",
+      "reason": null,
+      "governance": null,
+      "result": null
+    },
+    {
+      "id": "evt_d3516cb90b76",
+      "ts": "2026-11-03T18:50:02.185965",
+      "type": "AUTHORITY",
+      "event": "permit_refused",
+      "reason": "trajectory_obstacle_clearance",
+      "governance": null,
+      "result": null
+    },
+    {
+      "id": "evt_0023d3f07f5b",
+      "ts": "2026-11-03T18:50:02.202670",
+      "type": "EXECUTION",
+      "event": null,
+      "reason": null,
+      "governance": null,
+      "result": {
+        "ok": false,
+        "rejected": true,
+        "reason": "trajectory_obstacle_clearance"
+      }
+    },
+    {
+      "id": "evt_9b234f65df30",
+      "ts": "2026-11-03T18:50:02.224280",
+      "type": "ALERT",
+      "event": "execution_unverified",
+      "reason": null,
+      "governance": null,
+      "result": null
+    }
+  ],
+  "site_intel_status": {
+    "tavily_live": false,
+    "tavily_configured": false,
+    "lookup_state": "offline",
+    "mode": "Offline samples (no Tavily key configured)",
+    "trusted_domains": [
+      "hse.gov.uk",
+      "gov.uk",
+      "osha.gov",
+      "cdc.gov",
+      "epa.gov",
+      "noaa.gov",
+      "echa.europa.eu",
+      "europa.eu",
+      "pubchem.ncbi.nlm.nih.gov",
+      "nih.gov",
+      "who.int",
+      "ilo.org",
+      "ccohs.ca",
+      "safeworkaustralia.gov.au"
+    ],
+    "corroboration_required": 2,
+    "class_rules": {
+      "toxic_vapour": {
+        "radius_m": 5.0,
+        "slow_radius_m": 8.0,
+        "max_speed": 0.2
+      },
+      "flammable": {
+        "radius_m": 3.0,
+        "slow_radius_m": 6.0,
+        "max_speed": 0.2
+      },
+      "oxidiser": {
+        "radius_m": 2.5,
+        "slow_radius_m": 5.0,
+        "max_speed": 0.3
+      },
+      "corrosive": {
+        "radius_m": 2.0,
+        "slow_radius_m": 4.0,
+        "max_speed": 0.3
+      },
+      "slippery": {
+        "radius_m": 1.5,
+        "slow_radius_m": 3.0,
+        "max_speed": 0.3
+      }
+    },
+    "baseline": {
+      "radius_m": 1.2,
+      "slow_radius_m": 3.0,
+      "max_speed": 0.3
+    },
+    "active_constraints": []
+  }
+}
