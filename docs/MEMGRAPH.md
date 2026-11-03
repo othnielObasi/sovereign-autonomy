@@ -23,8 +23,23 @@ exact site, map, policy and capability versions. The graph stores references and
 structured observations, without model prompts, credentials or bulletin prose.
 
 Use **Trust & security → Operational knowledge graph** (`/authority`) to choose a
-finished run, sync evidence and expand its verified connections. The panel shows
-robot/location, decision/policy and source event/receipt IDs. The history API can
+finished run and explore its interactive node-and-arrow plot. **Mission overview**
+groups repeated decisions, observed cells and triggered policies. **Inspect a
+decision** follows one actual observation to its robot, location and policy hits.
+Selecting a node highlights its immediate relationships and opens the supporting
+records below. Enter/Space selects, Escape clears, and zoom/Fit view controls
+stay inside the plot. The layout switches to narrow-screen branches on phones.
+
+Filter approved versus blocked/review observations, then use the decision picker
+to inspect an event, receipt, timestamp, integrity hash and version context. The
+mission selector uses the mission title when available. Full identifiers remain
+in the evidence inspector and original table. Group counts describe the retrieved
+sample, capped at 30 by the workspace. A run with no policy hits does not acquire
+an invented policy node. The plot displays historical evidence, not a live
+execution controller. Its stable layout has no force simulation or external graph
+visualization dependency.
+
+The original connection table is retained below the plot. The history API can
 also find observations near a coordinate in an exact compatible context and
 return policy counts for the bounded sample.
 

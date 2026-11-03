@@ -1,0 +1,52 @@
+.explorer { margin: 1rem 0; color: #0f172a; }
+.toolbar, .graphFooter, .inspectorHeading, .evidenceActions { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: .75rem; }
+.toolbar label, .decisionPicker { display: flex; flex-direction: column; gap: .35rem; font-size: .8rem; color: #334155; }
+.toolbar select, .decisionPicker select { padding: .55rem .65rem; background: white; border: 1px solid #b4c5d6; border-radius: .5rem; color: #0f172a; max-width: 100%; font-size: .85rem; }
+.decisionPicker { margin-top: .8rem; }
+.modes { display: flex; flex-wrap: wrap; border: 1px solid #b4c5d6; border-radius: .6rem; padding: .2rem; gap: .2rem; background: #f1f5f9; }
+.explorer button { cursor: pointer; border-radius: .4rem; font-size: .8rem; padding: .5rem .65rem; color: #334155; }
+.explorer button:disabled { opacity: .45; cursor: default; }
+.modes button[aria-pressed="true"] { background: #0f766e; color: white; }
+.explorer button:focus-visible, .explorer select:focus-visible, .explorer summary:focus-visible, .viewport:focus-visible { outline: 3px solid #0f766e; outline-offset: 3px; }
+.help { font-size: .85rem; color: #475569; margin: .8rem 0; line-height: 1.5; }
+.viewport { border: 1px solid #cbd5e1; border-radius: .8rem; overflow: auto; background-color: #f8fafc; background-image: radial-gradient(#d6e0ea 1px, transparent 1px); background-size: 18px 18px; }
+.graph { display: block; max-width: none; height: auto; min-width: 0; }
+.node { cursor: pointer; outline: none; }
+.node:hover rect, .node:focus-visible rect { stroke-width: 3.5; }
+.node:focus-visible rect { stroke: #0f172a; stroke-dasharray: 5 3; }
+.kind { font-size: 13px; font-weight: 700; letter-spacing: .3px; }
+.nodeTitle { font-size: 16px; font-weight: 650; }
+.nodeDetail { font-size: 14px; }
+.edgeLabel { font-size: 14px; fill: #475569; paint-order: stroke; stroke: #f8fafc; stroke-width: 5px; stroke-linejoin: round; }
+.graphFooter { font-size: .75rem; color: #475569; margin: .6rem 0; }
+.graphFooter > div { display: flex; align-items: center; gap: .2rem; }
+.graphFooter button { border: 1px solid #cbd5e1; background: white; min-height: 36px; min-width: 36px; }
+.noPolicy { border-left: 3px solid #16a34a; padding: .5rem .75rem; font-size: .8rem; background: #f0fdf4; color: #166534; line-height: 1.5; }
+.noMatch { padding: 3rem 1rem; text-align: center; font-size: .9rem; }
+.noMatch p { margin: .5rem 0; color: #475569; }
+.noMatch button { background: #0f766e; color: white; }
+.inspector { margin-top: .8rem; border: 1px solid #cbd5e1; border-radius: .75rem; padding: 1rem; background: white; font-size: .85rem; line-height: 1.6; overflow-wrap: anywhere; }
+.inspectorHeading { align-items: start; margin-bottom: .6rem; }
+.inspectorHeading span { font-size: .7rem; text-transform: uppercase; color: #64748b; letter-spacing: .08em; }
+.inspectorHeading h3 { font-size: 1rem; font-weight: 650; margin-top: .15rem; }
+.inspectorHeading button { border: 1px solid #cbd5e1; }
+.evidenceList { display: grid; gap: .6rem; margin-top: .75rem; }
+.evidence { padding: .75rem; border: 1px solid #dbe3ec; border-radius: .6rem; background: #f8fafc; }
+.timestamp, .sampleNote { font-size: .75rem; color: #475569; }
+.evidence > code { font-size: .75rem; color: #475569; }
+.evidenceActions { justify-content: start; margin-top: .5rem; }
+.evidenceActions button { background: #e2eeec; color: #115e59; }
+.evidenceActions a { color: #115e59; text-decoration: underline; font-size: .8rem; }
+.evidence details { margin-top: .5rem; }
+.evidence summary { cursor: pointer; color: #334155; }
+.evidence dl { font-size: .75rem; margin: .5rem 0; }
+.evidence dt { color: #64748b; text-transform: capitalize; }
+.evidence dd { margin: 0 0 .4rem; }
+.sampleNote { margin-top: .7rem; }
+@media (max-width: 640px) {
+  .toolbar { align-items: stretch; }
+  .toolbar > *, .toolbar select { width: 100%; }
+  .modes button { flex: 1; min-height: 42px; }
+  .graphFooter { align-items: start; }
+  .inspector { padding: .75rem; }
+}

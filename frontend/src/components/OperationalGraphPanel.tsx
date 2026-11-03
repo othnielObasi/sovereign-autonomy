@@ -2,25 +2,25 @@
 
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
-import { getKnowledgeStatus, getKnowledgeRun, listRuns, syncKnowledge } from '@/lib/api';
+import { getKnowledgeStatus, getKnowledgeRun, listRuns, listMissions, syncKnowledge } from '@/lib/api';
 import { Button, Empty, Notice, Panel, Pill } from '@/components/ui';
-
-type Fact = { event_id: string; run_id: string; robot_id: string; x: number; y: number;
-  decision: string; policy_hits: string[]; context: { site_id: string }; receipt_id: number };
+import { KnowledgeGraph, KnowledgeFact } from '@/components/KnowledgeGraph';
 
 export function OperationalGraphPanel() {
   const [status, setStatus] = useState<any>(null);
   const [runs, setRuns] = useState<any[]>([]);
   const [selected, setSelected] = useState('');
-  const [history, setHistory] = useState<{ facts: Fact[]; excluded: number } | null>(null);
+  const [missionTitles, setMissionTitles] = useState<Record<string, string>>({});
+  const [history, setHistory] = useState<{ facts: KnowledgeFact[]; excluded: number } | null>(null);
   const [error, setError] = useState('');
   const [busy, setBusy] = useState(false);
   const [revision, setRevision] = useState(0);
   useEffect(() => {
     let active = true;
-    Promise.all([getKnowledgeStatus(), listRuns()]).then(([s, r]) => {
+    Promise.all([getKnowledgeStatus(), listRuns(), listMissions().catch(() => [])]).then(([s, r, missions]) => {
       if (!active) return;
       setStatus(s);
+      setMissionTitles(Object.fromEntries(missions.map((m: any) => [m.id, m.title])));
       const terminal = r.filter((run: any) => ['completed', 'stopped', 'failed', 'failed_safety'].includes(run.status));
       setRuns(terminal);
       setSelected(value => value || terminal[0]?.id || '');
@@ -55,16 +55,15 @@ export function OperationalGraphPanel() {
           <select aria-label="Knowledge graph run" value={selected} onChange={e => setSelected(e.target.value)}
             className="mt-1 block w-full rounded-lg border border-mc-line bg-mc-panel p-2 text-mc-ink">
             {!runs.length && <option value="">No finished runs</option>}
-            {runs.map(run => <option key={run.id} value={run.id}>{run.id} · {run.status}</option>)}
+            {runs.map(run => <option key={run.id} value={run.id}>{missionTitles[run.mission_id] || run.id} · {run.status}</option>)}
           </select>
         </label>
         <Button onClick={sync} disabled={busy}>{busy ? 'Syncing…' : 'Sync evidence'}</Button>
       </div>
       <div className="text-xs text-mc-dim mb-3">{status.runs ?? '—'} projected runs · {status.decisions ?? '—'} decision references · latest 30 matching observations shown</div>
-      <div aria-label="Knowledge graph relationships" className="flex flex-wrap gap-2 text-xs text-mc-mute mb-3">
-        {['Robot → Run', 'Run → Decision', 'Decision → Location', 'Decision → Policy'].map(label => <span key={label} className="rounded border border-mc-line px-2 py-1">{label}</span>)}
-      </div>
       {history && !history.facts.length && <Empty title="No verified graph evidence for this run">Sync the run to project eligible signed decisions. Older, unsigned or invalid evidence is excluded.</Empty>}
+      {!!history?.facts.length && <KnowledgeGraph key={selected} facts={history.facts}
+        missionTitle={missionTitles[history.facts[0].mission_id]} />}
       {!!history?.facts.length && <details className="rounded-lg border border-mc-line p-3">
         <summary className="cursor-pointer text-sm text-mc-ink">View {history.facts.length} verified decision connections</summary>
         <div className="overflow-auto max-h-96 mt-3">

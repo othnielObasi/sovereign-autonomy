@@ -1,0 +1,13 @@
+{
+  "passed": 7,
+  "checks": [
+    "Real 25-decision source renders as five connected nodes; zero policy hits produce no invented policy node",
+    "Pointer, Tab-focus/Enter/Space selection and Escape clearing expose evidence and highlight immediate connections",
+    "Single-decision picker preserves actual event, receipt, integrity hash and mission link",
+    "Empty filter is explained and recoverable; zoom stays inside the graph and Fit view resets it",
+    "Real graph reflows on phone/tablet/desktop with no overlapping nodes or page overflow",
+    "Explicit synthetic mixed-verdict fixture exercises policy connections and filtering; arrows avoid unrelated nodes on mobile",
+    "Graph exploration sends no robot commands and has no browser errors"
+  ],
+  "errors": []
+}
