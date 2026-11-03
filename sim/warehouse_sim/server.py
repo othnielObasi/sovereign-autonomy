@@ -36,6 +36,7 @@ from fastapi import FastAPI, HTTPException, Request, Response
 from pydantic import BaseModel, Field
 
 from app.autonomy import permit as permits
+from app.autonomy.robot_profiles import configured_profile, move_violation
 from app.autonomy.controller import ControllerJournal
 from bench.scenarios import HOTSPOTS, generate
 from bench.world import ROBOT_R, Circle, Layout, RobotState, Walker, World, drive_robot, load_layout
@@ -58,7 +59,7 @@ SIM_ROBOT_ID = os.getenv("SIM_ROBOT_ID", "robot-1")
 # own, so a crashed or cut-off backend cannot leave it driving. 0 disables it.
 SIM_DEADMAN_S = float(os.getenv("SIM_DEADMAN_S", "5"))
 # Which site the live simulator runs: "factory" (default) or "warehouse" (the benchmark site)
-SITE_LAYOUT = os.getenv("SITE_LAYOUT", "factory").strip() or "factory"
+SITE_LAYOUT = os.getenv("SITE_LAYOUT", "pharma").strip() or "pharma"
 SITE = load_layout(site=SITE_LAYOUT)
 PARKING = tuple((SITE.get("parking") or {}).get(os.getenv("SIM_ROBOT_ID", "robot-1"), (3.0, 3.5)))
 # Other robots: "id@x,y;id@x,y" (parking spots). Default: the site's own parking list.
@@ -108,7 +109,8 @@ def _fence(robot_id: Optional[str] = None) -> None:
 
 
 def _controller_context(w: World, robot_id: str) -> dict:
-    return dict(_journal.environment(w.layout.experience_identity), boot_id=_boot_id, generation=_generations.get(robot_id, 0))
+    return dict(_journal.environment(w.layout.experience_identity), boot_id=_boot_id, generation=_generations.get(robot_id, 0),
+                capability_profile_version=configured_profile(SITE, robot_id).version)
 
 
 def _environment_change(w: World, reason: str) -> None:
@@ -170,7 +172,7 @@ def _robot_bodies(w: World, exclude: str) -> List[Circle]:
     for rid in fleet_ids():
         if rid != exclude:
             r = _robot(w, rid)
-            bodies.append(Circle(r.x, r.y, ROBOT_R, "robot"))
+            bodies.append(Circle(r.x, r.y, configured_profile(SITE, rid).radius_m, "robot"))
     return bodies
 
 
@@ -270,7 +272,7 @@ async def _clock() -> None:
             for i, a in enumerate(ids):
                 for b in ids[i + 1:]:
                     ra, rb = _robot(w, a), _robot(w, b)
-                    if math.hypot(ra.x - rb.x, ra.y - rb.y) < 2 * ROBOT_R:
+                    if math.hypot(ra.x - rb.x, ra.y - rb.y) < configured_profile(SITE, a).radius_m + configured_profile(SITE, b).radius_m:
                         _contacts["robot_contact"] += 1
         await asyncio.sleep(max(0.0, dt - (time.perf_counter() - t0)))
 
@@ -322,22 +324,28 @@ def _telemetry(w: World, robot_id: Optional[str] = None) -> Dict[str, Any]:
     """Telemetry for one robot; the other robots appear as obstacles."""
     rid = robot_id or SIM_ROBOT_ID
     bodies = _robot_bodies(w, rid)       # from real positions, before any swap
+    peers = [{"robot_id": peer, "x": round(_robot(w,peer).x,3), "y": round(_robot(w,peer).y,3),
+              "theta": _robot(w,peer).theta, "speed": _robot(w,peer).speed,
+              "robot_kind": configured_profile(SITE,peer).kind}
+             for peer in fleet_ids() if peer != rid]
     if rid != SIM_ROBOT_ID:
         r = _robot(w, rid)
         saved = w.robot
         w.robot = r                      # reuse the world's sensing for this robot's pose
         try:
-            tel = _telemetry_one(w, rid, bodies)
+            tel = _telemetry_one(w, rid, bodies, peers)
         finally:
             w.robot = saved
         return tel
-    return _telemetry_one(w, rid, bodies)
+    return _telemetry_one(w, rid, bodies, peers)
 
 
-def _telemetry_one(w: World, robot_id: str, bodies: List[Circle]) -> Dict[str, Any]:
+def _telemetry_one(w: World, robot_id: str, bodies: List[Circle], peers: List[Dict[str, Any]]) -> Dict[str, Any]:
     tel = w.telemetry()
+    profile = configured_profile(SITE, robot_id)
+    tel['nearest_obstacle_m'] += ROBOT_R - profile.radius_m
     for body in bodies:                  # other robots count as obstacles for clearance
-        gap = body.distance(w.robot.x, w.robot.y) - ROBOT_R
+        gap = body.distance(w.robot.x, w.robot.y) - profile.radius_m
         if gap < tel["nearest_obstacle_m"]:
             tel["nearest_obstacle_m"] = round(gap, 3)
             p = body.nearest_point(w.robot.x, w.robot.y)
@@ -355,12 +363,13 @@ def _telemetry_one(w: World, robot_id: str, bodies: List[Circle]) -> Dict[str, A
         "events": events,
         "human": dict(nearest, type="human", id="nearest", role="primary") if nearest else None,
         "walking_humans": people,
-        "idle_robots": [],
+        "idle_robots": peers,
         "obstacles": _obstacles(w) + [{"x": round(b.x, 2), "y": round(b.y, 2), "r": b.r, "type": "robot"}
                                       for b in bodies],
         "bounds": w.layout.geofence,
         "target": w.robot.target,
         "robot_id": robot_id,
+        "robot_kind": profile.kind, "robot_profile": profile.public(),
         "estop": dict(_estop, robot=_robot_estops.get(robot_id)),
         "deadman_trips": (_deadman if robot_id == SIM_ROBOT_ID else _other_deadman[robot_id])["tripped"],
         "robot_contacts": _contacts["robot_contact"],
@@ -446,7 +455,7 @@ def fleet(request: Request):
         out = []
         for rid in fleet_ids():
             r = _robot(w, rid)
-            out.append({"robot_id": rid, "x": round(r.x, 3), "y": round(r.y, 3), "theta": round(r.theta, 3),
+            out.append({"robot_id": rid, "robot_kind": configured_profile(SITE,rid).kind, "robot_profile": configured_profile(SITE,rid).public(), "x": round(r.x, 3), "y": round(r.y, 3), "theta": round(r.theta, 3),
                         "speed": round(r.speed, 3), "target": r.target, "estopped": _estopped(rid)})
         return {"robots": out, "robot_contacts": _contacts["robot_contact"]}
 
@@ -498,6 +507,9 @@ def command(request: Request, cmd: Command):
             rid = (cmd.action or {}).get("robot_id") or SIM_ROBOT_ID
             if _estopped(rid):
                 raise HTTPException(status_code=423, detail="estop_engaged")
+            violation = move_violation(configured_profile(SITE, rid), cmd.params)
+            if violation:
+                raise HTTPException(status_code=403, detail=violation)
             payload = _check_permit(cmd)
             action = dict(cmd.action, kind=cmd.intent, params=cmd.params)
             context = _controller_context(w, rid)
