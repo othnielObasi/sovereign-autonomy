@@ -921,17 +921,19 @@ class RunService:
                     near_xy = telemetry.get("nearest_obstacle_xy")
                     if hazard_proposal is not None:
                         proposal = hazard_proposal
-                    elif (last_governance and "OBSTACLE_CLEARANCE_03" in (last_governance.get("policy_hits") or [])
+                    elif (last_governance and ({"OBSTACLE_CLEARANCE_03", "PATH_CLEARANCE_07"} & set(last_governance.get("policy_hits") or []))
                             and near_xy and float(telemetry.get("nearest_obstacle_m", 9.0)) < 0.5):
-                        # Too close to something: back away slowly (the one move the gate allows here)
-                        ax_, ay_ = float(telemetry.get("x", 0)) - float(near_xy[0]), float(telemetry.get("y", 0)) - float(near_xy[1])
-                        n_ = math.hypot(ax_, ay_) or 1e-9
-                        proposal = ActionProposal(
-                            intent="MOVE_TO",
-                            params={"x": float(telemetry.get("x", 0)) + ax_ / n_ * 0.8,
-                                    "y": float(telemetry.get("y", 0)) + ay_ / n_ * 0.8, "max_speed": 0.25},
-                            rationale="Slow retreat from obstacle",
-                        )
+                        # Too close to something: back away slowly (the one move the gate allows here).
+                        # In a corner, straight back can hit another partition, so try the allowed cone.
+                        from app.policies.retreat import retreat_target
+                        from app.policies.site_map import path_blocked
+                        params_ = retreat_target(telemetry, path_blocked)
+                        if params_ is None:
+                            ax_, ay_ = float(telemetry.get("x", 0)) - float(near_xy[0]), float(telemetry.get("y", 0)) - float(near_xy[1])
+                            n_ = math.hypot(ax_, ay_) or 1e-9
+                            params_ = {"x": float(telemetry.get("x", 0)) + ax_ / n_ * 0.8,
+                                       "y": float(telemetry.get("y", 0)) + ay_ / n_ * 0.8, "max_speed": 0.25}
+                        proposal = ActionProposal(intent="MOVE_TO", params=params_, rationale="Slow retreat from obstacle")
                     elif wp:
                         proposal = ActionProposal(
                             intent="MOVE_TO",

@@ -38,3 +38,36 @@ def is_slow_retreat(telemetry: Dict[str, Any], params: Dict[str, Any]) -> bool:
     if n1 < 1e-6 or n2 < 1e-6:
         return False
     return (mv[0] * away[0] + mv[1] * away[1]) / (n1 * n2) >= RETREAT_MIN_COS
+
+
+def retreat_target(telemetry: Dict[str, Any], blocked=None):
+    """A slow-retreat target the gate will accept, or None.
+
+    Straight away from the nearest obstacle can run into something else when the
+    robot is in a corner (seen live: a robot 0.42 m from one partition, with another
+    partition directly behind it, was refused every move until its mission timed
+    out). Try directions within the allowed 60-degree cone and shorter distances,
+    and return the first whose straight path `blocked(x, y, tx, ty)` does not refuse.
+    """
+    xy = telemetry.get("nearest_obstacle_xy")
+    if not xy or len(xy) != 2:
+        return None
+    try:
+        x, y = float(telemetry.get("x", 0.0)), float(telemetry.get("y", 0.0))
+        ox, oy = float(xy[0]), float(xy[1])
+    except (TypeError, ValueError):
+        return None
+    base = math.atan2(y - oy, x - ox)
+    if math.hypot(x - ox, y - oy) < 1e-6:
+        return None
+    for dist in (0.8, 0.5, 0.3):
+        for deg in (0, 20, -20, 40, -40, 55, -55):
+            a = base + math.radians(deg)
+            tx, ty = x + math.cos(a) * dist, y + math.sin(a) * dist
+            params = {"x": tx, "y": ty, "max_speed": 0.25}
+            if not is_slow_retreat(telemetry, params):
+                continue
+            if blocked is not None and blocked(x, y, tx, ty):
+                continue
+            return params
+    return None
