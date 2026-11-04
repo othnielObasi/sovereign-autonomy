@@ -271,7 +271,8 @@ def test_review_to_real_permit_motion_and_replan_hold(ops,mixed,monkeypatch):
     monkeypatch.setattr(adapter,'get_telemetry',uncertain)
     mission=db.get(Mission,'op-mission');mission.goal_json=json.dumps({'x':18,'y':2.5,'robot_id':'robot-3'});db.commit()
     state=asyncio.run(uncertain('robot-3'))
-    event,proposal=record_review(db,svc,state,{'x':18.,'y':8.,'max_speed':.3})
+    # A short move from wherever robot-3 parks, so the test does not depend on the parking coordinate
+    event,proposal=record_review(db,svc,state,{'x':float(state['x']),'y':float(state['y'])-1.,'max_speed':.3})
     assert json.loads(event.payload_json)['governance']['decision']=='NEEDS_REVIEW'
     svc._plans['op-run']=[dict(proposal.params),{'x':18.,'y':2.5,'max_speed':.3}]
     svc._plan_contexts['op-run']={'context':context_from_state(state,policy_version_hash()),'constraints':constraints_key(state)}
@@ -356,7 +357,7 @@ def test_replan_settles_a_delayed_controller_ack_without_losing_outcome(ops,mixe
     mission=db.get(Mission,'op-mission');mission.goal_json=json.dumps({'x':18,'y':2.5,'robot_id':'robot-3'})
     db.get(Run,'op-run').status='running';db.commit()
     state=asyncio.run(clear('robot-3'))
-    svc._plans['op-run']=[{'x':18.,'y':8.,'max_speed':.3}]
+    svc._plans['op-run']=[{'x':float(state['x']),'y':float(state['y'])-1.,'max_speed':.3}]   # short move from robot-3's parking
     svc._plan_contexts['op-run']={'context':context_from_state(state,policy_version_hash()),'constraints':constraints_key(state)}
     svc._launch_loop=RunService._launch_loop.__get__(svc)
     client.portal.call(svc._launch_loop,'op-run')
