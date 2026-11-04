@@ -1,0 +1,155 @@
+{
+  "run_id": "run_f8bdbc5984ab",
+  "source": "/landing/mission-story/audit.json",
+  "renderer": "frontend/src/components/twin/Warehouse3D.tsx",
+  "layout": "backend/bench/sites/pharma.json",
+  "layout_base_matches_recorded_controller_journal": true,
+  "base_map_version": "b62e8ce4bd0603c07f6f611fb3745f6e14d4ae95602137bbdcc0d406ecaf71b9",
+  "recorded_map_version": "014b025016270a2d7993724f323a13cc98224681334e5f3c40abb7e289881a3e",
+  "controller_journal_source": "backend\\data\\browser-validation\\controller-1793706920064305600.db",
+  "notes": [
+    "New visual rendering of archived telemetry through the actual facility renderer; not an original video recording.",
+    "Edited highlights use compressed timing and omit intermediate events. Actor smoothing is visual interpolation, not extra telemetry.",
+    "Policy decisions and controller acknowledgements are taken from the saved events, not inferred from pixels.",
+    "No live simulator commands or paid services are called."
+  ],
+  "crop": {
+    "source_size": [
+      800,
+      450
+    ],
+    "box": [
+      0,
+      25,
+      640,
+      385
+    ],
+    "purpose": "Exclude operator minimap and HUD; preserve the actual rendered facility and robot.",
+    "overview_chapters": "Full actual scene resized to 640x360 with operator HUD hidden during capture."
+  },
+  "chapters": [
+    {
+      "name": "plan",
+      "file": "plan.webm",
+      "duration_seconds": 2.0,
+      "source_event_ids": [
+        "evt_472b2909e066",
+        "evt_12fb15ecc1a6"
+      ],
+      "rendered_observation_ids": [
+        "evt_12fb15ecc1a6"
+      ],
+      "rendered_observation_times": [
+        "2026-11-03T12:02:08.371507+00:00"
+      ],
+      "camera": "overview",
+      "edited_timing": true,
+      "source_moment": "12:02:08 UTC"
+    },
+    {
+      "name": "move",
+      "file": "move.webm",
+      "duration_seconds": 2.75,
+      "source_event_ids": [
+        "evt_65cc2733f8b0",
+        "evt_0030f23ebaa0"
+      ],
+      "rendered_observation_ids": [
+        "evt_8099beb4fdbf",
+        "evt_be1d269633c6",
+        "evt_9eea52d7f88f",
+        "evt_10e07d956183",
+        "evt_46de20faafe9",
+        "evt_84e9253e4171",
+        "evt_c207aea4028f",
+        "evt_54d2c3462fe7",
+        "evt_000a3cb3aa49",
+        "evt_62a4424ed636",
+        "evt_371613fe771d"
+      ],
+      "rendered_observation_times": [
+        "2026-11-03T12:02:36.526135+00:00",
+        "2026-11-03T12:02:47.846312+00:00",
+        "2026-11-03T12:02:58.070317+00:00",
+        "2026-11-03T12:03:08.247897+00:00",
+        "2026-11-03T12:03:17.630619+00:00",
+        "2026-11-03T12:03:27.808926+00:00",
+        "2026-11-03T12:03:37.711284+00:00",
+        "2026-11-03T12:03:47.704050+00:00",
+        "2026-11-03T12:03:56.813215+00:00",
+        "2026-11-03T12:04:06.571268+00:00",
+        "2026-11-03T12:04:17.070909+00:00"
+      ],
+      "camera": "follow",
+      "edited_timing": true,
+      "source_moment": "12:02:36 - 12:02:37 UTC"
+    },
+    {
+      "name": "stop",
+      "file": "stop.webm",
+      "duration_seconds": 3.0,
+      "source_event_ids": [
+        "evt_0b5a92dc17f7",
+        "evt_b6ef905be414"
+      ],
+      "rendered_observation_ids": [
+        "evt_0b5a92dc17f7"
+      ],
+      "rendered_observation_times": [
+        "2026-11-03T12:04:23.039357+00:00"
+      ],
+      "camera": "follow",
+      "edited_timing": true,
+      "source_moment": "12:04:23 UTC"
+    },
+    {
+      "name": "replan",
+      "file": "replan.webm",
+      "duration_seconds": 2.5,
+      "source_event_ids": [
+        "evt_e18d4b6819ff",
+        "evt_dc1fd051140c",
+        "evt_c1781604bef2"
+      ],
+      "rendered_observation_ids": [
+        "evt_c1781604bef2"
+      ],
+      "rendered_observation_times": [
+        "2026-11-03T12:04:27.457215+00:00"
+      ],
+      "camera": "overview",
+      "edited_timing": true,
+      "source_moment": "12:04:24 - 12:04:27 UTC"
+    },
+    {
+      "name": "arrive",
+      "file": "arrive.webm",
+      "duration_seconds": 1.75,
+      "source_event_ids": [
+        "evt_7ff07c387322",
+        "evt_4d882f6a901d"
+      ],
+      "rendered_observation_ids": [
+        "evt_12417bdf7421",
+        "evt_5daa7711b9c2",
+        "evt_f0033bc68db4",
+        "evt_8ac48516bb60",
+        "evt_04481a1135bd",
+        "evt_f20feb0290ed",
+        "evt_7ff07c387322"
+      ],
+      "rendered_observation_times": [
+        "2026-11-03T12:04:28.778629+00:00",
+        "2026-11-03T12:04:33.189035+00:00",
+        "2026-11-03T12:04:38.771805+00:00",
+        "2026-11-03T12:04:44.113124+00:00",
+        "2026-11-03T12:04:54.474038+00:00",
+        "2026-11-03T12:04:59.808072+00:00",
+        "2026-11-03T12:05:05.165115+00:00"
+      ],
+      "camera": "follow",
+      "edited_timing": true,
+      "source_moment": "12:05:05 UTC"
+    }
+  ]
+}

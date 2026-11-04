@@ -1,0 +1,2058 @@
+{
+  "scope": "Read-only recorded artefacts; no live tests, robot control or proposed-learning simulation mixed into these results",
+  "validation": {
+    "date": "2026-11-03",
+    "scope": "Operational human oversight in the single-site simulator; local working tree",
+    "backend": {
+      "command": ".venv/Scripts/python.exe -m pytest backend/tests -q",
+      "passed": 489,
+      "duration_s": 244.19,
+      "oversight_cases_included": 33
+    },
+    "frontend": {
+      "command": "NEXT_DIST_DIR=.next-validation BACKEND_URL=http://127.0.0.1:18080 npm --prefix frontend run build",
+      "passed": true
+    },
+    "browser": {
+      "oversight_checks": 5,
+      "mission_control_checks": 10,
+      "errors": []
+    },
+    "limitations": [
+      "No paid live-model integration validation",
+      "No physical hardware verification",
+      "No commit or push performed"
+    ]
+  },
+  "browser_reports": [
+    {
+      "label": "Mission Control",
+      "source": "docs/validation/2026-11-03-operator-controls/mission-control/browser-report.json",
+      "checks": [
+        "Perspective overview, robot follow and robot-eye cameras retain the new dashboard",
+        "Original landing restored with its app link; Mission Control loads the real pharma world and fleet",
+        "Keyboard robot selection and accessible operator dialog work",
+        "Scenario lab changes real world geometry and records environment revalidation",
+        "Mission creation, controller admission evidence and pause update real backend state",
+        "New mission opens composer; busy robot blocked and second robot selectable",
+        "Persistent stop confirms controller stop; release does not resume paused mission",
+        "Mobile has no horizontal overflow; navigation, operator access and stop remain available",
+        "Lost connection marks positions stale and disables launching",
+        "Unavailable WebGL falls back to real floor plan while keeping controls"
+      ],
+      "errors": [],
+      "passed": true
+    },
+    {
+      "label": "Operator oversight",
+      "source": "docs/validation/2026-11-03-operator-controls/browser-report.json",
+      "checks": [
+        "Mission Control replaces a real humanoid route, records capped waypoints, verifies stop and holds without resuming; ordinary paused decisions cannot be force-approved",
+        "Explicit resume restores governed movement after operator route replacement",
+        "The full run page exposes the same operational route replacement and eligible-review controls",
+        "Oversight controls, reason entry and status messages fit mobile and desktop",
+        "Both named interventions are recorded and the full event hash chain verifies; no browser errors"
+      ],
+      "errors": [],
+      "passed": true
+    }
+  ],
+  "mission": {
+    "summary": {
+      "schema": "sovereign-mission-highlights-v1",
+      "run_id": "run_f8bdbc5984ab",
+      "recorded_date": "3 November 2026",
+      "robot_id": "robot-2",
+      "event_count": 413,
+      "permit_uses": 81,
+      "hard_fail_decisions": 8,
+      "notes": [
+        "Recorded local simulator validation on 3 November 2026; no physical robots or paid model calls.",
+        "Selected moments omit intermediate events and operator pauses. This is not real-time playback.",
+        "Fallback planning was used. This recording does not demonstrate live AI model execution or shared learning.",
+        "The record contains unsafe proposals, review decisions and integrity alerts. Completion does not mean every proposal was safe.",
+        "After arrival the simulator resets to parking; this is not a driven return journey.",
+        "All 413 individual event hashes verify. The historical chronological audit has 37 linkage discontinuities; it is not a fully continuous audit chain."
+      ],
+      "steps": [
+        {
+          "label": "Plan",
+          "title": "A route to the Quality lab",
+          "text": "Robot-2 receives a route from Formulation to the Quality lab through the shared corridor. The site router proposes 16 waypoints. Each move still needs its own safety check and permit.",
+          "status": "Route proposed",
+          "time": "2026-11-03T12:02:08.353729+00:00",
+          "event_ids": [
+            "evt_472b2909e066",
+            "evt_12fb15ecc1a6"
+          ],
+          "pose": {
+            "x": 30.0,
+            "y": 2.5,
+            "speed": 0.0,
+            "human_distance_m": 18.145
+          },
+          "route": [
+            [
+              30,
+              2.5
+            ],
+            [
+              29.85,
+              4.35
+            ],
+            [
+              29.7,
+              6.2
+            ],
+            [
+              29.55,
+              8.05
+            ],
+            [
+              29.4,
+              9.9
+            ],
+            [
+              29.25,
+              11.75
+            ],
+            [
+              27.5,
+              11.75
+            ],
+            [
+              25.75,
+              11.75
+            ],
+            [
+              24.0,
+              11.75
+            ],
+            [
+              22.25,
+              11.75
+            ],
+            [
+              20.5,
+              11.75
+            ],
+            [
+              18.75,
+              11.75
+            ],
+            [
+              18.6,
+              9.9
+            ],
+            [
+              18.45,
+              8.05
+            ],
+            [
+              18.3,
+              6.2
+            ],
+            [
+              18.15,
+              4.35
+            ],
+            [
+              18.0,
+              2.5
+            ]
+          ],
+          "fact_label": "Planned route",
+          "fact": "16 waypoints",
+          "time_range": "12:02:08 UTC",
+          "trail": [
+            [
+              30.0,
+              2.5
+            ]
+          ]
+        },
+        {
+          "label": "Move",
+          "title": "A permit allows the next move",
+          "text": "The controller records a used movement permit. Subsequent robot updates show the carrier leaving its start position. A route alone did not authorise this move.",
+          "status": "Permit used",
+          "time": "2026-11-03T12:02:36.714329+00:00",
+          "event_ids": [
+            "evt_65cc2733f8b0",
+            "evt_0030f23ebaa0"
+          ],
+          "pose": {
+            "x": 30.0,
+            "y": 2.607,
+            "speed": 0.3,
+            "human_distance_m": 16.107
+          },
+          "fact_label": "Recorded robot speed",
+          "fact": "0.3 m/s",
+          "time_range": "12:02:36 - 12:02:37 UTC",
+          "trail": [
+            [
+              30.0,
+              2.5
+            ],
+            [
+              30.0,
+              2.5
+            ],
+            [
+              30.0,
+              2.607
+            ]
+          ]
+        },
+        {
+          "label": "Stop",
+          "title": "A person comes too close",
+          "text": "The recorded human distance falls to 0.378 metres. The proximity rule refuses the proposed move and a verified STOP follows. The robot is stationary while the next route is assessed.",
+          "status": "Move refused / STOP verified",
+          "time": "2026-11-03T12:04:23.039357+00:00",
+          "event_ids": [
+            "evt_0b5a92dc17f7",
+            "evt_b6ef905be414"
+          ],
+          "pose": {
+            "x": 19.041,
+            "y": 11.73,
+            "speed": 0.0,
+            "human_distance_m": 0.378
+          },
+          "people": [
+            {
+              "x": 5.75,
+              "y": 1.75,
+              "name": "Worker A",
+              "type": "worker",
+              "role": "worker",
+              "conf": 0.9,
+              "speed": 0.0,
+              "heading": 1.381,
+              "activity": "working",
+              "destination": "Cold storage"
+            },
+            {
+              "x": 20.75,
+              "y": 16.75,
+              "name": "Runner 1",
+              "type": "worker",
+              "role": "worker",
+              "conf": 0.9,
+              "speed": 0.0,
+              "heading": 0.0,
+              "activity": "waiting_at_crossing",
+              "destination": "Crossing destination"
+            },
+            {
+              "x": 7.79,
+              "y": 11.75,
+              "name": "Runner 2",
+              "type": "worker",
+              "role": "worker",
+              "conf": 0.9,
+              "speed": 1.081,
+              "heading": 0.0,
+              "activity": "walking",
+              "destination": "Crossing destination"
+            },
+            {
+              "x": 19.25,
+              "y": 12.05,
+              "name": "Runner 3",
+              "type": "worker",
+              "role": "worker",
+              "conf": 0.9,
+              "speed": 1.148,
+              "heading": 1.571,
+              "activity": "walking",
+              "destination": "Crossing destination"
+            }
+          ],
+          "fact_label": "Recorded human distance",
+          "fact": "0.378 m",
+          "time_range": "12:04:23 UTC",
+          "trail": [
+            [
+              30.0,
+              2.5
+            ],
+            [
+              30.0,
+              2.5
+            ],
+            [
+              30.0,
+              2.607
+            ],
+            [
+              29.977,
+              2.876
+            ],
+            [
+              29.969,
+              2.96
+            ],
+            [
+              29.947,
+              3.217
+            ],
+            [
+              29.922,
+              3.516
+            ],
+            [
+              29.893,
+              3.844
+            ],
+            [
+              29.866,
+              4.173
+            ],
+            [
+              29.839,
+              4.502
+            ],
+            [
+              29.81,
+              4.861
+            ],
+            [
+              29.78,
+              5.22
+            ],
+            [
+              29.753,
+              5.549
+            ],
+            [
+              29.724,
+              5.907
+            ],
+            [
+              29.697,
+              6.236
+            ],
+            [
+              29.671,
+              6.565
+            ],
+            [
+              29.646,
+              6.864
+            ],
+            [
+              29.617,
+              7.223
+            ],
+            [
+              29.59,
+              7.552
+            ],
+            [
+              29.564,
+              7.881
+            ],
+            [
+              29.537,
+              8.21
+            ],
+            [
+              29.51,
+              8.539
+            ],
+            [
+              29.486,
+              8.838
+            ],
+            [
+              29.462,
+              9.137
+            ],
+            [
+              29.438,
+              9.436
+            ],
+            [
+              29.409,
+              9.795
+            ],
+            [
+              29.382,
+              10.124
+            ],
+            [
+              29.358,
+              10.423
+            ],
+            [
+              29.331,
+              10.752
+            ],
+            [
+              29.293,
+              11.214
+            ],
+            [
+              28.931,
+              11.454
+            ],
+            [
+              28.803,
+              11.481
+            ],
+            [
+              28.803,
+              11.481
+            ],
+            [
+              28.803,
+              11.481
+            ],
+            [
+              28.803,
+              11.481
+            ],
+            [
+              28.8,
+              11.468
+            ],
+            [
+              28.35,
+              11.563
+            ],
+            [
+              27.813,
+              11.681
+            ],
+            [
+              27.265,
+              11.714
+            ],
+            [
+              26.665,
+              11.728
+            ],
+            [
+              26.116,
+              11.741
+            ],
+            [
+              25.566,
+              11.745
+            ],
+            [
+              25.066,
+              11.747
+            ],
+            [
+              24.516,
+              11.748
+            ],
+            [
+              24.016,
+              11.749
+            ],
+            [
+              23.886,
+              11.749
+            ],
+            [
+              23.886,
+              11.749
+            ],
+            [
+              23.628,
+              11.749
+            ],
+            [
+              23.298,
+              11.749
+            ],
+            [
+              22.938,
+              11.75
+            ],
+            [
+              22.638,
+              11.75
+            ],
+            [
+              22.278,
+              11.75
+            ],
+            [
+              21.858,
+              11.75
+            ],
+            [
+              21.834,
+              11.75
+            ],
+            [
+              21.636,
+              11.75
+            ],
+            [
+              21.306,
+              11.75
+            ],
+            [
+              20.946,
+              11.75
+            ],
+            [
+              20.922,
+              11.75
+            ],
+            [
+              20.922,
+              11.75
+            ],
+            [
+              20.922,
+              11.75
+            ],
+            [
+              20.922,
+              11.75
+            ],
+            [
+              20.922,
+              11.75
+            ],
+            [
+              20.922,
+              11.75
+            ],
+            [
+              20.922,
+              11.75
+            ],
+            [
+              20.922,
+              11.75
+            ],
+            [
+              20.922,
+              11.75
+            ],
+            [
+              20.922,
+              11.75
+            ],
+            [
+              20.727,
+              11.643
+            ],
+            [
+              20.693,
+              11.623
+            ],
+            [
+              20.693,
+              11.623
+            ],
+            [
+              20.693,
+              11.623
+            ],
+            [
+              20.693,
+              11.623
+            ],
+            [
+              20.693,
+              11.623
+            ],
+            [
+              20.693,
+              11.623
+            ],
+            [
+              20.436,
+              11.635
+            ],
+            [
+              20.412,
+              11.636
+            ],
+            [
+              20.155,
+              11.654
+            ],
+            [
+              19.766,
+              11.68
+            ],
+            [
+              19.406,
+              11.705
+            ],
+            [
+              19.353,
+              11.709
+            ],
+            [
+              19.353,
+              11.709
+            ],
+            [
+              19.353,
+              11.709
+            ],
+            [
+              19.353,
+              11.709
+            ],
+            [
+              19.353,
+              11.709
+            ],
+            [
+              19.095,
+              11.726
+            ],
+            [
+              19.041,
+              11.73
+            ],
+            [
+              19.041,
+              11.73
+            ]
+          ]
+        },
+        {
+          "label": "Replan",
+          "title": "New plan. Fresh permission.",
+          "text": "After repeated proximity denials, the fallback planner proposes a replacement toward the same destination. A task check keeps it on goal. The controller later records a fresh permit use before continuation.",
+          "status": "New plan / fresh permit used",
+          "time": "2026-11-03T12:04:26.405331+00:00",
+          "event_ids": [
+            "evt_e18d4b6819ff",
+            "evt_dc1fd051140c",
+            "evt_c1781604bef2"
+          ],
+          "pose": {
+            "x": 19.012,
+            "y": 11.575,
+            "speed": 0.4,
+            "human_distance_m": 3.692
+          },
+          "route": [
+            [
+              19.041,
+              11.73
+            ],
+            [
+              18.0,
+              2.5
+            ]
+          ],
+          "fact_label": "Replacement plan",
+          "fact": "Same destination",
+          "time_range": "12:04:24 - 12:04:27 UTC",
+          "trail": [
+            [
+              30.0,
+              2.5
+            ],
+            [
+              30.0,
+              2.5
+            ],
+            [
+              30.0,
+              2.607
+            ],
+            [
+              29.977,
+              2.876
+            ],
+            [
+              29.969,
+              2.96
+            ],
+            [
+              29.947,
+              3.217
+            ],
+            [
+              29.922,
+              3.516
+            ],
+            [
+              29.893,
+              3.844
+            ],
+            [
+              29.866,
+              4.173
+            ],
+            [
+              29.839,
+              4.502
+            ],
+            [
+              29.81,
+              4.861
+            ],
+            [
+              29.78,
+              5.22
+            ],
+            [
+              29.753,
+              5.549
+            ],
+            [
+              29.724,
+              5.907
+            ],
+            [
+              29.697,
+              6.236
+            ],
+            [
+              29.671,
+              6.565
+            ],
+            [
+              29.646,
+              6.864
+            ],
+            [
+              29.617,
+              7.223
+            ],
+            [
+              29.59,
+              7.552
+            ],
+            [
+              29.564,
+              7.881
+            ],
+            [
+              29.537,
+              8.21
+            ],
+            [
+              29.51,
+              8.539
+            ],
+            [
+              29.486,
+              8.838
+            ],
+            [
+              29.462,
+              9.137
+            ],
+            [
+              29.438,
+              9.436
+            ],
+            [
+              29.409,
+              9.795
+            ],
+            [
+              29.382,
+              10.124
+            ],
+            [
+              29.358,
+              10.423
+            ],
+            [
+              29.331,
+              10.752
+            ],
+            [
+              29.293,
+              11.214
+            ],
+            [
+              28.931,
+              11.454
+            ],
+            [
+              28.803,
+              11.481
+            ],
+            [
+              28.803,
+              11.481
+            ],
+            [
+              28.803,
+              11.481
+            ],
+            [
+              28.803,
+              11.481
+            ],
+            [
+              28.8,
+              11.468
+            ],
+            [
+              28.35,
+              11.563
+            ],
+            [
+              27.813,
+              11.681
+            ],
+            [
+              27.265,
+              11.714
+            ],
+            [
+              26.665,
+              11.728
+            ],
+            [
+              26.116,
+              11.741
+            ],
+            [
+              25.566,
+              11.745
+            ],
+            [
+              25.066,
+              11.747
+            ],
+            [
+              24.516,
+              11.748
+            ],
+            [
+              24.016,
+              11.749
+            ],
+            [
+              23.886,
+              11.749
+            ],
+            [
+              23.886,
+              11.749
+            ],
+            [
+              23.628,
+              11.749
+            ],
+            [
+              23.298,
+              11.749
+            ],
+            [
+              22.938,
+              11.75
+            ],
+            [
+              22.638,
+              11.75
+            ],
+            [
+              22.278,
+              11.75
+            ],
+            [
+              21.858,
+              11.75
+            ],
+            [
+              21.834,
+              11.75
+            ],
+            [
+              21.636,
+              11.75
+            ],
+            [
+              21.306,
+              11.75
+            ],
+            [
+              20.946,
+              11.75
+            ],
+            [
+              20.922,
+              11.75
+            ],
+            [
+              20.922,
+              11.75
+            ],
+            [
+              20.922,
+              11.75
+            ],
+            [
+              20.922,
+              11.75
+            ],
+            [
+              20.922,
+              11.75
+            ],
+            [
+              20.922,
+              11.75
+            ],
+            [
+              20.922,
+              11.75
+            ],
+            [
+              20.922,
+              11.75
+            ],
+            [
+              20.922,
+              11.75
+            ],
+            [
+              20.922,
+              11.75
+            ],
+            [
+              20.727,
+              11.643
+            ],
+            [
+              20.693,
+              11.623
+            ],
+            [
+              20.693,
+              11.623
+            ],
+            [
+              20.693,
+              11.623
+            ],
+            [
+              20.693,
+              11.623
+            ],
+            [
+              20.693,
+              11.623
+            ],
+            [
+              20.693,
+              11.623
+            ],
+            [
+              20.436,
+              11.635
+            ],
+            [
+              20.412,
+              11.636
+            ],
+            [
+              20.155,
+              11.654
+            ],
+            [
+              19.766,
+              11.68
+            ],
+            [
+              19.406,
+              11.705
+            ],
+            [
+              19.353,
+              11.709
+            ],
+            [
+              19.353,
+              11.709
+            ],
+            [
+              19.353,
+              11.709
+            ],
+            [
+              19.353,
+              11.709
+            ],
+            [
+              19.353,
+              11.709
+            ],
+            [
+              19.095,
+              11.726
+            ],
+            [
+              19.041,
+              11.73
+            ],
+            [
+              19.041,
+              11.73
+            ],
+            [
+              19.041,
+              11.73
+            ],
+            [
+              19.012,
+              11.575
+            ]
+          ]
+        },
+        {
+          "label": "Arrive",
+          "title": "Arrival is recorded",
+          "text": "The final decision records robot-2 at the Quality lab with zero speed, followed by a verified STOP. The run completes. Its later parking reset is not a driven return journey.",
+          "status": "Completed / STOP verified",
+          "time": "2026-11-03T12:05:05.185121+00:00",
+          "event_ids": [
+            "evt_7ff07c387322",
+            "evt_4d882f6a901d"
+          ],
+          "pose": {
+            "x": 18.004,
+            "y": 2.533,
+            "speed": 0.0,
+            "human_distance_m": 11.532
+          },
+          "fact_label": "Recorded arrival",
+          "fact": "18.004, 2.533 m",
+          "time_range": "12:05:05 UTC",
+          "trail": [
+            [
+              30.0,
+              2.5
+            ],
+            [
+              30.0,
+              2.5
+            ],
+            [
+              30.0,
+              2.607
+            ],
+            [
+              29.977,
+              2.876
+            ],
+            [
+              29.969,
+              2.96
+            ],
+            [
+              29.947,
+              3.217
+            ],
+            [
+              29.922,
+              3.516
+            ],
+            [
+              29.893,
+              3.844
+            ],
+            [
+              29.866,
+              4.173
+            ],
+            [
+              29.839,
+              4.502
+            ],
+            [
+              29.81,
+              4.861
+            ],
+            [
+              29.78,
+              5.22
+            ],
+            [
+              29.753,
+              5.549
+            ],
+            [
+              29.724,
+              5.907
+            ],
+            [
+              29.697,
+              6.236
+            ],
+            [
+              29.671,
+              6.565
+            ],
+            [
+              29.646,
+              6.864
+            ],
+            [
+              29.617,
+              7.223
+            ],
+            [
+              29.59,
+              7.552
+            ],
+            [
+              29.564,
+              7.881
+            ],
+            [
+              29.537,
+              8.21
+            ],
+            [
+              29.51,
+              8.539
+            ],
+            [
+              29.486,
+              8.838
+            ],
+            [
+              29.462,
+              9.137
+            ],
+            [
+              29.438,
+              9.436
+            ],
+            [
+              29.409,
+              9.795
+            ],
+            [
+              29.382,
+              10.124
+            ],
+            [
+              29.358,
+              10.423
+            ],
+            [
+              29.331,
+              10.752
+            ],
+            [
+              29.293,
+              11.214
+            ],
+            [
+              28.931,
+              11.454
+            ],
+            [
+              28.803,
+              11.481
+            ],
+            [
+              28.803,
+              11.481
+            ],
+            [
+              28.803,
+              11.481
+            ],
+            [
+              28.803,
+              11.481
+            ],
+            [
+              28.8,
+              11.468
+            ],
+            [
+              28.35,
+              11.563
+            ],
+            [
+              27.813,
+              11.681
+            ],
+            [
+              27.265,
+              11.714
+            ],
+            [
+              26.665,
+              11.728
+            ],
+            [
+              26.116,
+              11.741
+            ],
+            [
+              25.566,
+              11.745
+            ],
+            [
+              25.066,
+              11.747
+            ],
+            [
+              24.516,
+              11.748
+            ],
+            [
+              24.016,
+              11.749
+            ],
+            [
+              23.886,
+              11.749
+            ],
+            [
+              23.886,
+              11.749
+            ],
+            [
+              23.628,
+              11.749
+            ],
+            [
+              23.298,
+              11.749
+            ],
+            [
+              22.938,
+              11.75
+            ],
+            [
+              22.638,
+              11.75
+            ],
+            [
+              22.278,
+              11.75
+            ],
+            [
+              21.858,
+              11.75
+            ],
+            [
+              21.834,
+              11.75
+            ],
+            [
+              21.636,
+              11.75
+            ],
+            [
+              21.306,
+              11.75
+            ],
+            [
+              20.946,
+              11.75
+            ],
+            [
+              20.922,
+              11.75
+            ],
+            [
+              20.922,
+              11.75
+            ],
+            [
+              20.922,
+              11.75
+            ],
+            [
+              20.922,
+              11.75
+            ],
+            [
+              20.922,
+              11.75
+            ],
+            [
+              20.922,
+              11.75
+            ],
+            [
+              20.922,
+              11.75
+            ],
+            [
+              20.922,
+              11.75
+            ],
+            [
+              20.922,
+              11.75
+            ],
+            [
+              20.922,
+              11.75
+            ],
+            [
+              20.727,
+              11.643
+            ],
+            [
+              20.693,
+              11.623
+            ],
+            [
+              20.693,
+              11.623
+            ],
+            [
+              20.693,
+              11.623
+            ],
+            [
+              20.693,
+              11.623
+            ],
+            [
+              20.693,
+              11.623
+            ],
+            [
+              20.693,
+              11.623
+            ],
+            [
+              20.436,
+              11.635
+            ],
+            [
+              20.412,
+              11.636
+            ],
+            [
+              20.155,
+              11.654
+            ],
+            [
+              19.766,
+              11.68
+            ],
+            [
+              19.406,
+              11.705
+            ],
+            [
+              19.353,
+              11.709
+            ],
+            [
+              19.353,
+              11.709
+            ],
+            [
+              19.353,
+              11.709
+            ],
+            [
+              19.353,
+              11.709
+            ],
+            [
+              19.353,
+              11.709
+            ],
+            [
+              19.095,
+              11.726
+            ],
+            [
+              19.041,
+              11.73
+            ],
+            [
+              19.041,
+              11.73
+            ],
+            [
+              19.041,
+              11.73
+            ],
+            [
+              19.012,
+              11.575
+            ],
+            [
+              18.963,
+              11.137
+            ],
+            [
+              18.953,
+              11.05
+            ],
+            [
+              18.953,
+              11.05
+            ],
+            [
+              18.953,
+              11.05
+            ],
+            [
+              18.918,
+              10.732
+            ],
+            [
+              18.869,
+              10.294
+            ],
+            [
+              18.818,
+              9.837
+            ],
+            [
+              18.778,
+              9.479
+            ],
+            [
+              18.738,
+              9.122
+            ],
+            [
+              18.705,
+              8.824
+            ],
+            [
+              18.672,
+              8.525
+            ],
+            [
+              18.632,
+              8.168
+            ],
+            [
+              18.592,
+              7.81
+            ],
+            [
+              18.555,
+              7.482
+            ],
+            [
+              18.519,
+              7.154
+            ],
+            [
+              18.486,
+              6.856
+            ],
+            [
+              18.449,
+              6.528
+            ],
+            [
+              18.412,
+              6.2
+            ],
+            [
+              18.373,
+              5.842
+            ],
+            [
+              18.333,
+              5.484
+            ],
+            [
+              18.293,
+              5.126
+            ],
+            [
+              18.263,
+              4.858
+            ],
+            [
+              18.226,
+              4.53
+            ],
+            [
+              18.19,
+              4.202
+            ],
+            [
+              18.153,
+              3.874
+            ],
+            [
+              18.113,
+              3.516
+            ],
+            [
+              18.08,
+              3.218
+            ],
+            [
+              18.05,
+              2.95
+            ],
+            [
+              18.004,
+              2.533
+            ]
+          ]
+        }
+      ]
+    },
+    "run_id": "run_f8bdbc5984ab",
+    "event_count": 413,
+    "individual_hashes_verified": true,
+    "chronological_chain_valid": false,
+    "ordering_gaps": 37,
+    "events": [
+      {
+        "id": "evt_472b2909e066",
+        "ts": "2026-11-03T12:02:08.353729+00:00",
+        "type": "PLAN",
+        "fields": {
+          "plan": {
+            "waypoints": [
+              {
+                "x": 29.85,
+                "y": 4.35,
+                "max_speed": 0.3
+              },
+              {
+                "x": 29.7,
+                "y": 6.2,
+                "max_speed": 0.3
+              },
+              {
+                "x": 29.55,
+                "y": 8.05,
+                "max_speed": 0.3
+              },
+              {
+                "x": 29.4,
+                "y": 9.9,
+                "max_speed": 0.3
+              },
+              {
+                "x": 29.25,
+                "y": 11.75,
+                "max_speed": 0.5
+              },
+              {
+                "x": 27.5,
+                "y": 11.75,
+                "max_speed": 0.5
+              },
+              {
+                "x": 25.75,
+                "y": 11.75,
+                "max_speed": 0.5
+              },
+              {
+                "x": 24.0,
+                "y": 11.75,
+                "max_speed": 0.5
+              },
+              {
+                "x": 22.25,
+                "y": 11.75,
+                "max_speed": 0.5
+              },
+              {
+                "x": 20.5,
+                "y": 11.75,
+                "max_speed": 0.5
+              },
+              {
+                "x": 18.75,
+                "y": 11.75,
+                "max_speed": 0.5
+              },
+              {
+                "x": 18.6,
+                "y": 9.9,
+                "max_speed": 0.3
+              },
+              {
+                "x": 18.45,
+                "y": 8.05,
+                "max_speed": 0.3
+              },
+              {
+                "x": 18.3,
+                "y": 6.2,
+                "max_speed": 0.3
+              },
+              {
+                "x": 18.15,
+                "y": 4.35,
+                "max_speed": 0.3
+              },
+              {
+                "x": 18.0,
+                "y": 2.5,
+                "max_speed": 0.3
+              }
+            ],
+            "model_used": "site_router"
+          },
+          "source": "fallback"
+        },
+        "source_event_hash": "sha256:89df7d8d89e8b2a490a582ce83985241b331e30d835c6208bdd8844b0836ac68",
+        "canonical_source_body": "{\"payload\":{\"mission_id\":\"mis_4f92b3c92f76\",\"note\":\"Seed plan along the aisles — model plan pending\",\"plan\":{\"model_used\":\"site_router\",\"waypoints\":[{\"max_speed\":0.3,\"x\":29.85,\"y\":4.35},{\"max_speed\":0.3,\"x\":29.7,\"y\":6.2},{\"max_speed\":0.3,\"x\":29.55,\"y\":8.05},{\"max_speed\":0.3,\"x\":29.4,\"y\":9.9},{\"max_speed\":0.5,\"x\":29.25,\"y\":11.75},{\"max_speed\":0.5,\"x\":27.5,\"y\":11.75},{\"max_speed\":0.5,\"x\":25.75,\"y\":11.75},{\"max_speed\":0.5,\"x\":24.0,\"y\":11.75},{\"max_speed\":0.5,\"x\":22.25,\"y\":11.75},{\"max_speed\":0.5,\"x\":20.5,\"y\":11.75},{\"max_speed\":0.5,\"x\":18.75,\"y\":11.75},{\"max_speed\":0.3,\"x\":18.6,\"y\":9.9},{\"max_speed\":0.3,\"x\":18.45,\"y\":8.05},{\"max_speed\":0.3,\"x\":18.3,\"y\":6.2},{\"max_speed\":0.3,\"x\":18.15,\"y\":4.35},{\"max_speed\":0.3,\"x\":18.0,\"y\":2.5}]},\"source\":\"fallback\"},\"prev_hash\":\"sha256:e29da319add164f82389f9a33f6196119f035c46cd2e9fdbdae6fe3fc2e09a94\",\"run_id\":\"run_f8bdbc5984ab\",\"ts\":\"2026-11-03T12:02:08.353729+00:00\",\"type\":\"PLAN\"}"
+      },
+      {
+        "id": "evt_12fb15ecc1a6",
+        "ts": "2026-11-03T12:02:08.371507+00:00",
+        "type": "DECISION",
+        "fields": {
+          "proposal": {
+            "intent": "MOVE_TO",
+            "params": {
+              "x": 29.85,
+              "y": 4.35,
+              "max_speed": 0.3
+            },
+            "rationale": "Following plan waypoint"
+          },
+          "governance": {
+            "decision": "APPROVED",
+            "policy_hits": [],
+            "reasons": [],
+            "required_action": null,
+            "risk_score": 0.0,
+            "policy_state": "SAFE",
+            "hard_fail": false,
+            "hard_fail_policies": []
+          }
+        },
+        "source_event_hash": "sha256:9407466ca838aacce7a0cc5b4addaca41929056f48627c9783db2d54877c8003",
+        "canonical_source_body": "{\"payload\":{\"context\":{\"mission_goal\":{\"robot_id\":\"robot-2\",\"x\":18.0,\"y\":2.5,\"zone\":\"staging\"},\"telemetry\":{\"accepted_actions\":[\"run_c6f2bd252d93:103:d5f4faa73ab948db849a55546be0841c\",\"run_c6f2bd252d93:102:5c45748a60e64edb97878a293163300f\",\"run_c6f2bd252d93:101:fa59eb71613d46f78cffb4ff21b9e192\",\"run_c6f2bd252d93:100:b4eef7fd3c8549dc845bb54c908d53e9\",\"run_c6f2bd252d93:99:da20650ce06747759b1876f16b0eeb5f\",\"run_c6f2bd252d93:98:de214d995e614d19a4884f1d439d98fb\",\"run_c6f2bd252d93:97:0c13bfdaae774c60b036830e041b0953\",\"run_c6f2bd252d93:96:81554beb6e45451a83eb319983e9bd0e\",\"run_c6f2bd252d93:95:ceb8a181c7f04c76b888458e5bda6718\",\"run_c6f2bd252d93:94:b5744eea679d40fe9f48a1c58a567c12\",\"run_c6f2bd252d93:93:dca18c5bf7ac4db7bbb8fc4dd3a7bf87\",\"run_c6f2bd252d93:92:476b665e05874e58b09855aaadbd35d4\",\"run_c6f2bd252d93:91:fef633b8208644c2857a9d05eed31541\",\"run_c6f2bd252d93:90:59ae5d6807914e7f9164e38ed4082efd\",\"run_c6f2bd252d93:89:1b827feec6ff48ab95bcc8a3ed829ee1\",\"run_c6f2bd252d93:88:2f0e46bd9c694819972c70bebec6c5c3\",\"run_c6f2bd252d93:87:bddaf373effa4fb591adffa312425e3f\",\"run_c6f2bd252d93:86:59660db520b449388e214db0fc13d246\",\"run_c6f2bd252d93:85:ba576770a75048b997c29627a3fad5fe\",\"run_c6f2bd252d93:84:7aa7dd2a30044d0ca2e85491764ee87b\",\"run_c6f2bd252d93:83:7ca1fd32bd074892be086fd24c9cf8b9\",\"run_c6f2bd252d93:82:98f48d79a49943cdb8fa82ef22001ab6\",\"run_c6f2bd252d93:81:da19cba49bdd4b6a969f025f7ebbb7c6\",\"run_c6f2bd252d93:80:af59ef01ef7e4f5898c2d610e8717c6a\",\"run_c6f2bd252d93:79:e8228ccd2f2a46daa71bb869af385ae9\",\"run_c6f2bd252d93:78:a83dbcc32f3043dfba271fa5486c01aa\",\"run_c6f2bd252d93:77:77cef780a1b545e08ccfc26707aa8a3c\",\"run_c6f2bd252d93:76:474122a325ad48dfbcb2a2af29849ac1\",\"run_c6f2bd252d93:75:4d6f7b3cfcf647c88ba18a5fd4daef1e\",\"run_c6f2bd252d93:74:9b1a7bf405bc4913a7dd18c503758ea8\",\"run_c6f2bd252d93:73:6c224c8e65a64004bfe9322c79a63142\",\"run_c6f2bd252d93:72:cad9ad65058d4e2c80afec2b82fd4b9e\",\"run_c6f2bd252d93:71:52643ca482e4434884712c3eaed898c7\",\"run_c6f2bd252d93:70:d0dbb17eb6d54230b98df145f21a0e9e\",\"run_c6f2bd252d93:69:8eec1b1a85c641c4b4755733ac4eb0aa\",\"run_c6f2bd252d93:68:f1ae488d5246415c98ecc6aaa981974e\",\"run_c6f2bd252d93:64:44e5238806c042a48e4989dfdc3f07c2\",\"run_c6f2bd252d93:52:8d14817e00164c0c855cd179aeede74c\",\"run_c6f2bd252d93:51:698f16634efd4072b16b5516a58e82b8\",\"run_c6f2bd252d93:50:dd562a4dbefc43f3a0cb00125012ed35\",\"run_c6f2bd252d93:47:765f9b3ac5c44c3e872e6d393619b58a\",\"run_c6f2bd252d93:46:0be0f5dd794b497b8cf5a9acf1973849\",\"run_c6f2bd252d93:45:2deb099af4764b9894231d025fefcfcc\",\"run_c6f2bd252d93:44:d882675a85df4b8ca8888d6877ec9b4e\",\"run_c6f2bd252d93:40:2713c9049ddd4b3e8e45d71ba73a68a8\",\"run_c6f2bd252d93:39:f601728edccb4c358361cbef70198080\",\"run_c6f2bd252d93:38:873700ed4b864a079d805e2961ab7143\",\"run_c6f2bd252d93:37:b132276c2d884589b2e2e3d38360493d\",\"run_c6f2bd252d93:36:44e4b5cb34904f0baab9838f2e9cb82e\",\"run_c6f2bd252d93:35:349eb00055364a5c90d10efd3fbd1a2e\",\"run_c6f2bd252d93:34:0f8bc452ded94bc3aa1f4a37c6831eee\",\"run_c6f2bd252d93:33:53dff2fb98a745e7aa41e0b67cb7e24d\",\"run_c6f2bd252d93:32:27aa62c25bab4f7cbe61e5f9fcd0d04d\",\"run_c6f2bd252d93:31:a363d4b175354b62906667624f4b87a8\",\"run_c6f2bd252d93:30:c3543fa39ac2405b86ad7eddb2b602a3\",\"run_c6f2bd252d93:29:5bbf3f2a48a743fbb170c35530ffb615\",\"run_c6f2bd252d93:28:30802be884e0482b8234c267312b7063\",\"run_c6f2bd252d93:27:e58a05ef1c614fe3be27ac87f6ddb89d\",\"run_c6f2bd252d93:26:1de561b79315470fbed7abc8f86c29c1\",\"run_c6f2bd252d93:25:27cc195cb1b74c2c8bd49b5b17970542\",\"run_c6f2bd252d93:24:1c9dfc54d930440cbc1a4937db097b66\",\"run_c6f2bd252d93:23:2c33046d695f408e90ca06d3cff1cf70\",\"run_c6f2bd252d93:22:2a365606f58d4bcd91637e1ee1b29742\",\"run_c6f2bd252d93:21:89b5004b1e2d4c91847910f8419fdce2\",\"run_c6f2bd252d93:20:ee53bd3243e549798cd92367fea99932\",\"run_c6f2bd252d93:19:b0e60dd051ed4116be0979e252ac4f11\",\"run_c6f2bd252d93:18:3c43250421084b74a4af54359e508296\",\"run_c6f2bd252d93:17:098dc8306694495b90db9f5636a1a240\",\"run_c6f2bd252d93:16:d70b739d94c94724aef18f6a64e83ea8\",\"run_c6f2bd252d93:15:6201f40c9bc74800b762ee10c32faf5c\",\"run_c6f2bd252d93:14:a4117c8cec1048c5aa7e69338257fc08\",\"run_c6f2bd252d93:13:7d2c5ba8d6bc4fce83100aac1c453b81\",\"run_c6f2bd252d93:12:3a5259720528441f9e36ef5fea6968a0\",\"run_c6f2bd252d93:11:b6c4002434594899babf193ace58a5b2\",\"run_c6f2bd252d93:10:effb354abcdc4becb9a9593bae2d0344\",\"run_c6f2bd252d93:9:7bff7f0f1dca4d668c61130fc11a9b30\",\"run_c6f2bd252d93:8:c0a226e649754a1f8b25ababdd1f2844\",\"run_c6f2bd252d93:7:8471091da69946eeb1b4fe026f225d18\",\"run_c6f2bd252d93:6:f5dad5f2f25a41f78a0d16ffec320fba\",\"run_c6f2bd252d93:5:9790697c71434ce885622ae9e367ffe1\"],\"boot_id\":\"cdc4ce8002ed4aec95e09c0b7415ac8c\",\"bounds\":{\"max_x\":36,\"max_y\":26,\"min_x\":0,\"min_y\":0},\"capability_profile_version\":\"sim-amr-radius-0.4m-v1\",\"deadman_trips\":0,\"environment_changes\":[{\"at\":1793706971.2090566,\"current\":{\"capability_profile_version\":\"sim-amr-radius-0.4m-v1\",\"map_version\":\"014b025016270a2d7993724f323a13cc98224681334e5f3c40abb7e289881a3e\",\"site_id\":\"sovereign-cleanroom\"},\"id\":\"10fe9a060de44164a8f4d88353de9aa9\",\"previous\":{\"capability_profile_version\":\"sim-amr-radius-0.4m-v1\",\"map_version\":\"e5e9613f5c0767800c041d41f0613a108dd4ceb05e3ca5e9e5f79f21675ccb2f\",\"site_id\":\"sovereign-cleanroom\"},\"reason\":\"scenario:clear\"},{\"at\":1793706970.0504458,\"current\":{\"capability_profile_version\":\"sim-amr-radius-0.4m-v1\",\"map_version\":\"e5e9613f5c0767800c041d41f0613a108dd4ceb05e3ca5e9e5f79f21675ccb2f\",\"site_id\":\"sovereign-cleanroom\"},\"id\":\"1ec0ab98c33e40d189fbc0ece9d47cd4\",\"previous\":{\"capability_profile_version\":\"sim-amr-radius-0.4m-v1\",\"map_version\":\"b62e8ce4bd0603c07f6f611fb3745f6e14d4ae95602137bbdcc0d406ecaf71b9\",\"site_id\":\"sovereign-cleanroom\"},\"reason\":\"scenario:path_blocked\"}],\"estop\":{\"engaged\":false,\"reason\":\"\",\"robot\":null,\"since\":null},\"events\":[\"scenario:clear\"],\"generation\":151,\"human\":{\"activity\":\"walking\",\"conf\":0.9,\"destination\":\"Crossing destination\",\"heading\":0.0,\"id\":\"nearest\",\"name\":\"Runner 1\",\"role\":\"primary\",\"speed\":0.837,\"type\":\"human\",\"x\":18.77,\"y\":16.75},\"human_conf\":0.0,\"human_detected\":false,\"human_distance_m\":18.145,\"idle_robots\":[],\"map_version\":\"014b025016270a2d7993724f323a13cc98224681334e5f3c40abb7e289881a3e\",\"mode\":\"live\",\"nearest_obstacle_m\":1.836,\"nearest_obstacle_xy\":[28,3.5],\"obstacles\":[{\"heading\":3.142,\"r\":1.9,\"type\":\"forklift\",\"x\":29.41,\"y\":12.75},{\"r\":0.4,\"type\":\"robot\",\"x\":6.06,\"y\":23.07}],\"robot_contacts\":0,\"robot_id\":\"robot-2\",\"seed\":42,\"sim_time\":361.0,\"site_constraints\":[],\"site_id\":\"sovereign-cleanroom\",\"speed\":0.0,\"t\":361.0,\"target\":null,\"theta\":0.0,\"timestamp\":1793707328.3685946,\"walking_humans\":[{\"activity\":\"working\",\"conf\":0.9,\"destination\":\"C-01\",\"heading\":1.268,\"name\":\"Worker A\",\"role\":\"worker\",\"speed\":0.0,\"type\":\"worker\",\"x\":5.75,\"y\":2.25},{\"activity\":\"walking\",\"conf\":0.9,\"destination\":\"Crossing destination\",\"heading\":0.0,\"name\":\"Runner 1\",\"role\":\"worker\",\"speed\":0.837,\"type\":\"worker\",\"x\":18.77,\"y\":16.75},{\"activity\":\"waiting_at_crossing\",\"conf\":0.9,\"destination\":\"Crossing destination\",\"heading\":3.142,\"name\":\"Runner 2\",\"role\":\"worker\",\"speed\":0.0,\"type\":\"worker\",\"x\":3.25,\"y\":11.75},{\"activity\":\"walking\",\"conf\":0.9,\"destination\":\"Crossing destination\",\"heading\":1.571,\"name\":\"Runner 3\",\"role\":\"worker\",\"speed\":1.148,\"type\":\"worker\",\"x\":22.75,\"y\":19.27}],\"x\":30.0,\"y\":2.5,\"zone\":\"staging\"}},\"governance\":{\"decision\":\"APPROVED\",\"hard_fail\":false,\"hard_fail_policies\":[],\"policy_hits\":[],\"policy_state\":\"SAFE\",\"reasons\":[],\"required_action\":null,\"risk_score\":0.0},\"proposal\":{\"intent\":\"MOVE_TO\",\"params\":{\"max_speed\":0.3,\"x\":29.85,\"y\":4.35},\"rationale\":\"Following plan waypoint\"}},\"prev_hash\":\"sha256:d5fc82ffc2853ca0f01ed0bd19d6327eba965129246ba281320753aedff6ce0b\",\"run_id\":\"run_f8bdbc5984ab\",\"ts\":\"2026-11-03T12:02:08.371507+00:00\",\"type\":\"DECISION\"}"
+      },
+      {
+        "id": "evt_65cc2733f8b0",
+        "ts": "2026-11-03T12:02:36.714329+00:00",
+        "type": "AUTHORITY",
+        "fields": {
+          "event": "permit_used",
+          "reason": null,
+          "action_id": "run_f8bdbc5984ab:105:6bfac1ce31d24c37bded7dd10befe581"
+        },
+        "source_event_hash": "sha256:73c07c151cb6ad0da948e77e3a5c88605ce2055261344c4a9162738fba8147c4",
+        "canonical_source_body": "{\"payload\":{\"action_id\":\"run_f8bdbc5984ab:105:6bfac1ce31d24c37bded7dd10befe581\",\"event\":\"permit_used\",\"policy_version\":\"04191ec27a83e803\",\"reason\":null,\"world_version\":147},\"prev_hash\":\"sha256:2fc5ced8fab5113e34490e810402666bc9090130fd88654ecfe95b01ff0eafc5\",\"run_id\":\"run_f8bdbc5984ab\",\"ts\":\"2026-11-03T12:02:36.714329+00:00\",\"type\":\"AUTHORITY\"}"
+      },
+      {
+        "id": "evt_0030f23ebaa0",
+        "ts": "2026-11-03T12:02:37.834224+00:00",
+        "type": "DECISION",
+        "fields": {
+          "proposal": {
+            "intent": "MOVE_TO",
+            "params": {
+              "x": 29.85,
+              "y": 4.35,
+              "max_speed": 0.3
+            },
+            "rationale": "Following plan waypoint"
+          },
+          "governance": {
+            "decision": "APPROVED",
+            "policy_hits": [],
+            "reasons": [],
+            "required_action": null,
+            "risk_score": 0.0,
+            "policy_state": "SAFE",
+            "hard_fail": false,
+            "hard_fail_policies": []
+          }
+        },
+        "source_event_hash": "sha256:d8317f864d057f904b0b8502120a42794a2122dcb97f929744d973bc04a194d5",
+        "canonical_source_body": "{\"payload\":{\"context\":{\"mission_goal\":{\"robot_id\":\"robot-2\",\"x\":18.0,\"y\":2.5,\"zone\":\"staging\"},\"telemetry\":{\"accepted_actions\":[\"run_f8bdbc5984ab:105:6bfac1ce31d24c37bded7dd10befe581\",\"run_c6f2bd252d93:103:d5f4faa73ab948db849a55546be0841c\",\"run_c6f2bd252d93:102:5c45748a60e64edb97878a293163300f\",\"run_c6f2bd252d93:101:fa59eb71613d46f78cffb4ff21b9e192\",\"run_c6f2bd252d93:100:b4eef7fd3c8549dc845bb54c908d53e9\",\"run_c6f2bd252d93:99:da20650ce06747759b1876f16b0eeb5f\",\"run_c6f2bd252d93:98:de214d995e614d19a4884f1d439d98fb\",\"run_c6f2bd252d93:97:0c13bfdaae774c60b036830e041b0953\",\"run_c6f2bd252d93:96:81554beb6e45451a83eb319983e9bd0e\",\"run_c6f2bd252d93:95:ceb8a181c7f04c76b888458e5bda6718\",\"run_c6f2bd252d93:94:b5744eea679d40fe9f48a1c58a567c12\",\"run_c6f2bd252d93:93:dca18c5bf7ac4db7bbb8fc4dd3a7bf87\",\"run_c6f2bd252d93:92:476b665e05874e58b09855aaadbd35d4\",\"run_c6f2bd252d93:91:fef633b8208644c2857a9d05eed31541\",\"run_c6f2bd252d93:90:59ae5d6807914e7f9164e38ed4082efd\",\"run_c6f2bd252d93:89:1b827feec6ff48ab95bcc8a3ed829ee1\",\"run_c6f2bd252d93:88:2f0e46bd9c694819972c70bebec6c5c3\",\"run_c6f2bd252d93:87:bddaf373effa4fb591adffa312425e3f\",\"run_c6f2bd252d93:86:59660db520b449388e214db0fc13d246\",\"run_c6f2bd252d93:85:ba576770a75048b997c29627a3fad5fe\",\"run_c6f2bd252d93:84:7aa7dd2a30044d0ca2e85491764ee87b\",\"run_c6f2bd252d93:83:7ca1fd32bd074892be086fd24c9cf8b9\",\"run_c6f2bd252d93:82:98f48d79a49943cdb8fa82ef22001ab6\",\"run_c6f2bd252d93:81:da19cba49bdd4b6a969f025f7ebbb7c6\",\"run_c6f2bd252d93:80:af59ef01ef7e4f5898c2d610e8717c6a\",\"run_c6f2bd252d93:79:e8228ccd2f2a46daa71bb869af385ae9\",\"run_c6f2bd252d93:78:a83dbcc32f3043dfba271fa5486c01aa\",\"run_c6f2bd252d93:77:77cef780a1b545e08ccfc26707aa8a3c\",\"run_c6f2bd252d93:76:474122a325ad48dfbcb2a2af29849ac1\",\"run_c6f2bd252d93:75:4d6f7b3cfcf647c88ba18a5fd4daef1e\",\"run_c6f2bd252d93:74:9b1a7bf405bc4913a7dd18c503758ea8\",\"run_c6f2bd252d93:73:6c224c8e65a64004bfe9322c79a63142\",\"run_c6f2bd252d93:72:cad9ad65058d4e2c80afec2b82fd4b9e\",\"run_c6f2bd252d93:71:52643ca482e4434884712c3eaed898c7\",\"run_c6f2bd252d93:70:d0dbb17eb6d54230b98df145f21a0e9e\",\"run_c6f2bd252d93:69:8eec1b1a85c641c4b4755733ac4eb0aa\",\"run_c6f2bd252d93:68:f1ae488d5246415c98ecc6aaa981974e\",\"run_c6f2bd252d93:64:44e5238806c042a48e4989dfdc3f07c2\",\"run_c6f2bd252d93:52:8d14817e00164c0c855cd179aeede74c\",\"run_c6f2bd252d93:51:698f16634efd4072b16b5516a58e82b8\",\"run_c6f2bd252d93:50:dd562a4dbefc43f3a0cb00125012ed35\",\"run_c6f2bd252d93:47:765f9b3ac5c44c3e872e6d393619b58a\",\"run_c6f2bd252d93:46:0be0f5dd794b497b8cf5a9acf1973849\",\"run_c6f2bd252d93:45:2deb099af4764b9894231d025fefcfcc\",\"run_c6f2bd252d93:44:d882675a85df4b8ca8888d6877ec9b4e\",\"run_c6f2bd252d93:40:2713c9049ddd4b3e8e45d71ba73a68a8\",\"run_c6f2bd252d93:39:f601728edccb4c358361cbef70198080\",\"run_c6f2bd252d93:38:873700ed4b864a079d805e2961ab7143\",\"run_c6f2bd252d93:37:b132276c2d884589b2e2e3d38360493d\",\"run_c6f2bd252d93:36:44e4b5cb34904f0baab9838f2e9cb82e\",\"run_c6f2bd252d93:35:349eb00055364a5c90d10efd3fbd1a2e\",\"run_c6f2bd252d93:34:0f8bc452ded94bc3aa1f4a37c6831eee\",\"run_c6f2bd252d93:33:53dff2fb98a745e7aa41e0b67cb7e24d\",\"run_c6f2bd252d93:32:27aa62c25bab4f7cbe61e5f9fcd0d04d\",\"run_c6f2bd252d93:31:a363d4b175354b62906667624f4b87a8\",\"run_c6f2bd252d93:30:c3543fa39ac2405b86ad7eddb2b602a3\",\"run_c6f2bd252d93:29:5bbf3f2a48a743fbb170c35530ffb615\",\"run_c6f2bd252d93:28:30802be884e0482b8234c267312b7063\",\"run_c6f2bd252d93:27:e58a05ef1c614fe3be27ac87f6ddb89d\",\"run_c6f2bd252d93:26:1de561b79315470fbed7abc8f86c29c1\",\"run_c6f2bd252d93:25:27cc195cb1b74c2c8bd49b5b17970542\",\"run_c6f2bd252d93:24:1c9dfc54d930440cbc1a4937db097b66\",\"run_c6f2bd252d93:23:2c33046d695f408e90ca06d3cff1cf70\",\"run_c6f2bd252d93:22:2a365606f58d4bcd91637e1ee1b29742\",\"run_c6f2bd252d93:21:89b5004b1e2d4c91847910f8419fdce2\",\"run_c6f2bd252d93:20:ee53bd3243e549798cd92367fea99932\",\"run_c6f2bd252d93:19:b0e60dd051ed4116be0979e252ac4f11\",\"run_c6f2bd252d93:18:3c43250421084b74a4af54359e508296\",\"run_c6f2bd252d93:17:098dc8306694495b90db9f5636a1a240\",\"run_c6f2bd252d93:16:d70b739d94c94724aef18f6a64e83ea8\",\"run_c6f2bd252d93:15:6201f40c9bc74800b762ee10c32faf5c\",\"run_c6f2bd252d93:14:a4117c8cec1048c5aa7e69338257fc08\",\"run_c6f2bd252d93:13:7d2c5ba8d6bc4fce83100aac1c453b81\",\"run_c6f2bd252d93:12:3a5259720528441f9e36ef5fea6968a0\",\"run_c6f2bd252d93:11:b6c4002434594899babf193ace58a5b2\",\"run_c6f2bd252d93:10:effb354abcdc4becb9a9593bae2d0344\",\"run_c6f2bd252d93:9:7bff7f0f1dca4d668c61130fc11a9b30\",\"run_c6f2bd252d93:8:c0a226e649754a1f8b25ababdd1f2844\",\"run_c6f2bd252d93:7:8471091da69946eeb1b4fe026f225d18\",\"run_c6f2bd252d93:6:f5dad5f2f25a41f78a0d16ffec320fba\",\"run_c6f2bd252d93:5:9790697c71434ce885622ae9e367ffe1\"],\"boot_id\":\"cdc4ce8002ed4aec95e09c0b7415ac8c\",\"bounds\":{\"max_x\":36,\"max_y\":26,\"min_x\":0,\"min_y\":0},\"capability_profile_version\":\"sim-amr-radius-0.4m-v1\",\"deadman_trips\":0,\"environment_changes\":[{\"at\":1793706971.2090566,\"current\":{\"capability_profile_version\":\"sim-amr-radius-0.4m-v1\",\"map_version\":\"014b025016270a2d7993724f323a13cc98224681334e5f3c40abb7e289881a3e\",\"site_id\":\"sovereign-cleanroom\"},\"id\":\"10fe9a060de44164a8f4d88353de9aa9\",\"previous\":{\"capability_profile_version\":\"sim-amr-radius-0.4m-v1\",\"map_version\":\"e5e9613f5c0767800c041d41f0613a108dd4ceb05e3ca5e9e5f79f21675ccb2f\",\"site_id\":\"sovereign-cleanroom\"},\"reason\":\"scenario:clear\"},{\"at\":1793706970.0504458,\"current\":{\"capability_profile_version\":\"sim-amr-radius-0.4m-v1\",\"map_version\":\"e5e9613f5c0767800c041d41f0613a108dd4ceb05e3ca5e9e5f79f21675ccb2f\",\"site_id\":\"sovereign-cleanroom\"},\"id\":\"1ec0ab98c33e40d189fbc0ece9d47cd4\",\"previous\":{\"capability_profile_version\":\"sim-amr-radius-0.4m-v1\",\"map_version\":\"b62e8ce4bd0603c07f6f611fb3745f6e14d4ae95602137bbdcc0d406ecaf71b9\",\"site_id\":\"sovereign-cleanroom\"},\"reason\":\"scenario:path_blocked\"}],\"estop\":{\"engaged\":false,\"reason\":\"\",\"robot\":null,\"since\":null},\"events\":[\"scenario:clear\"],\"generation\":154,\"human\":{\"activity\":\"walking\",\"conf\":0.9,\"destination\":\"Crossing destination\",\"heading\":-1.571,\"id\":\"nearest\",\"name\":\"Runner 3\",\"role\":\"primary\",\"speed\":1.148,\"type\":\"human\",\"x\":19.25,\"y\":14.6},\"human_conf\":0.0,\"human_detected\":false,\"human_distance_m\":16.107,\"idle_robots\":[],\"map_version\":\"014b025016270a2d7993724f323a13cc98224681334e5f3c40abb7e289881a3e\",\"mode\":\"live\",\"nearest_obstacle_m\":1.79,\"nearest_obstacle_xy\":[28,3.5],\"obstacles\":[{\"heading\":3.142,\"r\":1.9,\"type\":\"forklift\",\"x\":7.71,\"y\":12.75},{\"r\":0.4,\"type\":\"robot\",\"x\":6.06,\"y\":23.07}],\"robot_contacts\":0,\"robot_id\":\"robot-2\",\"seed\":42,\"sim_time\":383.0,\"site_constraints\":[],\"site_id\":\"sovereign-cleanroom\",\"speed\":0.3,\"t\":383.0,\"target\":{\"max_speed\":0.3,\"x\":29.85,\"y\":4.35},\"theta\":1.657,\"timestamp\":1793707357.829346,\"walking_humans\":[{\"activity\":\"working\",\"conf\":0.9,\"destination\":\"Cold storage\",\"heading\":1.381,\"name\":\"Worker A\",\"role\":\"worker\",\"speed\":0.0,\"type\":\"worker\",\"x\":5.75,\"y\":1.75},{\"activity\":\"waiting_at_crossing\",\"conf\":0.9,\"destination\":\"Crossing destination\",\"heading\":0.0,\"name\":\"Runner 1\",\"role\":\"worker\",\"speed\":0.0,\"type\":\"worker\",\"x\":20.75,\"y\":16.75},{\"activity\":\"waiting_at_crossing\",\"conf\":0.9,\"destination\":\"Crossing destination\",\"heading\":3.142,\"name\":\"Runner 2\",\"role\":\"worker\",\"speed\":0.0,\"type\":\"worker\",\"x\":3.25,\"y\":11.75},{\"activity\":\"walking\",\"conf\":0.9,\"destination\":\"Crossing destination\",\"heading\":-1.571,\"name\":\"Runner 3\",\"role\":\"worker\",\"speed\":1.148,\"type\":\"worker\",\"x\":19.25,\"y\":14.6}],\"x\":30.0,\"y\":2.607,\"zone\":\"staging\"}},\"governance\":{\"decision\":\"APPROVED\",\"hard_fail\":false,\"hard_fail_policies\":[],\"policy_hits\":[],\"policy_state\":\"SAFE\",\"reasons\":[],\"required_action\":null,\"risk_score\":0.0},\"proposal\":{\"intent\":\"MOVE_TO\",\"params\":{\"max_speed\":0.3,\"x\":29.85,\"y\":4.35},\"rationale\":\"Following plan waypoint\"}},\"prev_hash\":\"sha256:67004c99a8f75cef1cda86bf1d1e1d524969b3d3f932ba05fcf897c9fe64aace\",\"run_id\":\"run_f8bdbc5984ab\",\"ts\":\"2026-11-03T12:02:37.834224+00:00\",\"type\":\"DECISION\"}"
+      },
+      {
+        "id": "evt_0b5a92dc17f7",
+        "ts": "2026-11-03T12:04:23.039357+00:00",
+        "type": "DECISION",
+        "fields": {
+          "proposal": {
+            "intent": "MOVE_TO",
+            "params": {
+              "x": 18.6,
+              "y": 9.9,
+              "max_speed": 0.3
+            },
+            "rationale": "Following plan waypoint"
+          },
+          "governance": {
+            "decision": "DENIED",
+            "policy_hits": [
+              "HUMAN_PROXIMITY_02"
+            ],
+            "reasons": [
+              "Human too close: 0.38m < stop radius 1.0m. Full stop required."
+            ],
+            "required_action": "Full stop — human within safety perimeter.",
+            "risk_score": 0.95,
+            "policy_state": "STOP",
+            "hard_fail": true,
+            "hard_fail_policies": [
+              "HUMAN_PROXIMITY_02"
+            ]
+          }
+        },
+        "source_event_hash": "sha256:027970eae272cca901856bf52f4aaa3ad38df00cc1dabbcf99e3474a6bf873b5",
+        "canonical_source_body": "{\"payload\":{\"context\":{\"mission_goal\":{\"robot_id\":\"robot-2\",\"x\":18.0,\"y\":2.5,\"zone\":\"staging\"},\"telemetry\":{\"accepted_actions\":[\"run_f8bdbc5984ab:178:d958f588fdb64263bde6de67cbd3f917\",\"run_f8bdbc5984ab:173:050d50229ce440c5a43645e75bb32ccb\",\"run_f8bdbc5984ab:172:21632f760d264eac85ff71ab429edf78\",\"run_f8bdbc5984ab:171:270b4b3854574f758d38ca1b31c3db9f\",\"run_f8bdbc5984ab:170:01cd58e7bf2b496795c04b744b06a71e\",\"run_f8bdbc5984ab:163:2907afc5888c4e9ab8bd3d3ee516bb8d\",\"run_f8bdbc5984ab:156:544b3f53d7ca44c686d4699b51955d2d\",\"run_f8bdbc5984ab:155:632dfeac521a4ba386a78b2255fcd400\",\"run_f8bdbc5984ab:154:55942c0efefb4e5e843b7c4b6112e07e\",\"run_f8bdbc5984ab:152:c330c8e8a9344c2c8c208e331588891a\",\"run_f8bdbc5984ab:151:d578909877a04564bc6fe83ec9649df4\",\"run_f8bdbc5984ab:150:8d2db97727ea4be59c923b33843bc80a\",\"run_f8bdbc5984ab:149:ebc236222f6a48df903fbba6dc5df890\",\"run_f8bdbc5984ab:148:87e05ac530db4a9aa70209a865982051\",\"run_f8bdbc5984ab:147:61e3d1059b364821b792f6551a4a8da9\",\"run_f8bdbc5984ab:144:c0d31c7dd20f43858f4a3eae02fa9565\",\"run_f8bdbc5984ab:143:f9995be2d47443b4a4b5be291bbd4ef8\",\"run_f8bdbc5984ab:142:d0f2b018a48f4af092418f73e81e69a8\",\"run_f8bdbc5984ab:141:2765fd9527fb4467833e53d44a8e42af\",\"run_f8bdbc5984ab:140:e7dec40596e9484f83afc47a36b4b54a\",\"run_f8bdbc5984ab:139:8dba0d4fecda4890afca8d089f89b9fc\",\"run_f8bdbc5984ab:138:55539cb41ef94f40b8696f32dc330be9\",\"run_f8bdbc5984ab:137:18733e78acad401a8c8a244d206a19e5\",\"run_f8bdbc5984ab:136:be7fa7bda3a7434a819313fad08fc229\",\"run_f8bdbc5984ab:135:6bf8d11da71b45d8b0f904e1b6b918c8\",\"run_f8bdbc5984ab:134:cda942370bb24bc5a82ee7c6ac1999d8\",\"run_f8bdbc5984ab:133:9ad91855b8c94a1ca029cc9c7f9781e4\",\"run_f8bdbc5984ab:132:f06bdf5cfcd14895b3b6e4d8d5b63c4e\",\"run_f8bdbc5984ab:131:ea45e71ecf0f4e1c90633d2e45c5db75\",\"run_f8bdbc5984ab:130:8f71e1dee2c341a7a350cbe0f018020a\",\"run_f8bdbc5984ab:129:f2409873aab446289bff8891fe8b7c55\",\"run_f8bdbc5984ab:128:f157f4b83768483da6db624389830852\",\"run_f8bdbc5984ab:127:9d7ae1582f004758b644afa079a710cc\",\"run_f8bdbc5984ab:126:03d3d344b6c74d4aa5b4e111e6eb6116\",\"run_f8bdbc5984ab:125:be1cc00e9b8a4805b77b46e5352597fd\",\"run_f8bdbc5984ab:124:2513945874fc40719bac5846d98ab5f1\",\"run_f8bdbc5984ab:123:40fe147e6ce7433d89c59b7cb185bb79\",\"run_f8bdbc5984ab:122:8d92ed65f99f4617904045ec51630aa5\",\"run_f8bdbc5984ab:121:d11bd56540104c5c9a1da9b56fabc2d9\",\"run_f8bdbc5984ab:120:f8950a6c7182445b899f19ab1b80fa19\",\"run_f8bdbc5984ab:119:e0ac778d1e3a4e86a13de120f4c1e5c9\",\"run_f8bdbc5984ab:118:d8c4437e99fe426185b59f4c37ff9311\",\"run_f8bdbc5984ab:117:b4d0bb48897b4c68ab12b90a714da755\",\"run_f8bdbc5984ab:116:da7c85c9c6c4460abe9f489738cdea48\",\"run_f8bdbc5984ab:115:1a07d89cbfe945e89a67ad66dc363d09\",\"run_f8bdbc5984ab:114:2aef87f95d8842bd9486905e447f029c\",\"run_f8bdbc5984ab:113:79e0f89017b84bd0856b8c8ce0842c91\",\"run_f8bdbc5984ab:112:db4c0505fdd2427c935c040231c33f95\",\"run_f8bdbc5984ab:111:1128447a3e674d1494073ef9d9de5d20\",\"run_f8bdbc5984ab:110:2381eaea00d5471ab1cc1b54e1b6323e\",\"run_f8bdbc5984ab:109:41c75f46cf6a4ec58d12f011fd74fc60\",\"run_f8bdbc5984ab:108:26e5db0b05f44e28b07fda210515a34c\",\"run_f8bdbc5984ab:106:4c132b32d4454e8ea68fa8ae4a46969b\",\"run_f8bdbc5984ab:105:6bfac1ce31d24c37bded7dd10befe581\",\"run_c6f2bd252d93:103:d5f4faa73ab948db849a55546be0841c\",\"run_c6f2bd252d93:102:5c45748a60e64edb97878a293163300f\",\"run_c6f2bd252d93:101:fa59eb71613d46f78cffb4ff21b9e192\",\"run_c6f2bd252d93:100:b4eef7fd3c8549dc845bb54c908d53e9\",\"run_c6f2bd252d93:99:da20650ce06747759b1876f16b0eeb5f\",\"run_c6f2bd252d93:98:de214d995e614d19a4884f1d439d98fb\",\"run_c6f2bd252d93:97:0c13bfdaae774c60b036830e041b0953\",\"run_c6f2bd252d93:96:81554beb6e45451a83eb319983e9bd0e\",\"run_c6f2bd252d93:95:ceb8a181c7f04c76b888458e5bda6718\",\"run_c6f2bd252d93:94:b5744eea679d40fe9f48a1c58a567c12\",\"run_c6f2bd252d93:93:dca18c5bf7ac4db7bbb8fc4dd3a7bf87\",\"run_c6f2bd252d93:92:476b665e05874e58b09855aaadbd35d4\",\"run_c6f2bd252d93:91:fef633b8208644c2857a9d05eed31541\",\"run_c6f2bd252d93:90:59ae5d6807914e7f9164e38ed4082efd\",\"run_c6f2bd252d93:89:1b827feec6ff48ab95bcc8a3ed829ee1\",\"run_c6f2bd252d93:88:2f0e46bd9c694819972c70bebec6c5c3\",\"run_c6f2bd252d93:87:bddaf373effa4fb591adffa312425e3f\",\"run_c6f2bd252d93:86:59660db520b449388e214db0fc13d246\",\"run_c6f2bd252d93:85:ba576770a75048b997c29627a3fad5fe\",\"run_c6f2bd252d93:84:7aa7dd2a30044d0ca2e85491764ee87b\",\"run_c6f2bd252d93:83:7ca1fd32bd074892be086fd24c9cf8b9\",\"run_c6f2bd252d93:82:98f48d79a49943cdb8fa82ef22001ab6\",\"run_c6f2bd252d93:81:da19cba49bdd4b6a969f025f7ebbb7c6\",\"run_c6f2bd252d93:80:af59ef01ef7e4f5898c2d610e8717c6a\",\"run_c6f2bd252d93:79:e8228ccd2f2a46daa71bb869af385ae9\",\"run_c6f2bd252d93:78:a83dbcc32f3043dfba271fa5486c01aa\",\"run_c6f2bd252d93:77:77cef780a1b545e08ccfc26707aa8a3c\",\"run_c6f2bd252d93:76:474122a325ad48dfbcb2a2af29849ac1\",\"run_c6f2bd252d93:75:4d6f7b3cfcf647c88ba18a5fd4daef1e\",\"run_c6f2bd252d93:74:9b1a7bf405bc4913a7dd18c503758ea8\",\"run_c6f2bd252d93:73:6c224c8e65a64004bfe9322c79a63142\",\"run_c6f2bd252d93:72:cad9ad65058d4e2c80afec2b82fd4b9e\",\"run_c6f2bd252d93:71:52643ca482e4434884712c3eaed898c7\",\"run_c6f2bd252d93:70:d0dbb17eb6d54230b98df145f21a0e9e\",\"run_c6f2bd252d93:69:8eec1b1a85c641c4b4755733ac4eb0aa\",\"run_c6f2bd252d93:68:f1ae488d5246415c98ecc6aaa981974e\",\"run_c6f2bd252d93:64:44e5238806c042a48e4989dfdc3f07c2\",\"run_c6f2bd252d93:52:8d14817e00164c0c855cd179aeede74c\",\"run_c6f2bd252d93:51:698f16634efd4072b16b5516a58e82b8\",\"run_c6f2bd252d93:50:dd562a4dbefc43f3a0cb00125012ed35\",\"run_c6f2bd252d93:47:765f9b3ac5c44c3e872e6d393619b58a\",\"run_c6f2bd252d93:46:0be0f5dd794b497b8cf5a9acf1973849\",\"run_c6f2bd252d93:45:2deb099af4764b9894231d025fefcfcc\",\"run_c6f2bd252d93:44:d882675a85df4b8ca8888d6877ec9b4e\",\"run_c6f2bd252d93:40:2713c9049ddd4b3e8e45d71ba73a68a8\",\"run_c6f2bd252d93:39:f601728edccb4c358361cbef70198080\",\"run_c6f2bd252d93:38:873700ed4b864a079d805e2961ab7143\",\"run_c6f2bd252d93:37:b132276c2d884589b2e2e3d38360493d\",\"run_c6f2bd252d93:36:44e4b5cb34904f0baab9838f2e9cb82e\",\"run_c6f2bd252d93:35:349eb00055364a5c90d10efd3fbd1a2e\",\"run_c6f2bd252d93:34:0f8bc452ded94bc3aa1f4a37c6831eee\",\"run_c6f2bd252d93:33:53dff2fb98a745e7aa41e0b67cb7e24d\",\"run_c6f2bd252d93:32:27aa62c25bab4f7cbe61e5f9fcd0d04d\",\"run_c6f2bd252d93:31:a363d4b175354b62906667624f4b87a8\",\"run_c6f2bd252d93:30:c3543fa39ac2405b86ad7eddb2b602a3\",\"run_c6f2bd252d93:29:5bbf3f2a48a743fbb170c35530ffb615\",\"run_c6f2bd252d93:28:30802be884e0482b8234c267312b7063\",\"run_c6f2bd252d93:27:e58a05ef1c614fe3be27ac87f6ddb89d\",\"run_c6f2bd252d93:26:1de561b79315470fbed7abc8f86c29c1\",\"run_c6f2bd252d93:25:27cc195cb1b74c2c8bd49b5b17970542\",\"run_c6f2bd252d93:24:1c9dfc54d930440cbc1a4937db097b66\",\"run_c6f2bd252d93:23:2c33046d695f408e90ca06d3cff1cf70\",\"run_c6f2bd252d93:22:2a365606f58d4bcd91637e1ee1b29742\",\"run_c6f2bd252d93:21:89b5004b1e2d4c91847910f8419fdce2\",\"run_c6f2bd252d93:20:ee53bd3243e549798cd92367fea99932\",\"run_c6f2bd252d93:19:b0e60dd051ed4116be0979e252ac4f11\",\"run_c6f2bd252d93:18:3c43250421084b74a4af54359e508296\",\"run_c6f2bd252d93:17:098dc8306694495b90db9f5636a1a240\",\"run_c6f2bd252d93:16:d70b739d94c94724aef18f6a64e83ea8\",\"run_c6f2bd252d93:15:6201f40c9bc74800b762ee10c32faf5c\",\"run_c6f2bd252d93:14:a4117c8cec1048c5aa7e69338257fc08\",\"run_c6f2bd252d93:13:7d2c5ba8d6bc4fce83100aac1c453b81\",\"run_c6f2bd252d93:12:3a5259720528441f9e36ef5fea6968a0\",\"run_c6f2bd252d93:11:b6c4002434594899babf193ace58a5b2\",\"run_c6f2bd252d93:10:effb354abcdc4becb9a9593bae2d0344\",\"run_c6f2bd252d93:9:7bff7f0f1dca4d668c61130fc11a9b30\",\"run_c6f2bd252d93:8:c0a226e649754a1f8b25ababdd1f2844\",\"run_c6f2bd252d93:7:8471091da69946eeb1b4fe026f225d18\",\"run_c6f2bd252d93:6:f5dad5f2f25a41f78a0d16ffec320fba\",\"run_c6f2bd252d93:5:9790697c71434ce885622ae9e367ffe1\"],\"boot_id\":\"cdc4ce8002ed4aec95e09c0b7415ac8c\",\"bounds\":{\"max_x\":36,\"max_y\":26,\"min_x\":0,\"min_y\":0},\"capability_profile_version\":\"sim-amr-radius-0.4m-v1\",\"deadman_trips\":0,\"environment_changes\":[{\"at\":1793706971.2090566,\"current\":{\"capability_profile_version\":\"sim-amr-radius-0.4m-v1\",\"map_version\":\"014b025016270a2d7993724f323a13cc98224681334e5f3c40abb7e289881a3e\",\"site_id\":\"sovereign-cleanroom\"},\"id\":\"10fe9a060de44164a8f4d88353de9aa9\",\"previous\":{\"capability_profile_version\":\"sim-amr-radius-0.4m-v1\",\"map_version\":\"e5e9613f5c0767800c041d41f0613a108dd4ceb05e3ca5e9e5f79f21675ccb2f\",\"site_id\":\"sovereign-cleanroom\"},\"reason\":\"scenario:clear\"},{\"at\":1793706970.0504458,\"current\":{\"capability_profile_version\":\"sim-amr-radius-0.4m-v1\",\"map_version\":\"e5e9613f5c0767800c041d41f0613a108dd4ceb05e3ca5e9e5f79f21675ccb2f\",\"site_id\":\"sovereign-cleanroom\"},\"id\":\"1ec0ab98c33e40d189fbc0ece9d47cd4\",\"previous\":{\"capability_profile_version\":\"sim-amr-radius-0.4m-v1\",\"map_version\":\"b62e8ce4bd0603c07f6f611fb3745f6e14d4ae95602137bbdcc0d406ecaf71b9\",\"site_id\":\"sovereign-cleanroom\"},\"reason\":\"scenario:path_blocked\"}],\"estop\":{\"engaged\":false,\"reason\":\"\",\"robot\":null,\"since\":null},\"events\":[\"scenario:clear\"],\"generation\":259,\"human\":{\"activity\":\"walking\",\"conf\":0.9,\"destination\":\"Crossing destination\",\"heading\":1.571,\"id\":\"nearest\",\"name\":\"Runner 3\",\"role\":\"primary\",\"speed\":1.148,\"type\":\"human\",\"x\":19.25,\"y\":12.05},\"human_conf\":0.936,\"human_detected\":true,\"human_distance_m\":0.378,\"idle_robots\":[],\"map_version\":\"014b025016270a2d7993724f323a13cc98224681334e5f3c40abb7e289881a3e\",\"mode\":\"live\",\"nearest_obstacle_m\":1.022,\"nearest_obstacle_xy\":[20,10.68],\"obstacles\":[{\"heading\":3.142,\"r\":1.9,\"type\":\"forklift\",\"x\":23.67,\"y\":12.75},{\"r\":0.4,\"type\":\"robot\",\"x\":6.06,\"y\":23.07}],\"robot_contacts\":0,\"robot_id\":\"robot-2\",\"seed\":42,\"sim_time\":474.9,\"site_constraints\":[],\"site_id\":\"sovereign-cleanroom\",\"speed\":0.0,\"t\":474.9,\"target\":null,\"theta\":3.073,\"timestamp\":1793707463.0305476,\"walking_humans\":[{\"activity\":\"working\",\"conf\":0.9,\"destination\":\"Cold storage\",\"heading\":1.381,\"name\":\"Worker A\",\"role\":\"worker\",\"speed\":0.0,\"type\":\"worker\",\"x\":5.75,\"y\":1.75},{\"activity\":\"waiting_at_crossing\",\"conf\":0.9,\"destination\":\"Crossing destination\",\"heading\":0.0,\"name\":\"Runner 1\",\"role\":\"worker\",\"speed\":0.0,\"type\":\"worker\",\"x\":20.75,\"y\":16.75},{\"activity\":\"walking\",\"conf\":0.9,\"destination\":\"Crossing destination\",\"heading\":0.0,\"name\":\"Runner 2\",\"role\":\"worker\",\"speed\":1.081,\"type\":\"worker\",\"x\":7.79,\"y\":11.75},{\"activity\":\"walking\",\"conf\":0.9,\"destination\":\"Crossing destination\",\"heading\":1.571,\"name\":\"Runner 3\",\"role\":\"worker\",\"speed\":1.148,\"type\":\"worker\",\"x\":19.25,\"y\":12.05}],\"x\":19.041,\"y\":11.73,\"zone\":\"corridor\"}},\"governance\":{\"decision\":\"DENIED\",\"hard_fail\":true,\"hard_fail_policies\":[\"HUMAN_PROXIMITY_02\"],\"policy_hits\":[\"HUMAN_PROXIMITY_02\"],\"policy_state\":\"STOP\",\"reasons\":[\"Human too close: 0.38m < stop radius 1.0m. Full stop required.\"],\"required_action\":\"Full stop — human within safety perimeter.\",\"risk_score\":0.95},\"proposal\":{\"intent\":\"MOVE_TO\",\"params\":{\"max_speed\":0.3,\"x\":18.6,\"y\":9.9},\"rationale\":\"Following plan waypoint\"}},\"prev_hash\":\"sha256:ecfb60b674711bdfe8f4e6403c784b865926457c081c7f68c1d13b0e81b90998\",\"run_id\":\"run_f8bdbc5984ab\",\"ts\":\"2026-11-03T12:04:23.039357+00:00\",\"type\":\"DECISION\"}"
+      },
+      {
+        "id": "evt_b6ef905be414",
+        "ts": "2026-11-03T12:04:23.059893+00:00",
+        "type": "EXECUTION",
+        "fields": {
+          "command": {
+            "intent": "STOP",
+            "params": {}
+          },
+          "result": {
+            "ok": true,
+            "stopped": true,
+            "robot_id": "robot-2"
+          }
+        },
+        "source_event_hash": "sha256:7b286e610d645f31f000de3df43fa2a9ae616405314f5526c651edbdd4528703",
+        "canonical_source_body": "{\"payload\":{\"command\":{\"intent\":\"STOP\",\"params\":{}},\"decision\":\"DENIED\",\"enforced_by_gate\":true,\"policy_hits\":[\"HUMAN_PROXIMITY_02\"],\"result\":{\"ok\":true,\"robot_id\":\"robot-2\",\"stopped\":true},\"verified\":true},\"prev_hash\":\"sha256:027970eae272cca901856bf52f4aaa3ad38df00cc1dabbcf99e3474a6bf873b5\",\"run_id\":\"run_f8bdbc5984ab\",\"ts\":\"2026-11-03T12:04:23.059893+00:00\",\"type\":\"EXECUTION\"}"
+      },
+      {
+        "id": "evt_e18d4b6819ff",
+        "ts": "2026-11-03T12:04:24.842082+00:00",
+        "type": "PLAN",
+        "fields": {
+          "plan": {
+            "waypoints": [
+              {
+                "x": 18.0,
+                "y": 2.5,
+                "max_speed": 0.4
+              }
+            ],
+            "rationale": "[Fallback] Deterministic direct-to-goal plan.",
+            "estimated_time_s": 15.0,
+            "model_used": "deterministic_fallback",
+            "lessons_applied": []
+          },
+          "source": "fallback"
+        },
+        "source_event_hash": "sha256:38c2cac5a3a7a859b345c581a257900d00680ff9e40d3596021da5ddbdf5c2f1",
+        "canonical_source_body": "{\"payload\":{\"blocked_waypoint\":{\"max_speed\":0.3,\"x\":18.6,\"y\":9.9},\"lessons_applied\":[],\"lessons_offered\":[],\"note\":\"Replan after governance denial\",\"plan\":{\"estimated_time_s\":15.0,\"lessons_applied\":[],\"model_used\":\"deterministic_fallback\",\"rationale\":\"[Fallback] Deterministic direct-to-goal plan.\",\"waypoints\":[{\"max_speed\":0.4,\"x\":18.0,\"y\":2.5}]},\"source\":\"fallback\",\"task_check\":{\"metrics\":{\"end_distance_to_goal_m\":0.0,\"goal\":{\"x\":18.0,\"y\":2.5},\"length_limit_m\":26.6,\"plan_length_m\":9.3,\"reference_length_m\":9.3,\"waypoints\":1},\"reasons\":[],\"verdict\":\"ON_TASK\"}},\"prev_hash\":\"sha256:89642a6271e953d67daad28896b2d8136a88f8f3d1d7d0a8633a8b6208e0ee9c\",\"run_id\":\"run_f8bdbc5984ab\",\"ts\":\"2026-11-03T12:04:24.842082+00:00\",\"type\":\"PLAN\"}"
+      },
+      {
+        "id": "evt_dc1fd051140c",
+        "ts": "2026-11-03T12:04:26.405331+00:00",
+        "type": "AUTHORITY",
+        "fields": {
+          "event": "permit_used",
+          "reason": null,
+          "action_id": "run_f8bdbc5984ab:179:aeeb2fe046184a3788c2e3288c9c5938"
+        },
+        "source_event_hash": "sha256:ca82bcfedf267df99ef8e6d140c17d40742da58dec14875a96db9ad69132f559",
+        "canonical_source_body": "{\"payload\":{\"action_id\":\"run_f8bdbc5984ab:179:aeeb2fe046184a3788c2e3288c9c5938\",\"event\":\"permit_used\",\"policy_version\":\"04191ec27a83e803\",\"reason\":null,\"world_version\":253},\"prev_hash\":\"sha256:10e757477db5853c82f6422366ed813d3375059a8f0dea0829862a303c7ddffc\",\"run_id\":\"run_f8bdbc5984ab\",\"ts\":\"2026-11-03T12:04:26.405331+00:00\",\"type\":\"AUTHORITY\"}"
+      },
+      {
+        "id": "evt_c1781604bef2",
+        "ts": "2026-11-03T12:04:27.457215+00:00",
+        "type": "DECISION",
+        "fields": {
+          "proposal": {
+            "intent": "MOVE_TO",
+            "params": {
+              "x": 18.0,
+              "y": 2.5,
+              "max_speed": 0.4
+            },
+            "rationale": "Following plan waypoint"
+          },
+          "governance": {
+            "decision": "APPROVED",
+            "policy_hits": [],
+            "reasons": [],
+            "required_action": null,
+            "risk_score": 0.0,
+            "policy_state": "SAFE",
+            "hard_fail": false,
+            "hard_fail_policies": []
+          }
+        },
+        "source_event_hash": "sha256:4cb53bb76e6b912b6e6c64b83f46507030107caab1f974cf710db1e1997f4e1a",
+        "canonical_source_body": "{\"payload\":{\"context\":{\"mission_goal\":{\"robot_id\":\"robot-2\",\"x\":18.0,\"y\":2.5,\"zone\":\"staging\"},\"telemetry\":{\"accepted_actions\":[\"run_f8bdbc5984ab:179:aeeb2fe046184a3788c2e3288c9c5938\",\"run_f8bdbc5984ab:178:d958f588fdb64263bde6de67cbd3f917\",\"run_f8bdbc5984ab:173:050d50229ce440c5a43645e75bb32ccb\",\"run_f8bdbc5984ab:172:21632f760d264eac85ff71ab429edf78\",\"run_f8bdbc5984ab:171:270b4b3854574f758d38ca1b31c3db9f\",\"run_f8bdbc5984ab:170:01cd58e7bf2b496795c04b744b06a71e\",\"run_f8bdbc5984ab:163:2907afc5888c4e9ab8bd3d3ee516bb8d\",\"run_f8bdbc5984ab:156:544b3f53d7ca44c686d4699b51955d2d\",\"run_f8bdbc5984ab:155:632dfeac521a4ba386a78b2255fcd400\",\"run_f8bdbc5984ab:154:55942c0efefb4e5e843b7c4b6112e07e\",\"run_f8bdbc5984ab:152:c330c8e8a9344c2c8c208e331588891a\",\"run_f8bdbc5984ab:151:d578909877a04564bc6fe83ec9649df4\",\"run_f8bdbc5984ab:150:8d2db97727ea4be59c923b33843bc80a\",\"run_f8bdbc5984ab:149:ebc236222f6a48df903fbba6dc5df890\",\"run_f8bdbc5984ab:148:87e05ac530db4a9aa70209a865982051\",\"run_f8bdbc5984ab:147:61e3d1059b364821b792f6551a4a8da9\",\"run_f8bdbc5984ab:144:c0d31c7dd20f43858f4a3eae02fa9565\",\"run_f8bdbc5984ab:143:f9995be2d47443b4a4b5be291bbd4ef8\",\"run_f8bdbc5984ab:142:d0f2b018a48f4af092418f73e81e69a8\",\"run_f8bdbc5984ab:141:2765fd9527fb4467833e53d44a8e42af\",\"run_f8bdbc5984ab:140:e7dec40596e9484f83afc47a36b4b54a\",\"run_f8bdbc5984ab:139:8dba0d4fecda4890afca8d089f89b9fc\",\"run_f8bdbc5984ab:138:55539cb41ef94f40b8696f32dc330be9\",\"run_f8bdbc5984ab:137:18733e78acad401a8c8a244d206a19e5\",\"run_f8bdbc5984ab:136:be7fa7bda3a7434a819313fad08fc229\",\"run_f8bdbc5984ab:135:6bf8d11da71b45d8b0f904e1b6b918c8\",\"run_f8bdbc5984ab:134:cda942370bb24bc5a82ee7c6ac1999d8\",\"run_f8bdbc5984ab:133:9ad91855b8c94a1ca029cc9c7f9781e4\",\"run_f8bdbc5984ab:132:f06bdf5cfcd14895b3b6e4d8d5b63c4e\",\"run_f8bdbc5984ab:131:ea45e71ecf0f4e1c90633d2e45c5db75\",\"run_f8bdbc5984ab:130:8f71e1dee2c341a7a350cbe0f018020a\",\"run_f8bdbc5984ab:129:f2409873aab446289bff8891fe8b7c55\",\"run_f8bdbc5984ab:128:f157f4b83768483da6db624389830852\",\"run_f8bdbc5984ab:127:9d7ae1582f004758b644afa079a710cc\",\"run_f8bdbc5984ab:126:03d3d344b6c74d4aa5b4e111e6eb6116\",\"run_f8bdbc5984ab:125:be1cc00e9b8a4805b77b46e5352597fd\",\"run_f8bdbc5984ab:124:2513945874fc40719bac5846d98ab5f1\",\"run_f8bdbc5984ab:123:40fe147e6ce7433d89c59b7cb185bb79\",\"run_f8bdbc5984ab:122:8d92ed65f99f4617904045ec51630aa5\",\"run_f8bdbc5984ab:121:d11bd56540104c5c9a1da9b56fabc2d9\",\"run_f8bdbc5984ab:120:f8950a6c7182445b899f19ab1b80fa19\",\"run_f8bdbc5984ab:119:e0ac778d1e3a4e86a13de120f4c1e5c9\",\"run_f8bdbc5984ab:118:d8c4437e99fe426185b59f4c37ff9311\",\"run_f8bdbc5984ab:117:b4d0bb48897b4c68ab12b90a714da755\",\"run_f8bdbc5984ab:116:da7c85c9c6c4460abe9f489738cdea48\",\"run_f8bdbc5984ab:115:1a07d89cbfe945e89a67ad66dc363d09\",\"run_f8bdbc5984ab:114:2aef87f95d8842bd9486905e447f029c\",\"run_f8bdbc5984ab:113:79e0f89017b84bd0856b8c8ce0842c91\",\"run_f8bdbc5984ab:112:db4c0505fdd2427c935c040231c33f95\",\"run_f8bdbc5984ab:111:1128447a3e674d1494073ef9d9de5d20\",\"run_f8bdbc5984ab:110:2381eaea00d5471ab1cc1b54e1b6323e\",\"run_f8bdbc5984ab:109:41c75f46cf6a4ec58d12f011fd74fc60\",\"run_f8bdbc5984ab:108:26e5db0b05f44e28b07fda210515a34c\",\"run_f8bdbc5984ab:106:4c132b32d4454e8ea68fa8ae4a46969b\",\"run_f8bdbc5984ab:105:6bfac1ce31d24c37bded7dd10befe581\",\"run_c6f2bd252d93:103:d5f4faa73ab948db849a55546be0841c\",\"run_c6f2bd252d93:102:5c45748a60e64edb97878a293163300f\",\"run_c6f2bd252d93:101:fa59eb71613d46f78cffb4ff21b9e192\",\"run_c6f2bd252d93:100:b4eef7fd3c8549dc845bb54c908d53e9\",\"run_c6f2bd252d93:99:da20650ce06747759b1876f16b0eeb5f\",\"run_c6f2bd252d93:98:de214d995e614d19a4884f1d439d98fb\",\"run_c6f2bd252d93:97:0c13bfdaae774c60b036830e041b0953\",\"run_c6f2bd252d93:96:81554beb6e45451a83eb319983e9bd0e\",\"run_c6f2bd252d93:95:ceb8a181c7f04c76b888458e5bda6718\",\"run_c6f2bd252d93:94:b5744eea679d40fe9f48a1c58a567c12\",\"run_c6f2bd252d93:93:dca18c5bf7ac4db7bbb8fc4dd3a7bf87\",\"run_c6f2bd252d93:92:476b665e05874e58b09855aaadbd35d4\",\"run_c6f2bd252d93:91:fef633b8208644c2857a9d05eed31541\",\"run_c6f2bd252d93:90:59ae5d6807914e7f9164e38ed4082efd\",\"run_c6f2bd252d93:89:1b827feec6ff48ab95bcc8a3ed829ee1\",\"run_c6f2bd252d93:88:2f0e46bd9c694819972c70bebec6c5c3\",\"run_c6f2bd252d93:87:bddaf373effa4fb591adffa312425e3f\",\"run_c6f2bd252d93:86:59660db520b449388e214db0fc13d246\",\"run_c6f2bd252d93:85:ba576770a75048b997c29627a3fad5fe\",\"run_c6f2bd252d93:84:7aa7dd2a30044d0ca2e85491764ee87b\",\"run_c6f2bd252d93:83:7ca1fd32bd074892be086fd24c9cf8b9\",\"run_c6f2bd252d93:82:98f48d79a49943cdb8fa82ef22001ab6\",\"run_c6f2bd252d93:81:da19cba49bdd4b6a969f025f7ebbb7c6\",\"run_c6f2bd252d93:80:af59ef01ef7e4f5898c2d610e8717c6a\",\"run_c6f2bd252d93:79:e8228ccd2f2a46daa71bb869af385ae9\",\"run_c6f2bd252d93:78:a83dbcc32f3043dfba271fa5486c01aa\",\"run_c6f2bd252d93:77:77cef780a1b545e08ccfc26707aa8a3c\",\"run_c6f2bd252d93:76:474122a325ad48dfbcb2a2af29849ac1\",\"run_c6f2bd252d93:75:4d6f7b3cfcf647c88ba18a5fd4daef1e\",\"run_c6f2bd252d93:74:9b1a7bf405bc4913a7dd18c503758ea8\",\"run_c6f2bd252d93:73:6c224c8e65a64004bfe9322c79a63142\",\"run_c6f2bd252d93:72:cad9ad65058d4e2c80afec2b82fd4b9e\",\"run_c6f2bd252d93:71:52643ca482e4434884712c3eaed898c7\",\"run_c6f2bd252d93:70:d0dbb17eb6d54230b98df145f21a0e9e\",\"run_c6f2bd252d93:69:8eec1b1a85c641c4b4755733ac4eb0aa\",\"run_c6f2bd252d93:68:f1ae488d5246415c98ecc6aaa981974e\",\"run_c6f2bd252d93:64:44e5238806c042a48e4989dfdc3f07c2\",\"run_c6f2bd252d93:52:8d14817e00164c0c855cd179aeede74c\",\"run_c6f2bd252d93:51:698f16634efd4072b16b5516a58e82b8\",\"run_c6f2bd252d93:50:dd562a4dbefc43f3a0cb00125012ed35\",\"run_c6f2bd252d93:47:765f9b3ac5c44c3e872e6d393619b58a\",\"run_c6f2bd252d93:46:0be0f5dd794b497b8cf5a9acf1973849\",\"run_c6f2bd252d93:45:2deb099af4764b9894231d025fefcfcc\",\"run_c6f2bd252d93:44:d882675a85df4b8ca8888d6877ec9b4e\",\"run_c6f2bd252d93:40:2713c9049ddd4b3e8e45d71ba73a68a8\",\"run_c6f2bd252d93:39:f601728edccb4c358361cbef70198080\",\"run_c6f2bd252d93:38:873700ed4b864a079d805e2961ab7143\",\"run_c6f2bd252d93:37:b132276c2d884589b2e2e3d38360493d\",\"run_c6f2bd252d93:36:44e4b5cb34904f0baab9838f2e9cb82e\",\"run_c6f2bd252d93:35:349eb00055364a5c90d10efd3fbd1a2e\",\"run_c6f2bd252d93:34:0f8bc452ded94bc3aa1f4a37c6831eee\",\"run_c6f2bd252d93:33:53dff2fb98a745e7aa41e0b67cb7e24d\",\"run_c6f2bd252d93:32:27aa62c25bab4f7cbe61e5f9fcd0d04d\",\"run_c6f2bd252d93:31:a363d4b175354b62906667624f4b87a8\",\"run_c6f2bd252d93:30:c3543fa39ac2405b86ad7eddb2b602a3\",\"run_c6f2bd252d93:29:5bbf3f2a48a743fbb170c35530ffb615\",\"run_c6f2bd252d93:28:30802be884e0482b8234c267312b7063\",\"run_c6f2bd252d93:27:e58a05ef1c614fe3be27ac87f6ddb89d\",\"run_c6f2bd252d93:26:1de561b79315470fbed7abc8f86c29c1\",\"run_c6f2bd252d93:25:27cc195cb1b74c2c8bd49b5b17970542\",\"run_c6f2bd252d93:24:1c9dfc54d930440cbc1a4937db097b66\",\"run_c6f2bd252d93:23:2c33046d695f408e90ca06d3cff1cf70\",\"run_c6f2bd252d93:22:2a365606f58d4bcd91637e1ee1b29742\",\"run_c6f2bd252d93:21:89b5004b1e2d4c91847910f8419fdce2\",\"run_c6f2bd252d93:20:ee53bd3243e549798cd92367fea99932\",\"run_c6f2bd252d93:19:b0e60dd051ed4116be0979e252ac4f11\",\"run_c6f2bd252d93:18:3c43250421084b74a4af54359e508296\",\"run_c6f2bd252d93:17:098dc8306694495b90db9f5636a1a240\",\"run_c6f2bd252d93:16:d70b739d94c94724aef18f6a64e83ea8\",\"run_c6f2bd252d93:15:6201f40c9bc74800b762ee10c32faf5c\",\"run_c6f2bd252d93:14:a4117c8cec1048c5aa7e69338257fc08\",\"run_c6f2bd252d93:13:7d2c5ba8d6bc4fce83100aac1c453b81\",\"run_c6f2bd252d93:12:3a5259720528441f9e36ef5fea6968a0\",\"run_c6f2bd252d93:11:b6c4002434594899babf193ace58a5b2\",\"run_c6f2bd252d93:10:effb354abcdc4becb9a9593bae2d0344\",\"run_c6f2bd252d93:9:7bff7f0f1dca4d668c61130fc11a9b30\",\"run_c6f2bd252d93:8:c0a226e649754a1f8b25ababdd1f2844\",\"run_c6f2bd252d93:7:8471091da69946eeb1b4fe026f225d18\",\"run_c6f2bd252d93:6:f5dad5f2f25a41f78a0d16ffec320fba\",\"run_c6f2bd252d93:5:9790697c71434ce885622ae9e367ffe1\"],\"boot_id\":\"cdc4ce8002ed4aec95e09c0b7415ac8c\",\"bounds\":{\"max_x\":36,\"max_y\":26,\"min_x\":0,\"min_y\":0},\"capability_profile_version\":\"sim-amr-radius-0.4m-v1\",\"deadman_trips\":0,\"environment_changes\":[{\"at\":1793706971.2090566,\"current\":{\"capability_profile_version\":\"sim-amr-radius-0.4m-v1\",\"map_version\":\"014b025016270a2d7993724f323a13cc98224681334e5f3c40abb7e289881a3e\",\"site_id\":\"sovereign-cleanroom\"},\"id\":\"10fe9a060de44164a8f4d88353de9aa9\",\"previous\":{\"capability_profile_version\":\"sim-amr-radius-0.4m-v1\",\"map_version\":\"e5e9613f5c0767800c041d41f0613a108dd4ceb05e3ca5e9e5f79f21675ccb2f\",\"site_id\":\"sovereign-cleanroom\"},\"reason\":\"scenario:clear\"},{\"at\":1793706970.0504458,\"current\":{\"capability_profile_version\":\"sim-amr-radius-0.4m-v1\",\"map_version\":\"e5e9613f5c0767800c041d41f0613a108dd4ceb05e3ca5e9e5f79f21675ccb2f\",\"site_id\":\"sovereign-cleanroom\"},\"id\":\"1ec0ab98c33e40d189fbc0ece9d47cd4\",\"previous\":{\"capability_profile_version\":\"sim-amr-radius-0.4m-v1\",\"map_version\":\"b62e8ce4bd0603c07f6f611fb3745f6e14d4ae95602137bbdcc0d406ecaf71b9\",\"site_id\":\"sovereign-cleanroom\"},\"reason\":\"scenario:path_blocked\"}],\"estop\":{\"engaged\":false,\"reason\":\"\",\"robot\":null,\"since\":null},\"events\":[\"scenario:clear\"],\"generation\":261,\"human\":{\"activity\":\"waiting_for_forklift\",\"conf\":0.9,\"destination\":\"Crossing destination\",\"heading\":1.571,\"id\":\"nearest\",\"name\":\"Runner 3\",\"role\":\"primary\",\"speed\":0.0,\"type\":\"human\",\"x\":19.25,\"y\":15.26},\"human_conf\":0.874,\"human_detected\":true,\"human_distance_m\":3.692,\"idle_robots\":[],\"map_version\":\"014b025016270a2d7993724f323a13cc98224681334e5f3c40abb7e289881a3e\",\"mode\":\"live\",\"nearest_obstacle_m\":0.933,\"nearest_obstacle_xy\":[20,10.68],\"obstacles\":[{\"heading\":3.142,\"r\":1.9,\"type\":\"forklift\",\"x\":22.27,\"y\":12.75},{\"r\":0.4,\"type\":\"robot\",\"x\":6.06,\"y\":23.07}],\"robot_contacts\":0,\"robot_id\":\"robot-2\",\"seed\":42,\"sim_time\":478.7,\"site_constraints\":[],\"site_id\":\"sovereign-cleanroom\",\"speed\":0.4,\"t\":478.7,\"target\":{\"max_speed\":0.4,\"x\":18.0,\"y\":2.5},\"theta\":4.601,\"timestamp\":1793707467.4389489,\"walking_humans\":[{\"activity\":\"walking\",\"conf\":0.9,\"destination\":\"C-01\",\"heading\":1.571,\"name\":\"Worker A\",\"role\":\"worker\",\"speed\":0.61,\"type\":\"worker\",\"x\":5.75,\"y\":1.93},{\"activity\":\"waiting_at_crossing\",\"conf\":0.9,\"destination\":\"Crossing destination\",\"heading\":0.0,\"name\":\"Runner 1\",\"role\":\"worker\",\"speed\":0.0,\"type\":\"worker\",\"x\":20.75,\"y\":16.75},{\"activity\":\"waiting_at_crossing\",\"conf\":0.9,\"destination\":\"Crossing destination\",\"heading\":0.0,\"name\":\"Runner 2\",\"role\":\"worker\",\"speed\":0.0,\"type\":\"worker\",\"x\":9.75,\"y\":11.75},{\"activity\":\"waiting_for_forklift\",\"conf\":0.9,\"destination\":\"Crossing destination\",\"heading\":1.571,\"name\":\"Runner 3\",\"role\":\"worker\",\"speed\":0.0,\"type\":\"worker\",\"x\":19.25,\"y\":15.26}],\"x\":19.012,\"y\":11.575,\"zone\":\"corridor\"}},\"governance\":{\"decision\":\"APPROVED\",\"hard_fail\":false,\"hard_fail_policies\":[],\"policy_hits\":[],\"policy_state\":\"SAFE\",\"reasons\":[],\"required_action\":null,\"risk_score\":0.0},\"proposal\":{\"intent\":\"MOVE_TO\",\"params\":{\"max_speed\":0.4,\"x\":18.0,\"y\":2.5},\"rationale\":\"Following plan waypoint\"}},\"prev_hash\":\"sha256:a3cd422c03446c60953851fffcad32814ef0dc18e1de9b557bed6bccad6f862e\",\"run_id\":\"run_f8bdbc5984ab\",\"ts\":\"2026-11-03T12:04:27.457215+00:00\",\"type\":\"DECISION\"}"
+      },
+      {
+        "id": "evt_7ff07c387322",
+        "ts": "2026-11-03T12:05:05.165115+00:00",
+        "type": "DECISION",
+        "fields": {
+          "proposal": {
+            "intent": "STOP",
+            "params": {},
+            "rationale": "[Fallback] Reached goal."
+          },
+          "governance": {
+            "decision": "APPROVED",
+            "policy_hits": [],
+            "reasons": [],
+            "required_action": null,
+            "risk_score": 0.0,
+            "policy_state": "SAFE",
+            "hard_fail": false,
+            "hard_fail_policies": []
+          }
+        },
+        "source_event_hash": "sha256:937d1d04aa9d2d58b4c720006ca88859cde55d2c21e574ac8c7babc5816f2082",
+        "canonical_source_body": "{\"payload\":{\"context\":{\"mission_goal\":{\"robot_id\":\"robot-2\",\"x\":18.0,\"y\":2.5,\"zone\":\"staging\"},\"telemetry\":{\"accepted_actions\":[\"run_f8bdbc5984ab:205:547e5d34e75e44cfaafcc77e404572c4\",\"run_f8bdbc5984ab:204:bc4cedddfe2d4d48bb4dd065f8f07815\",\"run_f8bdbc5984ab:203:9330d506e0fe4f17a3d8dd423ac8fd37\",\"run_f8bdbc5984ab:202:6af2cca1bad6401fa505c6f2f0f4325d\",\"run_f8bdbc5984ab:201:07ba964548d243e888042ae6e77a109c\",\"run_f8bdbc5984ab:200:997a76d2634a4831b866650869e4fc36\",\"run_f8bdbc5984ab:199:857a6e3dc4e148e3ba63d9c84db08aeb\",\"run_f8bdbc5984ab:198:1879bee3f3724dab8f9382d1d21b8236\",\"run_f8bdbc5984ab:197:bf59fbbc623746b88b7a4122f7c376db\",\"run_f8bdbc5984ab:196:40ee94543966445ca84343b4f9d4808a\",\"run_f8bdbc5984ab:195:10d35a8fd749450fbb42764485f1f122\",\"run_f8bdbc5984ab:194:ff4a7dffd2d14dfd8a4e702eaf601373\",\"run_f8bdbc5984ab:193:0def50c9440f409296a848c4b0f9105b\",\"run_f8bdbc5984ab:192:e643b1c565594954983a915841f91426\",\"run_f8bdbc5984ab:191:587ae4d983a14f86ae61d0a98d612ead\",\"run_f8bdbc5984ab:190:3691fbae850649e7991956497ca35f8a\",\"run_f8bdbc5984ab:189:b80a2330ed1f415a91124a8532f02e13\",\"run_f8bdbc5984ab:188:0db68de696714eb7b4a613a4c5a9c91f\",\"run_f8bdbc5984ab:187:bb5d2a373b8b49128208187c69c07c02\",\"run_f8bdbc5984ab:186:20a074ebd33d4ff5ac6c008390fe1d66\",\"run_f8bdbc5984ab:185:56e6464a55f34db9bf1446567ddc3ac8\",\"run_f8bdbc5984ab:184:3f2e58cba1bb4c679f72cef1dd09bffc\",\"run_f8bdbc5984ab:183:12bbfe1a0b67422fa8d1327a34b9f71a\",\"run_f8bdbc5984ab:182:d4507df9137645ec909f41ebf52306d4\",\"run_f8bdbc5984ab:181:e67cb2aa41c24fc9b016e4e486cd535f\",\"run_f8bdbc5984ab:180:b86d3909c0764f28850355ef25003c64\",\"run_f8bdbc5984ab:179:aeeb2fe046184a3788c2e3288c9c5938\",\"run_f8bdbc5984ab:178:d958f588fdb64263bde6de67cbd3f917\",\"run_f8bdbc5984ab:173:050d50229ce440c5a43645e75bb32ccb\",\"run_f8bdbc5984ab:172:21632f760d264eac85ff71ab429edf78\",\"run_f8bdbc5984ab:171:270b4b3854574f758d38ca1b31c3db9f\",\"run_f8bdbc5984ab:170:01cd58e7bf2b496795c04b744b06a71e\",\"run_f8bdbc5984ab:163:2907afc5888c4e9ab8bd3d3ee516bb8d\",\"run_f8bdbc5984ab:156:544b3f53d7ca44c686d4699b51955d2d\",\"run_f8bdbc5984ab:155:632dfeac521a4ba386a78b2255fcd400\",\"run_f8bdbc5984ab:154:55942c0efefb4e5e843b7c4b6112e07e\",\"run_f8bdbc5984ab:152:c330c8e8a9344c2c8c208e331588891a\",\"run_f8bdbc5984ab:151:d578909877a04564bc6fe83ec9649df4\",\"run_f8bdbc5984ab:150:8d2db97727ea4be59c923b33843bc80a\",\"run_f8bdbc5984ab:149:ebc236222f6a48df903fbba6dc5df890\",\"run_f8bdbc5984ab:148:87e05ac530db4a9aa70209a865982051\",\"run_f8bdbc5984ab:147:61e3d1059b364821b792f6551a4a8da9\",\"run_f8bdbc5984ab:144:c0d31c7dd20f43858f4a3eae02fa9565\",\"run_f8bdbc5984ab:143:f9995be2d47443b4a4b5be291bbd4ef8\",\"run_f8bdbc5984ab:142:d0f2b018a48f4af092418f73e81e69a8\",\"run_f8bdbc5984ab:141:2765fd9527fb4467833e53d44a8e42af\",\"run_f8bdbc5984ab:140:e7dec40596e9484f83afc47a36b4b54a\",\"run_f8bdbc5984ab:139:8dba0d4fecda4890afca8d089f89b9fc\",\"run_f8bdbc5984ab:138:55539cb41ef94f40b8696f32dc330be9\",\"run_f8bdbc5984ab:137:18733e78acad401a8c8a244d206a19e5\",\"run_f8bdbc5984ab:136:be7fa7bda3a7434a819313fad08fc229\",\"run_f8bdbc5984ab:135:6bf8d11da71b45d8b0f904e1b6b918c8\",\"run_f8bdbc5984ab:134:cda942370bb24bc5a82ee7c6ac1999d8\",\"run_f8bdbc5984ab:133:9ad91855b8c94a1ca029cc9c7f9781e4\",\"run_f8bdbc5984ab:132:f06bdf5cfcd14895b3b6e4d8d5b63c4e\",\"run_f8bdbc5984ab:131:ea45e71ecf0f4e1c90633d2e45c5db75\",\"run_f8bdbc5984ab:130:8f71e1dee2c341a7a350cbe0f018020a\",\"run_f8bdbc5984ab:129:f2409873aab446289bff8891fe8b7c55\",\"run_f8bdbc5984ab:128:f157f4b83768483da6db624389830852\",\"run_f8bdbc5984ab:127:9d7ae1582f004758b644afa079a710cc\",\"run_f8bdbc5984ab:126:03d3d344b6c74d4aa5b4e111e6eb6116\",\"run_f8bdbc5984ab:125:be1cc00e9b8a4805b77b46e5352597fd\",\"run_f8bdbc5984ab:124:2513945874fc40719bac5846d98ab5f1\",\"run_f8bdbc5984ab:123:40fe147e6ce7433d89c59b7cb185bb79\",\"run_f8bdbc5984ab:122:8d92ed65f99f4617904045ec51630aa5\",\"run_f8bdbc5984ab:121:d11bd56540104c5c9a1da9b56fabc2d9\",\"run_f8bdbc5984ab:120:f8950a6c7182445b899f19ab1b80fa19\",\"run_f8bdbc5984ab:119:e0ac778d1e3a4e86a13de120f4c1e5c9\",\"run_f8bdbc5984ab:118:d8c4437e99fe426185b59f4c37ff9311\",\"run_f8bdbc5984ab:117:b4d0bb48897b4c68ab12b90a714da755\",\"run_f8bdbc5984ab:116:da7c85c9c6c4460abe9f489738cdea48\",\"run_f8bdbc5984ab:115:1a07d89cbfe945e89a67ad66dc363d09\",\"run_f8bdbc5984ab:114:2aef87f95d8842bd9486905e447f029c\",\"run_f8bdbc5984ab:113:79e0f89017b84bd0856b8c8ce0842c91\",\"run_f8bdbc5984ab:112:db4c0505fdd2427c935c040231c33f95\",\"run_f8bdbc5984ab:111:1128447a3e674d1494073ef9d9de5d20\",\"run_f8bdbc5984ab:110:2381eaea00d5471ab1cc1b54e1b6323e\",\"run_f8bdbc5984ab:109:41c75f46cf6a4ec58d12f011fd74fc60\",\"run_f8bdbc5984ab:108:26e5db0b05f44e28b07fda210515a34c\",\"run_f8bdbc5984ab:106:4c132b32d4454e8ea68fa8ae4a46969b\",\"run_f8bdbc5984ab:105:6bfac1ce31d24c37bded7dd10befe581\",\"run_c6f2bd252d93:103:d5f4faa73ab948db849a55546be0841c\",\"run_c6f2bd252d93:102:5c45748a60e64edb97878a293163300f\",\"run_c6f2bd252d93:101:fa59eb71613d46f78cffb4ff21b9e192\",\"run_c6f2bd252d93:100:b4eef7fd3c8549dc845bb54c908d53e9\",\"run_c6f2bd252d93:99:da20650ce06747759b1876f16b0eeb5f\",\"run_c6f2bd252d93:98:de214d995e614d19a4884f1d439d98fb\",\"run_c6f2bd252d93:97:0c13bfdaae774c60b036830e041b0953\",\"run_c6f2bd252d93:96:81554beb6e45451a83eb319983e9bd0e\",\"run_c6f2bd252d93:95:ceb8a181c7f04c76b888458e5bda6718\",\"run_c6f2bd252d93:94:b5744eea679d40fe9f48a1c58a567c12\",\"run_c6f2bd252d93:93:dca18c5bf7ac4db7bbb8fc4dd3a7bf87\",\"run_c6f2bd252d93:92:476b665e05874e58b09855aaadbd35d4\",\"run_c6f2bd252d93:91:fef633b8208644c2857a9d05eed31541\",\"run_c6f2bd252d93:90:59ae5d6807914e7f9164e38ed4082efd\",\"run_c6f2bd252d93:89:1b827feec6ff48ab95bcc8a3ed829ee1\",\"run_c6f2bd252d93:88:2f0e46bd9c694819972c70bebec6c5c3\",\"run_c6f2bd252d93:87:bddaf373effa4fb591adffa312425e3f\",\"run_c6f2bd252d93:86:59660db520b449388e214db0fc13d246\",\"run_c6f2bd252d93:85:ba576770a75048b997c29627a3fad5fe\",\"run_c6f2bd252d93:84:7aa7dd2a30044d0ca2e85491764ee87b\",\"run_c6f2bd252d93:83:7ca1fd32bd074892be086fd24c9cf8b9\",\"run_c6f2bd252d93:82:98f48d79a49943cdb8fa82ef22001ab6\",\"run_c6f2bd252d93:81:da19cba49bdd4b6a969f025f7ebbb7c6\",\"run_c6f2bd252d93:80:af59ef01ef7e4f5898c2d610e8717c6a\",\"run_c6f2bd252d93:79:e8228ccd2f2a46daa71bb869af385ae9\",\"run_c6f2bd252d93:78:a83dbcc32f3043dfba271fa5486c01aa\",\"run_c6f2bd252d93:77:77cef780a1b545e08ccfc26707aa8a3c\",\"run_c6f2bd252d93:76:474122a325ad48dfbcb2a2af29849ac1\",\"run_c6f2bd252d93:75:4d6f7b3cfcf647c88ba18a5fd4daef1e\",\"run_c6f2bd252d93:74:9b1a7bf405bc4913a7dd18c503758ea8\",\"run_c6f2bd252d93:73:6c224c8e65a64004bfe9322c79a63142\",\"run_c6f2bd252d93:72:cad9ad65058d4e2c80afec2b82fd4b9e\",\"run_c6f2bd252d93:71:52643ca482e4434884712c3eaed898c7\",\"run_c6f2bd252d93:70:d0dbb17eb6d54230b98df145f21a0e9e\",\"run_c6f2bd252d93:69:8eec1b1a85c641c4b4755733ac4eb0aa\",\"run_c6f2bd252d93:68:f1ae488d5246415c98ecc6aaa981974e\",\"run_c6f2bd252d93:64:44e5238806c042a48e4989dfdc3f07c2\",\"run_c6f2bd252d93:52:8d14817e00164c0c855cd179aeede74c\",\"run_c6f2bd252d93:51:698f16634efd4072b16b5516a58e82b8\",\"run_c6f2bd252d93:50:dd562a4dbefc43f3a0cb00125012ed35\",\"run_c6f2bd252d93:47:765f9b3ac5c44c3e872e6d393619b58a\",\"run_c6f2bd252d93:46:0be0f5dd794b497b8cf5a9acf1973849\",\"run_c6f2bd252d93:45:2deb099af4764b9894231d025fefcfcc\",\"run_c6f2bd252d93:44:d882675a85df4b8ca8888d6877ec9b4e\",\"run_c6f2bd252d93:40:2713c9049ddd4b3e8e45d71ba73a68a8\",\"run_c6f2bd252d93:39:f601728edccb4c358361cbef70198080\",\"run_c6f2bd252d93:38:873700ed4b864a079d805e2961ab7143\",\"run_c6f2bd252d93:37:b132276c2d884589b2e2e3d38360493d\",\"run_c6f2bd252d93:36:44e4b5cb34904f0baab9838f2e9cb82e\",\"run_c6f2bd252d93:35:349eb00055364a5c90d10efd3fbd1a2e\",\"run_c6f2bd252d93:34:0f8bc452ded94bc3aa1f4a37c6831eee\",\"run_c6f2bd252d93:33:53dff2fb98a745e7aa41e0b67cb7e24d\",\"run_c6f2bd252d93:32:27aa62c25bab4f7cbe61e5f9fcd0d04d\",\"run_c6f2bd252d93:31:a363d4b175354b62906667624f4b87a8\",\"run_c6f2bd252d93:30:c3543fa39ac2405b86ad7eddb2b602a3\",\"run_c6f2bd252d93:29:5bbf3f2a48a743fbb170c35530ffb615\",\"run_c6f2bd252d93:28:30802be884e0482b8234c267312b7063\",\"run_c6f2bd252d93:27:e58a05ef1c614fe3be27ac87f6ddb89d\",\"run_c6f2bd252d93:26:1de561b79315470fbed7abc8f86c29c1\",\"run_c6f2bd252d93:25:27cc195cb1b74c2c8bd49b5b17970542\",\"run_c6f2bd252d93:24:1c9dfc54d930440cbc1a4937db097b66\",\"run_c6f2bd252d93:23:2c33046d695f408e90ca06d3cff1cf70\",\"run_c6f2bd252d93:22:2a365606f58d4bcd91637e1ee1b29742\",\"run_c6f2bd252d93:21:89b5004b1e2d4c91847910f8419fdce2\",\"run_c6f2bd252d93:20:ee53bd3243e549798cd92367fea99932\",\"run_c6f2bd252d93:19:b0e60dd051ed4116be0979e252ac4f11\",\"run_c6f2bd252d93:18:3c43250421084b74a4af54359e508296\",\"run_c6f2bd252d93:17:098dc8306694495b90db9f5636a1a240\",\"run_c6f2bd252d93:16:d70b739d94c94724aef18f6a64e83ea8\",\"run_c6f2bd252d93:15:6201f40c9bc74800b762ee10c32faf5c\",\"run_c6f2bd252d93:14:a4117c8cec1048c5aa7e69338257fc08\",\"run_c6f2bd252d93:13:7d2c5ba8d6bc4fce83100aac1c453b81\",\"run_c6f2bd252d93:12:3a5259720528441f9e36ef5fea6968a0\",\"run_c6f2bd252d93:11:b6c4002434594899babf193ace58a5b2\",\"run_c6f2bd252d93:10:effb354abcdc4becb9a9593bae2d0344\",\"run_c6f2bd252d93:9:7bff7f0f1dca4d668c61130fc11a9b30\",\"run_c6f2bd252d93:8:c0a226e649754a1f8b25ababdd1f2844\",\"run_c6f2bd252d93:7:8471091da69946eeb1b4fe026f225d18\",\"run_c6f2bd252d93:6:f5dad5f2f25a41f78a0d16ffec320fba\",\"run_c6f2bd252d93:5:9790697c71434ce885622ae9e367ffe1\"],\"boot_id\":\"cdc4ce8002ed4aec95e09c0b7415ac8c\",\"bounds\":{\"max_x\":36,\"max_y\":26,\"min_x\":0,\"min_y\":0},\"capability_profile_version\":\"sim-amr-radius-0.4m-v1\",\"deadman_trips\":0,\"environment_changes\":[{\"at\":1793706971.2090566,\"current\":{\"capability_profile_version\":\"sim-amr-radius-0.4m-v1\",\"map_version\":\"014b025016270a2d7993724f323a13cc98224681334e5f3c40abb7e289881a3e\",\"site_id\":\"sovereign-cleanroom\"},\"id\":\"10fe9a060de44164a8f4d88353de9aa9\",\"previous\":{\"capability_profile_version\":\"sim-amr-radius-0.4m-v1\",\"map_version\":\"e5e9613f5c0767800c041d41f0613a108dd4ceb05e3ca5e9e5f79f21675ccb2f\",\"site_id\":\"sovereign-cleanroom\"},\"reason\":\"scenario:clear\"},{\"at\":1793706970.0504458,\"current\":{\"capability_profile_version\":\"sim-amr-radius-0.4m-v1\",\"map_version\":\"e5e9613f5c0767800c041d41f0613a108dd4ceb05e3ca5e9e5f79f21675ccb2f\",\"site_id\":\"sovereign-cleanroom\"},\"id\":\"1ec0ab98c33e40d189fbc0ece9d47cd4\",\"previous\":{\"capability_profile_version\":\"sim-amr-radius-0.4m-v1\",\"map_version\":\"b62e8ce4bd0603c07f6f611fb3745f6e14d4ae95602137bbdcc0d406ecaf71b9\",\"site_id\":\"sovereign-cleanroom\"},\"reason\":\"scenario:path_blocked\"}],\"estop\":{\"engaged\":false,\"reason\":\"\",\"robot\":null,\"since\":null},\"events\":[\"scenario:clear\"],\"generation\":290,\"human\":{\"activity\":\"walking\",\"conf\":0.9,\"destination\":\"Crossing destination\",\"heading\":1.571,\"id\":\"nearest\",\"name\":\"Runner 3\",\"role\":\"primary\",\"speed\":1.148,\"type\":\"human\",\"x\":19.25,\"y\":14.0},\"human_conf\":0.0,\"human_detected\":false,\"human_distance_m\":11.532,\"idle_robots\":[],\"map_version\":\"014b025016270a2d7993724f323a13cc98224681334e5f3c40abb7e289881a3e\",\"mode\":\"live\",\"nearest_obstacle_m\":1.818,\"nearest_obstacle_xy\":[20,3.5],\"obstacles\":[{\"heading\":0.0,\"r\":1.9,\"type\":\"forklift\",\"x\":28.15,\"y\":12.75},{\"r\":0.4,\"type\":\"robot\",\"x\":6.06,\"y\":23.07}],\"robot_contacts\":0,\"robot_id\":\"robot-2\",\"seed\":42,\"sim_time\":511.1,\"site_constraints\":[],\"site_id\":\"sovereign-cleanroom\",\"speed\":0.0,\"t\":511.1,\"target\":null,\"theta\":4.601,\"timestamp\":1793707505.1397693,\"walking_humans\":[{\"activity\":\"working\",\"conf\":0.9,\"destination\":\"C-01\",\"heading\":1.268,\"name\":\"Worker A\",\"role\":\"worker\",\"speed\":0.0,\"type\":\"worker\",\"x\":5.75,\"y\":2.25},{\"activity\":\"walking\",\"conf\":0.9,\"destination\":\"Crossing destination\",\"heading\":3.142,\"name\":\"Runner 1\",\"role\":\"worker\",\"speed\":0.837,\"type\":\"worker\",\"x\":20.58,\"y\":16.75},{\"activity\":\"waiting_at_crossing\",\"conf\":0.9,\"destination\":\"Crossing destination\",\"heading\":0.0,\"name\":\"Runner 2\",\"role\":\"worker\",\"speed\":0.0,\"type\":\"worker\",\"x\":9.75,\"y\":11.75},{\"activity\":\"walking\",\"conf\":0.9,\"destination\":\"Crossing destination\",\"heading\":1.571,\"name\":\"Runner 3\",\"role\":\"worker\",\"speed\":1.148,\"type\":\"worker\",\"x\":19.25,\"y\":14.0}],\"x\":18.004,\"y\":2.533,\"zone\":\"staging\"}},\"governance\":{\"decision\":\"APPROVED\",\"hard_fail\":false,\"hard_fail_policies\":[],\"policy_hits\":[],\"policy_state\":\"SAFE\",\"reasons\":[],\"required_action\":null,\"risk_score\":0.0},\"proposal\":{\"intent\":\"STOP\",\"params\":{},\"rationale\":\"[Fallback] Reached goal.\"}},\"prev_hash\":\"sha256:7bd3b3c58a9d1d56f84678268e6a8b49734728448961d86b8c714fbf25907a12\",\"run_id\":\"run_f8bdbc5984ab\",\"ts\":\"2026-11-03T12:05:05.165115+00:00\",\"type\":\"DECISION\"}"
+      },
+      {
+        "id": "evt_4d882f6a901d",
+        "ts": "2026-11-03T12:05:05.185121+00:00",
+        "type": "EXECUTION",
+        "fields": {
+          "command": {
+            "intent": "STOP",
+            "params": {}
+          },
+          "result": {
+            "ok": true,
+            "stopped": true,
+            "robot_id": "robot-2"
+          }
+        },
+        "source_event_hash": "sha256:45efc715dfe3d7ad3568885f1252565f6ed1a2e69d1d5c0d31d36a2289fc5ace",
+        "canonical_source_body": "{\"payload\":{\"command\":{\"intent\":\"STOP\",\"params\":{}},\"result\":{\"ok\":true,\"robot_id\":\"robot-2\",\"stopped\":true},\"verified\":true},\"prev_hash\":\"sha256:937d1d04aa9d2d58b4c720006ca88859cde55d2c21e574ac8c7babc5816f2082\",\"run_id\":\"run_f8bdbc5984ab\",\"ts\":\"2026-11-03T12:05:05.185121+00:00\",\"type\":\"EXECUTION\"}"
+      }
+    ],
+    "full_archive": "/landing/mission-story/audit.json"
+  },
+  "live_validation": {
+    "run_id": "run_84fa654ec55a",
+    "verification": {
+      "run_id": "run_84fa654ec55a",
+      "chain_valid": true,
+      "total_entries": 88,
+      "first_hash": "sha256:4a42568f8...",
+      "last_hash": "sha256:3cd64db1e...",
+      "verified_at": "2026-11-03T17:47:12.201027+00:00",
+      "scope": "original stored event contents and previous-hash links"
+    },
+    "receipt_verification": [
+      {
+        "receipt_id": 1,
+        "signed": true,
+        "key_id": "d8af68a902da2254",
+        "algorithm": "Ed25519",
+        "valid": true,
+        "reason": "signature matches the decision content"
+      },
+      {
+        "receipt_id": 2,
+        "signed": true,
+        "key_id": "d8af68a902da2254",
+        "algorithm": "Ed25519",
+        "valid": true,
+        "reason": "signature matches the decision content"
+      },
+      {
+        "receipt_id": 3,
+        "signed": true,
+        "key_id": "d8af68a902da2254",
+        "algorithm": "Ed25519",
+        "valid": true,
+        "reason": "signature matches the decision content"
+      },
+      {
+        "receipt_id": 4,
+        "signed": true,
+        "key_id": "d8af68a902da2254",
+        "algorithm": "Ed25519",
+        "valid": true,
+        "reason": "signature matches the decision content"
+      },
+      {
+        "receipt_id": 5,
+        "signed": true,
+        "key_id": "d8af68a902da2254",
+        "algorithm": "Ed25519",
+        "valid": true,
+        "reason": "signature matches the decision content"
+      },
+      {
+        "receipt_id": 6,
+        "signed": true,
+        "key_id": "d8af68a902da2254",
+        "algorithm": "Ed25519",
+        "valid": true,
+        "reason": "signature matches the decision content"
+      },
+      {
+        "receipt_id": 7,
+        "signed": true,
+        "key_id": "d8af68a902da2254",
+        "algorithm": "Ed25519",
+        "valid": true,
+        "reason": "signature matches the decision content"
+      },
+      {
+        "receipt_id": 8,
+        "signed": true,
+        "key_id": "d8af68a902da2254",
+        "algorithm": "Ed25519",
+        "valid": true,
+        "reason": "signature matches the decision content"
+      },
+      {
+        "receipt_id": 9,
+        "signed": true,
+        "key_id": "d8af68a902da2254",
+        "algorithm": "Ed25519",
+        "valid": true,
+        "reason": "signature matches the decision content"
+      },
+      {
+        "receipt_id": 10,
+        "signed": true,
+        "key_id": "d8af68a902da2254",
+        "algorithm": "Ed25519",
+        "valid": true,
+        "reason": "signature matches the decision content"
+      },
+      {
+        "receipt_id": 11,
+        "signed": true,
+        "key_id": "d8af68a902da2254",
+        "algorithm": "Ed25519",
+        "valid": true,
+        "reason": "signature matches the decision content"
+      },
+      {
+        "receipt_id": 12,
+        "signed": true,
+        "key_id": "d8af68a902da2254",
+        "algorithm": "Ed25519",
+        "valid": true,
+        "reason": "signature matches the decision content"
+      },
+      {
+        "receipt_id": 13,
+        "signed": true,
+        "key_id": "d8af68a902da2254",
+        "algorithm": "Ed25519",
+        "valid": true,
+        "reason": "signature matches the decision content"
+      },
+      {
+        "receipt_id": 14,
+        "signed": true,
+        "key_id": "d8af68a902da2254",
+        "algorithm": "Ed25519",
+        "valid": true,
+        "reason": "signature matches the decision content"
+      },
+      {
+        "receipt_id": 15,
+        "signed": true,
+        "key_id": "d8af68a902da2254",
+        "algorithm": "Ed25519",
+        "valid": true,
+        "reason": "signature matches the decision content"
+      },
+      {
+        "receipt_id": 16,
+        "signed": true,
+        "key_id": "d8af68a902da2254",
+        "algorithm": "Ed25519",
+        "valid": true,
+        "reason": "signature matches the decision content"
+      },
+      {
+        "receipt_id": 17,
+        "signed": true,
+        "key_id": "d8af68a902da2254",
+        "algorithm": "Ed25519",
+        "valid": true,
+        "reason": "signature matches the decision content"
+      },
+      {
+        "receipt_id": 18,
+        "signed": true,
+        "key_id": "d8af68a902da2254",
+        "algorithm": "Ed25519",
+        "valid": true,
+        "reason": "signature matches the decision content"
+      },
+      {
+        "receipt_id": 19,
+        "signed": true,
+        "key_id": "d8af68a902da2254",
+        "algorithm": "Ed25519",
+        "valid": true,
+        "reason": "signature matches the decision content"
+      },
+      {
+        "receipt_id": 20,
+        "signed": true,
+        "key_id": "d8af68a902da2254",
+        "algorithm": "Ed25519",
+        "valid": true,
+        "reason": "signature matches the decision content"
+      },
+      {
+        "receipt_id": 21,
+        "signed": true,
+        "key_id": "d8af68a902da2254",
+        "algorithm": "Ed25519",
+        "valid": true,
+        "reason": "signature matches the decision content"
+      },
+      {
+        "receipt_id": 22,
+        "signed": true,
+        "key_id": "d8af68a902da2254",
+        "algorithm": "Ed25519",
+        "valid": true,
+        "reason": "signature matches the decision content"
+      },
+      {
+        "receipt_id": 23,
+        "signed": true,
+        "key_id": "d8af68a902da2254",
+        "algorithm": "Ed25519",
+        "valid": true,
+        "reason": "signature matches the decision content"
+      },
+      {
+        "receipt_id": 24,
+        "signed": true,
+        "key_id": "d8af68a902da2254",
+        "algorithm": "Ed25519",
+        "valid": true,
+        "reason": "signature matches the decision content"
+      },
+      {
+        "receipt_id": 25,
+        "signed": true,
+        "key_id": "d8af68a902da2254",
+        "algorithm": "Ed25519",
+        "valid": true,
+        "reason": "signature matches the decision content"
+      }
+    ],
+    "scope": "Isolated simulator; live Meta planning and Tavily search"
+  },
+  "hash_check_scope": "SHA-256 over the exact canonical original event body. Checks individual contents only; does not resolve historical ordering gaps, certify hardware or verify an Ed25519 receipt."
+}

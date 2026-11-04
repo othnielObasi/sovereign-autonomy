@@ -1,0 +1,49 @@
+/* Contrast and progressive disclosure, confined to the third preview. */
+#learning-transfer{background:#f2edf9;color:#251c39}
+#learning-transfer h2,#learning-transfer h3,#learning-transfer h4{color:#261b3b}
+#learning-transfer .intro p,#learning-transfer .section-kicker,#learning-transfer .transfer-label{color:#59446f}
+#learning-transfer .transfer-demo{background:#fff;color:#30243e;border-color:#cbbddc;box-shadow:0 20px 70px #39234a12}
+#learning-transfer .transfer-toolbar,#learning-transfer .transfer-status,#learning-transfer .knowledge-envelope{background:#e9dff4;color:#352347;border-color:#cbbddc}
+#learning-transfer .transfer-toolbar p,#learning-transfer .knowledge-envelope dt,#learning-transfer .knowledge-envelope dd,#learning-transfer .knowledge-envelope small{color:#453054}
+#learning-transfer .transfer-stage p,#learning-transfer .transfer-eyebrow,#learning-transfer .recipient-flow,#learning-transfer .version-history,#learning-transfer .recipient-state,#learning-transfer .recipient-movement,#learning-transfer .recipient small,#learning-transfer .recipient-profile{color:#493655}
+#learning-transfer .transfer-evidence,#learning-transfer .recipient{background:#f7f3fb;border-color:#cabbd8}
+#learning-transfer .transfer-evidence blockquote{background:#e9dff4;color:#382345}
+#learning-transfer .transfer-checks,#learning-transfer .transfer-result{color:#493655}
+#learning-transfer .transfer-step,#learning-transfer .transfer-reset,#learning-transfer .transfer-revise{background:#f0e8f8;color:#49305e;border-color:#b9a3ce}
+#learning-transfer .transfer-step[aria-selected=true]{background:#603787;color:#fff}
+#learning-transfer .transfer-step:disabled{opacity:.65}
+#learning-transfer .recipient select{background:#fff;color:#342242;border-color:#baa5ce}
+#learning-transfer .recipient-state[data-tone=pass]{color:#076751}
+#learning-transfer .recipient-state[data-tone=stop]{color:#943b25}
+#learning-transfer .transfer-scope,#learning-transfer .transfer-scope p{background:transparent;color:#493655;border-color:#cbbddc}
+#learning-transfer .transfer-action{background:#7242a0;color:white}
+#learning-transfer .transfer-label{background:#e5d8f0;border-color:#bda7d0;color:#4a305f;font-size:14px}
+#learning-transfer .version-history summary,#learning-transfer .transfer-scope summary,#learning-transfer .transfer-toggle,#learning-transfer .transfer-status{color:#493357}
+#learning-transfer .transfer-step span{color:inherit}
+#learning-transfer .transfer-status{color:#493357!important}
+#learning-transfer .recipient[data-received=true]{background:#edf7f2;border-color:#639b82}
+#learning-transfer .recipient[data-mismatch=true]{background:#fff1eb;border-color:#b47b62}
+#environments{background:#eaf2f7;color:#20374a}
+#environments h2,#environments .section-kicker,#environments .intro p{color:#253e53}
+#environments .env-thumb{background:#fff;color:#25374a;border-color:#b2c4d1}
+#environments .env-thumb span,#environments .env-thumb small,#environments .env-art-note{color:#354e63}
+#environments .env-thumb[aria-pressed=true]{border-color:#7949a2;box-shadow:0 0 0 2px #7949a2}
+.learning-flow{display:grid;grid-template-columns:repeat(5,1fr);gap:12px;margin:30px 0}
+.learning-flow>div{position:relative;border:1px solid #baa7cb;border-radius:10px;padding:20px 16px;background:#fff;min-width:0}
+.learning-flow strong{display:block;font-size:19px;color:#352246;margin-bottom:8px}
+.learning-flow small{font-size:15px;line-height:1.6;color:#584266}
+.learning-flow [data-active=true]{background:#62378a;color:#fff;border-color:#62378a}
+.learning-flow [data-active=true] strong,.learning-flow [data-active=true] small{color:#fff}
+.learning-flow .flow-robot{font-size:30px;display:block;margin-bottom:12px}
+.preview-boundary{font-size:16px;line-height:1.8;padding:18px 22px;border-left:3px solid #8056a5;background:#e7ddf1;color:#493357;margin-bottom:24px}
+.transfer-evidence-details summary,.capability-detail summary{font-size:16px;cursor:pointer;line-height:1.7;padding:14px 0;font-weight:600}
+.transfer-evidence-details{align-self:start}.transfer-stage{align-items:start}
+.cinema{background:radial-gradient(ellipse at 60% 20%,#253e53,#101322 80%);border:1px solid #6e6482;border-radius:16px;overflow:hidden;margin:24px 0 32px}
+.cinema-top,.cinema-bottom{display:flex;align-items:center;justify-content:space-between;gap:20px;padding:20px 24px;color:#ede8f6}
+.cinema-top p,.cinema-bottom p{margin:0;font-size:16px;line-height:1.6;color:#d4cde1}
+.cinema-top strong{display:block;font-size:23px;margin-bottom:5px}.cinema button{background:#8651b4;border:1px solid #c2a3df;color:#fff;padding:13px 20px;border-radius:7px;font:inherit;cursor:pointer;flex-shrink:0}
+.cinema canvas{display:block;width:100%;height:auto;aspect-ratio:1000/520}
+.cinema-bottom{border-top:1px solid #ffffff24}.cinema-state{font-weight:600;color:#a1edda!important}
+.cinema-state[data-stop=true]{color:#ffc79d!important}
+@media(max-width:800px){.learning-flow{grid-template-columns:1fr 1fr}.learning-flow>div:last-child{grid-column:1/-1}.cinema-top,.cinema-bottom{align-items:flex-start;flex-direction:column}.cinema canvas{aspect-ratio:1000/650}.cinema-top strong{font-size:21px}.learning-flow strong{font-size:17px}}
+@media(prefers-reduced-motion:reduce){.learning-flow *{animation:none!important}}

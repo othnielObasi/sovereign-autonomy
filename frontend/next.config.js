@@ -7,7 +7,7 @@ const nextConfig = {
     return {
       // The public landing page is static; operations start at /mission-control.
       beforeFiles: [
-        { source: "/", destination: "/landing/index.html" },
+        { source: "/", destination: "/home/index.html" },
         { source: "/how-it-works", destination: "/how-it-works/index.html" },
       ],
       afterFiles: [

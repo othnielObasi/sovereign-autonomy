@@ -1,0 +1,22 @@
+/* A single mission presentation: actual facility rendering plus synced decisions. */
+#experience .story-context figure{display:none}
+.mission-film{min-width:0;background:#131a23;display:flex;flex-direction:column}
+.mission-film video{display:block;width:100%;aspect-ratio:16/9;object-fit:contain;background:#bcc9d2}
+.mission-film video::cue{font-size:16px;line-height:1.4}
+.film-title{padding:18px 22px;border-bottom:1px solid #ffffff25;display:flex;justify-content:space-between;gap:16px;align-items:center}
+.film-title strong{color:#f2eaf9;font-size:17px}.film-title span{color:#d2c5e0;font-size:14px}
+.film-transport{display:flex;flex-wrap:wrap;align-items:center;gap:15px;padding:18px 22px}
+.film-transport button{font:inherit;padding:12px 19px;border:1px solid #c2a0df;border-radius:7px;background:#7744a0;color:white;cursor:pointer}
+.film-transport output{font-size:15px;color:#e4d7f0;line-height:1.6}
+.film-note{font-size:14px!important;color:#cec3db!important;line-height:1.8!important;padding:0 22px 20px;margin:0!important}
+.film-note a{color:#e4c5ff;text-decoration:underline}
+.film-source{margin-top:20px;border:1px solid #81728e;border-radius:10px;padding:18px 22px;color:#e6dceb}
+.film-source>summary{font-size:16px;cursor:pointer;font-weight:600}.film-source .story-visual{margin-top:20px;border-radius:10px;overflow:hidden;max-width:900px}
+.film-captions{font-size:18px;line-height:1.75;color:#f1eaf7;margin:0;padding:16px 22px;border-bottom:1px solid #ffffff25;background:#34233f}
+.story-layout{grid-template-columns:minmax(0,1.45fr) minmax(0,.8fr)}
+/* The short decision is already beside the footage; captions remain available in the video. */
+.film-captions{display:none}
+.film-media-controls{padding:0 22px 20px;display:flex;align-items:center;gap:12px;flex-wrap:wrap}.film-media-controls label{font-size:14px;color:#d5c7df}.film-media-controls select{background:#231a2e;color:white;border:1px solid #937ba7;border-radius:5px;padding:7px;font:inherit}
+.film-buffering{font-size:14px;color:#ffdfb5;padding:0 22px;margin:0 0 14px}
+@media(max-width:900px){.story-layout{grid-template-columns:1fr}.film-title{flex-direction:column;align-items:flex-start}.mission-film video{min-height:0}.film-captions{font-size:17px}.film-source{padding:16px}}
+@media(prefers-reduced-motion:reduce){.mission-film *{scroll-behavior:auto}}

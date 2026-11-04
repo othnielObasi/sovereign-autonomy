@@ -1,7 +1,7 @@
 {
   "name": "pharma",
   "site_id": "sovereign-cleanroom",
-  "title": "Meridian Life Sciences",
+  "title": "Demo Pharma Plant",
   "units": "metres",
   "coordinate_frame": "facility-floor-v1",
   "geofence": {

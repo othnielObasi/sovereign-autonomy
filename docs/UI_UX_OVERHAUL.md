@@ -104,7 +104,7 @@ configuration still belongs to the project's backend deployment.
 Restart the simulator and backend together after changing the setting so that
 the gate synchronizes with the active world. An explicit `SITE_LAYOUT=factory` or `SITE_LAYOUT=warehouse` keeps either alternative available. Existing explicit environment settings take precedence.
 
-The fictional Meridian Life Sciences facility has six destinations, glass
+The fictional Demo Pharma Plant facility has six destinations, glass
 partitions, benches, a shared transfer corridor, two mobile carriers and a simulated humanoid navigator. Its
 collision geometry is shared by routing, governance and rendering. Every
 destination is tested from all parking positions for reachability and clear
