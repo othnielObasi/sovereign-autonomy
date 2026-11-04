@@ -21,6 +21,16 @@ async function knowledgeRequest(path: string, method = 'GET') {
   return r.json();
 }
 export const getKnowledgeStatus = () => knowledgeRequest('/status');
+export async function learningRequest(path = '', body?: unknown) {
+  const token = await authToken();
+  const response = await fetch(`${API_BASE}/learning${path}`, {
+    method: body === undefined ? 'GET' : 'POST', cache: 'no-store',
+    headers: { ...(token ? { Authorization: `Bearer ${token}` } : {}), ...(body === undefined ? {} : { 'Content-Type': 'application/json' }) },
+    ...(body === undefined ? {} : { body: JSON.stringify(body) }),
+  });
+  if (!response.ok) throw new Error(await parseErrorResponse(response, 'Learning workflow unavailable'));
+  return response.json();
+}
 export const getKnowledgeRun = (runId: string) => knowledgeRequest(`/runs/${encodeURIComponent(runId)}`);
 export const syncKnowledge = (runId?: string) => knowledgeRequest(runId ? `/runs/${encodeURIComponent(runId)}/sync` : '/sync', 'POST');
 

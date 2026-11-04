@@ -369,6 +369,35 @@ class RouteMemory:
                 'cell_support': self.cell_support,
                 'advisory': sum(d['status'] == 'advisory' for d in self.last_retrieval)}
 
+    def release_evidence(self, context):
+        """Current, independently checked source rows for the human release workflow.
+
+        Loading still applies the existing ledger, invalidations and quarantine.
+        Recheck each row signature after reading; UI-supplied numbers are never evidence.
+        """
+        self.load(context=context)
+        eligible = {d['id']: d for d in self.last_retrieval if d['status'] != 'excluded'}
+        if self.integrity_error:
+            return []
+        conn = self._db()
+        try:
+            rows = conn.execute('SELECT e.*,c.metadata FROM experience e JOIN experience_context c ON e.id=c.id').fetchall()
+        finally:
+            conn.close()
+        result = []
+        for rid, run, i, j, delay, kind, observed, signature, raw in rows:
+            if rid not in eligible:
+                continue
+            metadata = json.loads(raw)
+            body = dict(id=rid, run_id=run, i=i, j=j, delay_s=delay, kind=kind, observed_at=observed)
+            if not hmac.compare_digest(self.sign(dict(body, metadata=metadata)), signature):
+                continue
+            if metadata.get('context') != context:
+                continue
+            result.append(dict(body, source_robot_id=metadata['source_robot_id'],
+                               context=context, status=eligible[rid]['status']))
+        return result
+
 
 _memory: Optional[RouteMemory] = None
 

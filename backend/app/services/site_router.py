@@ -65,7 +65,7 @@ def capped_speed(x: float, y: float, speed: float, zones: Optional[List[Dict[str
 last_route_info: Dict[str, Any] = {}
 
 
-def _route(layout, start, goal, extra, context=None):
+def _route(layout, start, goal, extra, context=None, robot_id=None):
     """NetworkX route with delays learned from signed experience; the A* grid router
     is the fallback. Either way racks and hazard zones stay impassable."""
     from app.config import settings
@@ -73,6 +73,17 @@ def _route(layout, start, goal, extra, context=None):
         try:
             from app.services.route_learning import get_memory, learned_route
             delays, quarantined = get_memory().load(context=context)
+            released = {'accepted': [], 'excluded': []}
+            try:
+                from app.services.learning_release import get_learning_release
+                advice = get_learning_release().retrieve(context, robot_id, get_memory())
+                released = {k: v for k, v in advice.items() if k != 'penalties'}
+                delays = dict(delays)
+                for cell, margin in advice['penalties'].items():
+                    delays[cell] = delays.get(cell, 0) + margin
+            except Exception as exc:
+                # Unavailable release storage excludes released advice, not static routing.
+                released['unavailable'] = type(exc).__name__
             result = learned_route(layout, start, goal, extra, delays)
             if result:
                 last_route_info.clear()
@@ -81,6 +92,7 @@ def _route(layout, start, goal, extra, context=None):
                                        quarantined=len(quarantined))
                 last_route_info["experience_context"] = context
                 last_route_info["experience_decisions"] = get_memory().last_retrieval[-100:]
+                last_route_info['approved_learning'] = released
                 return result["points"]
         except Exception as exc:
             logger.warning("Learned routing failed, using grid A*: %s", exc)
@@ -109,7 +121,7 @@ def route_plan(world: Dict[str, Any], start: Dict[str, Any], goal: Dict[str, Any
     profile = observed_profile(start)
     if profile and profile.max_speed_mps is not None:
         max_speed = min(max_speed, profile.max_speed_mps)
-    route = _route(layout, (float(start["x"]), float(start["y"])), (float(goal["x"]), float(goal["y"])), extra, context)
+    route = _route(layout, (float(start["x"]), float(start["y"])), (float(goal["x"]), float(goal["y"])), extra, context, start.get('robot_id'))
     if not route:
         return None
     wps = []
