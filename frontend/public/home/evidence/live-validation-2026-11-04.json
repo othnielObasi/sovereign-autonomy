@@ -1,0 +1,118 @@
+{
+ "title": "Live validation on the deployed site",
+ "date": "2026-11-04",
+ "deployment": "https://204-12-178-126.sslip.io (Nebius us-north1)",
+ "generated_from": "public API responses of the live deployment; see each item's source path",
+ "health": {
+  "muse_enabled": true,
+  "muse_open_enabled": true,
+  "vision_provider": "sam",
+  "voice_enabled": true,
+  "planner_provider": "muse",
+  "public_demo": true
+ },
+ "mission": {
+  "run_id": "run_a8a029cc36cb",
+  "source": "/api/runs/run_a8a029cc36cb/events",
+  "planner_models": [
+   "site_router",
+   "muse-spark-1.3",
+   "meta-models/muse-spark-open-1026",
+   "muse-spark-1.3",
+   "muse-spark-1.3",
+   "meta-models/muse-spark-open-1026"
+  ],
+  "decisions": 203,
+  "permit_events": 182
+ },
+ "sam_3_1": {
+  "checks": 41,
+  "verdicts": {
+   "agree": 29,
+   "unconfirmed_sighting": 11,
+   "missed_hazard": 1
+  },
+  "median_latency_ms": 907,
+  "max_position_error_m": 0.77,
+  "source": "/api/runs/run_a8a029cc36cb/events (PERCEPTION)",
+  "matched_objects": 35,
+  "median_position_error_m": 0.02,
+  "p90_position_error_m": 0.19,
+  "note": "missed_hazard is SAM missing something the simulator knew was there; it is recorded as a perception fault and the gate still uses the sensors."
+ },
+ "evidence_chain": {
+  "chain_valid": true,
+  "total_entries": 1222,
+  "verified_at": "2026-11-04T14:26:28.933066+00:00",
+  "source": "/api/compliance/verify/run_a8a029cc36cb"
+ },
+ "signed_receipt": {
+  "receipt_id": 1763,
+  "algorithm": "Ed25519",
+  "key_id": "948f2a70a7b36c43",
+  "valid": true,
+  "public_key_source": "/api/governance/signing-key",
+  "key_id_published": "948f2a70a7b36c43"
+ },
+ "voice_stop": {
+  "phrase": "Stop robot one now.",
+  "transcript": "stop robot one now.",
+  "model": "muse-voice-transcribe-1.0",
+  "transcribe_ms": 1445,
+  "authority_revoked_ms": 3.38,
+  "stop_verified": true,
+  "stop_verified_ms": 2.9,
+  "reset_without_sign_in": 401,
+  "reset_as_operator": 200,
+  "recorded_at": "2026-11-04T13:5x UTC (single test, synthetic speech)"
+ },
+ "tavily": {
+  "query": "ethanol spill hazards handling precautions workplace safety data",
+  "mode": "live",
+  "results": 6,
+  "sources_accepted_by_firewall": [
+   "osha.gov",
+   "chemicalsafety.ilo.org",
+   "ccohs.ca"
+  ],
+  "recorded_at": "2026-11-04 (single lookup; lookup history is in memory and resets on restart)"
+ },
+ "fleet_learning": {
+  "lesson": "Slow zone: west corridor near the Gowning door",
+  "version": 1,
+  "lifecycle": [
+   "candidate",
+   "evaluated",
+   "approved",
+   "released"
+  ],
+  "current_status_note": "expired after its one-hour lifetime, as designed",
+  "recipients_when_released": {
+   "robot-1": "accepted",
+   "robot-2": "accepted",
+   "robot-3 (humanoid)": "excluded: different capability profile"
+  },
+  "source": "/api/learning"
+ },
+ "backup": {
+  "created": "20261104-140840",
+  "verify_ok": true,
+  "files": [
+   "app.sql",
+   "authority.db",
+   "experience-anchor.db"
+  ],
+  "journal_intact": true
+ },
+ "tests": {
+  "backend_passed": 531,
+  "skipped": 4,
+  "command": "python -m pytest backend/tests",
+  "recorded": "2026-11-04"
+ },
+ "limits": [
+  "Simulator only; no physical robot",
+  "Voice was tested once with synthetic speech",
+  "Learning lessons expire by design"
+ ]
+}

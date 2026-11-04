@@ -81,7 +81,7 @@ function evRender(){
     const facts=evEl('div',{class:'ev-facts'});facts.append(evFact(report.backend.passed,'tests recorded as passed'),evFact(report.backend.duration_s+' s','recorded test duration'),evFact(report.backend.oversight_cases_included,'oversight cases included'));evPanel.append(facts);
     evPanel.append(evText('p','Command recorded with this result:'),evText('pre',report.backend.command,'ev-command'),evNote('This artefact is an aggregate recorded test summary. It does not contain individual backend test-case logs, and opening it does not run the suite.'));
     evPanel.append(evText('h5','Scope of this validation batch'));
-    const list=evEl('ul');report.limitations.forEach(text=>list.append(evText('li',text)));list.className='ev-command';evPanel.append(list,evLink('Open the original recorded summary ↗','/landing/validation.json'),evText('p','The separate live Meta mission and receipt checks are available under Chain & signatures.','ev-meta'));
+    const list=evEl('ul');report.limitations.filter(text=>text!=='No commit or push performed').forEach(text=>list.append(evText('li',text)));list.className='ev-command';evPanel.append(list,evLink('Open the original recorded summary ↗','/landing/validation.json'),evText('p','The separate live Meta mission and receipt checks are available under Chain & signatures.','ev-meta'));
   }else if(evTab==='browser'){
     const count=evData.browser_reports.reduce((n,report)=>n+report.checks.length,0);
     evPanel.append(evText('h4',count+' recorded browser checks, not '+count+' scenarios'),evText('p','10 Mission Control checks + 5 operator-oversight checks. Each statement below comes from its saved report. These are recorded outcomes, not checks running in this browser.'));

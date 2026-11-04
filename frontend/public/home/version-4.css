@@ -20,3 +20,30 @@
 .film-buffering{font-size:14px;color:#ffdfb5;padding:0 22px;margin:0 0 14px}
 @media(max-width:900px){.story-layout{grid-template-columns:1fr}.film-title{flex-direction:column;align-items:flex-start}.mission-film video{min-height:0}.film-captions{font-size:17px}.film-source{padding:16px}}
 @media(prefers-reduced-motion:reduce){.mission-film *{scroll-behavior:auto}}
+
+/* Audit fixes, 4 Nov 2026 */
+.transfer-action:disabled{background:#292132;border-color:#5e466e;color:#cdbbdb;cursor:not-allowed}
+.outline,.btn.primary,.story-controls button.primary,#story-next,#film-play{background:#7339cc;border-color:#8f5be0}
+.outline:hover,.btn.primary:hover{background:#8247dc}
+.flow-number,.section-kicker,.family-card span{font-size:12px}
+@media (max-width:760px){
+  .outline,.btn{font-size:12px;min-height:44px}
+  .brand span:last-child{font-size:11px}
+  .navlinks a{display:inline-flex;align-items:center;min-height:44px}
+  .public-nav-toggle{min-height:44px;font-size:12px}
+}
+#learning-transfer .transfer-action:disabled{background:#292132;border-color:#5e466e;color:#cdbbdb}
+.pill[aria-pressed=true],.cta .btn:not(.btn+.btn){background:#7339cc;border-color:#8f5be0;color:#fff}
+/* Standalone links get a comfortable tap height without changing their look */
+.text-link,.story-source-link,.ev-panel a,.ev-command~a,.family-card+a,.card-links a,a[target=_blank]{display:inline-block;padding-block:8px}
+.statement a,.platform-summary .section-next a{display:inline-block;padding-block:8px}
+
+.live-proof{margin:34px 0 10px;padding:26px;border:1px solid #8f5be066;border-radius:12px;background:#1b1426}
+.live-proof-head h3{margin:8px 0 6px;font-size:24px}
+.live-proof-head p{margin:0 0 18px;color:#cfc3dc}
+.live-proof-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}
+.live-proof-grid article{display:flex;flex-direction:column;gap:8px;padding:18px;border:1px solid #ffffff1f;border-radius:10px;background:#ffffff08}
+.live-proof-grid strong{font-size:20px;color:#e6c7ff}
+.live-proof-grid span{color:#ddd3e8;font-size:14px;line-height:1.55;flex:1}
+.live-proof-grid a{color:#d6b3ff;font-size:13px;display:inline-block;padding-block:8px}
+@media (max-width:900px){.live-proof-grid{grid-template-columns:1fr}.live-proof{padding:18px}}

@@ -63,3 +63,6 @@
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',initFilm,{once:true});else initFilm();
 })();
 
+
+/* A rejected candidate cannot continue: say so on the (disabled) button. */
+(function(){const base=v2RenderTransfer;v2RenderTransfer=function(){base.apply(this,arguments);const a=document.getElementById('transfer-action');if(a&&v2Transfer.step===1&&v2Transfer.unsafe){a.textContent='Rejected · reset to try a valid candidate';a.disabled=true;}};})();
