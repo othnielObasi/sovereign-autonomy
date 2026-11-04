@@ -1,0 +1,83 @@
+# Production stack: Caddy (HTTPS) -> frontend + backend, with the simulator and Postgres private.
+# Run from the repo root on the server:
+#   docker compose -f deploy/docker-compose.prod.yml --env-file deploy/.env.production up -d --build
+services:
+  postgres:
+    image: postgres:16
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: sovereign
+      POSTGRES_PASSWORD: "${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD}"
+      POSTGRES_DB: sovereign
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U sovereign"]
+      interval: 5s
+      retries: 20
+
+  backend:
+    build: ../backend
+    restart: unless-stopped
+    env_file: .env.production
+    environment:
+      DATABASE_URL: "postgresql://sovereign:${POSTGRES_PASSWORD}@postgres:5432/sovereign"
+      SIM_BASE_URL: "http://warehouse-sim:8090"
+      SITE_LAYOUT: "${SITE_LAYOUT:-pharma}"
+      CORS_ORIGINS: "https://${SITE_DOMAIN}"
+      EXPERIENCE_ANCHOR_PATH: "/anchors/experience.sqlite"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    volumes:
+      - backend_data:/app/data
+      - memory_anchor_data:/anchors
+
+  warehouse-sim:
+    build:
+      context: ..
+      dockerfile: sim/warehouse_sim/Dockerfile
+    restart: unless-stopped
+    environment:
+      SIM_TICK_HZ: "10"
+      SIM_SEED: "42"
+      AUTHORITY_BASE_URL: "http://backend:8080"
+      SIM_STATE_DB: "/app/data/controller.db"
+      SITE_LAYOUT: "${SITE_LAYOUT:-pharma}"
+      PERMIT_SECRET: "${PERMIT_SECRET:?Set PERMIT_SECRET}"
+    volumes:
+      - controller_data:/app/data
+
+  frontend:
+    build:
+      context: ../frontend
+      dockerfile: Dockerfile.prod
+    restart: unless-stopped
+    environment:
+      BACKEND_URL: "http://backend:8080"
+    depends_on:
+      - backend
+
+  caddy:
+    image: caddy:2.8
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    environment:
+      SITE_DOMAIN: "${SITE_DOMAIN:?Set SITE_DOMAIN}"
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy_data:/data
+      - caddy_config:/config
+    depends_on:
+      - frontend
+      - backend
+
+volumes:
+  postgres_data:
+  backend_data:
+  controller_data:
+  memory_anchor_data:
+  caddy_data:
+  caddy_config:

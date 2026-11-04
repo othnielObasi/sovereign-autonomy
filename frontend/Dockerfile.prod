@@ -5,6 +5,9 @@ RUN if [ -f package-lock.json ]; then npm ci; else npm install; fi
 COPY . /app
 ARG NEXT_PUBLIC_API_BASE
 ENV NEXT_PUBLIC_API_BASE=${NEXT_PUBLIC_API_BASE}
+# The /api rewrite is fixed at build time, so the backend address must be known here
+ARG BACKEND_URL=http://backend:8080
+ENV BACKEND_URL=${BACKEND_URL}
 RUN npm run build
 
 FROM node:20-alpine AS runner
@@ -15,6 +18,7 @@ COPY --from=builder --chown=nextjs:nextjs /app/package.json ./
 COPY --from=builder --chown=nextjs:nextjs /app/node_modules ./node_modules
 COPY --from=builder --chown=nextjs:nextjs /app/.next ./.next
 COPY --from=builder --chown=nextjs:nextjs /app/next.config.js ./
+COPY --from=builder --chown=nextjs:nextjs /app/public ./public
 
 USER nextjs
 EXPOSE 3000

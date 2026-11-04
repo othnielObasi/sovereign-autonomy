@@ -1,0 +1,13 @@
+{$SITE_DOMAIN} {
+	encode zstd gzip
+
+	# Live run feed: Next.js cannot proxy WebSockets, so send it straight to the backend
+	@ws path /ws/*
+	handle @ws {
+		reverse_proxy backend:8080
+	}
+
+	handle {
+		reverse_proxy frontend:3000
+	}
+}
