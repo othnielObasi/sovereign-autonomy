@@ -12,7 +12,7 @@ COPY backend/bench/__init__.py backend/bench/world.py backend/bench/scenarios.py
 COPY backend/bench/sites /app/bench/sites
 # Permit checks share one standard-library module with the backend
 COPY backend/app/__init__.py /app/app/__init__.py
-COPY backend/app/autonomy/__init__.py backend/app/autonomy/permit.py backend/app/autonomy/controller.py backend/app/autonomy/experience.py /app/app/autonomy/
+COPY backend/app/autonomy/__init__.py backend/app/autonomy/permit.py backend/app/autonomy/controller.py backend/app/autonomy/experience.py backend/app/autonomy/robot_profiles.py /app/app/autonomy/
 COPY sim/warehouse_sim/server.py sim/warehouse_sim/camera.py sim/warehouse_sim/traffic.py /app/
 RUN mkdir -p /app/data && chown sim:sim /app/data
 
