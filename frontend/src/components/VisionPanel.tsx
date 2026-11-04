@@ -64,7 +64,7 @@ export function VisionPanel({ runId }: { runId?: string }) {
   const mine = runId ? recent.filter((c) => c.run_id === runId || c.run_id === null) : recent;
   const last = mine[mine.length - 1];
   const zones: any[] = status.caution_zones || [];
-  const shortModel = String(status.model || "").replace(/^nvidia\//, "");
+  const shortModel = String(status.model || "").replace(/^[^/]+\//, "");
 
   async function checkNow() {
     setChecking(true);

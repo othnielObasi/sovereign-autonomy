@@ -1141,7 +1141,7 @@ export default function RunPage({ params }: { params: { runId: string } }) {
             {!agenticResult && llmPlan && (() => {
               const raw = String(llmPlan.rationale || "");
               const m = raw.match(/^\[([^\]]+)\]\s*/);
-              const model = (m ? m[1] : llmPlan.model || "").replace(/^nvidia\//, "");
+              const model = (m ? m[1] : llmPlan.model || "").replace(/^[^/]+\//, "");
               const strategy = raw.replace(/^\[[^\]]+\]\s*/, "") || "Route along the aisles to the destination.";
               return (
                 <div className="mb-3 rounded-lg border border-mc-line bg-mc-raise/60 p-3">

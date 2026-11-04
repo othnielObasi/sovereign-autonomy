@@ -740,7 +740,7 @@ class RunService:
                     except Exception as si_err:
                         logger.warning("Run %s: site intel failed: %s", run_id, si_err)
 
-                    # Vision: an NVIDIA VLM reads the robot camera in the background.
+                    # Vision: Meta SAM 3.1 reads the robot camera in the background.
                     # Results are cross-checked with the sensors and recorded here; an
                     # unconfirmed sighting only adds a short slow zone (never less caution).
                     try:

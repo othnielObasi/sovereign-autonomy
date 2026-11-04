@@ -9,7 +9,7 @@ import { LearningEvidence } from "@/components/LearningEvidence";
 type Ev = { id?: number | string; type: string; ts?: string; payload?: any; payload_json?: any };
 
 const payloadOf = (e: Ev) => e.payload ?? e.payload_json ?? {};
-const short = (m?: string) => String(m || "").replace(/^nvidia\//, "");
+const short = (m?: string) => String(m || "").replace(/^[^/]+\//, "");
 const time = (ts?: string) => (ts ? new Date(ts).toLocaleTimeString() : "");
 
 /**
