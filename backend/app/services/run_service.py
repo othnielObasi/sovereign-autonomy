@@ -1135,6 +1135,13 @@ class RunService:
                                 # approves that slower move too. Nothing executes unapproved.
                                 cautious_params = dict(proposal.params or {})
                                 cautious_params["max_speed"] = min(float(cautious_params.get("max_speed", 0.5)), 0.2)
+                                # The STOP above advanced the controller generation. Judge and permit the
+                                # slower move against the robot as it is now, or the controller refuses
+                                # the permit as stale on every tick and the robot never moves again.
+                                try:
+                                    telemetry.update(await self.sim_for(run_id).get_telemetry())
+                                except Exception as fresh_err:
+                                    logger.warning("Run %s: telemetry refresh after stop failed: %s", run_id, fresh_err)
                                 cautious = ActionProposal(intent=proposal.intent, params=cautious_params,
                                                           rationale=f"{proposal.rationale} (slowed after review)")
                                 recheck = self.gov.evaluate_and_record(db, run_id, telemetry, cautious)
@@ -1145,12 +1152,16 @@ class RunService:
                                 })
                                 if recheck.decision == "APPROVED":
                                     logger.info("Run %s: NEEDS_REVIEW — slower move approved (count %d)", run_id, denial_count)
-                                    self._wp_denial_counts[run_id] = 0   # the robot is moving under an approved decision
                                     cmd = {"intent": cautious.intent, "params": cautious_params}
                                     authority.observe(telemetry, robot_id=self.robot_for(run_id))
                                     execution = await self._execute_permitted(
                                         db, run_id, mission.id if mission else run.mission_id, cautious.intent, cautious_params)
                                     exec_verified = execution.get("ok", False) or execution.get("ack", False)
+                                    if execution.get("rejected"):
+                                        # The controller refused it: count it, so repeated refusals replan
+                                        self._wp_denial_counts[run_id] = self._wp_denial_counts.get(run_id, 0) + 1
+                                    else:
+                                        self._wp_denial_counts[run_id] = 0   # moving under an approved decision
                                     self._append_event(db, run_id, "EXECUTION", {
                                         "command": cmd,
                                         "result": execution,
