@@ -1,0 +1,841 @@
+{
+ "schema": "sovereign-mission-highlights-v1",
+ "run_id": "run_939e05c6e625",
+ "recorded_date": "4 November 2026",
+ "robot_id": "robot-1",
+ "event_count": 1018,
+ "permit_uses": 104,
+ "hard_fail_decisions": 8,
+ "notes": [
+  "Recorded live on the deployed site on 4 November 2026 in the simulator; no physical robot.",
+  "Planning used Meta's models (muse-spark-1.3, site_router); SAM 3.1 ran 44 vision checks.",
+  "Each chapter is a real-time excerpt of a screen recording of the live 3D view; time between chapters is skipped.",
+  "The run's 1018 events verify as one unbroken hash chain.",
+  "Completion does not mean every proposal was safe: refused proposals are part of the record."
+ ],
+ "steps": [
+  {
+   "label": "Plan",
+   "title": "Muse Spark plans a route to the Quality lab",
+   "status": "Route proposed by Meta's Muse Spark",
+   "text": "Robot-1 is given a delivery from Gowning to the Quality lab. Meta's Muse Spark proposes 26 waypoints from the map and the robot's camera view. A mission review checks the plan; each move still needs its own safety check and permit.",
+   "time": "2026-11-04T15:04:47.831302Z",
+   "event_ids": [
+    "evt_50c9b1aa2212",
+    "evt_db6410900560"
+   ],
+   "pose": {
+    "x": 6,
+    "y": 23.5,
+    "speed": 0.0,
+    "human_distance_m": 11.451
+   },
+   "route": [
+    [
+     6.0,
+     18.0
+    ],
+    [
+     6.0,
+     12.0
+    ],
+    [
+     6.0,
+     6.0
+    ],
+    [
+     6.38,
+     4.38
+    ],
+    [
+     6.75,
+     2.75
+    ],
+    [
+     7.75,
+     2.25
+    ],
+    [
+     8.88,
+     2.38
+    ],
+    [
+     10.0,
+     2.5
+    ],
+    [
+     8.62,
+     2.38
+    ],
+    [
+     7.25,
+     2.25
+    ],
+    [
+     6.75,
+     3.25
+    ],
+    [
+     6.75,
+     5.25
+    ],
+    [
+     6.75,
+     7.25
+    ],
+    [
+     6.75,
+     9.25
+    ],
+    [
+     6.75,
+     11.25
+    ],
+    [
+     8.25,
+     11.75
+    ],
+    [
+     10.05,
+     11.75
+    ],
+    [
+     11.85,
+     11.75
+    ],
+    [
+     13.65,
+     11.75
+    ],
+    [
+     15.45,
+     11.75
+    ],
+    [
+     17.25,
+     11.75
+    ],
+    [
+     17.4,
+     9.9
+    ],
+    [
+     17.55,
+     8.05
+    ],
+    [
+     17.7,
+     6.2
+    ],
+    [
+     17.85,
+     4.35
+    ],
+    [
+     18.0,
+     2.5
+    ]
+   ],
+   "fact_label": "Planned by",
+   "fact": "muse-spark-1.3",
+   "time_range": "15:04:47 UTC",
+   "trail": []
+  },
+  {
+   "label": "Move",
+   "title": "A permit allows the next move",
+   "status": "Permit used",
+   "text": "The controller redeems a signed, single-use permit for this exact move, and the robot starts driving. The plan alone did not authorise it.",
+   "time": "2026-11-04T15:04:47.902939Z",
+   "event_ids": [
+    "evt_d70530cba9a2",
+    "evt_48e409e11a34"
+   ],
+   "pose": {
+    "x": 6.012,
+    "y": 22.705,
+    "speed": 0.3,
+    "human_distance_m": 10.991
+   },
+   "fact_label": "Recorded robot speed",
+   "fact": "0.3 m/s",
+   "time_range": "15:04:47 UTC",
+   "trail": [
+    [
+     6,
+     23.5
+    ],
+    [
+     6.013,
+     23.035
+    ]
+   ]
+  },
+  {
+   "label": "Stop",
+   "title": "A worker nearby: too fast, refused",
+   "status": "Move refused / robot stopped",
+   "text": "A worker is 4.304 m away and the planned speed is too high near people. The safety gate refuses the move (HUMAN_CLEARANCE_02) and the robot stops; it continues only at a slower speed the gate approves again.",
+   "time": "2026-11-04T15:05:17.289971Z",
+   "event_ids": [
+    "evt_0325adbdb150",
+    "evt_62114a70e9c8"
+   ],
+   "pose": {
+    "x": 7.277,
+    "y": 15.272,
+    "speed": 0.3,
+    "human_distance_m": 4.304
+   },
+   "people": [
+    [
+     5.75,
+     2.25
+    ],
+    [
+     15.25,
+     16.75
+    ],
+    [
+     9.75,
+     11.75
+    ],
+    [
+     22.34,
+     16.54
+    ]
+   ],
+   "fact_label": "Recorded human distance",
+   "fact": "4.304 m",
+   "time_range": "15:05:17 UTC",
+   "trail": [
+    [
+     6,
+     23.5
+    ],
+    [
+     6.012,
+     22.705
+    ],
+    [
+     6.01,
+     21.775
+    ],
+    [
+     6.007,
+     20.815
+    ],
+    [
+     6.061,
+     19.849
+    ],
+    [
+     6.258,
+     18.94
+    ],
+    [
+     6.458,
+     18.001
+    ],
+    [
+     6.714,
+     17.077
+    ],
+    [
+     7.0,
+     16.16
+    ],
+    [
+     7.277,
+     15.272
+    ]
+   ]
+  },
+  {
+   "label": "Replan",
+   "title": "New plan. Fresh permission.",
+   "status": "New plan / fresh permit used",
+   "text": "After repeated refusals the run loop asks for a new route. Meta's Muse Spark proposes a replacement toward the same destination, and the next move needs a fresh permit.",
+   "time": "2026-11-04T15:08:11.084176Z",
+   "event_ids": [
+    "evt_2c668df0d615",
+    "evt_a1c286a5852f",
+    "evt_76c1624cf0ad"
+   ],
+   "pose": {
+    "x": 17.209,
+    "y": 10.355,
+    "speed": 0.0,
+    "human_distance_m": 1.628
+   },
+   "route": [
+    [
+     17.25,
+     9.75
+    ],
+    [
+     16.0,
+     10.0
+    ],
+    [
+     16.75,
+     9.25
+    ],
+    [
+     15.5,
+     9.0
+    ],
+    [
+     14.25,
+     8.75
+    ],
+    [
+     15.2,
+     7.0
+    ],
+    [
+     16.0,
+     4.0
+    ],
+    [
+     18.0,
+     2.5
+    ]
+   ],
+   "fact_label": "Replanned by",
+   "fact": "muse-spark-1.3",
+   "time_range": "15:07:40 UTC",
+   "trail": [
+    [
+     6,
+     23.5
+    ],
+    [
+     6.012,
+     22.705
+    ],
+    [
+     6.01,
+     21.775
+    ],
+    [
+     6.007,
+     20.815
+    ],
+    [
+     6.061,
+     19.849
+    ],
+    [
+     6.258,
+     18.94
+    ],
+    [
+     6.458,
+     18.001
+    ],
+    [
+     6.714,
+     17.077
+    ],
+    [
+     7.0,
+     16.16
+    ],
+    [
+     7.277,
+     15.272
+    ],
+    [
+     7.461,
+     14.678
+    ],
+    [
+     7.863,
+     14.038
+    ],
+    [
+     8.906,
+     13.636
+    ],
+    [
+     10.373,
+     13.246
+    ],
+    [
+     11.825,
+     12.877
+    ],
+    [
+     13.419,
+     12.547
+    ],
+    [
+     14.206,
+     12.383
+    ],
+    [
+     14.817,
+     12.256
+    ],
+    [
+     15.4,
+     12.135
+    ],
+    [
+     16.011,
+     12.007
+    ],
+    [
+     16.622,
+     11.88
+    ],
+    [
+     17.014,
+     11.297
+    ],
+    [
+     17.188,
+     10.667
+    ],
+    [
+     17.188,
+     10.667
+    ],
+    [
+     17.188,
+     10.667
+    ],
+    [
+     17.188,
+     10.667
+    ],
+    [
+     17.188,
+     10.667
+    ],
+    [
+     17.188,
+     10.667
+    ],
+    [
+     17.188,
+     10.667
+    ],
+    [
+     17.188,
+     10.667
+    ],
+    [
+     17.188,
+     10.667
+    ],
+    [
+     17.188,
+     10.667
+    ],
+    [
+     17.188,
+     10.667
+    ],
+    [
+     17.188,
+     10.667
+    ],
+    [
+     17.188,
+     10.667
+    ],
+    [
+     17.188,
+     10.667
+    ],
+    [
+     17.188,
+     10.667
+    ],
+    [
+     17.188,
+     10.667
+    ],
+    [
+     17.188,
+     10.667
+    ],
+    [
+     17.188,
+     10.667
+    ],
+    [
+     17.188,
+     10.667
+    ],
+    [
+     17.188,
+     10.667
+    ],
+    [
+     17.188,
+     10.667
+    ],
+    [
+     17.188,
+     10.667
+    ],
+    [
+     17.188,
+     10.667
+    ],
+    [
+     17.188,
+     10.667
+    ],
+    [
+     17.188,
+     10.667
+    ],
+    [
+     17.188,
+     10.667
+    ],
+    [
+     17.188,
+     10.667
+    ],
+    [
+     17.188,
+     10.667
+    ],
+    [
+     17.188,
+     10.667
+    ],
+    [
+     17.188,
+     10.667
+    ],
+    [
+     17.188,
+     10.667
+    ],
+    [
+     17.188,
+     10.667
+    ],
+    [
+     17.209,
+     10.355
+    ]
+   ]
+  },
+  {
+   "label": "Arrive",
+   "title": "Arrival is recorded",
+   "status": "Completed / STOP verified",
+   "text": "The final decision records robot-1 at the Quality lab and the run completes. The full record of 1018 events forms an unbroken hash chain.",
+   "time": "2026-11-04T15:09:11.824503Z",
+   "event_ids": [
+    "evt_3a711e81c453"
+   ],
+   "pose": {
+    "x": 17.995,
+    "y": 2.537,
+    "speed": 0.0,
+    "human_distance_m": 12.259
+   },
+   "fact_label": "Recorded arrival",
+   "fact": "17.995, 2.537 m",
+   "time_range": "15:09:11 UTC",
+   "trail": [
+    [
+     6,
+     23.5
+    ],
+    [
+     6.012,
+     22.705
+    ],
+    [
+     6.01,
+     21.775
+    ],
+    [
+     6.007,
+     20.815
+    ],
+    [
+     6.061,
+     19.849
+    ],
+    [
+     6.258,
+     18.94
+    ],
+    [
+     6.458,
+     18.001
+    ],
+    [
+     6.714,
+     17.077
+    ],
+    [
+     7.0,
+     16.16
+    ],
+    [
+     7.277,
+     15.272
+    ],
+    [
+     7.461,
+     14.678
+    ],
+    [
+     7.863,
+     14.038
+    ],
+    [
+     8.906,
+     13.636
+    ],
+    [
+     10.373,
+     13.246
+    ],
+    [
+     11.825,
+     12.877
+    ],
+    [
+     13.419,
+     12.547
+    ],
+    [
+     14.206,
+     12.383
+    ],
+    [
+     14.817,
+     12.256
+    ],
+    [
+     15.4,
+     12.135
+    ],
+    [
+     16.011,
+     12.007
+    ],
+    [
+     16.622,
+     11.88
+    ],
+    [
+     17.014,
+     11.297
+    ],
+    [
+     17.188,
+     10.667
+    ],
+    [
+     17.188,
+     10.667
+    ],
+    [
+     17.188,
+     10.667
+    ],
+    [
+     17.188,
+     10.667
+    ],
+    [
+     17.188,
+     10.667
+    ],
+    [
+     17.188,
+     10.667
+    ],
+    [
+     17.188,
+     10.667
+    ],
+    [
+     17.188,
+     10.667
+    ],
+    [
+     17.188,
+     10.667
+    ],
+    [
+     17.188,
+     10.667
+    ],
+    [
+     17.188,
+     10.667
+    ],
+    [
+     17.188,
+     10.667
+    ],
+    [
+     17.188,
+     10.667
+    ],
+    [
+     17.188,
+     10.667
+    ],
+    [
+     17.188,
+     10.667
+    ],
+    [
+     17.188,
+     10.667
+    ],
+    [
+     17.188,
+     10.667
+    ],
+    [
+     17.188,
+     10.667
+    ],
+    [
+     17.188,
+     10.667
+    ],
+    [
+     17.188,
+     10.667
+    ],
+    [
+     17.188,
+     10.667
+    ],
+    [
+     17.188,
+     10.667
+    ],
+    [
+     17.188,
+     10.667
+    ],
+    [
+     17.188,
+     10.667
+    ],
+    [
+     17.188,
+     10.667
+    ],
+    [
+     17.188,
+     10.667
+    ],
+    [
+     17.188,
+     10.667
+    ],
+    [
+     17.188,
+     10.667
+    ],
+    [
+     17.188,
+     10.667
+    ],
+    [
+     17.188,
+     10.667
+    ],
+    [
+     17.188,
+     10.667
+    ],
+    [
+     17.188,
+     10.667
+    ],
+    [
+     17.209,
+     10.355
+    ],
+    [
+     17.063,
+     10.24
+    ],
+    [
+     17.082,
+     10.02
+    ],
+    [
+     17.069,
+     9.748
+    ],
+    [
+     16.924,
+     9.926
+    ],
+    [
+     16.892,
+     9.62
+    ],
+    [
+     16.902,
+     9.251
+    ],
+    [
+     16.625,
+     9.304
+    ],
+    [
+     16.847,
+     8.723
+    ],
+    [
+     16.787,
+     8.579
+    ],
+    [
+     16.944,
+     8.27
+    ],
+    [
+     17.106,
+     7.493
+    ],
+    [
+     17.355,
+     6.597
+    ],
+    [
+     17.516,
+     5.65
+    ],
+    [
+     17.673,
+     4.703
+    ],
+    [
+     17.81,
+     3.783
+    ],
+    [
+     17.951,
+     2.834
+    ],
+    [
+     17.995,
+     2.537
+    ]
+   ]
+  }
+ ]
+}

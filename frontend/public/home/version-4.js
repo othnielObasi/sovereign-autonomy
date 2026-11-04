@@ -24,19 +24,19 @@
 
   function initFilm(){
     const host=document.getElementById('mission-story'),steps=JSON.parse(document.getElementById('mission-story-data').textContent).steps;
-    host.querySelector('.story-context p').textContent='Watch the actual facility renderer replay a saved delivery. A person approaches, a move is refused, and continuation needs fresh permission.';
-    host.querySelector('.story-recording-label').textContent='Actual 3D facility renderer · archived simulator data · edited highlights';
+    host.querySelector('.story-context p').textContent='Watch a live delivery on this site. Muse Spark plans the route, the gate refuses a move that is too fast near a worker, the robot replans and arrives.';
+    host.querySelector('.story-recording-label').textContent='Screen recording of the live 3D view · real-time excerpts · 4 November 2026';
     const map=host.querySelector('.story-visual'),layout=host.querySelector('.story-layout'),source=document.createElement('details');source.className='film-source';
     const summary=document.createElement('summary');summary.textContent='Inspect the recorded floor plan and source positions';source.append(summary,map);layout.after(source);
-    const film=document.createElement('div');film.className='mission-film';film.innerHTML='<div class="film-title"><strong>Robot-2 · Formulation → Quality lab</strong><span>Saved run · 3 November 2026</span></div><video id="mission-film" playsinline preload="metadata" muted poster="/home/mission-film/plan.webp" aria-label="Recorded simulator data replayed in the actual 3D facility"><track kind="captions" src="/home/mission-film/captions.vtt" srclang="en" label="English decisions" default></video><p id="film-caption" class="film-captions"></p><div class="film-transport"><button id="film-play" type="button" aria-controls="mission-film">Play mission replay</button><button id="film-restart" type="button" aria-controls="mission-film">Restart</button><output id="film-status" role="status">Ready · Plan</output></div><div class="film-media-controls"><label for="film-speed">Playback speed</label><select id="film-speed"><option value="1">Normal</option><option value="0.75">Slower</option><option value="1.5">Faster</option></select></div><p id="film-buffering" class="film-buffering" role="status" hidden>Loading this recorded segment…</p><p class="film-note">New rendering of saved telemetry through our actual 3D facility. Edited timing and visual smoothing; not original video, a live feed or a physical-robot test. <a href="/home/mission-film/provenance.json">Inspect replay provenance ↗</a></p>';
+    const film=document.createElement('div');film.className='mission-film';film.innerHTML='<div class="film-title"><strong>Robot-1 · Gowning → Quality lab</strong><span>Live run · 4 November 2026</span></div><video id="mission-film" playsinline preload="metadata" muted poster="/home/mission-film/plan.webp" aria-label="Screen recording of the live 3D facility during the mission"><track kind="captions" src="/home/mission-film/captions.vtt" srclang="en" label="English decisions" default></video><p id="film-caption" class="film-captions"></p><div class="film-transport"><button id="film-play" type="button" aria-controls="mission-film">Play mission replay</button><button id="film-restart" type="button" aria-controls="mission-film">Restart</button><output id="film-status" role="status">Ready · Plan</output></div><div class="film-media-controls"><label for="film-speed">Playback speed</label><select id="film-speed"><option value="1">Normal</option><option value="0.75">Slower</option><option value="1.5">Faster</option></select></div><p id="film-buffering" class="film-buffering" role="status" hidden>Loading this recorded segment…</p><p class="film-note">Real-time excerpts of a screen recording of the live 3D view, cut at the run’s event timestamps; time between chapters is skipped. Simulator, not a physical robot. <a href="/home/mission-film/provenance.json">Inspect replay provenance ↗</a></p>';
     layout.prepend(film);
     const video=document.getElementById('mission-film'),play=document.getElementById('film-play'),status=document.getElementById('film-status'),caption=document.getElementById('film-caption'),buffer=document.getElementById('film-buffering');
     const names=['plan','move','stop','replan','arrive'],captions=[
-      'The destination is set. A route proposes how to get there.',
-      'A movement permit is used. Saved observations show the robot leaving its start.',
-      'A person is 0.378 m away. The next move is refused; a STOP is acknowledged.',
-      'The destination stays the same. A replacement plan needs fresh permission.',
-      'The robot reaches the Quality lab. The final STOP is acknowledged.'
+      'Muse Spark plans the route from the map and the robot’s camera. The plan is only a proposal.',
+      'A signed, single-use permit is redeemed by the controller, and the robot sets off.',
+      'A worker is 4.3 m away and the move is too fast near people: the gate refuses it and the robot stops.',
+      'After repeated refusals Muse Spark plans again. The new route needs fresh permission.',
+      'The robot reaches the Quality lab and the run completes, every event in one unbroken chain.'
     ];
     let index=-1,playing=false,internal=false,loadSequence=0;
     function text(){play.textContent=playing?'Pause mission replay':'Play mission replay';status.textContent=(playing?'Playing':'Paused')+' · '+steps[index].label+' · '+(index+1)+' / 5';}
