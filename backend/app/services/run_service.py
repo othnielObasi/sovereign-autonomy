@@ -114,6 +114,8 @@ class RunService:
 
         # --- Replan-on-denial ---
         self._wp_denial_counts: Dict[str, int] = {}  # consecutive governance denials
+        # Runs whose slowed move the path check refused: replan instead of waiting for an operator
+        self._path_blocked: Dict[str, bool] = {}
         self.REPLAN_DENIAL_THRESHOLD = 5  # trigger LLM re-plan after N consecutive denials
         self.WAYPOINT_REACHED_M = 0.6     # a plan waypoint counts as reached within this distance
 
@@ -1034,6 +1036,7 @@ class RunService:
                     if gov_decision.decision == "APPROVED":
                         # Reset waypoint denial counter on approval
                         self._wp_denial_counts[run_id] = 0
+                        self._path_blocked.pop(run_id, None)
 
                         cmd = {"intent": proposal.intent, "params": proposal.params}
                         execution = await self._execute_permitted(
@@ -1103,7 +1106,8 @@ class RunService:
 
                         # NEEDS_REVIEW: execute cautiously at reduced speed (soft policy hit)
                         # Only pause if NEEDS_REVIEW persists for too many consecutive ticks
-                        if gov_decision.decision == "NEEDS_REVIEW" and not gov_decision.hard_fail:
+                        if (gov_decision.decision == "NEEDS_REVIEW" and not gov_decision.hard_fail
+                                and not self._path_blocked.get(run_id)):
                             NEEDS_REVIEW_PAUSE_THRESHOLD = 5  # pause after 5 consecutive NEEDS_REVIEW
                             if denial_count >= NEEDS_REVIEW_PAUSE_THRESHOLD:
                                 logger.warning("Run %s: %d consecutive NEEDS_REVIEW — pausing for operator", run_id, denial_count)
@@ -1160,6 +1164,8 @@ class RunService:
                                     if execution.get("rejected"):
                                         # The controller refused it: count it, so repeated refusals replan
                                         self._wp_denial_counts[run_id] = self._wp_denial_counts.get(run_id, 0) + 1
+                                        if str(execution.get("reason", "")).startswith("trajectory_"):
+                                            self._path_blocked[run_id] = True   # slower won't help: route around
                                     else:
                                         self._wp_denial_counts[run_id] = 0   # moving under an approved decision
                                     self._append_event(db, run_id, "EXECUTION", {
@@ -1176,6 +1182,7 @@ class RunService:
                               or (gov_decision.hard_fail and denial_count >= 3)) and wp:
                             # Trigger replanning: discard blocked waypoint and request new plan
                             blocked_wp = wp
+                            self._path_blocked.pop(run_id, None)
                             logger.warning(
                                 "Run %s: %d consecutive denials on waypoint %s — triggering replan",
                                 run_id, denial_count, blocked_wp,
