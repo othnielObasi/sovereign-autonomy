@@ -43,6 +43,10 @@ export default function LearningPage() {
   }
   const groups = new Map<string, Evidence[]>();
   for (const row of data?.evidence || []) { const key = `${row.i},${row.j}`; groups.set(key, [...(groups.get(key) || []), row]); }
+  // Same rule as the server: another robot was delayed in this cell or a touching one (about 0.75 m)
+  const nearbyRobots = (rows: Evidence[]) => new Set((data?.evidence || []).filter(o => rows.some(r => Math.abs(o.i - r.i) <= 1 && Math.abs(o.j - r.j) <= 1)).map(o => o.source_robot_id));
+  const corroborated = [...groups].filter(([, rows]) => nearbyRobots(rows).size >= 2);
+  const originCorroborated = corroborated.filter(([, rows]) => [...nearbyRobots(rows)].includes(data?.robot_id || ''));
   return <Page>
     <PageHeader eyebrow="Governed collective learning" title="Review knowledge before the fleet reuses it"
       subtitle="Create a bounded congestion caution from signed robot observations. Evaluate, approve and release one version; each receiving robot must still pass its own movement checks." />
@@ -68,10 +72,15 @@ export default function LearningPage() {
           <label className="block text-sm text-slate-200">External notice or operational context (optional)<textarea className={field} value={notice} onChange={e => setNotice(e.target.value)} maxLength={700} rows={3} /></label>
           <label className="block text-sm text-slate-200">Source reference (optional; stored, never fetched)<input className={field} value={source} onChange={e => setSource(e.target.value)} maxLength={400} /></label>
           <fieldset className="space-y-2"><legend className="mb-2 font-semibold text-slate-100">Verified source cells</legend>
+            {corroborated.length > 0 && <div className="flex flex-wrap items-center gap-3 text-sm text-slate-200">
+              <span>{corroborated.length} cell(s) corroborated by two or more robots.</span>
+              <button type="button" className={button} disabled={busy || !originCorroborated.length} onClick={() => setSelected(originCorroborated.flatMap(([, rows]) => rows.map(r => r.id)))}>Select corroborated cells</button>
+              {!originCorroborated.length && <span>Inspect one of the robots that observed them to propose.</span>}
+            </div>}
             {!groups.size && <p className="text-slate-300">No eligible signed observations for this context yet. Complete missions with two compatible robot identities that independently observe congestion in the same area, then refresh. No example evidence is manufactured here.</p>}
             {[...groups].map(([key, rows]) => <label key={key} className="flex gap-3 rounded border border-slate-600 p-3 text-slate-200">
               <input type="checkbox" checked={rows.every(r => selected.includes(r.id))} onChange={e => setSelected(old => e.target.checked ? [...new Set([...old, ...rows.map(r => r.id)])] : old.filter(id => !rows.some(r => r.id === id)))} />
-              <span>Cell {key} · {new Set(rows.map(r => r.source_robot_id)).size} source robots<br /><small>{rows.map(r => `${r.source_robot_id}: ${r.delay_s}s (${r.run_id})`).join(' · ')}</small></span>
+              <span>Cell {key} · {new Set(rows.map(r => r.source_robot_id)).size} source robot(s) here · {nearbyRobots(rows).size >= 2 ? 'corroborated nearby' : 'needs a second robot nearby'}<br /><small>{rows.map(r => `${r.source_robot_id}: ${r.delay_s}s (${r.run_id})`).join(' · ')}</small></span>
             </label>)}
           </fieldset>
           <p className="text-sm text-slate-300">Origin: {data?.robot_id || 'unavailable'}. Expiry: one hour. The origin must be represented in the selected signed evidence.</p>

@@ -106,10 +106,21 @@ class LearningRelease:
             if ident not in rows:
                 raise ReleaseConflict('evidence_expired_invalidated_or_unavailable')
             selected.append(rows[ident])
-        groups = {}
+        per_cell = {}
         for row in selected:
-            sources = groups.setdefault((row['i'], row['j']), {})
+            sources = per_cell.setdefault((row['i'], row['j']), {})
             sources[row['source_robot_id']] = max(sources.get(row['source_robot_id'], 0), row['delay_s'])
+        # Two robots held up by the same worker stop a few centimetres apart, rarely in the
+        # same 0.5 m cell. A cell is corroborated when a different robot was delayed in it
+        # or in a touching cell (within about 0.75 m). Every cell still needs two robots.
+        groups = {}
+        for (i, j) in per_cell:
+            sources = {}
+            for (ni, nj), near in per_cell.items():
+                if abs(ni - i) <= 1 and abs(nj - j) <= 1:
+                    for robot, delay in near.items():
+                        sources[robot] = max(sources.get(robot, 0), delay)
+            groups[(i, j)] = sources
         if not groups or any(len(sources) < 2 for sources in groups.values()):
             raise ReleaseConflict('two_independent_robot_sources_required_per_cell')
         if not any(r['source_robot_id'] == candidate['origin_robot_id'] for r in selected):

@@ -219,3 +219,32 @@ def test_api_requires_operator_and_real_context(env, monkeypatch):
     read = client.get('/learning?robot_id=robot-C', headers=viewer).json()
     assert read['eligibility']['accepted'][0]['recipient_robot_id'] == 'robot-C'
     assert client.post(path + 'withdraw', json=transition, headers=viewer).status_code == 403
+
+
+def test_adjacent_cells_corroborate_but_one_robot_cannot_corroborate_itself(tmp_path):
+    from bench.world import load_layout
+    from app.services.site_router import _layout
+    now = [1000.]
+    world = dict(load_layout(), **CTX)
+    layout = _layout(world)
+    i, j = next((i, j) for i in range(4, layout.nx - 4) for j in range(4, layout.ny - 4)
+                if not any(layout._blocked[a][b] for a in (i, i + 1) for b in (j, j + 1)))
+    mem = RouteMemory(str(tmp_path / 'memory.db'), SECRET, clock=lambda: now[0], ttl_s=120, decay_s=86400)
+    service = LearningRelease(tmp_path / 'releases.db', SECRET, clock=lambda: now[0])
+
+    def lesson_from(observations):
+        for robot, cell in observations:
+            mem.record('run-' + robot + str(cell), [(cell, 4., 'STOP')], context=CTX, source_robot_id=robot)
+        ids = [r['id'] for r in mem.release_evidence(CTX)]
+        lesson = service.propose(actor='alice', context=CTX, origin_robot_id='robot-A', title='Congestion caution',
+                                 notice='', source_url='', evidence_ids=ids)
+        return service.transition(lesson['lesson_id'], lesson['version'], 'evaluate', lesson['digest'], 'alice',
+                                  context=CTX, memory=mem, world=world)
+
+    # One robot delayed in two touching cells is still one source
+    alone = lesson_from([('robot-A', (i, j)), ('robot-A', (i + 1, j))])
+    assert not alone['evaluation']['passed']
+    assert alone['evaluation']['reason'] == 'two_independent_robot_sources_required_per_cell'
+    # A second robot delayed in a touching cell corroborates it
+    together = lesson_from([('robot-B', (i + 1, j + 1))])
+    assert together['evaluation']['passed'], together['evaluation']
