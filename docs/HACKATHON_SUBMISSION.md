@@ -1,96 +1,104 @@
-# Hackathon submission draft
+# Sovereign Autonomy: hackathon submission
 
-Project: Sovereign Autonomy
+**AI can propose. Only authorised movement can proceed.**
 
-Team name:
+| | |
+|---|---|
+| Live product | https://204-12-178-126.sslip.io |
+| Try it | [Mission Control](https://204-12-178-126.sslip.io/mission-control) · [Fleet learning](https://204-12-178-126.sslip.io/learning) · [How it works](https://204-12-178-126.sslip.io/how-it-works) |
+| Repository | https://github.com/othnielObasi/sovereign-autonomy |
+| Three-minute video | _add link_ |
+| Track / theme | Startup · Push the Frontier |
+| Team | _add names_ |
 
-Participants:
+## The problem
 
-Track: Startup (README classification; confirm eligibility before submission).
+Pharmaceutical cleanrooms, hospitals and warehouses want autonomous robot fleets
+working beside people. Planning models are now good enough to drive them, but a
+model can be wrong, confused or manipulated, and it cannot be certified. One bad
+move means an injury, a lost batch or a failed audit. Today a site has two bad
+options: keep the AI away from the robots, or trust it blindly.
 
-Theme: Push the Frontier.
+## What Sovereign Autonomy does
 
-Repository: https://github.com/othnielObasi/sovereign-autonomy
+It is the independent safety and trust layer between AI planners and the robots
+they command.
 
-Public demo URL:
+1. **Meta's models plan and perceive, but only propose.** Muse Spark plans each
+   mission from the site map and the robot's camera; Muse Spark Open proposes
+   steps; SAM 3.1 finds people, spills and pallets in the camera image.
+2. **A safety gate checks every proposed move** against the site's versioned rules
+   (geofence, speed, human and worker proximity, clearance, hazard zones).
+3. **An execution authority signs a single-use, short-lived permit** for exactly
+   that move. The robot's controller checks the permit again before moving.
+   A refused move stops the robot; the model replans and the new route needs
+   fresh permission.
+4. **Stops never depend on the AI.** A spoken "stop" (Muse Voice Transcribe), a
+   button or a kill switch revokes authority at the controller. Voice can stop a
+   robot but never start one; only a signed-in operator can release a stop.
+5. **Every decision is on the record:** Ed25519-signed decision receipts and a
+   hash-chained event log anyone can verify.
+6. **Robots learn as a fleet, under human control.** Observations are signed and
+   scoped to site, map, rules and robot type. A lesson is shared only after it is
+   evaluated and an operator approves and releases that exact version, and only
+   to robots it fits. Poisoned or manipulated lessons are rejected or quarantined.
 
-Three-minute video URL:
+Who it is for: operations, quality and safety leads running mixed robot fleets
+alongside people, starting with pharmaceutical manufacturing. The live demo runs
+a simulated pharma cleanroom with two wheeled carriers and a humanoid.
 
-## What it does
+## How Meta's models are used
 
-Meta models propose navigation using the mission, facility map and robot camera.
-Deterministic policies check actions. A separate authority issues signed,
-expiring, single-use permits that the simulator controller must admit before
-movement. Operators can pause, replace a route, inspect evidence and review
-scoped uncertainty. The pharmaceutical workspace shares facility geometry across
-2D/3D views. Humanoid support is navigation, without manipulation or balance.
+| Model | Role | Where | Verified live (4 Nov 2026) |
+|---|---|---|---|
+| Muse Spark 1.3 (Meta Model API) | Mission planning and replanning from map and camera | `backend/app/services/muse_planner.py`, `meta_models.py` | Planned and replanned run `run_939e05c6e625` (shown on the homepage) |
+| Muse Spark Open (open weights, via Baseten) | Per-step proposals; takes over planning if the API is unavailable | same | Proposed steps in live runs |
+| SAM 3.1 (Meta Model API) | Finds people, spills and pallets; projects them onto the floor; cross-checked with sensors; can only add caution | `backend/app/services/perception.py` | 41 checks in one run; median position error 2 cm across 35 matched objects |
+| Muse Voice Transcribe | Spoken stop becomes a kill switch | `backend/app/api/routes_authority.py` | "Stop robot one now": transcribed in 1.4 s, authority revoked in 3.4 ms, stop verified |
 
-## New work versus the existing foundation
+Model output is never authority. Every proposal passes the gate, the permit and
+the controller, and the evidence record names the model behind each plan.
 
-Do not present all capabilities as new hackathon work. Baseline `3738a53` already
-contains the policy gate, receipt/event foundation, task guard, warehouse twin,
-rule workflows, benchmarking and Tavily site intelligence. Git history alone
-does not independently establish when earlier work was originally conceived.
+## Built during the hackathon versus the existing foundation
 
-Later work adds Meta adapters, execution permits/controller admission, restart
-reconciliation, scoped signed learning with poisoning/rollback defenses, mixed
-robot profiles, the cleanroom workspace, operator route replacement/review and
-expanded public explanation pages. Current validation fixes event ordering and
-original-content verification and distinguishes configured from verified search.
-An optional Memgraph projection now connects verified decision evidence for
-investigation and compatible planner context; NetworkX remains the route engine.
-See [implementation and limits](MEMGRAPH.md).
-The video should identify the foundation and focus on these additions.
+The first commit, `3738a53`, is the pre-existing codebase from before 26 October
+2026: the policy gate, decision receipts and event chain, task guard, warehouse
+twin, rule workflows, benchmarking and Tavily site intelligence. Every later
+commit (`git log 3738a53..HEAD`) is hackathon work:
 
-## Verified on 3 November 2026
+- Meta model integration: Muse Spark, Muse Spark Open, SAM 3.1, Muse Voice Transcribe
+- Execution authority: signed single-use permits, controller redemption, kill switches, voice stop, checkpoints, restart reconciliation
+- Mixed fleet: wheeled carriers and a humanoid with enforced capability profiles
+- Signed, scoped route learning with poisoning defences, quarantine and checkpoint rollback
+- Operator-released fleet learning: candidate → evaluated → approved → released → withdrawn
+- Pharmaceutical cleanroom site, 3D facility realism pass, operator workspace
+- Memgraph evidence graph and interactive mission knowledge graph
+- Production deployment, public pages, pilot-request form, live validation
+- Run-loop robustness fixes found live: stale permits after a stop, replanning when a slowed move is blocked, backing out of corners, and vision sightings no longer wiping route experience
 
-- Muse Spark 1.3 and Muse Spark Open answered live HTTP requests.
-- Fresh run `run_84fa654ec55a` used a Muse Spark plan with camera context and
-  completed after pause, spill injection, clearance and resume.
-- Live Tavily results corroborated flammable guidance from NOAA and OSHA. The
-  simulated exclusion zone expanded from 1.2 m to 3 m and speed tightened to
-  0.2 m/s. A pure policy evaluation of a move into the zone was denied by
-  `HAZARD_EXCLUSION_08`; no controller move into the spill was attempted.
-- A malicious bulletin was quarantined without changing rules.
-- All 88 original events passed content/link verification; all 25 signed
-  decision receipts passed Ed25519 verification.
-- Full backend suite: 496 passed. After extending integrity checks to every
-  compliance export, 52 focused tests passed, including the new regression.
-- Production frontend build passed; 13 public-page browser checks passed.
+## Evidence
 
-Evidence: [connectivity](validation/2026-11-03-live-integrations/connectivity.json),
-[fresh mission and receipts](validation/2026-11-03-live-integrations/mission.json),
-[public pages](validation/2026-11-03-public-pages/).
+- Live results, read from the deployed site's API: [live-validation-2026-11-04.json](../frontend/public/home/evidence/live-validation-2026-11-04.json)
+- Homepage replay record, 1,018 events in one unbroken hash chain: `frontend/public/home/mission-story/live-run.json`
+- Verify a run's chain on the live site: `/api/compliance/verify/{run_id}`; verify a receipt: `/api/governance/receipts/{run_id}/{decision_id}/verify`; public key: `/api/governance/signing-key`
+- Backend tests: 563 passed (`python -m pytest backend/tests`)
+- [Capability audit](CAPABILITY_AUDIT.md) and [Safety case](SAFETY_CASE.md)
 
-Provider calls include retries and fallbacks; not every call succeeded. SAM and
-voice were not freshly validated here. The older public recorded story retains
-its disclosed historical chain gaps; this passing run does not rewrite it.
+## Trying it
 
-## How Tavily is used
+- **Mission Control** runs missions on the shared simulator. Public demo limits: one mission at a time, missions stop after 7 minutes, and paid model calls have hourly caps.
+- **Fleet learning** is open to view. Approving and releasing lessons, and releasing kill switches, needs operator sign-in; credentials for judges are provided in the submission form, not in this repository.
+- **Request a pilot** on the homepage stores real enquiries.
 
-`backend/.env` now contains the configured Tavily key; env files remain ignored.
-Spill telemetry creates an immediate baseline zone and schedules background
-search. Restricted-domain results pass injection screening and keyword-based
-hazard classification. Two distinct trusted domains must corroborate a class
-before reviewed rules tighten geometry or speed. Outside text never authorizes
-movement. Missing credentials/search errors use labeled sample guidance.
+## Deployment
 
-The UI now distinguishes a configured key from a successful live lookup.
-Keyword matching does not establish contextual understanding or independent
-sources. These simulation constraints are not chemical handling instructions.
+One Nebius VM (us-north1): Docker Compose with Caddy (HTTPS), FastAPI backend,
+Next.js frontend, simulator, Postgres and Memgraph. Meta's Model API does not
+serve EU addresses, so the deployment runs in a US region. See `deploy/`.
 
-## Reproduce
+## Limits
 
-Follow the README for normal operation. For isolated paid-provider checks, build
-the frontend against backend port 18080. Set `BROWSER_LIVE_INTEGRATIONS=1`,
-`BROWSER_SITE_LAYOUT=pharma`, and `BROWSER_NEXT_DIST_DIR` to that output directory
-before launching `scripts/browser_validation_stack.py` with the project venv.
-Run `scripts/validate_live_mission.py` in another terminal. It controls a single
-mission against the isolated local simulator; do not adapt it to physical robots.
-
-## Remaining submission actions
-
-Fill participants/team when ready, confirm track eligibility, record the
-[three-minute script](demo-script.md), publish an accessible video, confirm judge
-access and submit the official form. Localhost is not a public deployment. This
-draft does not claim a recorded video or a completed portal submission.
+- Simulator only: no physical robot, no manipulation or balance control.
+- Not a safety certification. Real deployments need hardware stops, calibrated perception and site-specific safety assessment.
+- Busy corridors can hold a robot long enough to reach the demo's 7-minute limit; that is the safety rules working.
+- Cross-platform skill transfer and multi-site failover are not implemented.
