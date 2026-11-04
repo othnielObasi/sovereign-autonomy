@@ -60,7 +60,7 @@ def _rect_distance(x: float, y: float, r: Rect) -> float:
 
 
 def path_blocked(x: float, y: float, tx: float, ty: float, racks: Optional[List[Rect]] = None,
-                 margin: float = PATH_MARGIN_M) -> Optional[str]:
+                 margin: float = PATH_MARGIN_M, keep_clear: Optional[float] = None) -> Optional[str]:
     """Id of the first rack the straight path (x, y) -> (tx, ty) runs through, or None.
 
     The start point itself is ignored (a robot that is already close is handled by
@@ -76,12 +76,18 @@ def path_blocked(x: float, y: float, tx: float, ty: float, racks: Optional[List[
         # Telemetry puts the robot inside racking: the map and the robot disagree, so this
         # check cannot be trusted here; the live clearance rule still applies.
         return None
+    # keep_clear (robot centre to racking) matches the live clearance rule. Without it a
+    # move could be approved that ends where that rule then refuses every move, leaving
+    # the robot frozen (seen live at a partition corner). A robot already closer than
+    # keep_clear may still move anywhere that does not bring it closer.
+    start_d = min(_rect_distance(x, y, r) for r in racks) if keep_clear else 0.0
     ux, uy = (tx - x) / length, (ty - y) / length
     s = min(ROBOT_RADIUS_M, length)
     while s <= length + 1e-9:
         px, py = x + ux * s, y + uy * s
         for r in racks:
-            if _rect_distance(px, py, r) < margin:
+            d = _rect_distance(px, py, r)
+            if d < margin or (keep_clear and d < keep_clear and d < start_d - 1e-6):
                 return r[0]
         s += SAMPLE_STEP_M
     return None

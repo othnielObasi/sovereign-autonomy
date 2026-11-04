@@ -5,7 +5,7 @@ from typing import Dict, Any, Tuple, List
 from app.schemas.governance import GovernanceDecision, ActionProposal
 from app.policies.params import DEFAULT_PARAMS, active_params
 from app.policies.retreat import is_slow_retreat
-from app.policies.site_map import path_blocked
+from app.policies.site_map import ROBOT_RADIUS_M, path_blocked
 from app.autonomy.robot_profiles import observed_profile
 
 
@@ -140,7 +140,8 @@ def evaluate_policies(
 
     # --- PATH_CLEARANCE_07: the straight path must not run through permanent racking ---
     if intent == "MOVE_TO" and "x" in params and "y" in params:
-        blocked_by = path_blocked(x, y, float(params["x"]), float(params["y"]))
+        blocked_by = path_blocked(x, y, float(params["x"]), float(params["y"]),
+                                  keep_clear=ROBOT_RADIUS_M + MIN_OBSTACLE_CLEARANCE_M)
         if blocked_by:
             policy_hits.append("PATH_CLEARANCE_07")
             reasons.append(f"Path to ({float(params['x']):.1f},{float(params['y']):.1f}) runs through rack {blocked_by}.")

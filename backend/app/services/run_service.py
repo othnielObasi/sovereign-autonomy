@@ -927,7 +927,10 @@ class RunService:
                         # In a corner, straight back can hit another partition, so try the allowed cone.
                         from app.policies.retreat import retreat_target
                         from app.policies.site_map import path_blocked
-                        params_ = retreat_target(telemetry, path_blocked)
+                        from app.policies.site_map import ROBOT_RADIUS_M
+                        from app.policies.params import active_params
+                        clear_ = ROBOT_RADIUS_M + float(active_params().get("MIN_OBSTACLE_CLEARANCE_M", 0.5))
+                        params_ = retreat_target(telemetry, lambda a, b, c, d: path_blocked(a, b, c, d, keep_clear=clear_))
                         if params_ is None:
                             ax_, ay_ = float(telemetry.get("x", 0)) - float(near_xy[0]), float(telemetry.get("y", 0)) - float(near_xy[1])
                             n_ = math.hypot(ax_, ay_) or 1e-9
