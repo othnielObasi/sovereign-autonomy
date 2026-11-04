@@ -29,6 +29,7 @@ from app.api.routes_evidence import router as evidence_router
 from app.api.routes_authority import router as authority_router  # noqa: E402
 from app.api.routes_knowledge import router as knowledge_router
 from app.api.routes_learning import router as learning_router
+from app.api.routes_pilot import router as pilot_router
 from app.services.run_service import RunService
 
 configure_logging()
@@ -236,6 +237,7 @@ app.include_router(evidence_router)
 app.include_router(authority_router)
 app.include_router(knowledge_router)
 app.include_router(learning_router)
+app.include_router(pilot_router)
 
 # Initialize RunService and bind broadcaster
 run_service = RunService()

@@ -214,3 +214,20 @@ class PolicyActivation(Base):
     proposal_id = Column(String, nullable=True)
     previous_version = Column(String, nullable=True)
     reason = Column(Text, nullable=True)
+
+
+class PilotRequest(Base):
+    """A pilot enquiry from the public site. Contact details are kept for follow-up only."""
+    __tablename__ = "pilot_requests"
+
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    reference = Column(String, unique=True, nullable=False)
+    created_at = Column(DateTime(timezone=True), nullable=False)
+    name = Column(String, nullable=False)
+    email = Column(String, nullable=False)
+    organisation = Column(String, nullable=False)
+    role = Column(String, nullable=True)
+    site_type = Column(String, nullable=False)
+    fleet_size = Column(String, nullable=True)
+    message = Column(Text, nullable=True)
+    source_hash = Column(String, nullable=True)   # salted hash of the sender's address, for abuse limits only
