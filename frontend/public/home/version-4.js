@@ -66,3 +66,29 @@
 
 /* A rejected candidate cannot continue: say so on the (disabled) button. */
 (function(){const base=v2RenderTransfer;v2RenderTransfer=function(){base.apply(this,arguments);const a=document.getElementById('transfer-action');if(a&&v2Transfer.step===1&&v2Transfer.unsafe){a.textContent='Rejected · reset to try a valid candidate';a.disabled=true;}};})();
+
+/* Pilot request form: posts to the backend; no third-party services. */
+(function(){
+  const form=document.getElementById('pilot-form'); if(!form) return;
+  const status=document.getElementById('pf-status'), button=form.querySelector('button[type=submit]');
+  const say=(text,tone)=>{status.textContent=text;status.dataset.tone=tone||'';};
+  form.addEventListener('submit',async e=>{
+    e.preventDefault();
+    form.querySelectorAll('[aria-invalid]').forEach(el=>el.removeAttribute('aria-invalid'));
+    const bad=[...form.querySelectorAll('input[required],select[required]')].filter(el=>el.type==='checkbox'?!el.checked:!el.checkValidity()||!el.value.trim());
+    if(bad.length){bad.forEach(el=>el.setAttribute('aria-invalid','true'));bad[0].focus();say(bad[0].type==='checkbox'?'Please agree to be contacted so we can reply.':'Please complete the highlighted fields.','error');return;}
+    const d=Object.fromEntries(new FormData(form).entries());
+    const body={name:d.name.trim(),email:d.email.trim(),organisation:d.organisation.trim(),role:(d.role||'').trim()||null,site_type:d.site_type,
+      fleet_size:d.fleet_size||null,message:(d.message||'').trim()||null,consent:true,website:d.website||null};
+    button.disabled=true;say('Sending…');
+    try{
+      const r=await fetch('/api/pilot-requests',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});
+      const j=await r.json().catch(()=>({}));
+      if(r.ok){form.reset();say('Thank you. Your request '+j.reference+' is in, and we will reply by email.','ok');}
+      else if(r.status===429){say('Too many requests from here. Please try again in a while.','error');}
+      else if(r.status===422){say('Please check your email address and the required fields.','error');}
+      else{say('Something went wrong. Please try again.','error');}
+    }catch(err){say('Could not reach the server. Please try again.','error');}
+    finally{button.disabled=false;}
+  });
+})();
