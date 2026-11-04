@@ -1,4 +1,38 @@
-# Platform capability audit - 3 November 2026
+# Platform capability audit - 4 November 2026 update
+
+Checked against the live deployment (Nebius us-north1, https://204-12-178-126.sslip.io)
+with real missions, and against the test suite (531 passed, 4 skipped).
+
+## What changed since 3 November
+
+| Area | Change | Verified |
+|---|---|---|
+| Fleet learning release | Lessons now have a real lifecycle: candidate, evaluated, approved, released, withdrawn. Evidence must come from two robots in the same or a touching 0.5 m cell. Approval and release need a signed-in operator and are signed, tamper-evident events. Planners use only released versions that match their site, map, policy and robot type. | Live: a lesson built from robot-1 and robot-2 observations was released; both carriers received it and the humanoid (robot-3) was excluded as incompatible. robot-2's next route plan recorded the lesson. |
+| Run loop: stale permits | After a soft review the robot is stopped, which advances its controller generation. The slower retry was permitted against telemetry from before the stop, so the controller refused it on every tick and the robot never replanned. Telemetry is now re-read first, and controller refusals count as denials. | Live: the mission that had 90 refusals now completes. |
+| Run loop: blocked path | When the path check refuses a slowed move, the loop now replans instead of pausing for an operator. | Live: robot-1 delivery completed after two replans. |
+| Meta models live | Meta's Model API returns no models to EU addresses (tested from Scaleway Paris, Amsterdam and Warsaw). The deployment moved to Nebius us-north1, where Muse Spark 1.3, SAM 3.1 and Muse Voice Transcribe are available. | Live: Muse Spark 1.3 planned a mission; SAM 3.1 matched people to simulator ground truth within about 1 cm at ~0.8 s per check. |
+| Public pages | Homepage has a Built on Meta section; How it works uses the pharma cleanroom illustration, names the Meta models and lists 23 capabilities including fleet learning release. | Browser checks at 390 and 1440 px, no script errors. |
+
+## Live status, 4 November
+
+| Capability | Live | Notes |
+|---|---|---|
+| Missions, safety gate, signed permits, controller redemption | Yes | |
+| Replanning after refusals | Yes | Muse Spark / Muse Spark Open |
+| Muse Spark 1.3, SAM 3.1, Muse Voice Transcribe | Yes | Nebius us-north1 |
+| Muse Spark Open (Baseten) | Yes | |
+| Mixed fleet (2 carriers, 1 humanoid) | Yes | |
+| Fleet learning release | Yes | Released lessons expire after their TTL (default 1 hour, maximum 24 hours) |
+| Evidence chain and Ed25519 receipts | Yes | Receipt verification passes; the public-key listing endpoint returns an empty list (minor) |
+| Tavily site intelligence | Configured | No live lookup exercised yet |
+| LangSmith tracing | Key set | Trace delivery not confirmed |
+| Memgraph | Off | Optional, off by default |
+
+Known limits: worker-heavy corridors can keep a robot stopped long enough to hit the
+public demo's 7-minute mission limit (safe behaviour, not a fault); an integrity alert
+message shows a garbled dash; robots navigate, stop and wait only.
+
+# Earlier audit - 3 November 2026
 
 Checked repository implementation, saved validation reports and the running
 isolated preview at port 19300. This was a read-only runtime check; no missions,
