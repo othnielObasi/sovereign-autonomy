@@ -13,6 +13,9 @@ WORKDIR /app
 
 RUN groupadd -r sovereign && useradd -r -g sovereign -d /app -s /sbin/nologin sovereign
 
+# pg_dump/psql for app.ops.backup (signed backups of the Postgres database)
+RUN apt-get update && apt-get install -y --no-install-recommends postgresql-client && rm -rf /var/lib/apt/lists/*
+
 COPY --from=builder /usr/local/lib/python3.11/site-packages /usr/local/lib/python3.11/site-packages
 COPY --from=builder /usr/local/bin /usr/local/bin
 
