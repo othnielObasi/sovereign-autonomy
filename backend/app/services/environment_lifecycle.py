@@ -18,8 +18,12 @@ from app.config import settings
 
 
 def constraints_key(state: dict) -> str:
+    # Vision caution zones are short-lived (seconds), slow-only advisories added to
+    # telemetry for the gate. They are not site structure: counting them made every
+    # SAM sighting look like a constraint change and invalidated all route experience.
     zones = [{k: z[k] for k in ("id", "x", "y", "radius", "slow_radius", "max_speed") if k in z}
-             for z in state.get("site_constraints") or []]
+             for z in state.get("site_constraints") or []
+             if not str(z.get("id", "")).startswith("vision-")]
     return hashlib.sha256(canonical(sorted(zones, key=canonical)).encode()).hexdigest()
 
 
