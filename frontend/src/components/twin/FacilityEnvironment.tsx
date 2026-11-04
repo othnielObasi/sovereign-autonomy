@@ -118,6 +118,30 @@ function Floor({ world }: any) {
   </>;
 }
 
+/** Cheap static contact shading keeps equipment grounded even without GPU shadows.
+ * One shared texture; no extra lighting passes and no new collision geometry.
+ */
+function FixtureContactShading({ world }: { world: any }) {
+  const texture = useMemo(() => {
+    const canvas = document.createElement('canvas'); canvas.width=64; canvas.height=64;
+    const ctx=canvas.getContext('2d')!;
+    const gradient=ctx.createRadialGradient(32,32,4,32,32,32);
+    gradient.addColorStop(0,'rgba(19,35,39,.55)');
+    gradient.addColorStop(.65,'rgba(19,35,39,.27)');
+    gradient.addColorStop(1,'rgba(19,35,39,0)');
+    ctx.fillStyle=gradient;ctx.fillRect(0,0,64,64);
+    return new THREE.CanvasTexture(canvas);
+  }, []);
+  useEffect(() => () => texture.dispose(), [texture]);
+  return <group name="facility-contact-shading">{(world.racks || []).map((rack:any,index:number) => {
+    const width=rack.x2-rack.x1, depth=rack.depth||1;
+    return <mesh key={rack.id||index} position={[(rack.x1+rack.x2)/2,.019,-rack.y-depth/2]} rotation={[-Math.PI/2,0,0]} renderOrder={1}>
+      <planeGeometry args={[width+.45,depth+.45]}/>
+      <meshBasicMaterial map={texture} transparent opacity={.7} depthWrite={false} polygonOffset polygonOffsetFactor={-1}/>
+    </mesh>;
+  })}</group>;
+}
+
 
 // Both operational views render the same static geometry from /sim/world.
 // Choosing a renderer must never choose or synthesize a different site layout.
@@ -131,6 +155,7 @@ export const FacilityEnvironment = memo(function FacilityEnvironment({ world, ro
   </group>;
   return <group name="facility-environment">
     <Floor world={world}/>
+    <FixtureContactShading world={world}/>
     <CleanroomShell world={world} roofMode={roofMode}/>
     <Entrances world={world}/>
     {(world.racks || []).map((rack: any, i: number) => rack.kind === 'partition'

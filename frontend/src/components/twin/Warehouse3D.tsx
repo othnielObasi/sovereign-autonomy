@@ -15,6 +15,7 @@ import { WarehouseToolbar } from "./WarehouseToolbar";
 import { FacilityEnvironment } from "./FacilityEnvironment";
 import { Forklift, Obstacle, FleetRobot, VERDICT_COLOURS, Worker, ZoneCones, ZoneMarking } from "./Actors";
 import type { WorldLayout } from "./textures";
+import { cameraObstacles, clearFollowCamera } from './cameraGeometry';
 
 
 export type CameraMode = "overview" | "follow" | "robot";
@@ -52,12 +53,13 @@ export type TwinProps = {
 
 /* ───────────────────────── camera rigs ───────────────────────── */
 
-function CameraRig({ mode, robot, center, reset, span, focus, eyeHeight }: { eyeHeight: number; span: number; focus: Pt | null; reset: number; mode: CameraMode; robot: React.MutableRefObject<{ x: number; y: number; theta: number }>; center: THREE.Vector3 }) {
+function CameraRig({ mode, robot, center, reset, span, focus, eyeHeight, world }: { world: any; eyeHeight: number; span: number; focus: Pt | null; reset: number; mode: CameraMode; robot: React.MutableRefObject<{ x: number; y: number; theta: number }>; center: THREE.Vector3 }) {
   const { camera } = useThree();
   const look = useRef(new THREE.Vector3().copy(center));
   const pos = useRef(new THREE.Vector3());
   const lookTarget = useRef(new THREE.Vector3());
   const snap = useRef(true);
+  const cameraBoxes = useMemo(() => cameraObstacles(world), [world]);
   useEffect(() => {
     const cam = camera as THREE.PerspectiveCamera;
     cam.fov = mode === "robot" ? 78 : mode === "follow" ? 55 : 42;
@@ -77,13 +79,17 @@ function CameraRig({ mode, robot, center, reset, span, focus, eyeHeight }: { eye
     const fx = Math.cos(r.theta), fz = -Math.sin(r.theta);
     const k = 1 - Math.exp(-(mode === "robot" ? 14 : 3.5) * Math.min(dt, 0.1));
     if (mode === "follow") {
-      pos.current.set(r.x - fx * 4.2, 3.1, -r.y - fz * 4.2);
-      look.current.lerp(lookTarget.current.set(r.x + fx * 3, 0.5, -r.y + fz * 3), snap.current ? 1 : k);
+      pos.current.set(r.x - fx * 3.8, 2.15, -r.y - fz * 3.8);
+      look.current.lerp(lookTarget.current.set(r.x + fx * .8, 0.7, -r.y + fz * .8), snap.current ? 1 : k);
     } else {
       pos.current.set(r.x + fx * 0.37, eyeHeight, -r.y + fz * 0.37);
       look.current.set(r.x + fx * 6, eyeHeight-.05, -r.y + fz * 6);
     }
     camera.position.lerp(pos.current, mode === "robot" || snap.current ? 1 : k);
+    if (mode === 'follow') {
+      const safe = clearFollowCamera({x:r.x,y:.85,z:-r.y}, camera.position, cameraBoxes, world.geofence);
+      camera.position.set(safe.x,safe.y,safe.z);
+    }
     snap.current = false;
     camera.lookAt(look.current);
   });
@@ -351,7 +357,7 @@ function Scene(props: TwinProps & { focus: Pt | null; onCameraFootprint: (points
         </group>
       )}
 
-      <CameraRig eyeHeight={telemetry?.robot_kind === "humanoid" ? 1.61 : .76} mode={mode} robot={props.robotPose} center={center} reset={props.reset} span={span} focus={props.focus} />
+      <CameraRig world={layout} eyeHeight={telemetry?.robot_kind === "humanoid" ? 1.61 : .76} mode={mode} robot={props.robotPose} center={center} reset={props.reset} span={span} focus={props.focus} />
       <CameraFootprint onChange={props.onCameraFootprint} />
       <DetectionProbe active={mode === "robot"} items={detItems} onDetections={props.onDetections} racks={layout.racks} />
       {mode === "overview" && <OrbitControls key={props.reset} target={props.focus ? [props.focus.x, 0, -props.focus.y] : center} maxPolarAngle={Math.PI / 2.15} minDistance={4} maxDistance={span * 2} enableDamping />}

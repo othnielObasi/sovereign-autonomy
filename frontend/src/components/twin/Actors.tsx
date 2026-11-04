@@ -98,7 +98,7 @@ export function Robot({ x, y, theta, verdict, ghost = false, idle = false, pose,
 
   return (
     <group ref={ref}>
-      {label && <Html position={[0, 1.2, 0]} center distanceFactor={16}><div className="whitespace-nowrap rounded bg-slate-950/80 px-2 py-1 text-[10px] text-slate-300">{label} · {idle ? "IDLE" : "MOVING"}</div></Html>}
+      {label && <Html position={[0, 1.2, 0]} center zIndexRange={[12,0]} style={{pointerEvents:'none'}}><div className="whitespace-nowrap rounded bg-slate-950/80 px-2 py-1 text-[10px] text-slate-300">{label} · {idle ? "IDLE" : "MOVING"}</div></Html>}
       {/* Four recessed rubber wheels roll with measured rendered travel. */}
       {[[-0.28, -0.31], [-0.28, 0.31], [0.28, -0.31], [0.28, 0.31]].map(([wx, wz], i) => <group key={i} ref={(wheel) => { if (wheel) wheels.current[i] = wheel; }} position={[wx, 0.095, wz]}>
         <mesh rotation={[Math.PI / 2, 0, 0]} castShadow><cylinderGeometry args={[0.095, 0.095, 0.065, 16]} /><meshStandardMaterial color="#161b22" roughness={0.94} /></mesh>
@@ -426,7 +426,7 @@ export function Worker({ x, y, id, highlight = false, label, heading }: { headin
 
   return (
     <group ref={ref}>
-      {label && <Html position={[0, 2.05, 0]} center distanceFactor={16}><div className="whitespace-nowrap rounded bg-slate-950/80 px-2 py-0.5 text-[10px] text-amber-200">{label}</div></Html>}
+      {label && <Html position={[0, 2.05, 0]} center zIndexRange={[12,0]} style={{pointerEvents:'none'}}><div className="whitespace-nowrap rounded bg-slate-950/80 px-2 py-0.5 text-[10px] text-amber-200">{label}</div></Html>}
       <group ref={body} scale={[look.scale, look.scale, look.scale * look.build]}>
         {leg(hipL, kneeL, 0.095)}
         {leg(hipR, kneeR, -0.095)}

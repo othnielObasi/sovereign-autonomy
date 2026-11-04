@@ -29,6 +29,7 @@ data/
 
 # Generated assets
 recordings/
+sim/isaac_sim/runtime/
 
 # IDE / tool caches
 .qodo/

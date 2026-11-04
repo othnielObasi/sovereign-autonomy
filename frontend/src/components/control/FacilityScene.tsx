@@ -6,6 +6,7 @@ import { Html, Line, OrbitControls } from '@react-three/drei';
 import * as THREE from 'three';
 import { FleetRobot, Forklift } from '@/components/twin/Actors';
 import { FacilityEnvironment, Box, Cylinder } from '@/components/twin/FacilityEnvironment';
+import { cameraObstacles, clearFollowCamera } from '@/components/twin/cameraGeometry';
 
 type CameraMode = 'overview' | 'follow' | 'robot';
 type Pose = { x: number; y: number; theta: number };
@@ -38,6 +39,7 @@ function CameraRig({ mode, world, pose, eyeHeight }: { eyeHeight: number; mode: 
   const desired = useMemo(() => new THREE.Vector3(), []);
   const look = useMemo(() => new THREE.Vector3(), []);
   const snap = useRef(true);
+  const cameraBoxes = useMemo(() => cameraObstacles(world), [world]);
   useEffect(() => {
     const cam = camera as THREE.PerspectiveCamera;
     cam.fov = mode === 'robot' ? 76 : mode === 'follow' ? 56 : 43;
@@ -55,13 +57,17 @@ function CameraRig({ mode, world, pose, eyeHeight }: { eyeHeight: number; mode: 
     if (mode === 'overview') return;
     const r = pose.current, fx = Math.cos(r.theta), fz = -Math.sin(r.theta);
     if (mode === 'follow') {
-      desired.set(r.x - fx * 5.5, 2.7, -r.y - fz * 5.5);
-      look.set(r.x + fx * 2, .7, -r.y + fz * 2);
+      desired.set(r.x - fx * 3.8, 2.15, -r.y - fz * 3.8);
+      look.set(r.x + fx * .8, .7, -r.y + fz * .8);
     } else {
       desired.set(r.x + fx * .45, eyeHeight, -r.y + fz * .45);
       look.set(r.x + fx * 8, eyeHeight-.05, -r.y + fz * 8);
     }
     camera.position.lerp(desired, snap.current ? 1 : 1 - Math.exp(-5 * Math.min(dt, .1)));
+    if (mode === 'follow') {
+      const safe = clearFollowCamera({x:r.x,y:.85,z:-r.y}, camera.position, cameraBoxes, g);
+      camera.position.set(safe.x,safe.y,safe.z);
+    }
     camera.lookAt(look); snap.current = false;
   });
   return null;
