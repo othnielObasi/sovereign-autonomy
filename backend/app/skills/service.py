@@ -256,7 +256,7 @@ class SkillLab:
             permit = dict(nonce=secrets.token_hex(16), version=version, digest=digest, robot_id=robot_id,
                 profile=physics.PROFILE, environment_hash=physics.environment_hash(), seed=seed,
                 generation=state['generation'], fleet_epoch=self.fleet_epoch(),
-                expires_at=self.clock()+30, max_control_ticks=1200, max_wall_s=30.)
+                expires_at=int(self.clock())+30, max_control_ticks=1200, max_wall_s=30)  # ints survive a browser JSON round trip
             self.append(conn, 'grant', actor, permit=permit)
         return dict(permit=permit, signature=self.sign(permit))
 

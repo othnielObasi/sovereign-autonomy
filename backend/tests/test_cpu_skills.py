@@ -205,3 +205,17 @@ def test_operator_authentication_is_required_for_skill_writes(lab, monkeypatch):
     monkeypatch.setattr(settings, 'skill_lab_enabled', False)
     assert client.get('/skills').json()['enabled'] is False
     assert client.post('/skills/train',headers=operator).status_code == 503
+
+
+def test_grant_survives_browser_json_round_trip(lab):
+    """Browsers re-serialise 30.0 as 30; the signed grant must still verify after that."""
+    import json
+
+    def js_like(value):
+        if isinstance(value, float) and value.is_integer(): return int(value)
+        if isinstance(value, dict): return {k: js_like(v) for k, v in value.items()}
+        return value
+
+    envelope = installed_grant(lab)
+    sent = json.loads(json.dumps(js_like(envelope)))
+    assert lab.execute(sent, 'alice')['result']['success']
