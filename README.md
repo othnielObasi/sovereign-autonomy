@@ -52,12 +52,11 @@ The public demo shares one simulated facility, permits one mission at a time, li
 
 | Origin | Scope | Where to inspect |
 | --- | --- | --- |
-| Pre-existing foundation, before 26 October 2026 | Deterministic policy gate; decision receipts and event chain; task-drift guard; adaptive tuning and cross-run learning; 2D warehouse map; rule workflows and benchmarking | [MoveProof](https://github.com/othnielObasi/moveproof), [contribution declaration](docs/HACKATHON_SUBMISSION.md#built-during-the-hackathon-versus-the-existing-foundation) |
-| Hackathon work already included in the imported baseline | Original 3D facility twin and Tavily site intelligence | [Twin implementation](frontend/src/components/twin), [site intelligence](backend/app/services/site_intel) |
-| Hackathon additions after the baseline | Meta planning, SAM perception and voice stop; controller-enforced permits and recovery; mixed-fleet coordination; signed/scoped experience and operator-released learning; cleanroom workspace; Memgraph integration and deployment | [Changelog](CHANGELOG.md), [baseline comparison](https://github.com/othnielObasi/sovereign-autonomy/compare/3738a53...cd5fa57), [submission detail](docs/HACKATHON_SUBMISSION.md) |
-| Experimental addition committed during the event window | CPU pick-and-place learning, held-out evaluation and governed same-profile recipient execution; disabled by default and not part of the deployed navigation demo | [Implementation commit](https://github.com/othnielObasi/sovereign-autonomy/commit/64a5bbd), [CPU lab scope and method](docs/CPU_SKILL_LAB.md) |
+| Pre-existing foundation, before 26 October 2026 | Deterministic policy gate; decision receipts and event chain; task-drift guard; adaptive tuning and cross-run learning; 3D warehouse twin (first committed 22 Oct); Tavily site intelligence (22 Oct); rule workflows and benchmarking | [MoveProof](https://github.com/othnielObasi/moveproof), [contribution declaration](docs/HACKATHON_SUBMISSION.md#built-during-the-hackathon-versus-the-existing-foundation) |
+| Hackathon additions after the baseline | Meta planning, SAM perception and voice stop; controller-enforced permits and recovery; mixed-fleet coordination; signed/scoped experience and operator-released learning; pharmaceutical cleanroom facility and 3D realism pass; Memgraph integration and deployment | [Changelog](CHANGELOG.md), [baseline comparison](https://github.com/othnielObasi/sovereign-autonomy/compare/3738a53...cd5fa57), [submission detail](docs/HACKATHON_SUBMISSION.md) |
+| Governed skill transfer (hackathon) | CPU pick-and-place learning, held-out evaluation and governed same-profile recipient execution; live at [/skills](https://204-12-178-126.sslip.io/skills) | [Implementation](https://github.com/othnielObasi/sovereign-autonomy/commit/64a5bbd), [grant fix](https://github.com/othnielObasi/sovereign-autonomy/commit/b786a13), [CPU lab scope and method](docs/CPU_SKILL_LAB.md) |
 
-Baseline `3738a53` was assembled on **1 November 2026** and contains both the earlier foundation and initial hackathon additions. Its timestamp is an import date, not proof that every included file predates the event. The table follows the project's declared development history. The linked comparison ends at a fixed revision; future commits are not automatically hackathon work. The guide's build period is **27 October–4 November 2026**, with a deadline of **4 November at 21:00 EST (5 November at 02:00 UTC)**; work attributed to 26 October should be identified separately rather than assumed eligible.
+Baseline `3738a53` was assembled on **1 November 2026** from the earlier MoveProof codebase; its timestamp is an import date. Original creation dates are in the [MoveProof history](https://github.com/othnielObasi/moveproof/commits/main) (for example the 3D twin and Tavily integration, both 22 October 2026). The linked comparison ends at a fixed revision; future commits are not automatically hackathon work. The guide's build period is **27 October–4 November 2026**, with a deadline of **4 November at 21:00 EST (5 November at 02:00 UTC)**; work attributed to 26 October should be identified separately rather than assumed eligible.
 
 ## Why it exists
 
@@ -82,7 +81,7 @@ signed trail an auditor can check.
 | Agentic orchestration and memory | Tool-based planning path, decision feedback, scoped memory and operational graph queries | [Agent service](backend/app/services/agent_service.py), [Memgraph](docs/MEMGRAPH.md); available paths depend on configuration |
 | Evidence and recovery | Signed receipts, hash-chain verification, replay, checkpoints, restart reconciliation and signed backups | [Traceability](docs/TRACEABILITY.md), [runbook](docs/RUNBOOK.md) |
 | Rule and robustness evaluation | Rule proposals, replay/benchmark evaluation, approval, rollback and adversarial scenarios | [Capability audit](docs/CAPABILITY_AUDIT.md); reports are not certification |
-| CPU skill learning and transfer | Learned actuator targets, six held-out trials, negative control and approved execution on a compatible simulated arm | [CPU skill lab](docs/CPU_SKILL_LAB.md); experimental, fixed task phases, local validation |
+| CPU skill learning and transfer | Learned actuator targets, six held-out trials, negative control and approved execution on a compatible simulated arm | [CPU skill lab](docs/CPU_SKILL_LAB.md); live at /skills; fixed task phases, simulated arms |
 
 <details>
 <summary>Workspace screenshot: facility, mission desk and fleet controls</summary>
@@ -227,8 +226,9 @@ safety-rated hardware controls on physical robots.
 | Voice stop | 1,445 ms transcription; 3.38 ms revocation after transcription; unauthenticated reset refused | One synthetic-speech test; not a safety latency guarantee |
 | Fleet lesson release | Version evaluated, approved and released; two carrier profiles accepted and humanoid profile excluded | Demonstrates scoped release eligibility, not general cross-platform transfer |
 | Latest focused local regression run | 108 passed, 4 skipped; frontend TypeScript passed | CPU lab, learning release, agent memory, planner lessons, integrity and graph tests; not a full-suite count or deployment test |
+| Skill transfer on production, 5 Nov | Trained; 6/6 held-out placements; approved and released; installed on arm-b; arm-c refused (profile mismatch); signed grant executed once and placed the object; replayed grant refused | One recorded run on the deployed CPU lab |
 
-The first five rows come from [recorded deployed API evidence](frontend/public/home/evidence/live-validation-2026-11-04.json). They are dated observations, not continuously refreshed status. The focused regression run was performed on the local code committed as `64a5bbd`. Final production-build and browser verification for the new CPU lab remain pending. Earlier broad-suite counts belong to their respective revisions and should not be combined with this focused run.
+The first five rows come from [recorded deployed API evidence](frontend/public/home/evidence/live-validation-2026-11-04.json). They are dated observations, not continuously refreshed status. The focused regression run was performed on the local code committed as `64a5bbd`. Earlier broad-suite counts belong to their respective revisions and should not be combined with this focused run.
 
 Reproduce the focused checks:
 
@@ -263,8 +263,8 @@ the next step toward physical deployment.
 learns a pick-and-place skill from twelve demonstrations; the skill is tested on held-out
 positions (with a no-grip ablation that must fail), approved and released by exact
 digest, installed on compatible Robot B, refused for incompatible Robot C, and executed
-only under a signed single-use grant. It is experimental and disabled by default
-(`SKILL_LAB_ENABLED=true` to enable).
+only under a signed single-use grant. It is enabled on the live deployment and disabled by
+default elsewhere (`SKILL_LAB_ENABLED=true` with the `skills` extra).
 What was built during the hackathon, as distinct from the earlier policy-gate
 foundation, is set out in [HACKATHON_SUBMISSION.md](docs/HACKATHON_SUBMISSION.md).
 
