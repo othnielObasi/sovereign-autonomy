@@ -73,7 +73,7 @@ hackathon work. Every later commit (`git log 3738a53..HEAD`) is also hackathon w
 
 - Meta model integration: Muse Spark, Muse Spark Open, SAM 3.1, Muse Voice Transcribe
 - 3D facility twin (replacing the 2D map) and Tavily site intelligence
-- Governed skill transfer (CPU lab, MuJoCo physics): a pick-and-place skill learned on Robot A, tested on held-out positions, approved, installed on compatible Robot B, refused for Robot C (`64a5bbd`; disabled by default, not on the live deployment)
+- Governed skill transfer (CPU lab, MuJoCo physics): a pick-and-place skill learned on Robot A, tested on held-out positions, approved, installed on compatible Robot B, refused for Robot C (`64a5bbd`, `b786a13`; live at /skills, verified end to end on the production deployment on 5 Nov 2026)
 - Execution authority: signed single-use permits, controller redemption, kill switches, voice stop, checkpoints, restart reconciliation
 - Mixed fleet: wheeled carriers and a humanoid with enforced capability profiles
 - Signed, scoped route learning with poisoning defences, quarantine and checkpoint rollback
