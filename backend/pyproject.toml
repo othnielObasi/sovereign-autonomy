@@ -30,6 +30,10 @@ dependencies = [
 [project.optional-dependencies]
 postgres = ["psycopg[binary]>=2.9.9"]
 dev = ["pytest>=8.0.0", "ruff>=0.4.0", "matplotlib>=3.8"]
+skills = ["mujoco==3.17.0", "numpy>=1.26,<3"]
+
+[tool.setuptools.package-data]
+"app.skills" = ["*.xml"]
 
 [tool.setuptools.packages.find]
 include = ["app*"]

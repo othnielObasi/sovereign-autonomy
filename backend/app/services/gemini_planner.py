@@ -270,7 +270,8 @@ Output STRICT JSON: {{"intent":"MOVE_TO|STOP|WAIT","params":{{...}},"rationale":
         """Multi-waypoint plan. `lessons` = advisory context from planner_lessons
         (learned from past gate decisions); their IDs are returned as lessons_applied.
         `untrusted_context` = fenced, firewall-screened outside information (reference only)."""
-        lesson_ids = [l["id"] for l in (lessons or [])]
+        lessons = [lesson for lesson in (lessons or []) if lesson.get('status') == 'released']
+        lesson_ids = [l["id"] for l in lessons]
         if not self.api_key:
             plan = self._deterministic_plan(telemetry, goal)
             plan["lessons_applied"] = []

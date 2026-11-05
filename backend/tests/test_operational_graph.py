@@ -210,7 +210,7 @@ def test_real_projection_failure_rolls_back_and_namespaces_are_separate(source, 
         assert not live_graph.history(db)['facts']
 
 
-def test_planner_retrieves_real_graph_history_in_matching_context(source, live_graph, monkeypatch):
+def test_planner_withholds_unreleased_real_graph_history(source, live_graph, monkeypatch):
     from app.services import operational_graph as module
     import app.db.session as session_module
     from app.policies import versioning
@@ -220,7 +220,8 @@ def test_planner_retrieves_real_graph_history_in_matching_context(source, live_g
     monkeypatch.setattr(session_module, 'SessionLocal', factory)
     monkeypatch.setattr(versioning, 'policy_version_hash', lambda: 'policy-one')
     tel = dict(CONTEXT, x=4., y=4.)
-    assert planner_history(tel)['facts'][0]['event_id'] == event.id
+    assert planner_history(tel)['facts'] == []
+    assert live_graph.history(db, context=CONTEXT)['facts'][0]['event_id'] == event.id
     assert not planner_history(dict(tel, capability_profile_version='other'))['facts']
 
 
@@ -258,6 +259,11 @@ def test_real_connection_refusal_returns_no_planner_history(source, monkeypatch)
     monkeypatch.setattr(module, 'graph', graph)
     monkeypatch.setattr(session_module, 'SessionLocal', factory)
     monkeypatch.setattr(versioning, 'policy_version_hash', lambda: 'policy-one')
+    # Let the release boundary pass so this case still exercises a real Bolt refusal.
+    from app.services import learning_release, route_learning
+    monkeypatch.setattr(learning_release, 'released_route_advice', lambda *args:
+                        {'accepted': [{'evidence_ids': ['released']} ]})
+    monkeypatch.setattr(route_learning.get_memory(), 'release_evidence', lambda context: [])
     try:
         assert planner_history(dict(CONTEXT, x=4., y=4.)) == {'state': 'unavailable', 'facts': []}
     finally:

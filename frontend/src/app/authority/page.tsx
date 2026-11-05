@@ -55,11 +55,12 @@ export default function AuthorityPage() {
       <div className="grid lg:grid-cols-3 gap-4">
         <div className="lg:col-span-1 space-y-4 min-w-0">
           <AuthorityPanel />
-          <Panel id="route-learning" title="Learned routing" subtitle="NetworkX over the warehouse floor; only signed experience counts">
+          <Panel id="route-learning" title="Learned routing" subtitle="NetworkX uses only evaluated, operator-approved and released congestion cautions">
             {!learning ? <Empty title="Loading…" /> : (
               <>
                 <KV k="Router" v={learning.last_route?.router || "—"} mono />
-                <KV k="Cells with learned delay" v={learning.learned_cells} mono />
+                <KV k="Verified observation cells (awaiting release checks)" v={learning.learned_cells} mono />
+                <KV k="Released caution cells on last route" v={learning.last_route?.learned_cells ?? 0} mono />
                 <KV k="Quarantined records" v={learning.quarantined} mono />
                 {learning.last_route?.learned_delay_s != null && <KV k="Expected delay on last route" v={`${learning.last_route.learned_delay_s} s`} mono />}
               </>

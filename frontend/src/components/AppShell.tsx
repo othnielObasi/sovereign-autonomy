@@ -13,6 +13,7 @@ const navigation = [
   { href: '/missions', label: 'Missions', icon: 'route', match: ['/missions'] },
   { href: '/runs', label: 'Mission history', icon: 'clock', match: ['/runs'] },
   { href: '/learning', label: 'Fleet learning', icon: 'check', match: ['/learning'] },
+  { href: '/skills', label: 'CPU skill lab', icon: 'layers', match: ['/skills'] },
   { href: '/authority', label: 'Trust & security', icon: 'shield', match: ['/authority'] },
   { href: '/policies', label: 'Governance', icon: 'layers', match: ['/policies'] },
   { href: '/evidence', label: 'Evidence', icon: 'chart', match: ['/evidence', '/audit', '/compliance'] },

@@ -9,6 +9,10 @@ its eight neighbours. Two kinds of edge data are kept apart:
   carry an expected delay, so the router prefers a slightly longer route that has
   gone smoothly before.
 
+Raw costs returned by load() are verification/candidate data, not permission for
+operational reuse. Runtime planners and routing consume only operator-released
+advice through learning_release.released_route_advice().
+
 Experience is written by the backend at the end of each run, one signed record per
 cell. On load every record is verified; a record that fails (for example one
 planted directly in the database to make a dangerous route look fast) is
@@ -367,6 +371,8 @@ class RouteMemory:
                 "ttl_s": self.ttl_s, "decay_s": self.decay_s, 'minimum_sources': MIN_SOURCES,
                 'integrity_error': self.integrity_error, 'source_quarantine': self.source_quarantine,
                 'cell_support': self.cell_support,
+                'reuse_policy': 'operator_released_only',
+                'scope': 'verified candidate observations; not approved routing advice',
                 'advisory': sum(d['status'] == 'advisory' for d in self.last_retrieval)}
 
     def release_evidence(self, context):
@@ -463,4 +469,17 @@ def learned_route(layout, start: Tuple[float, float], goal: Tuple[float, float],
         return None
     pts[0], pts[-1] = start, goal
     learned_delay = sum(graph.graph[a][b]["delay"] for a, b in zip(result["path"], result["path"][1:]))
-    return {"points": layout._prune(pts, blocked), "cost": result["cost"], "learned_delay": learned_delay}
+    if delays:
+        # Geometry-only line-of-sight pruning can erase a learned-cost detour by
+        # cutting straight back through congestion. Remove only collinear points
+        # when released costs participate, preserving the chosen path's bends.
+        pruned = [pts[0]]
+        for a, b, c in zip(pts, pts[1:], pts[2:]):
+            ab, bc = (b[0]-a[0], b[1]-a[1]), (c[0]-b[0], c[1]-b[1])
+            if abs(ab[0]*bc[1] - ab[1]*bc[0]) > 1e-9 or ab[0]*bc[0] + ab[1]*bc[1] <= 0:
+                pruned.append(b)
+        if len(pts) > 1:
+            pruned.append(pts[-1])
+    else:
+        pruned = layout._prune(pts, blocked)
+    return {"points": pruned, "cost": result["cost"], "learned_delay": learned_delay}

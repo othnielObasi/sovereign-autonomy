@@ -79,7 +79,7 @@ export function RunLearningPanel({ runId, events, ended }: { runId: string; even
           <Pill>{offered.length}</Pill>
         </div>
         {offered.length === 0 ? (
-          <div className="text-xs text-mc-dim">No lessons near this route yet. They come from earlier runs where the gate denied moves nearby.</div>
+          <div className="text-xs text-mc-dim">No released cautions near this route. Historical observations require evaluation, operator approval and release before reuse.</div>
         ) : (
           <ul className="space-y-1.5">
             {offered.map(([id, text]) => (

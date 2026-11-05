@@ -5,7 +5,7 @@ export function LearningEvidence({ decisions = [], changes = [], context, securi
   decisions?: any[]; changes?: any[]; context?: any; security?: any;
 }) {
   return <Panel id="learning-evidence" title="Experience and environment" subtitle="Past experience is advisory. Current conditions decide whether it can be reused.">
-    <p className="text-xs text-mc-mute mb-3">Shared routing requires two distinct robot identities. Repeated missions from one robot count as one source.</p>
+    <p className="text-xs text-mc-mute mb-3">Observations are collected automatically. Routing reuse requires evaluation, operator approval and release of the exact version. Repeated missions from one robot count as one source.</p>
     {security?.integrity_error && <p role="alert" className="text-sm text-red-300 mb-3">Experience integrity check failed. Learning is disabled until an operator investigates.</p>}
     {security?.source_quarantine?.length > 0 && <div className="text-xs text-amber-300 mb-3" data-testid="source-quarantine">{security.source_quarantine.map((s: any) => <p key={s.id}>Learning quarantined for {s.source_robot_id}: repeated observations disagree with two peers. This is an anomaly flag, not proof of maliciousness.</p>)}</div>}
     {context && <div className="mb-3 text-xs"><KV k="Site" v={context.site_id} mono /><KV k="Map version" v={String(context.map_version || "").slice(0, 12)} mono /></div>}

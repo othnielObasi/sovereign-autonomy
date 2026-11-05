@@ -76,7 +76,7 @@ def render() -> str:
         from app.services.route_learning import get_memory
         from app.services.site_router import last_route_info
         delays, quarantined = get_memory().load(context=last_route_info.get("experience_context"))
-        lines += ["# TYPE learning_cells gauge", f"learning_cells {len(delays)}",
+        lines += ["# TYPE learning_cells gauge", f"learning_cells {last_route_info.get('learned_cells', 0)}",
                   "# TYPE learning_quarantined_records gauge", f"learning_quarantined_records {len(quarantined)}"]
     except Exception:
         pass

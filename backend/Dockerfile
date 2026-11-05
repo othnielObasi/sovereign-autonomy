@@ -5,11 +5,13 @@ WORKDIR /app
 RUN apt-get update && apt-get install -y --no-install-recommends build-essential && rm -rf /var/lib/apt/lists/*
 
 COPY pyproject.toml /app/pyproject.toml
-RUN pip install --no-cache-dir .[postgres]
+ARG BACKEND_EXTRAS=postgres
+RUN pip install --no-cache-dir ".[${BACKEND_EXTRAS}]"
 
 FROM python:3.11-slim
 
 WORKDIR /app
+ENV MUJOCO_GL=disable
 
 RUN groupadd -r sovereign && useradd -r -g sovereign -d /app -s /sbin/nologin sovereign
 

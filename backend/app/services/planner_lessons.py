@@ -1,12 +1,13 @@
 """Planner learning loop — location-aware lessons distilled from the governance gate.
 
-How Sovereign Autonomy learns (the "fast loop"):
+Observation collection and runtime reuse are separate:
 
 1. After each run, the gate's own decision records are distilled into lessons:
    *where* a policy denied moves (a 2 m grid cell + zone), how often, across
    which runs, and which speeds the gate approved in that same cell.
-2. Before planning or replanning, lessons near the route corridor are retrieved
-   and handed to the planner (Muse Spark) as advisory context.
+2. Distilled spatial lessons remain audit-only candidates. Runtime planning and
+   replanning receive deterministic congestion advice from operator-released
+   versions only; raw candidate wording never enters the operational prompt.
 3. Every PLAN / REPLAN event records which lesson IDs were applied, so the
    effect of learning is auditable and replayable.
 
@@ -319,7 +320,7 @@ def _dist_to_segment(px: float, py: float, ax: float, ay: float, bx: float, by: 
     return math.hypot(px - (ax + t * dx), py - (ay + t * dy))
 
 
-def lessons_for_route(
+def candidate_lessons_for_route(
     db: Session,
     start: Dict[str, Any],
     goal: Optional[Dict[str, Any]] = None,
@@ -327,7 +328,7 @@ def lessons_for_route(
     avoid: Optional[Dict[str, Any]] = None,
     context: Optional[Dict[str, str]] = None,
 ) -> List[Dict[str, Any]]:
-    """Lessons near the straight-line corridor from start to goal, current policy version only.
+    """Audit-only candidate preview; never pass this output to an operational planner.
 
     `avoid` (e.g. a blocked waypoint during a replan) is treated as part of the route.
     """
@@ -390,10 +391,50 @@ def lessons_for_route(
     ]
 
 
+def lessons_for_route(db, start, goal=None, limit=MAX_LESSONS_IN_PROMPT, avoid=None, context=None):
+    """Runtime planner context contains only current operator-released cautions.
+
+    Distilled spatial lessons remain inspectable candidates. A release of a
+    congestion caution does not approve their speed suggestions or arbitrary text.
+    """
+    from app.services.learning_release import released_route_advice
+    version = policy_version_hash()
+    observed_context = context_from_state(start, version)
+    if context is not None and context != observed_context:
+        return []
+    context = observed_context
+    if not context or context.get('policy_version') != version:
+        return []
+    advice = released_route_advice(context, start.get('robot_id'))
+    pts = [(float(start.get('x', 0)), float(start.get('y', 0)))]
+    for point in (avoid, goal):
+        if point and 'x' in point and 'y' in point:
+            pts.append((float(point['x']), float(point['y'])))
+    segments = list(zip(pts, pts[1:]))
+    rows = []
+    for lesson in advice['accepted']:
+        for cell in lesson['cells']:
+            x, y = (cell['i'] + .5) * .5, (cell['j'] + .5) * .5
+            distance = (min(_dist_to_segment(x, y, *a, *b) for a, b in segments)
+                        if segments else math.hypot(x - pts[0][0], y - pts[0][1]))
+            if distance > (ROUTE_CORRIDOR_M if segments else NEAR_START_M):
+                continue
+            rows.append((distance, dict(
+                id=f"release:{lesson['lesson_id']}:v{lesson['version']}:{cell['i']}:{cell['j']}",
+                text=f"Released congestion caution near ({x:.2f}, {y:.2f}); prefer a less congested route. "
+                     "Current rules and movement permits still apply.",
+                policy='CONGESTION_CAUTION', zone='route', cell=[x, y],
+                experience_context=context, status='released',
+                lesson_id=lesson['lesson_id'], version=lesson['version'], digest=lesson['digest'])))
+    rows.sort(key=lambda row: (row[0], row[1]['id']))
+    return [row for _, row in rows[:limit]]
+
+
 def format_for_prompt(lessons: List[Dict[str, Any]]) -> str:
+    lessons = [lesson for lesson in lessons if lesson.get('status') == 'released']
     if not lessons:
         return ""
-    lines = ["LESSONS FROM PAST RUNS (learned from the safety gate's decisions; advisory only, "
+    lines = ["LESSONS FROM PAST RUNS (operator-released route cautions; advisory only, "
              "the gate still evaluates every move):"]
     lines += [f"- [L{l['id']}] {l['text']}" for l in lessons]
     lines.append("Plan routes and speeds that avoid repeating these denials.")

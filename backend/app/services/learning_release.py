@@ -208,6 +208,7 @@ class LearningRelease:
         accepted, excluded, penalties = [], [], {}
         for state in self.list():
             reason = None
+            cells = []
             if state['status'] != 'released':
                 reason = 'not_released:' + state['status']
             elif not robot_id:
@@ -222,13 +223,31 @@ class LearningRelease:
                         age = max(0, self.clock() - min(r['observed_at'] for r in selected if (r['i'], r['j']) == cell))
                         penalty = min(2.0, sorted(sources.values(), reverse=True)[1] * .25) * math.exp(-age / memory.decay_s)
                         penalties[cell] = max(penalties.get(cell, 0), penalty)
+                        cells.append(dict(i=cell[0], j=cell[1], penalty=penalty))
                 except ReleaseConflict as exc:
                     reason = str(exc)
             summary = dict(lesson_id=state['lesson_id'], version=state['version'], digest=state['digest'],
                            recipient_robot_id=robot_id, reason=reason)
+            if not reason:
+                summary.update(evidence_ids=state['evidence_ids'], cells=cells)
             (excluded if reason else accepted).append(summary)
         return dict(accepted=accepted, excluded=excluded, penalties=penalties,
                     movement_authority='unchanged; fresh policy checks and controller permit required')
+
+
+def released_route_advice(context, robot_id):
+    """The sole historical-route reuse boundary. Failure excludes all learned advice.
+
+    Raw observation collection/verification stays automatic. Neither verified raw
+    costs nor distilled candidate text grants permission for planner reuse.
+    """
+    from app.services.route_learning import get_memory
+    try:
+        result = get_learning_release().retrieve(context, robot_id, get_memory())
+        return dict(result, reuse_policy='operator_released_only')
+    except Exception as exc:
+        return dict(accepted=[], excluded=[], penalties={}, unavailable=type(exc).__name__,
+                    reuse_policy='operator_released_only')
 
 
 _release = None

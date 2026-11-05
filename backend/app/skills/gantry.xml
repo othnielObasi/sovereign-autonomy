@@ -1,0 +1,42 @@
+<mujoco model="sovereign-cpu-container-bench-v1">
+  <compiler angle="radian"/>
+  <option timestep="0.002" integrator="implicitfast" gravity="0 0 -9.81"/>
+  <default>
+    <joint damping="5" armature="0.02"/>
+    <geom friction="2 0.01 0.001" solref="0.005 1" solimp="0.95 0.99 0.001"/>
+  </default>
+  <worldbody>
+    <geom name="floor" type="plane" size="1 1 .05" rgba=".25 .30 .35 1"/>
+    <body name="x_carriage" gravcomp="1">
+      <joint name="x" type="slide" axis="1 0 0" range="-.45 .45"/>
+      <geom type="box" size=".04 .04 .02" pos="0 0 .50" contype="0" conaffinity="0" mass="1"/>
+      <body name="y_carriage" gravcomp="1">
+        <joint name="y" type="slide" axis="0 1 0" range="-.30 .30"/>
+        <geom type="box" size=".03 .03 .02" pos="0 0 .47" contype="0" conaffinity="0" mass="1"/>
+        <body name="palm" pos="0 0 .4" gravcomp="1">
+          <joint name="z" type="slide" axis="0 0 1" range="-.33 .12"/>
+          <geom name="palm_geom" type="box" size=".075 .05 .015" pos="0 0 .015" mass=".25"/>
+          <body name="left_finger" pos="-.065 0 -.045" gravcomp="1">
+            <joint name="left" type="slide" axis="1 0 0" range="0 .052"/>
+            <geom name="left_pad" type="box" size=".008 .035 .035" mass=".04"/>
+          </body>
+          <body name="right_finger" pos=".065 0 -.045" gravcomp="1">
+            <joint name="right" type="slide" axis="-1 0 0" range="0 .052"/>
+            <geom name="right_pad" type="box" size=".008 .035 .035" mass=".04"/>
+          </body>
+        </body>
+      </body>
+    </body>
+    <body name="container" pos="-.22 0 .026">
+      <freejoint name="container_free"/>
+      <geom name="container_geom" type="box" size=".025 .025 .025" mass=".08" rgba=".3 .7 .9 1"/>
+    </body>
+  </worldbody>
+  <actuator>
+    <position joint="x" kp="1200" kv="70" forcerange="-60 60"/>
+    <position joint="y" kp="1200" kv="70" forcerange="-60 60"/>
+    <position joint="z" kp="1200" kv="70" forcerange="-60 60"/>
+    <position joint="left" kp="300" kv="8" forcerange="-8 8"/>
+    <position joint="right" kp="300" kv="8" forcerange="-8 8"/>
+  </actuator>
+</mujoco>

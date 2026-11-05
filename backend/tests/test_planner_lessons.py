@@ -106,9 +106,9 @@ def test_distill_does_not_change_the_rules(db):
 def test_route_retrieval_keeps_corridor_lessons_only(db):
     pl.distill_run(db, _run_with_speeding(db))
 
-    on_route = pl.lessons_for_route(db, _start(2, 8), {"x": 30.0, "y": 8.0})
-    off_route = pl.lessons_for_route(db, _start(2, 22), {"x": 30.0, "y": 22.0})
-    replan = pl.lessons_for_route(db, _start(2, 22), {"x": 30.0, "y": 22.0}, avoid={"x": 13.0, "y": 9.0})
+    on_route = pl.candidate_lessons_for_route(db, _start(2, 8), {"x": 30.0, "y": 8.0})
+    off_route = pl.candidate_lessons_for_route(db, _start(2, 22), {"x": 30.0, "y": 22.0})
+    replan = pl.candidate_lessons_for_route(db, _start(2, 22), {"x": 30.0, "y": 22.0}, avoid={"x": 13.0, "y": 9.0})
 
     assert [l["policy"] for l in on_route] == ["SAFE_SPEED_01"]
     assert off_route == []
@@ -118,7 +118,7 @@ def test_route_retrieval_keeps_corridor_lessons_only(db):
 def test_lessons_from_older_policy_versions_are_not_retrieved(db, monkeypatch):
     pl.distill_run(db, _run_with_speeding(db))
     monkeypatch.setattr(pl, "policy_version_hash", lambda: "rules-changed")
-    assert pl.lessons_for_route(db, _start(2, 8), {"x": 30.0, "y": 8.0}) == []
+    assert pl.candidate_lessons_for_route(db, _start(2, 8), {"x": 30.0, "y": 8.0}) == []
     assert pl.all_lessons(db) == []
     assert len(pl.all_lessons(db, current_version_only=False)) == 1
 
@@ -126,9 +126,9 @@ def test_lessons_from_older_policy_versions_are_not_retrieved(db, monkeypatch):
 @pytest.mark.parametrize("field", ["site_id", "map_version", "capability_profile_version"])
 def test_lesson_retrieval_requires_compatible_environment_and_robot(db, field):
     pl.distill_run(db, _run_with_speeding(db))
-    assert pl.lessons_for_route(db, _start(2, 8), {"x": 30, "y": 8})
+    assert pl.candidate_lessons_for_route(db, _start(2, 8), {"x": 30, "y": 8})
     start = dict(_start(2, 8), **{field: "changed"})
-    assert pl.lessons_for_route(db, start, {"x": 30, "y": 8}) == []
+    assert pl.candidate_lessons_for_route(db, start, {"x": 30, "y": 8}) == []
 
 
 def test_old_contextless_lessons_are_audit_only(db):
@@ -139,7 +139,7 @@ def test_old_contextless_lessons_are_audit_only(db):
     entry.content_json = json.dumps(content)
     db.commit()
     assert len(pl.all_lessons(db)) == 1
-    assert pl.lessons_for_route(db, _start(2, 8), {"x": 30, "y": 8}) == []
+    assert pl.candidate_lessons_for_route(db, _start(2, 8), {"x": 30, "y": 8}) == []
 
 
 def test_lesson_freshness_and_invalidation_use_the_same_rules_as_route_memory(db, tmp_path, monkeypatch):
@@ -156,12 +156,12 @@ def test_lesson_freshness_and_invalidation_use_the_same_rules_as_route_memory(db
     content['signature'] = pl._signature(content, entry.id)  # valid old-observation fixture
     entry.content_json = json.dumps(content)
     db.commit()
-    assert pl.lessons_for_route(db, _start(2, 8), {"x": 30, "y": 8})
+    assert pl.candidate_lessons_for_route(db, _start(2, 8), {"x": 30, "y": 8})
     now[0] += 101
-    assert pl.lessons_for_route(db, _start(2, 8), {"x": 30, "y": 8}) == []
+    assert pl.candidate_lessons_for_route(db, _start(2, 8), {"x": 30, "y": 8}) == []
     now[0] = 1000.0
     mem.invalidate("maintenance", {"site_id": "warehouse"}, "layout unavailable")
-    assert pl.lessons_for_route(db, _start(2, 8), {"x": 30, "y": 8}) == []
+    assert pl.candidate_lessons_for_route(db, _start(2, 8), {"x": 30, "y": 8}) == []
 
 
 # -- planner integration ---------------------------------------------------------
@@ -177,7 +177,7 @@ def _muse(monkeypatch):
     monkeypatch.setattr(settings, "muse_plan_with_camera", False)
 
 
-def test_planner_prompt_carries_lessons_and_reports_ids(db, monkeypatch):
+def test_planner_rejects_raw_candidate_lessons_even_if_explicitly_supplied(db, monkeypatch):
     _muse(monkeypatch)
     seen = []
 
@@ -188,15 +188,14 @@ def test_planner_prompt_carries_lessons_and_reports_ids(db, monkeypatch):
     monkeypatch.setattr(np_mod, "_client", httpx.AsyncClient(transport=httpx.MockTransport(handler)))
 
     pl.distill_run(db, _run_with_speeding(db))
-    lessons = pl.lessons_for_route(db, _start(2, 8), {"x": 30.0, "y": 8.0})
+    lessons = pl.candidate_lessons_for_route(db, _start(2, 8), {"x": 30.0, "y": 8.0})
     plan = asyncio.run(MusePlanner().generate_plan(
         {"x": 2.0, "y": 8.0}, "deliver to dock", {"x": 30.0, "y": 8.0}, lessons=lessons))
 
     prompt = seen[0]["messages"][-1]["content"]
-    assert "LESSONS FROM PAST RUNS" in prompt
-    assert lessons[0]["text"] in prompt
-    assert "the gate still evaluates every move" in prompt
-    assert plan["lessons_applied"] == [lessons[0]["id"]]
+    assert lessons and "LESSONS FROM PAST RUNS" not in prompt
+    assert lessons[0]["text"] not in prompt
+    assert plan["lessons_applied"] == []
 
 
 def test_no_lessons_means_no_lesson_block(monkeypatch):
@@ -215,7 +214,7 @@ def test_no_lessons_means_no_lesson_block(monkeypatch):
 
 # -- API -------------------------------------------------------------------------
 
-def test_lesson_endpoints(db, monkeypatch):
+def test_candidate_inspection_does_not_release_runtime_lessons(db, monkeypatch):
     from unittest.mock import AsyncMock
     from app.api.routes_runs import get_run_svc
     monkeypatch.setattr(get_run_svc().sim, "get_world", AsyncMock(return_value=IDENTITY))
@@ -224,5 +223,5 @@ def test_lesson_endpoints(db, monkeypatch):
         all_ = client.get("/agent/lessons").json()
         route = client.get("/agent/lessons/route", params={"sx": 2, "sy": 8, "gx": 30, "gy": 8}).json()
     assert all_["count"] == 1 and all_["policy_version"] == policy_version_hash()
-    assert route["lessons"][0]["policy"] == "SAFE_SPEED_01"
-    assert route["prompt_block"].startswith("LESSONS FROM PAST RUNS")
+    assert route["lessons"] == []
+    assert route["prompt_block"] == ""

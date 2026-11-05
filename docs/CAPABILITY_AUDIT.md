@@ -3,6 +3,12 @@
 Checked against the live deployment (Nebius us-north1, https://204-12-178-126.sslip.io)
 with real missions, and against the test suite (531 passed, 4 skipped).
 
+Local follow-up: the [operator-release boundary](LEARNING_RELEASE_BOUNDARY.md)
+now removes the automatic raw route-memory baseline and gates spatial planner
+context and Memgraph planner history as well. Historical observations remain
+available for review. This hardening has local regression coverage; the earlier
+live results below do not establish that this follow-up has been deployed.
+
 ## What changed since 3 November
 
 | Area | Change | Verified |

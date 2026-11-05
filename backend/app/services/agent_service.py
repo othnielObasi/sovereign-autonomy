@@ -73,6 +73,7 @@ class AgentRouter:
         self.simple = SimpleAgent()
         self._gemini = None
         self._agentic = None
+        self._memory_scope = None
         self._last_thought_chain: List[Dict[str, Any]] = []
 
     def _gemini_planner(self):
@@ -113,6 +114,13 @@ class AgentRouter:
     ) -> ActionProposal:
         from app.config import settings
         self._last_thought_chain = []
+        from app.autonomy.experience import context_from_state, context_key
+        from app.policies.versioning import policy_version_hash
+        context = context_from_state(telemetry, policy_version_hash())
+        scope = (telemetry.get('robot_id'), context_key(context)) if context and telemetry.get('robot_id') else None
+        if scope is None or scope != self._memory_scope:
+            self._agentic = None
+        self._memory_scope = scope
 
         if not settings.llm_enabled:
             return self.simple.propose(telemetry, goal, last_governance)

@@ -431,21 +431,24 @@ async def get_lessons_for_route(
     gx: Optional[float] = Query(None, description="Goal x (m)"),
     gy: Optional[float] = Query(None, description="Goal y (m)"),
     limit: int = Query(5, ge=1, le=20),
+    robot_id: Optional[str] = Query(None, max_length=128),
     db: Session = Depends(get_db),
 ):
     """Preview the lessons the planner would receive for a route."""
     from app.services.planner_lessons import format_for_prompt, lessons_for_route
-    from app.autonomy.experience import context_from_world
+    from app.autonomy.experience import context_from_state
     from app.policies.versioning import policy_version_hash
     from app.api.routes_runs import get_run_svc
 
     goal = {"x": gx, "y": gy} if gx is not None and gy is not None else None
     try:
-        world = await get_run_svc().sim.get_world()
-        context = context_from_world(world, policy_version_hash())
+        telemetry = await get_run_svc().sim.get_telemetry(robot_id=robot_id)
+        if robot_id and telemetry.get('robot_id') != robot_id:
+            raise ValueError('recipient_identity_mismatch')
+        context = context_from_state(telemetry, policy_version_hash())
     except Exception:
-        context = None
-    lessons = lessons_for_route(db, {"x": sx, "y": sy}, goal, limit=limit, context=context)
+        return {"lessons": [], "prompt_block": "", "reason": "current_recipient_context_unavailable"}
+    lessons = lessons_for_route(db, dict(telemetry, x=sx, y=sy), goal, limit=limit, context=context)
     return {"lessons": lessons, "prompt_block": format_for_prompt(lessons)}
 
 

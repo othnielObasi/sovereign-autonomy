@@ -28,7 +28,10 @@ services:
       - memgraph_data:/var/lib/memgraph
 
   backend:
-    build: ../backend
+    build:
+      context: ../backend
+      args:
+        BACKEND_EXTRAS: "${BACKEND_EXTRAS:-postgres}"
     restart: unless-stopped
     env_file: .env.production
     environment:
@@ -58,6 +61,7 @@ services:
       SIM_STATE_DB: "/app/data/controller.db"
       SITE_LAYOUT: "${SITE_LAYOUT:-pharma}"
       PERMIT_SECRET: "${PERMIT_SECRET:?Set PERMIT_SECRET}"
+      SIM_TOKEN: "${SIM_TOKEN:?Set SIM_TOKEN}"
     volumes:
       - controller_data:/app/data
 

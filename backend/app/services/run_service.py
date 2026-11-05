@@ -675,6 +675,9 @@ class RunService:
         from app.db.session import SessionLocal
         from app.db.models import Mission
 
+        # Short-term feedback belongs to this run only. Historical fleet learning
+        # must pass the separate operator-release retrieval boundary.
+        agent = AgentRouter()
         last_governance: Optional[Dict[str, Any]] = None
         consecutive_errors = 0
 
@@ -954,10 +957,10 @@ class RunService:
                             pass
                         try:
                             async with asyncio.timeout(self.AGENT_PROPOSAL_TIMEOUT):
-                                proposal = await self.agent.propose(telemetry, goal, nl_task, last_governance, world_state)
+                                proposal = await agent.propose(telemetry, goal, nl_task, last_governance, world_state)
                         except (asyncio.TimeoutError, Exception) as prop_err:
                             logger.warning("Run %s: agent proposal failed/timed out: %s — using deterministic fallback", run_id, prop_err)
-                            proposal = self.agent.simple.propose(telemetry, goal, last_governance)
+                            proposal = agent.simple.propose(telemetry, goal, last_governance)
                     # Clamp planned max_speed to zone limits and human proximity
                     if proposal.intent == "MOVE_TO":
                         zone = telemetry.get("zone", "aisle")
@@ -1230,7 +1233,7 @@ class RunService:
                                     lessons = lessons_for_route(db, telemetry, goal, avoid=blocked_wp)
                                 except Exception as les_err:
                                     logger.warning("Run %s: lesson retrieval failed: %s", run_id, les_err)
-                                planner = self.agent._gemini_planner()
+                                planner = agent._gemini_planner()
                                 from app.services.site_intel.service import site_intel as _si
                                 from app.services.muse_planner import planning_robot
                                 from app.observability import tracing as _tr
@@ -1328,7 +1331,7 @@ class RunService:
                         latest_gov.event_hash = decision_evt.hash
 
                     # Record outcome in agent memory (agentic mode)
-                    self.agent.record_outcome(proposal, gov_decision, was_executed)
+                    agent.record_outcome(proposal, gov_decision, was_executed)
 
                     # Persist decision in DB-backed memory (#17)
                     try:
@@ -1352,7 +1355,7 @@ class RunService:
                     # Broadcast event summary to UI
                     if self._ws_broadcast:
                         # Broadcast agent reasoning chain (agentic mode)
-                        thought_chain = self.agent.last_thought_chain
+                        thought_chain = agent.last_thought_chain
                         if thought_chain:
                             await self._ws_broadcast(run_id, {
                                 "kind": "agent_reasoning",

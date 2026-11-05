@@ -66,32 +66,28 @@ last_route_info: Dict[str, Any] = {}
 
 
 def _route(layout, start, goal, extra, context=None, robot_id=None):
-    """NetworkX route with delays learned from signed experience; the A* grid router
+    """NetworkX route with operator-released congestion advice; the A* grid router
     is the fallback. Either way racks and hazard zones stay impassable."""
     from app.config import settings
     if settings.learned_routing:
         try:
             from app.services.route_learning import get_memory, learned_route
-            delays, quarantined = get_memory().load(context=context)
-            released = {'accepted': [], 'excluded': []}
-            try:
-                from app.services.learning_release import get_learning_release
-                advice = get_learning_release().retrieve(context, robot_id, get_memory())
-                released = {k: v for k, v in advice.items() if k != 'penalties'}
-                delays = dict(delays)
-                for cell, margin in advice['penalties'].items():
-                    delays[cell] = delays.get(cell, 0) + margin
-            except Exception as exc:
-                # Unavailable release storage excludes released advice, not static routing.
-                released['unavailable'] = type(exc).__name__
+            from app.services.learning_release import released_route_advice
+            advice = released_route_advice(context, robot_id)
+            delays = advice['penalties']
+            released = {k: v for k, v in advice.items() if k != 'penalties'}
+            released_ids = {ident for lesson in advice['accepted'] for ident in lesson['evidence_ids']}
+            decisions = [dict(d, **({'status': 'advisory', 'reason': 'operator_release_required'}
+                         if d['status'] == 'accepted' and d['id'] not in released_ids else {}))
+                         for d in get_memory().last_retrieval[-100:]]
             result = learned_route(layout, start, goal, extra, delays)
             if result:
                 last_route_info.clear()
                 last_route_info.update(router="networkx", learned_cells=len(delays),
                                        learned_delay_s=round(result["learned_delay"], 2),
-                                       quarantined=len(quarantined))
+                                       excluded_observations=sum(d['status'] == 'excluded' for d in decisions))
                 last_route_info["experience_context"] = context
-                last_route_info["experience_decisions"] = get_memory().last_retrieval[-100:]
+                last_route_info["experience_decisions"] = decisions
                 last_route_info['approved_learning'] = released
                 return result["points"]
         except Exception as exc:

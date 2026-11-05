@@ -110,7 +110,11 @@ facts do not change route-learning corroboration requirements or NetworkX costs.
 ## Planner integration
 
 Muse mission planning and the agentic planner retrieve up to ten nearby verified
-observations in the exact current site/map/policy/capability context. Muse plans
+observations in the exact current site/map/policy/capability context, restricted
+to source run/robot/cell, observation kind and signed timestamp selected by currently released congestion
+lessons. Verified raw observations alone are not planner permission. Withdrawal,
+expiry, context mismatch or unavailable release storage supplies no such history.
+Operator graph inspection remains available independently. Muse plans
 record the retrieval state and offered source event IDs in `graph_history`.
 This records offered evidence, not proof that a model used it correctly. Current
 telemetry, task checks, deterministic policy and permits continue to govern the

@@ -70,6 +70,7 @@ class Settings(BaseSettings):
     experience_anchor_path: Optional[str] = None  # independently protected SQLite checkpoint; default <authority DB>.anchor.sqlite
     # Optional advisory knowledge graph. Never used to authorize movement.
     memgraph_enabled: bool = False
+    skill_lab_enabled: bool = False  # Optional CPU MuJoCo experiment; authenticated writes only.
     memgraph_uri: str = "bolt://127.0.0.1:7687"
     memgraph_username: str = ""
     memgraph_password: str = ""

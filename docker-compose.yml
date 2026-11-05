@@ -21,7 +21,10 @@ services:
       - postgres_data:/var/lib/postgresql/data
 
   backend:
-    build: ./backend
+    build:
+      context: ./backend
+      args:
+        BACKEND_EXTRAS: "${BACKEND_EXTRAS:-postgres}"
     env_file:
       - path: .env
         required: false

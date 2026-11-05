@@ -255,6 +255,11 @@ async def graph_worker():
 
 
 def planner_history(telemetry):
+    """Planner history is restricted to evidence selected by a current release.
+
+    Operator graph inspection remains complete; context matching and a valid
+    signature alone do not authorise historical experience reuse by a planner.
+    """
     if not settings.memgraph_enabled:
         return {'state': 'disabled', 'facts': []}
     from app.autonomy.experience import context_from_state
@@ -264,7 +269,25 @@ def planner_history(telemetry):
     if context is None:
         return {'state': 'context_unavailable', 'facts': []}
     try:
+        from app.services.learning_release import released_route_advice
+        from app.services.route_learning import get_memory, DELAY_FOR
+        advice = released_route_advice(context, telemetry.get('robot_id'))
+        if not advice['accepted']:
+            return {'state': 'unavailable' if advice.get('unavailable') else 'operator_release_required', 'facts': []}
+        ids = {ident for lesson in advice['accepted'] for ident in lesson['evidence_ids']}
+        selected = {(r['run_id'], r['source_robot_id'], r['i'], r['j'], r['kind']): r['observed_at']
+                    for r in get_memory().release_evidence(context) if r['id'] in ids}
         with SessionLocal() as db:
-            return graph.history(db, context=context, x=float(telemetry['x']), y=float(telemetry['y']), limit=10)
+            result = graph.history(db, context=context, x=float(telemetry['x']), y=float(telemetry['y']), limit=10)
+        def released_fact(fact):
+            kind = fact['policy_state'] if fact['policy_state'] in DELAY_FOR else fact['decision']
+            observed = selected.get((fact['run_id'], fact['robot_id'], math.floor(fact['x'] / .5),
+                                     math.floor(fact['y'] / .5), kind))
+            return observed is not None and abs(datetime.fromisoformat(fact['ts']).timestamp() - observed) <= 1e-6
+        facts = [f for f in result['facts'] if released_fact(f)]
+        return dict(result, facts=facts, excluded=result.get('excluded', 0) + len(result['facts']) - len(facts),
+                    policy_counts=[{'policy': p, 'count': n} for p, n in
+                                   Counter(p for f in facts for p in f['policy_hits']).most_common()],
+                    scope='operator-released congestion evidence only; fresh execution checks required')
     except Exception:
         return {'state': 'unavailable', 'facts': []}
