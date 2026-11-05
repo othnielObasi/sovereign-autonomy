@@ -61,18 +61,13 @@ the controller, and the evidence record names the model behind each plan.
 
 ## Built during the hackathon versus the existing foundation
 
-The pre-existing foundation (before 26 October 2026) is: the policy gate, decision
-receipts and event chain, the task-drift guard, adaptive tuning and cross-run
-learning, a 2D warehouse map, rule workflows and benchmarking.
-
-The first commit, `3738a53`, was assembled on 1 November 2026. Besides that
-foundation it already contains hackathon work from 26 October to 1 November:
-the 3D facility twin (`frontend/src/components/twin/`) and the Tavily site
-intelligence integration (`backend/app/services/site_intel/`). Those two are
-hackathon work. Every later commit (`git log 3738a53..HEAD`) is also hackathon work:
+The first commit, `3738a53`, is the pre-existing codebase from before 26 October
+2026: the policy gate, decision receipts and event chain, the task-drift guard,
+adaptive tuning and cross-run learning, the 3D warehouse twin (first committed
+22 October 2026), Tavily site intelligence (22 October 2026), rule workflows and
+benchmarking. Every later commit (`git log 3738a53..HEAD`) is hackathon work:
 
 - Meta model integration: Muse Spark, Muse Spark Open, SAM 3.1, Muse Voice Transcribe
-- 3D facility twin (replacing the 2D map) and Tavily site intelligence
 - Governed skill transfer (CPU lab, MuJoCo physics): a pick-and-place skill learned on Robot A, tested on held-out positions, approved, installed on compatible Robot B, refused for Robot C (`64a5bbd`, `b786a13`; live at /skills, verified end to end on the production deployment on 5 Nov 2026)
 - Execution authority: signed single-use permits, controller redemption, kill switches, voice stop, checkpoints, restart reconciliation
 - Mixed fleet: wheeled carriers and a humanoid with enforced capability profiles
