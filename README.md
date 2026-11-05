@@ -163,8 +163,14 @@ Memgraph, LangSmith tracing and backups:
 ## Scope
 
 The robots run in a simulator today; hardware adapters and site safety validation are
-the next step toward physical deployment. An optional CPU manipulation lab
-([docs](docs/CPU_SKILL_LAB.md)) is experimental and disabled by default.
+the next step toward physical deployment.
+
+**Governed skill transfer** ([CPU skill lab](docs/CPU_SKILL_LAB.md), MuJoCo physics): Robot A
+learns a pick-and-place skill from twelve demonstrations; the skill is tested on held-out
+positions (with a no-grip ablation that must fail), approved and released by exact
+digest, installed on compatible Robot B, refused for incompatible Robot C, and executed
+only under a signed single-use grant. It is experimental and disabled by default
+(`SKILL_LAB_ENABLED=true` to enable).
 What was built during the hackathon, as distinct from the earlier policy-gate
 foundation, is set out in [HACKATHON_SUBMISSION.md](docs/HACKATHON_SUBMISSION.md).
 
