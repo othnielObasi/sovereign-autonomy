@@ -1,0 +1,2 @@
+/* Lighter homepage: these sections repeat /how-it-works, which keeps the full detail. */
+#capability-overview, #environments { display: none !important; }
