@@ -1,2 +1,8 @@
 /* Lighter homepage: these sections repeat /how-it-works, which keeps the full detail. */
 #capability-overview, #environments { display: none !important; }
+
+/* Hero: mixed-fleet image, one clear film link, fewer competing items. */
+.hero:before{background-image:linear-gradient(0deg,#100e1c 0%,#100e1cbb 14%,#100e1c00 62%),linear-gradient(90deg,#100e1cd0 0%,#100e1cb5 40%,#100e1c90 70%,#100e1c60 100%),url('/home/hero-fleet.jpg')!important;background-position:center,center,center 45%!important}
+.hero-foot{display:none!important}
+.hero-film-link{font-size:16px!important;font-weight:600;color:#fff!important;background:#7339cc33!important;border-color:#c29aff88!important}
+@media(max-width:700px){.hero:before{background-position:center,center,60% center!important}}
