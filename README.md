@@ -18,10 +18,12 @@ cleanrooms.
 
 **Project repository:** [github.com/othnielObasi/sovereign-autonomy](https://github.com/othnielObasi/sovereign-autonomy)
 
+**Demo video (2:45):** [youtu.be/Kak8teTVHSA](https://youtu.be/Kak8teTVHSA)
+
+[![Watch the Sovereign Autonomy demo video](docs/images/demo-video-thumbnail.jpg)](https://youtu.be/Kak8teTVHSA)
+
 **Recorded mission:** [Watch the deployed simulator recording](https://204-12-178-126.sslip.io/#experience) ·
-[Direct movement clip](frontend/public/home/mission-film/move.webm) ·
 [Recording provenance](frontend/public/home/mission-film/provenance.json).
-These are mission excerpts; the public URL for the full submission video is not yet recorded in this repository.
 
 Built for the **Meta Global AI Developer Hackathon**, Startup track, **Push the Frontier**.
 This extends an existing project; [the contribution declaration below](#hackathon-contribution-declaration)
@@ -83,14 +85,15 @@ signed trail an auditor can check.
 | Rule and robustness evaluation | Rule proposals, replay/benchmark evaluation, approval, rollback and adversarial scenarios | [Capability audit](docs/CAPABILITY_AUDIT.md); reports are not certification |
 | CPU skill learning and transfer | Learned actuator targets, six held-out trials, negative control and approved execution on a compatible simulated arm | [CPU skill lab](docs/CPU_SKILL_LAB.md); live at /skills; fixed task phases, simulated arms |
 
-<details>
-<summary>Workspace screenshot: facility, mission desk and fleet controls</summary>
+### Screenshots (live deployment, 5 November 2026)
 
-![Mission Control with the pharmaceutical facility, three simulated robots, mission composer and evidence panel](docs/validation/2026-11-03-workspace/mission-control/mission-control-3d.png)
+**Mission Control:** pharmaceutical facility twin, fleet status, permits enforced, mission desk.
 
-*Local browser-validation capture, 3 November 2026. This earlier workspace build used deterministic planning with vision unconfigured, as shown in its banner. It illustrates the interface, not current deployed model availability. [Validation record](docs/validation/2026-11-03-workspace/README.md).*
+![Mission Control on the live deployment: Demo Pharma Plant facility twin, three robots, mission desk](docs/images/mission-control-live.png)
 
-</details>
+**CPU skill lab:** Robot A's expert demonstration beside arm-b executing the learned, released policy in MuJoCo physics.
+
+![CPU skill lab on the live deployment: expert demonstration and learned-policy execution on a compatible arm](docs/images/skills-live.png)
 
 ## A mission, end to end
 

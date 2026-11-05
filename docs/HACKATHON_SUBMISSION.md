@@ -7,7 +7,7 @@
 | Live product | https://204-12-178-126.sslip.io |
 | Try it | [Mission Control](https://204-12-178-126.sslip.io/mission-control) · [Fleet learning](https://204-12-178-126.sslip.io/learning) · [How it works](https://204-12-178-126.sslip.io/how-it-works) |
 | Repository | https://github.com/othnielObasi/sovereign-autonomy |
-| Three-minute video | _add link_ |
+| Three-minute video | https://youtu.be/Kak8teTVHSA |
 | Track / theme | Startup · Push the Frontier |
 | Team | _add names_ |
 
