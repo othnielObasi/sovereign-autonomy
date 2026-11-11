@@ -6,7 +6,7 @@ import { AuthorityPanel } from "@/components/AuthorityPanel";
 import { LearningEvidence } from "@/components/LearningEvidence";
 import { OperationalGraphPanel } from "@/components/OperationalGraphPanel";
 import { RuntimeCapabilities } from '@/components/RuntimeCapabilities';
-import { Button, Empty, KV, Mono, Notice, Page, PageHeader, Panel, Pill, Stat } from "@/components/ui";
+import { Button, Empty, KV, Notice, Page, PageHeader, Panel, Pill, Stat } from "@/components/ui";
 
 type Drill = { drill: string; passed: boolean; detail: string; skipped?: boolean; checks?: { check: string; passed: boolean }[] };
 
@@ -46,49 +46,40 @@ export default function AuthorityPage() {
     load();
   };
 
+  const [showAll, setShowAll] = useState(false);
+  const shown = showAll ? events : events.slice(0, 12);
+  const kindText = (k: string) => ({ permit_used: "permit used", permit_issued: "permit issued", kill: "stop pressed", kill_reset: "stop released" } as Record<string, string>)[k] || k.replace(/_/g, " ");
+
   return (
     <Page>
-      <PageHeader eyebrow="Built during the hackathon" title="Execution authority"
-        subtitle="Inspect execution permissions, verified experience and connected mission evidence. Every move requires current controller admission, whether a model or fallback planner proposed it." />
+      <PageHeader eyebrow="Safety & stops" title="Every move needs permission"
+        subtitle="The AI only proposes moves. Each one needs a single-use permit that the robot checks before it moves, and anyone can stop a robot at any time. Only a signed-in operator can release a stop." />
       <RuntimeCapabilities />
 
       <div className="grid lg:grid-cols-3 gap-4">
         <div className="lg:col-span-1 space-y-4 min-w-0">
           <AuthorityPanel />
-          <Panel id="route-learning" title="Learned routing" subtitle="NetworkX uses only evaluated, operator-approved and released congestion cautions">
-            {!learning ? <Empty title="Loading…" /> : (
-              <>
-                <KV k="Router" v={learning.last_route?.router || "—"} mono />
-                <KV k="Verified observation cells (awaiting release checks)" v={learning.learned_cells} mono />
-                <KV k="Released caution cells on last route" v={learning.last_route?.learned_cells ?? 0} mono />
-                <KV k="Quarantined records" v={learning.quarantined} mono />
-                {learning.last_route?.learned_delay_s != null && <KV k="Expected delay on last route" v={`${learning.last_route.learned_delay_s} s`} mono />}
-              </>
-            )}
-          </Panel>
         </div>
 
         <div className="lg:col-span-2 space-y-4 min-w-0">
-          <OperationalGraphPanel />
-          <LearningEvidence decisions={learning?.decisions} changes={learning?.lifecycle?.events} context={learning?.experience_context} security={learning} />
-          <Panel id="security-drills" title="Security drills" subtitle="Real attacks against the live simulator, each with a pass/fail result"
+          <Panel id="security-drills" title="Attack drills" subtitle="Real attacks against the live simulator. Each one should be blocked."
             actions={<Button variant="primary" disabled={running} onClick={go}>{running ? "Running…" : "Run all drills"}</Button>}>
             {err && <Notice tone="stop">{err}</Notice>}
-            {!drills ? <Empty title="No drills run yet">Runs only while no mission is active. The probe move targets the robot&apos;s own position, and everything is cleaned up afterwards.</Empty> : (
+            {!drills ? <Empty title="No drills run yet">Drills run only while no mission is active, and everything is cleaned up afterwards.</Empty> : (
               <>
                 <div className="grid grid-cols-3 gap-2 mb-3">
-                  <Stat label="Passed" value={`${drills.passed}/${drills.ran}`} tone={drills.all_passed ? "ok" : "stop"} />
+                  <Stat label="Blocked" value={`${drills.passed}/${drills.ran}`} tone={drills.all_passed ? "ok" : "stop"} />
                   <Stat label="Result" value={drills.all_passed ? "All blocked" : "Check"} tone={drills.all_passed ? "ok" : "stop"} />
                   <Stat label="Took" value={`${(drills.duration_ms / 1000).toFixed(1)} s`} />
                 </div>
                 <div className="space-y-1.5">
                   {drills.results.map((d) => (
                     <div key={d.drill} className="flex items-start gap-3 rounded-lg border border-mc-line px-3 py-2">
-                      <Pill tone={d.skipped ? "neutral" : d.passed ? "ok" : "stop"} dot>{d.skipped ? "SKIPPED" : d.passed ? "PASS" : "FAIL"}</Pill>
+                      <Pill tone={d.skipped ? "neutral" : d.passed ? "ok" : "stop"} dot>{d.skipped ? "SKIPPED" : d.passed ? "BLOCKED" : "FAIL"}</Pill>
                       <div className="min-w-0">
                         <div className="text-sm text-mc-ink">{DRILL_LABEL[d.drill] || d.drill}</div>
                         <div className="text-xs text-mc-mute">{d.detail}</div>
-                        {d.checks && <ul className="mt-2 space-y-1 text-xs">{d.checks.map(c => <li key={c.check} className={c.passed ? "text-emerald-300" : "text-red-300"}>{c.passed ? "PASS" : "FAIL"} · {c.check.replaceAll("_", " ")}</li>)}</ul>}
+                        {d.checks && <details className="mt-1 text-xs"><summary className="cursor-pointer text-mc-mute">{d.checks.filter(c => c.passed).length}/{d.checks.length} checks passed</summary><ul className="mt-1 space-y-1">{d.checks.map(c => <li key={c.check} className={c.passed ? "text-emerald-300" : "text-red-300"}>{c.passed ? "PASS" : "FAIL"} · {c.check.replaceAll("_", " ")}</li>)}</ul></details>}
                       </div>
                     </div>
                   ))}
@@ -97,23 +88,46 @@ export default function AuthorityPage() {
             )}
           </Panel>
 
-          <Panel title="Dispatch and kill-switch events" subtitle="Most recent first">
+          <Panel title="Recent permits and stops" subtitle="Most recent first">
             {events.length === 0 ? <Empty title="No events yet">Start a mission to see each permit used.</Empty> : (
-              <div className="max-h-[420px] overflow-y-auto mc-scroll divide-y divide-mc-line/60">
-                {events.map((e, i) => (
-                  <div key={i} className="flex flex-wrap items-start justify-between gap-2 py-2 text-xs min-w-0">
-                    <div className="flex flex-wrap items-center gap-2 min-w-0 flex-1 basis-48">
-                      <Pill tone={e.kind.includes("kill") ? "stop" : e.kind.includes("unknown") ? "warn" : e.kind.includes("drill") ? "info" : "ok"}>{e.kind.replace(/_/g, " ")}</Pill>
-                      <span className="font-mono text-xs text-mc-ink break-all min-w-0">{e.action_id || e.scope || ""}</span>
+              <>
+                <div className="divide-y divide-mc-line/60">
+                  {shown.map((e, i) => (
+                    <div key={i} className="flex items-center justify-between gap-2 py-2 text-xs min-w-0" title={e.action_id || e.scope || ""}>
+                      <Pill tone={e.kind.includes("kill") ? "stop" : e.kind.includes("unknown") ? "warn" : e.kind.includes("drill") ? "info" : "ok"}>{kindText(e.kind)}</Pill>
+                      <span className="text-mc-dim tabular shrink-0">{new Date(e.timestamp * 1000).toLocaleTimeString()}</span>
                     </div>
-                    <span className="text-mc-dim tabular shrink-0">{new Date(e.timestamp * 1000).toLocaleTimeString()}</span>
-                  </div>
-                ))}
-              </div>
+                  ))}
+                </div>
+                {events.length > 12 && <button className="mt-2 text-xs text-mc-mute underline" onClick={() => setShowAll(!showAll)}>{showAll ? "Show fewer" : `Show all ${events.length}`}</button>}
+              </>
             )}
           </Panel>
         </div>
       </div>
+
+      <details className="mt-6">
+        <summary className="cursor-pointer text-sm font-semibold text-mc-ink">Technical details: learned routing, experience checks and the evidence graph</summary>
+        <div className="mt-4 grid lg:grid-cols-3 gap-4">
+          <div className="lg:col-span-1 space-y-4 min-w-0">
+            <Panel id="route-learning" title="Learned routing" subtitle="Routing uses only lessons that were evaluated, approved and released">
+              {!learning ? <Empty title="Loading…" /> : (
+                <>
+                  <KV k="Router" v={learning.last_route?.router || "—"} mono />
+                  <KV k="Confirmed delay areas (not yet released)" v={learning.learned_cells} mono />
+                  <KV k="Released lesson areas on the last route" v={learning.last_route?.learned_cells ?? 0} mono />
+                  <KV k="Quarantined records" v={learning.quarantined} mono />
+                  {learning.last_route?.learned_delay_s != null && <KV k="Expected delay on the last route" v={`${learning.last_route.learned_delay_s} s`} mono />}
+                </>
+              )}
+            </Panel>
+          </div>
+          <div className="lg:col-span-2 space-y-4 min-w-0">
+            <LearningEvidence decisions={learning?.decisions} changes={learning?.lifecycle?.events} context={learning?.experience_context} security={learning} />
+            <OperationalGraphPanel />
+          </div>
+        </div>
+      </details>
     </Page>
   );
 }

@@ -65,12 +65,12 @@ async function until(fn, message, timeout=45000) {
     await until(async()=> (await api(`/runs/${run.id}/events?latest=true&limit=80`)).some(e=>e.type==='AUTHORITY'&&e.payload?.event==='permit_used'),'No controller admission');
     await page.getByText('Controller admission recorded',{exact:true}).waitFor({timeout:30000});
     const previousWorld = await api('/sim/world');
-    await page.getByRole('tab',{name:'Scenario lab',exact:true}).click();
+    await page.getByRole('tab',{name:'Try a scenario',exact:true}).click();
     await page.locator('.sa-scenario-grid button').filter({hasText:'The route changes'}).click();
     await until(async()=> (await api('/sim/world')).map_version !== previousWorld.map_version,'Obstacle did not change real environment');
     await until(async()=> (await api(`/runs/${run.id}/events?latest=true&limit=80`)).some(e=>e.type==='ENVIRONMENT_CHANGE'),'Environment change missing from mission evidence');
     await page.locator('.sa-scenario-grid button').filter({hasText:'Clear the route'}).click();
-    await page.getByRole('tab',{name:'Decision trail',exact:true}).click();
+    await page.getByRole('tab',{name:'What happened',exact:true}).click();
     report.checks.push('Scenario lab changes real world geometry and records environment revalidation');
     await page.getByRole('button',{name:'Pause',exact:true}).click();
     await page.getByRole('button',{name:'Resume',exact:true}).waitFor();

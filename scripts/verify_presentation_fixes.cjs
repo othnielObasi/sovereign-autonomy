@@ -71,7 +71,7 @@ fs.mkdirSync(out, { recursive: true });
     await page.screenshot({ path: path.join(out, 'run-refused-desktop.png'), fullPage: false });
     await page.goto(base + '/mission-control?view=2d&panel=scenarios#mission-evidence');
     await page.getByRole('button', { name: 'Floor plan', exact: true }).waitFor();
-    check('Scenario deep link opens the correct tab', await page.getByRole('tab', { name: 'Scenario lab' }).getAttribute('aria-selected') === 'true');
+    check('Scenario deep link opens the correct tab', await page.getByRole('tab', { name: 'Try a scenario' }).getAttribute('aria-selected') === 'true');
     check('Floor view query is honored', await page.getByRole('button', { name: 'Floor plan', exact: true }).getAttribute('aria-pressed') === 'true');
     await page.goto(base + '/policies?tab=rules');
     await page.getByLabel('Rule threshold').waitFor();

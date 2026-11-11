@@ -29,7 +29,7 @@ export default function SkillsPage(){
   const attempt=(result?.version===version&&result?.robot_id===robot ? result : null) ||
     [...(data?.attempts||[])].reverse().find((a:any)=>a.action==='finished'&&a.version===version&&a.robot_id===robot);
   return <Page>
-    <PageHeader eyebrow="CPU skill lab · experimental" title="Learn once. Evaluate. Release. Try on another robot."
+    <PageHeader eyebrow="Skill lab · simulated arms" title="Learn once. Evaluate. Release. Try on another robot."
       subtitle="Two identical Cartesian grippers share a small learned pick-and-place policy. MuJoCo computes contacts and object motion on the CPU; no Isaac or dedicated GPU is required."/>
     <div className="mb-5 flex flex-wrap gap-4 text-violet-700"><Link href="/learning">Routing knowledge</Link><Link href="/mission-control">Warehouse operations</Link></div>
     <p className="mb-5 rounded-lg bg-slate-900 p-4 text-sm leading-relaxed text-slate-200">This is a separate bench experiment inside the operations workspace. It uses measured object coordinates, eight fixed task phases and learned continuous joint/gripper targets. It does not demonstrate vision-based manipulation, humanoid skills or physical hardware readiness. The views replay measured physics results after each operation.</p>

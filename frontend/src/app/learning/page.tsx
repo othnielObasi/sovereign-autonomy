@@ -47,71 +47,88 @@ export default function LearningPage() {
   const nearbyRobots = (rows: Evidence[]) => new Set((data?.evidence || []).filter(o => rows.some(r => Math.abs(o.i - r.i) <= 1 && Math.abs(o.j - r.j) <= 1)).map(o => o.source_robot_id));
   const corroborated = [...groups].filter(([, rows]) => nearbyRobots(rows).size >= 2);
   const originCorroborated = corroborated.filter(([, rows]) => [...nearbyRobots(rows)].includes(data?.robot_id || ''));
+  const single = [...groups].filter(([, rows]) => nearbyRobots(rows).size < 2);
+  const now = Date.now() / 1000;
+  const allLessons = [...(data?.lessons || [])].reverse();
+  const isCurrent = (l: Lesson) => now < l.expires_at && l.status !== 'withdrawn';
+  const currentLessons = allLessons.filter(isCurrent), pastLessons = allLessons.filter(l => !isCurrent(l));
+  const statusText: Record<string, string> = { candidate: 'Proposed · waiting for evaluation', evaluated: 'Evaluated · waiting for approval', approved: 'Approved · ready to release', released: 'Released to the fleet', rejected: 'Rejected at evaluation', withdrawn: 'Withdrawn' };
+  const cell = ([key, rows]: [string, Evidence[]]) => <label key={key} className="flex gap-3 rounded border border-slate-300 bg-white p-3 text-slate-800">
+    <input type="checkbox" checked={rows.every(r => selected.includes(r.id))} onChange={e => setSelected(old => e.target.checked ? [...new Set([...old, ...rows.map(r => r.id)])] : old.filter(id => !rows.some(r => r.id === id)))} />
+    <span>Area {key} · {nearbyRobots(rows).size >= 2 ? 'confirmed by two robots' : 'seen by one robot'}<br /><small className="text-slate-500">{rows.map(r => `${r.source_robot_id} delayed ${r.delay_s}s`).join(' · ')}</small></span>
+  </label>;
+  const renderLesson = (lesson: Lesson) => {
+    const latest = !data?.lessons.some(other => other.lesson_id === lesson.lesson_id && other.version > lesson.version);
+    const expired = now >= lesson.expires_at;
+    const received = data?.eligibility.accepted.some(r => r.lesson_id === lesson.lesson_id && r.version === lesson.version);
+    const excluded = data?.eligibility.excluded.find(r => r.lesson_id === lesson.lesson_id && r.version === lesson.version);
+    const step = ['candidate', 'evaluated', 'approved'].indexOf(lesson.status);
+    const next = step >= 0 ? (['evaluate', 'approve', 'release'] as const)[step] : null;
+    const label = { evaluate: 'Evaluate evidence', approve: 'Approve this version', release: 'Release to the fleet' };
+    const live = latest && !expired && canWrite;
+    const quiet = 'rounded-md border border-slate-300 px-4 py-2 text-sm text-slate-700 disabled:opacity-40';
+    return <article key={`${lesson.lesson_id}:${lesson.version}`} className="rounded-lg border border-slate-300 bg-white p-4" data-lesson-status={lesson.status}>
+      <h3 className="text-lg font-semibold text-slate-900">{lesson.title} <span className="text-sm font-normal text-slate-500">v{lesson.version}</span></h3>
+      <p className="my-1 font-medium text-violet-800">{expired ? 'Expired' : statusText[lesson.status] || lesson.status}</p>
+      {lesson.status === 'released' && !expired && <p className="text-sm text-slate-700">{received ? `${data?.robot_id} will use it on its next route plan.` : `Not used by ${data?.robot_id}: ${excluded?.reason || 'not compatible'}`}</p>}
+      {lesson.evaluation && !lesson.evaluation.passed && <p className="mt-1 text-sm text-slate-700">Reason: {lesson.evaluation.reason}</p>}
+      {live && <div className="mt-3 flex flex-wrap gap-2">
+        {next && <button className={button} disabled={busy} onClick={() => transition(lesson, next)}>{label[next]}</button>}
+        {lesson.status !== 'withdrawn' && <button className={quiet} disabled={busy} onClick={() => transition(lesson, 'withdraw')}>Withdraw</button>}
+        <button className={quiet} disabled={busy} onClick={() => { setRevision(lesson); setTitle(lesson.title); setNotice(lesson.notice); setSource(lesson.source_url); setSelected(lesson.evidence_ids); }}>Revise</button>
+      </div>}
+      <details className="mt-3 text-sm text-slate-600"><summary className="cursor-pointer">Technical details</summary>
+        <p className="mt-2">Origin robot: {lesson.origin_robot_id}</p>
+        <p className="break-all">Digest: {lesson.digest}</p><pre className="my-2 whitespace-pre-wrap break-all">{JSON.stringify(lesson.context, null, 2)}</pre>
+        <p className="whitespace-pre-wrap">External note (untrusted): {lesson.notice || 'none'}</p><p className="break-all">Source reference: {lesson.source_url || 'none'}</p>
+        <p>Expires: {new Date(lesson.expires_at * 1000).toLocaleString()}</p>
+        <ul className="mt-3 space-y-1">{lesson.history.map(event => <li key={event.id}>{event.action} · {event.actor} · {new Date(event.at * 1000).toLocaleString()}</li>)}</ul>
+      </details>
+    </article>;
+  };
   return <Page>
-    <PageHeader eyebrow="Governed collective learning" title="Review knowledge before the fleet reuses it"
-      subtitle="Create a bounded congestion caution from signed robot observations. Evaluate, approve and release one version; each receiving robot must still pass its own movement checks." />
-    <div className="flex flex-wrap gap-5 mb-5 font-medium text-violet-700"><Link href="/authority#route-learning">Route memory &amp; execution authority →</Link><Link href="/missions">Collect evidence through missions →</Link></div>
-    <p className="mb-5 rounded-lg border border-slate-500 bg-slate-900 p-4 text-slate-200">Observations are collected automatically; routing and planner reuse require evaluation, operator approval and release of the exact version. External text remains untrusted context. Sharing requires signed evidence from at least two robot identities in the same or touching cells. Release adds only a bounded positive congestion margin; it never authorises movement or relaxes a safety rule.</p>
-    <form className="mb-6 flex flex-wrap items-end gap-3" onSubmit={e => { e.preventDefault(); perform(() => load(robot)); }}>
-      <label className="text-sm font-medium text-slate-700">Inspect a receiving robot<input className={field} value={robot} onChange={e => setRobot(e.target.value)} placeholder="Robot ID" required maxLength={128} /></label>
-      <button className={button} disabled={busy}>Refresh current context</button>
-      {data && <p className="text-sm text-slate-600">Loaded: {data.robot_id} · {data.context.capability_profile_version}</p>}
-    </form>
-    {error && <p role="alert" className="mb-5 rounded border border-red-400 bg-red-950 p-4 text-red-100">{error}. Sign in through Operator access if authentication is required.</p>}
+    <PageHeader eyebrow="Fleet learning" title="Robots learn from each other, with your sign-off"
+      subtitle="When two robots are delayed in the same area, that can become a lesson for the whole fleet. Nothing is shared until you evaluate, approve and release it, and robots still check every move." />
+    <ol className="mb-6 grid gap-3 text-sm text-slate-700 sm:grid-cols-4">{['Robots report where they were delayed', 'Propose a lesson from areas two robots confirmed', 'Evaluate it, then approve it', 'Release it to compatible robots'].map((t, i) => <li key={t} className="rounded-lg border border-slate-300 bg-white p-3"><strong className="mr-1 text-violet-800">{i + 1}.</strong>{t}</li>)}</ol>
+    <details className="mb-6 text-sm text-slate-700"><summary className="cursor-pointer">Viewing as {data?.robot_id || '…'} · change robot</summary>
+    <form className="mt-3 flex flex-wrap items-end gap-3" onSubmit={e => { e.preventDefault(); perform(() => load(robot)); }}>
+      <label className="text-sm font-medium text-slate-700">Robot ID<input className={field} value={robot} onChange={e => setRobot(e.target.value)} placeholder="robot-2" required maxLength={128} /></label>
+      <button className={button} disabled={busy}>Show this robot</button>
+      {data && <span className="text-slate-500">Profile {data.context.capability_profile_version}</span>}
+    </form></details>
+    {error && <p role="alert" className="mb-5 rounded border border-red-400 bg-red-950 p-4 text-red-100">{error}. Approving and releasing lessons needs an operator sign-in.</p>}
     {message && <p role="status" className="mb-5 rounded border border-emerald-500 bg-emerald-950 p-4 text-emerald-100">{message}</p>}
     {data?.memory_integrity_error && <p role="alert" className="text-red-700">Source memory integrity failed. No evidence can be released: {data.memory_integrity_error}</p>}
     <div className="grid gap-6 xl:grid-cols-2">
-      <Panel title={revision ? `Revise ${revision.title} / next version` : 'Propose a congestion caution'} subtitle="Use real signed observations; the server verifies them again at evaluation, approval, release and retrieval.">
+      <Panel title={revision ? `Revise: ${revision.title}` : 'Propose a lesson'} subtitle="Pick areas where robots were delayed. Only areas confirmed by two robots can be shared.">
         <form className="space-y-4" onSubmit={e => { e.preventDefault(); perform(async () => {
           const result = await learningRequest('/candidates', { robot_id: data?.robot_id, title, notice, source_url: source, evidence_ids: selected,
             ...(revision ? { lesson_id: revision.lesson_id, expected_digest: revision.digest } : {}) });
-          setMessage(`Candidate v${result.version} persisted. Evaluation and operator approval are still required.`);
+          setMessage(`Lesson proposed (v${result.version}). Next: evaluate it.`);
           setRevision(null); setSelected([]); await load(data?.robot_id);
         }); }}>
           <label className="block text-sm font-medium text-slate-700">Title<input className={field} value={title} onChange={e => setTitle(e.target.value)} required maxLength={120} /></label>
-          <label className="block text-sm font-medium text-slate-700">External notice or operational context (optional)<textarea className={field} value={notice} onChange={e => setNotice(e.target.value)} maxLength={700} rows={3} /></label>
-          <label className="block text-sm font-medium text-slate-700">Source reference (optional; stored, never fetched)<input className={field} value={source} onChange={e => setSource(e.target.value)} maxLength={400} /></label>
-          <fieldset className="space-y-2"><legend className="mb-2 font-semibold text-slate-900">Verified source cells</legend>
+          <label className="block text-sm font-medium text-slate-700">Note for operators (optional)<textarea className={field} value={notice} onChange={e => setNotice(e.target.value)} maxLength={700} rows={3} /></label>
+          <label className="block text-sm font-medium text-slate-700">Source link (optional, never opened by the system)<input className={field} value={source} onChange={e => setSource(e.target.value)} maxLength={400} /></label>
+          <fieldset className="space-y-2"><legend className="mb-2 font-semibold text-slate-900">Delay areas</legend>
             {corroborated.length > 0 && <div className="flex flex-wrap items-center gap-3 text-sm text-slate-700">
-              <span>{corroborated.length} cell(s) corroborated by two or more robots.</span>
-              <button type="button" className={button} disabled={busy || !originCorroborated.length} onClick={() => setSelected(originCorroborated.flatMap(([, rows]) => rows.map(r => r.id)))}>Select corroborated cells</button>
-              {!originCorroborated.length && <span>Inspect one of the robots that observed them to propose.</span>}
+              <span>{corroborated.length} area(s) confirmed by two robots.</span>
+              <button type="button" className={button} disabled={busy || !originCorroborated.length} onClick={() => setSelected(originCorroborated.flatMap(([, rows]) => rows.map(r => r.id)))}>Select confirmed areas</button>
+              {!originCorroborated.length && <span>Switch to one of the robots that saw them to propose a lesson.</span>}
             </div>}
-            {!groups.size && <p className="text-slate-600">No eligible signed observations for this context yet. Complete missions with two compatible robot identities that independently observe congestion in the same area, then refresh. No example evidence is manufactured here.</p>}
-            {[...groups].map(([key, rows]) => <label key={key} className="flex gap-3 rounded border border-slate-300 bg-white p-3 text-slate-800">
-              <input type="checkbox" checked={rows.every(r => selected.includes(r.id))} onChange={e => setSelected(old => e.target.checked ? [...new Set([...old, ...rows.map(r => r.id)])] : old.filter(id => !rows.some(r => r.id === id)))} />
-              <span>Cell {key} · {new Set(rows.map(r => r.source_robot_id)).size} source robot(s) here · {nearbyRobots(rows).size >= 2 ? 'corroborated nearby' : 'needs a second robot nearby'}<br /><small>{rows.map(r => `${r.source_robot_id}: ${r.delay_s}s (${r.run_id})`).join(' · ')}</small></span>
-            </label>)}
+            {!groups.size && <p className="text-slate-600">No delays recorded yet. Run missions with two robots through the same busy area, then come back.</p>}
+            {corroborated.map(cell)}
+            {single.length > 0 && <details className="text-sm text-slate-600"><summary className="cursor-pointer">{single.length} area(s) seen by only one robot (cannot be shared yet)</summary><div className="mt-2 space-y-2">{single.map(cell)}</div></details>}
           </fieldset>
-          <p className="text-sm text-slate-600">Origin: {data?.robot_id || 'unavailable'}. Expiry: one hour. The origin must be represented in the selected signed evidence.</p>
-          <button className={button} disabled={busy || !canWrite || !selected.length || !data}>{revision ? 'Create revision & withdraw previous version' : 'Persist candidate'}</button>
+          <p className="text-sm text-slate-600">Proposed by {data?.robot_id || '…'}. Lessons expire after one hour.</p>
+          <button className={button} disabled={busy || !canWrite || !selected.length || !data}>{revision ? 'Save revision (replaces the previous version)' : 'Propose lesson'}</button>
           {revision && <button className="ml-3 text-violet-700" type="button" onClick={() => setRevision(null)}>Cancel revision</button>}
         </form>
       </Panel>
-      <Panel title="Versioned review & release" subtitle="Approval and release are separate signed audit events. Revisions cannot inherit approval.">
-        {!data?.lessons.length && <p className="text-slate-600">No candidate versions have been created.</p>}
-        <div className="space-y-4">{[...(data?.lessons || [])].reverse().map(lesson => {
-          const latest = !data?.lessons.some(other => other.lesson_id === lesson.lesson_id && other.version > lesson.version);
-          const expired = Date.now() / 1000 >= lesson.expires_at;
-          const received = data?.eligibility.accepted.some(r => r.lesson_id === lesson.lesson_id && r.version === lesson.version);
-          const excluded = data?.eligibility.excluded.find(r => r.lesson_id === lesson.lesson_id && r.version === lesson.version);
-          return <article key={`${lesson.lesson_id}:${lesson.version}`} className="rounded-lg border border-slate-500 bg-slate-900 p-4" data-lesson-status={lesson.status}>
-            <h3 className="text-lg font-semibold text-white">{lesson.title} / v{lesson.version}</h3>
-            <p className="my-2 text-violet-200">{lesson.status}{expired ? ' · expired' : ''} · origin {lesson.origin_robot_id}</p>
-            <p className="text-sm text-slate-200">{received ? `${data?.robot_id}: eligible for this released version at the next route plan.` : `Not offered: ${excluded?.reason || 'pending'}`}</p>
-            {lesson.evaluation && <p className="mt-2 text-sm text-slate-200">Evaluation: {lesson.evaluation.passed ? 'passed' : 'rejected'} {lesson.evaluation.reason}</p>}
-            <div className="mt-4 flex flex-wrap gap-2">{['evaluate', 'approve', 'release'].map((action, i) => <button key={action} className={button} disabled={busy || !canWrite || !latest || expired || lesson.status !== ['candidate', 'evaluated', 'approved'][i]} onClick={() => transition(lesson, action)}>{action === 'evaluate' ? 'Evaluate evidence' : action === 'approve' ? 'Approve this version' : 'Release to compatible planners'}</button>)}
-              <button className={button} disabled={busy || !canWrite || !latest || lesson.status === 'withdrawn'} onClick={() => transition(lesson, 'withdraw')}>Withdraw</button>
-              <button className={button} disabled={busy || !canWrite || !latest} onClick={() => { setRevision(lesson); setTitle(lesson.title); setNotice(lesson.notice); setSource(lesson.source_url); setSelected(lesson.evidence_ids); }}>Prepare revision</button>
-            </div>
-            <details className="mt-4 text-sm text-slate-200"><summary className="cursor-pointer">Inspect provenance, context and audit history</summary>
-              <p className="mt-2 break-all">Digest: {lesson.digest}</p><pre className="my-2 whitespace-pre-wrap break-all">{JSON.stringify(lesson.context, null, 2)}</pre>
-              <p className="whitespace-pre-wrap">Untrusted context: {lesson.notice || 'none'}</p><p className="break-all">Source reference: {lesson.source_url || 'none'}</p>
-              <p>Expires: {new Date(lesson.expires_at * 1000).toLocaleString()}</p>
-              <ul className="mt-3 space-y-1">{lesson.history.map(event => <li key={event.id}>{event.action} · {event.actor} · {new Date(event.at * 1000).toLocaleString()}</li>)}</ul>
-            </details>
-          </article>;
-        })}</div>
+      <Panel title="Lessons" subtitle="Each version is reviewed on its own. A revision needs a fresh approval.">
+        {!currentLessons.length && <p className="text-slate-600">No current lessons. Propose one from confirmed delay areas.</p>}
+        <div className="space-y-4">{currentLessons.map(renderLesson)}</div>
+        {pastLessons.length > 0 && <details className="mt-4 text-sm text-slate-600"><summary className="cursor-pointer">{pastLessons.length} expired or withdrawn lesson(s)</summary><div className="mt-3 space-y-4">{pastLessons.map(renderLesson)}</div></details>}
       </Panel>
     </div>
   </Page>;

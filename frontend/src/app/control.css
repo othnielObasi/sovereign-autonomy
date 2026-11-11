@@ -2502,3 +2502,44 @@ button svg,a svg {
 .sa-operator-actions textarea::placeholder { color:#52677a; opacity:1; }
 .sa-operator-actions p { margin-top:8px; }
 .sa-operator-buttons { display:flex; flex-wrap:wrap; gap:8px; margin-top:10px; }
+
+/* Mission Control: one status line replaces the four status cards */
+.sa-status-strip {
+  display:flex;
+  flex-wrap:wrap;
+  gap:8px 22px;
+  align-items:center;
+  padding:11px 16px;
+  margin-bottom:20px;
+  border:1px solid var(--sa-line);
+  border-radius:11px;
+  background:#f8fbff;
+  color:#40566b;
+  font-size:13px
+}
+.sa-status-strip span {
+  display:inline-flex;
+  align-items:center;
+  gap:7px
+}
+.sa-status-strip .sa-dot { position:static }
+
+/* Sidebar: grouped sections and a "More" toggle */
+.sa-nav-group + .sa-nav-group { margin-top:14px }
+.sa-nav-group .sa-nav-caption { margin:0 0 6px }
+.sa-nav-more {
+  display:flex;
+  align-items:center;
+  gap:8px;
+  width:100%;
+  margin-top:14px;
+  padding:8px 12px;
+  border:0;
+  background:none;
+  color:#b7cbb0;
+  font:inherit;
+  font-size:13px;
+  cursor:pointer;
+  text-align:left
+}
+.sa-nav-more:hover { color:#e6eddf }
