@@ -117,7 +117,8 @@ export default function LearningPage() {
               {!originCorroborated.length && <span>Switch to one of the robots that saw them to propose a lesson.</span>}
             </div>}
             {!groups.size && <p className="text-slate-600">No delays recorded yet. Run missions with two robots through the same busy area, then come back.</p>}
-            {corroborated.map(cell)}
+            {corroborated.length > 0 && <details className="text-sm text-slate-600"><summary className="cursor-pointer">Choose areas one by one</summary><div className="mt-2 space-y-2">{corroborated.map(cell)}</div></details>}
+            {selected.length > 0 && <p className="text-sm text-slate-700">{selected.length} observation(s) selected.</p>}
             {single.length > 0 && <details className="text-sm text-slate-600"><summary className="cursor-pointer">{single.length} area(s) seen by only one robot (cannot be shared yet)</summary><div className="mt-2 space-y-2">{single.map(cell)}</div></details>}
           </fieldset>
           <p className="text-sm text-slate-600">Proposed by {data?.robot_id || '…'}. Lessons expire after one hour.</p>

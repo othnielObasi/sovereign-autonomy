@@ -123,10 +123,12 @@ export function AuthorityPanel({ compact = false }: { compact?: boolean }) {
 
       {s && !compact && (
         <div className="mt-3">
-          <KV k="Robot" v={s.robot_id} mono />
-          <KV k="Authority epoch" v={s.epoch} mono />
-          <KV k="World version" v={s.world_version ?? "—"} mono />
-          <KV k="Action journal" v={s.journal_intact ? "intact" : "TAMPERED"} />
+          <KV k="Permit log" v={s.journal_intact ? "intact" : "TAMPERED"} />
+          <details className="mt-2 text-xs text-mc-mute"><summary className="cursor-pointer">Technical details</summary>
+            <KV k="Robot" v={s.robot_id} mono />
+            <KV k="Authority epoch" v={s.epoch} mono />
+            <KV k="World version" v={s.world_version ?? "—"} mono />
+          </details>
         </div>
       )}
     </Panel>

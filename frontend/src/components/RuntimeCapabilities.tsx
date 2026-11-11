@@ -17,9 +17,9 @@ export function RuntimeCapabilities() {
   const health = useRuntimeCapabilities();
   return <p className="text-sm text-mc-mute rounded-lg border border-mc-line p-3 my-3" role="status">
     {!health ? 'Checking runtime capabilities…' : <>
-      Planner default: <strong>{health.planner_provider === 'fallback' ? 'deterministic fallback' : health.planner_provider}</strong>
-      {' · '}Vision: {health.vision_provider || 'not configured'}{' · '}Voice: {health.voice_enabled ? 'configured' : 'not configured'}.
-      {' '}Each run records the planner actually used. Configured services still require successful requests.
+      Planning: <strong>{health.planner_provider === 'muse' ? 'Meta Muse Spark' : health.planner_provider === 'fallback' ? 'built-in fallback planner' : health.planner_provider}</strong>
+      {' · '}Camera vision: {health.vision_provider === 'sam' ? 'Meta SAM 3.1' : health.vision_provider || 'off'}{' · '}Voice stop: {health.voice_enabled ? 'on' : 'off'}.
+      {' '}Each mission records which planner it actually used.
     </>}
   </p>;
 }
